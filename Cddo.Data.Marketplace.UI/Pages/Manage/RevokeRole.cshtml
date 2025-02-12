@@ -1,0 +1,95 @@
+﻿@page
+@model Cddo.Data.Marketplace.UI.Pages.Manage.RevokeRoleModel
+@{
+
+    bool hasError = false;
+    if(ViewData["NoReasonProvided"] != null)
+    {
+        hasError = true;
+    }
+}
+
+
+<div class="govuk-width-container">
+    <a href="@HttpContext.Request.Headers["Referer"]" class="govuk-back-link">Back</a>
+
+    <div class="govuk-main-wrapper">
+        
+        @if (Model != null && Model.RevokeConfirmation == false)
+        {
+            <h1 class="govuk-heading-xl">
+                Revoke role
+            </h1>
+            <div class="govuk-width-container">
+                @if (Model != null && Model.Subject.User != null)
+                {
+                    <dl class="govuk-summary-list">
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">User name</dt>
+                            <dd class="govuk-summary-list__value">@Model.Subject.User!.UserName</dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">Domain</dt>
+                            <dd class="govuk-summary-list__value">@Model.Subject.Domain!.DomainName</dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">Organisation</dt>
+                            <dd class="govuk-summary-list__value">@Model.Subject.Organisation!.OrganisationName</dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">Role</dt>
+                            <dd class="govuk-summary-list__value">@Model.UserRole!.RoleName</dd>
+                        </div>
+                    </dl>
+
+                    <div class="govuk-form-group">
+                       
+                            <fieldset>
+                                <form method="post" id="approveForm" asp-page-handler="Revoke" class="inline">
+                                <div class="govuk-form-group govuk-character-count @(hasError ? "govuk-form-group--error" : "")" data-module="govuk-character-count" data-maxlength="160">
+                                    <div id="with-hint-hint" class="govuk-hint">
+                                        Provide a reason for your decision.
+                                    </div>
+                                    @if (hasError)
+                                    {
+                                        <p id="revoke-reason-error" class="govuk-error-message">
+                                            <span class="govuk-visually-hidden">Error:</span> You need to give a reason for why you're revoking this role
+                                        </p>
+                                    }
+                                    <textarea class="govuk-textarea govuk-js-character-count" id="with-hint" name="revokeReason" rows="5" aria-describedby="with-hint-info with-hint-hint revoke-reason-error">@Model.RevokeReason</textarea>
+                                    <div id="with-hint-info" class="govuk-hint govuk-character-count__message">
+                                        You can enter up to 160 characters
+                                    </div>
+                                </div>
+                                    <div class="govuk-button-group">
+                                    <input type="hidden" name="roleId" value="@Model.UserRole.RoleId" />
+                                    <input type="hidden" name="userId" value="@Model.Subject.User!.UserId" />
+                                    <button type="submit" name="revoke" value="revoke" class="govuk-button govuk-button--primary">Submit</button>
+                                    </div>
+                                </form>
+                            </fieldset>
+                    </div>
+                    }
+            </div>
+        }
+        else
+        {
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-two-thirds">
+                    <form method="post" id="ConfirmRevoke" asp-page-handler="ConfirmRevoke" class="inline">
+                        <input type="hidden" name="roleId" value="@Model?.UserRole.RoleId" />
+                        <input type="hidden" name="userId" value="@Model?.Subject.User!.UserId" />
+                        <input type="hidden" name="revokeReason" value="@Model?.RevokeReason" />
+                        
+                        <h2 class="govuk-heading-l">Are you sure you want to revoke this role?</h2>
+                        <p class="govuk-body">@Model?.UserRole!.RoleName</p>
+                        <div class="govuk-button-group">
+                            <button class="govuk-button" name="confirmrevoke" value="confirmrevoke" type="submit">Confirm</button>
+                            <button type="submit" name="cancelrevoke" value="cancelrevoke" class="govuk-button govuk-button--secondary">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+</div>

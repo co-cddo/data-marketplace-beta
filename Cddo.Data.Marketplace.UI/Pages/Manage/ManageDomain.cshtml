@@ -1,0 +1,141 @@
+﻿@page
+@using Cddo.Data.Marketplace.UI.Model
+@model Cddo.Data.Marketplace.UI.Pages.Manage.ManageDomainModel
+@{
+    ViewData["Title"] = "Manage - Domain";
+
+    var organisation = @Model.OrganisationDetail;
+    var domain = @Model.DomainDetail;
+}
+
+<a class="govuk-back-link" asp-controller="ManageOrganisation" asp-action="ManageOrganisation" asp-route-organisationId="@organisation.OrganisationId">Back</a>
+
+<div class="govuk-width-container">
+    <div class="govuk-main-wrapper">
+
+        <form method="post">
+            <input type="hidden" name="organisationId" value="@organisation.OrganisationId" />
+            <input type="hidden" name="domainId" value="@domain.DomainId" />
+
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full">
+                    <h2 class="govuk-heading-l">Manage domain</h2>
+
+                    <table class="govuk-table govuk-!-margin-bottom-8">
+                        <tbody class="govuk-table__body">
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header">Organisation</th>
+                            <td class="govuk-table__cell">
+                                @organisation.OrganisationName
+                            </td>
+                        </tr>
+
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header">Domain</th>
+                            <td class="govuk-table__cell">
+                                @domain.DomainName
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full">
+                    <h3 class="govuk-heading-m">Data share request notifications</h3>
+
+                    @if (string.IsNullOrWhiteSpace(@domain.DataShareRequestMailboxAddress))
+                    {
+                        <div class="govuk-grid-row">
+                            <div class="govuk-grid-column-full">
+                                <p class="govuk-body">Data share request notifications are not enabled for this domain.</p>
+
+                                <p class="govuk-body">To enable them, please provide an email address within the domain to receive the notifications.</p>
+                            </div>
+                        </div>
+
+                        @if (ViewData.ModelState.TryGetValue("enableDataShareRequestMailboxAddress", out var enableDataShareRequestMailboxAddressError))
+                        {
+                            <div class="govuk-grid-row">
+                                <div class="govuk-grid-column-full">
+                                    <p id="metadataTitle-error" class="govuk-error-message">
+                                        <span class="govuk-visually-hidden">Error:</span> @enableDataShareRequestMailboxAddressError.Errors.FirstOrDefault()?.ErrorMessage
+                                    </p>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="govuk-grid-row">
+                            <div class="govuk-grid-column-one-half">
+                                <input class="govuk-input @(enableDataShareRequestMailboxAddressError != null ? "govuk-input--error" : "")"
+                                       id="enableDataShareRequestMailboxAddress" name="enableDataShareRequestMailboxAddress" type="text" required
+                                       placeholder="Notification email address"/>
+                            </div>
+
+                            <div class="govuk-grid-column-one-half">
+                                <button class="govuk-button" asp-page-handler="EnableDataShareRequests" type="submit">Enable notifications</button>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="govuk-grid-row">
+                            <div class="govuk-grid-column-full">
+                                <p class="govuk-body">Data share request notifications are enabled for this domain.</p>
+                            </div>
+                        </div>
+
+                        <div class="govuk-grid-row">
+                            <div class="govuk-grid-column-full">
+                                <button class="govuk-button" asp-page-handler="DisableDataShareRequests" type="submit">Disable notifications</button>
+                            </div>
+                        </div>
+
+                        <div class="govuk-grid-row">
+                            <div class="govuk-grid-column-one-quarter">
+                                <h4 class="govuk-heading-s">Current email address</h4>
+                            </div>
+
+                            <div class="govuk-grid-column-three-quarters">
+                                @domain.DataShareRequestMailboxAddress
+                            </div>
+                        </div>
+
+                        @if (ViewData.ModelState.TryGetValue("updatedDataShareRequestMailboxAddress", out var updatedDataShareRequestMailboxAddressError))
+                        {
+                            <div class="govuk-grid-row">
+                                <div class="govuk-grid-column-full">
+                                    <p id="metadataTitle-error" class="govuk-error-message">
+                                        <span class="govuk-visually-hidden">Error:</span> @updatedDataShareRequestMailboxAddressError.Errors.FirstOrDefault()?.ErrorMessage
+                                    </p>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="govuk-grid-row">
+                            <div class="govuk-grid-column-one-quarter">
+                                <h4 class="govuk-heading-s">New email address</h4>
+                            </div>
+
+                            <div class="govuk-grid-column-one-half">
+                                <input class="govuk-input @(updatedDataShareRequestMailboxAddressError != null ? "govuk-input--error" : "")"
+                                       id="updatedDataShareRequestMailboxAddress" name="updatedDataShareRequestMailboxAddress" type="text" required
+                                       placeholder="New email address"/>
+                            </div>
+
+                            <div class="govuk-grid-column-one-quarter">
+                                <button class="govuk-button govuk-button--secondary" asp-page-handler="UpdateDataShareRequestMailboxAddress" type="submit">Update address</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full">
+                    <button class="govuk-button govuk-button--secondary" asp-page-handler="ReturnToOrganisationDetails">Return to organisation details</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+

@@ -1,0 +1,31 @@
+﻿@using Microsoft.AspNetCore.Mvc.ModelBinding
+@model ModelStateDictionary
+
+@if (Model.SelectMany(ms => ms.Value?.Errors!).Any())
+{
+    <div class="govuk-error-summary validation-summary-errors" data-module="govuk-error-summary">
+        <div role="alert">
+            <h2 class="govuk-error-summary__title">
+                There is a problem
+            </h2>
+            <div class="govuk-error-summary__body">
+                <ul class="govuk-list govuk-error-summary__list">
+                    @foreach (var fieldState in Model)
+                    {
+                        var fieldName = fieldState.Key;
+                        var errors = fieldState.Value?.Errors;
+                        if (errors != null && errors.Any())
+                        {
+                            foreach (var error in errors)
+                            {
+                                <li>
+                                    <a href="#@fieldName">@error.ErrorMessage</a>
+                                </li>
+                            }
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+}

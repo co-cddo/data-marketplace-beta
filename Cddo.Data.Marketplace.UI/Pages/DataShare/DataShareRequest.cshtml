@@ -1,0 +1,67 @@
+﻿@using Cddo.Data.Marketplace.Api.Dto.Requests.DataShareRequests
+@using Cddo.Data.Marketplace.UI.Controllers
+@model DataShareRequest
+@{
+    ViewData["Title"] = "Datashare Request";
+}
+<a class="govuk-back-link" <a class="govuk-back-link" asp-controller="CatalogData"
+   asp-action="@nameof(CatalogDataController.GetCddoDataAsset)" asp-route-DataAssetId="@Model?.DatasetId">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl">
+                Request @Model.Title data
+            </h1>
+            <p class="govuk-body">
+                You need to answer some questions to ensure your request meets data protection and data sharing standards.
+            </p>
+            <p class="govuk-body">
+                Your answers will be reviewed by the organisation that owns the data – the data supplier.
+            </p>
+            <p class="govuk-body">
+                It can take time for them to make a decision, and they may ask you for more information.
+            </p>
+            <p class="govuk-body">
+                If your request is approved, you'll need to agree a Memorandum of Understanding (MOU) with the data supplier. They will then share their data with you directly. This happens outside the Data Marketplace because each organisation manages data transfers differently.
+            </p>
+            <h2 class="govuk-heading-l">
+                Before you start
+            </h2>
+            <p class="govuk-body">
+                Some questions may require support from people with  skills in:
+            </p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>legal</li>
+                <li>data protection</li>
+                <li>data security and technology</li>
+                <li>data governance</li>
+            </ul>
+            <p class="govuk-body">
+                You do not need to answer all the questions in one go. You can save your answers and return to edit them as often as you need before submitting your request.
+            </p>
+
+            <p class="govuk-body">
+                <a class="govuk-link" asp-controller="DataRequest" asp-action="DataShareRequestPrevious" asp-route-esdaId="@Model.DatasetId">
+                    View previous requests for this data made by your organisation
+                </a>
+            </p>
+
+            <form asp-controller="DataRequest" asp-action="RequestStartSubmit">
+                <input type="hidden" name="esdaId" value="@Model.DatasetId"/>
+                <input type="hidden" name="esdaName" value="@Model.Title" />
+                <button role="button" draggable="false" class="govuk-button govuk-button--start" data-module="govuk-button">
+                    Start now
+                    <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
+                        <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z"></path>
+                    </svg>
+                </button>
+            </form>
+            <h3 class="govuk-heading-m">For more help</h3>
+            <ul class="govuk-list">
+                <li class="govuk-link"><a class="govuk-link" asp-controller="Support" asp-action="@nameof(SupportController.DataShareQuestions)">Check questions before you start</a></li>
+                <li class="govuk-link"><a class="govuk-link" asp-controller="Support" asp-action="@nameof(SupportController.SetUpDataShareArrangement)">How to set up a data share arrangement in government</a></li>
+            </ul>
+        </div>
+    </div>
+</div>

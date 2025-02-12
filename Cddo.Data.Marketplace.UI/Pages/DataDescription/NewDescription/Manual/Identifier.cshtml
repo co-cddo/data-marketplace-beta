@@ -1,0 +1,61 @@
+﻿@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
+@using Cddo.Data.Marketplace.UI.Controllers
+@model QuestionSupplierIdentifierRequest
+@{
+    ViewData["Title"] = "Identifier";
+    bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
+    bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
+    bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
+
+    string saveButtonName;
+
+    if (isCheckList)
+    {
+        saveButtonName = "isCheckList";
+    }
+    else if (isCheckAnswers)
+    {
+        saveButtonName = "isCheckAnswers";
+    }
+    else
+    {
+        saveButtonName = "isCheckList";
+    }
+
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddInternalIdentifierSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                <input type="hidden" name="@nameof(QuestionSupplierIdentifierRequest.Identifier)" value="@Model.Identifier" />
+                <div class="govuk-form-group">
+                    <h1 class="govuk-label-wrapper">
+                        <label class="govuk-label govuk-label--l" for="supplierIdentifier">
+                            What internal identifier do you have for the data set?
+                        </label>
+                    </h1>
+                    <div id="supplierIdentifier-hint" class="govuk-hint">
+                        Provide the ID number, code or URL that you use to identify this data set in your organisation’s data catalogue or system.
+                        This can help you match the metadata record in your system with the record in the Data Marketplace’s catalogue.
+                    </div>
+                    <input class="govuk-input" id="supplierIdentifier" name="@nameof(QuestionSupplierIdentifierRequest.SupplierIdentifier)"
+                           type="text" aria-describedby="supplierIdentifier-hint" autocomplete="off" value="@Model.SupplierIdentifier">
+                </div>
+                <div class="govuk-button-group">
+                    @if (!isEditMode)
+                    {
+                        <button type="submit" name="showNextQuestion" value="true" class="govuk-button" data-module="govuk-button">
+                            Continue
+                        </button>
+                    }
+                    <button type="submit" name="@saveButtonName" value="true" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        Save and return
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

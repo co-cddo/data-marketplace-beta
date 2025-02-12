@@ -1,0 +1,37 @@
+﻿@page
+@using Cddo.Data.Marketplace.UI.Controllers
+@model Cddo.Data.Marketplace.UI.Pages.Developer.RevokeConfirmationModel
+@{
+}
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+            <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                <div class="govuk-notification-banner__header">
+                    <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                        Success
+                    </h2>
+                </div>
+                <div class="govuk-notification-banner__content">
+                    <p class="govuk-notification-banner__heading">
+                        API credentials revoked
+                    </p>
+                </div>
+            </div>
+            <h1 class="govuk-heading-l">
+                API credentials
+            </h1>
+
+            <p class="govuk-body">
+                <a asp-controller="Support" asp-action="@nameof(SupportController.ApiSupport)" class="govuk-link">Data Marketplace API documentation</a>
+            </p>
+
+            <div class="govuk-!-margin-top-6">
+                <a asp-controller="Developer" asp-action="@nameof(DeveloperController.GotoCreateApiCredential)" class="govuk-button">
+                    Create new API credentials
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,226 @@
+﻿@using Agm.Catalog.DotNet.Dto.Responses.DataAssets
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Pages.Shared
+
+@model SpreadsheetDataAssetSummaryModel
+@{
+    ViewData["Title"] = "Spreadsheet Data Description Summary";
+
+    var itemsSummary = Model.ItemSummary;
+
+    var propertiesWithErrors = Model.ItemSummary.AllProperties.Where(x => x.PropertyErrors.Any());
+
+    var potentialDuplicates = Model.PotentialDuplicatesToSpreadsheetItem;
+}
+
+<a class="govuk-back-link" asp-controller="CatalogSpreadsheet"
+   asp-action="@nameof(CatalogSpreadsheetController.GetValidatedDataAssetsSpreadsheet)">Back</a>
+
+@functions
+{
+    private static string PrettifyString(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+
+        var inputTokens = input.Split('-');
+
+        var prettifiedInputTokens = inputTokens.Select(inputToken =>
+        {
+            var firstChar = char.ToUpper(inputToken.First());
+
+            var restOfToken = inputToken.Substring(1);
+
+            return $"{firstChar}{restOfToken}";
+        });
+
+        return string.Join(" ", prettifiedInputTokens);
+    }
+
+    private static string PrettifyDuplicateSimilarityDescriptions(
+        IEnumerable<string> similarityDescriptions)
+    {
+        var formattedSimilarityDescriptions = similarityDescriptions.Select(x => x.ToLower()).ToList();
+
+        var numberOfFormattedSimilarityDescriptions = formattedSimilarityDescriptions.Count;
+
+        switch (numberOfFormattedSimilarityDescriptions)
+        {
+            case 0: return string.Empty;
+
+            case 1: return formattedSimilarityDescriptions.First();
+
+            default:
+                {
+                    var finalFormattedSimilarityDescription = formattedSimilarityDescriptions.Last();
+
+                    var otherFormattedSimilarityDescriptions = formattedSimilarityDescriptions.Take(formattedSimilarityDescriptions.Count - 1).ToList();
+
+                    return $"{string.Join(", ", otherFormattedSimilarityDescriptions)} and {finalFormattedSimilarityDescription}";
+                }
+        }
+    }
+}
+
+<div class="govuk-main-wrapper ">
+
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">
+            @(!string.IsNullOrWhiteSpace(itemsSummary.AssetTitle) ? itemsSummary.AssetTitle : "No title provided")
+        </h1>
+        
+        @if (@propertiesWithErrors.Any())
+        {
+            <div class="govuk-error-summary validation-summary-errors" data-module="govuk-error-summary">
+                <div role="alert">
+                    <h2 class="govuk-error-summary__title">
+                        There is a problem
+                    </h2>
+                    <div class="govuk-error-summary__body">
+                        <ul class="govuk-list govuk-error-summary__list">
+                            @foreach (var propertyWithErrors in propertiesWithErrors)
+                            {
+                                foreach (var propertyError in propertyWithErrors.PropertyErrors)
+                                {
+                                    <li>
+                                        <a href="#">@PrettifyString(propertyWithErrors.PropertyName): @propertyError.Error</a>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (potentialDuplicates.PotentialDuplicateDataAssets.Any() ||
+        potentialDuplicates.PotentialDuplicateSpreadsheetContentItems.Any())
+        {
+            <div class="govuk-grid-row">
+                <section class="govuk-notification-banner" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                    <div class="govuk-notification-banner__header">
+                        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                            <div class="govuk-warning-text govuk-!-static-margin-bottom-1">
+                                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                <strong class="govuk-warning-text__text">
+                                    <span class="govuk-warning-text__assistive">Warning</span>
+                                    This record might be a duplicate.
+                                </strong>
+                            </div>
+                        </h2>
+                    </div>
+                    <div class="govuk-notification-banner__content">
+                        @if (potentialDuplicates.PotentialDuplicateDataAssets.Any())
+                        {
+                            <p class="govuk-body">
+                                The details you’ve provided seem to match with the following data description(s) in the Data Marketplace’s catalogue:
+                            </p>
+
+                            <ul class="govuk-list govuk-list--bullet">
+                                @foreach (var potentialDuplicateDataAsset in potentialDuplicates.PotentialDuplicateDataAssets)
+                                {
+                                    <li>
+                                        <a class="govuk-link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssetByUser)" asp-route-identifier="@potentialDuplicateDataAsset.DataAssetId">
+                                            @potentialDuplicateDataAsset.Title
+                                        </a>
+                                        (based on your @PrettifyDuplicateSimilarityDescriptions(potentialDuplicateDataAsset.SimilarityDescriptions))
+                                    </li>
+                                }
+                            </ul>
+
+                            <p class="govuk-body">
+                                You can choose to either update that data description by following the link above, or continue with creating a new data description.
+                            </p>
+                        }
+
+                        @if (potentialDuplicates.PotentialDuplicateSpreadsheetContentItems.Any())
+                        {
+                            <p class="govuk-body">
+                                @(potentialDuplicates.PotentialDuplicateDataAssets.Any() ? "Also, the" : "The") details you’ve provided seem to match with the following data description(s) in the spreadsheet:
+                            </p>
+
+                            <ul class="govuk-list govuk-list--bullet">
+                                @foreach (var potentialDuplicateSpreadsheetContentItem in potentialDuplicates.PotentialDuplicateSpreadsheetContentItems)
+                                {
+                                    <li>
+                                        <a class="govuk-link" asp-controller="CatalogSpreadsheet" asp-action="@nameof(CatalogSpreadsheetController.GetValidatedDataAssetSpreadsheet)"
+                                           asp-route-recordId="@potentialDuplicateSpreadsheetContentItem.RecordId">
+                                            @potentialDuplicateSpreadsheetContentItem.Title (row @potentialDuplicateSpreadsheetContentItem.RecordId)
+                                        </a>
+                                        (based on your @PrettifyDuplicateSimilarityDescriptions(potentialDuplicateSpreadsheetContentItem.SimilarityDescriptions))
+                                    </li>
+                                }
+                            </ul>
+
+                            <p class="govuk-body">
+                                You can choose to either edit the data descriptions and re-upload the spreadsheet, or continue with creating a new data description.
+                            </p>
+                        }
+                    </div>
+                </section>
+            </div>
+        }
+
+        @if (itemsSummary.CoreProperties != null)
+        {
+            var coreProperties = itemsSummary.CoreProperties;
+            <h2 class="govuk-heading-l">Data set description</h2>
+
+            <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+                @foreach (var property in coreProperties.Properties)
+                {
+                    <div class="govuk-summary-list__row @(property.PropertyErrors.Any() ? "govuk-form-group--error" : "")">
+                        <dt class="govuk-summary-list__key">
+                            @property.PropertyName
+                        </dt>
+
+                        <dd class="govuk-summary-list__value">
+                            @if (property.PropertyErrors.Any())
+                            {
+                                <p class="govuk-error-message">@Html.Raw(string.Join("<br/>", property.PropertyErrors.Select(x => x.Error)))</p>
+                            }
+                            @Html.Raw(string.Join("<br/>", property.PropertyValues))
+                        </dd>
+                    </div>
+                }
+            </dl>
+        }
+
+        @if (itemsSummary.DataProperties != null)
+        {
+            var dataProperties = itemsSummary.DataProperties;
+            <h2 class="govuk-heading-l">@dataProperties.CollectionDescription</h2>
+            
+            @foreach (var propertySet in dataProperties.PropertySets)
+            {
+                <h3 class="govuk-heading-m">@propertySet.SetDescription</h3>
+
+                <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+                    @foreach (var property in propertySet.Properties)
+                    {
+                        <div class="govuk-summary-list__row @(property.PropertyErrors.Any() ? "govuk-form-group--error" : "")">
+                            <dt class="govuk-summary-list__key">
+                                @property.PropertyName
+                            </dt>
+
+                            <dd class="govuk-summary-list__value">
+                                @if (property.PropertyErrors.Any())
+                                {
+                                    <p class="govuk-error-message">@Html.Raw(string.Join("<br/>", property.PropertyErrors.Select(x => x.Error)))</p>
+                                }
+                                @Html.Raw(string.Join("<br/>", property.PropertyValues))
+                            </dd>
+                        </div>
+                    }
+                </dl>
+            }
+        }
+
+        <form asp-controller="CatalogSpreadsheet">
+            <input type="hidden" name="answers-checked" value="true">
+            <button class="govuk-button govuk-button--secondary" asp-controller="CatalogSpreadsheet" asp-action="@nameof(CatalogSpreadsheetController.GetValidatedDataAssetsSpreadsheet)">
+                Return to summary
+            </button>
+
+        </form>
+    </div>
+</div>

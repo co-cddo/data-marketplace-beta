@@ -1,0 +1,175 @@
+﻿@using Agm.Catalog.DotNet.Dto.Models.DataAssets
+@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums
+@using Cddo.Data.Marketplace.UI.Configuration
+@using Cddo.Data.Marketplace.UI.Controllers
+
+@model CddoDataAsset
+@{
+    var contactPoint = Model.DataAssetContacts.FirstOrDefault(x => x.Role == DataAssetContactRoleType.Contact);
+    var contactOwner = Model.DataAssetContacts.FirstOrDefault(x => x.Role == DataAssetContactRoleType.Owner);
+}
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/dataset-detail.min.css" />
+}
+
+@functions
+{
+    private string GetDataShareRequestNotificationRecipientType()
+    {
+        return Model.DataShareRequestNotificationRecipientType switch
+        {
+            DataShareRequestNotificationRecipientType.DomainDsrNotificationAddress => $"Domain address",
+            DataShareRequestNotificationRecipientType.EsdaContactPointEmailAddress => $"Data description contact point",
+            DataShareRequestNotificationRecipientType.EsdaCustomDsrNotificationAddress => $"Custom address",
+            _ => "Not configured"
+        };
+    }
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+@if (Model is not null)
+{
+    <div class="govuk-main-wrapper">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds-from-desktop govuk-!-margin-bottom-4">
+                <span class="govuk-caption-xl">@Model.PublisherPrettified</span>
+                <h1 class="govuk-heading-xl govuk-!-margin-bottom-1">@Model.Title</h1>
+                <p class="govuk-caption-m"> Last updated: <strong>@Model.Modified.ToGDSHelperString()</strong></p>
+                <p class="govuk-body govuk-!-margin-bottom-5">
+                    <strong class="govuk-tag govuk-tag--blue mb-1">@Model.DataAssetStatus</strong>
+                    @if (Model.ManifestationTypes.Any())
+                    {
+                        <span>|</span>
+                        @foreach (var type in Model.ManifestationTypes!)
+                        {
+                            <strong class="govuk-tag govuk-tag--grey mb-1">@type</strong>
+                        }
+                    }
+                </p>
+                <p class="govuk-body" id="dataset-description">
+                    @Model.Description
+                </p>
+            </div>
+        </div>
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds-from-desktop govuk-!-margin-bottom-8">
+
+                @if (Model.DataAssetType == DataAssetType.DataSet)
+                {
+                    <h2 class="govuk-heading-l">Distribution available</h2>
+                    <p class="govuk-body">The distribution information is available for this data set.</p>
+                    <table class="govuk-table govuk-!-margin-bottom-8">
+                        <tbody class="govuk-table__body">
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">Media type</th>
+                                <td class="govuk-table__cell">
+                                    @Model.DataAssetDistribution?.MediaType
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                }
+
+                <h2 class="govuk-heading-l">Further information</h2>
+                <table class="govuk-table govuk-!-margin-bottom-8">
+                    <tbody class="govuk-table__body">                      
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header govuk-!-width-one-half">Publisher</th>
+                            <td class="govuk-table__cell govuk-!-width-one-half">
+                                @Model.PublisherPrettified
+                            </td>
+                        </tr>
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header govuk-!-width-one-half">Security Classification</th>
+                            <td class="govuk-table__cell govuk-!-width-one-half">@Model.SecurityClassification</td>
+                        </tr>                        
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header govuk-!-width-one-half">Updated</th>
+                            <td class="govuk-table__cell govuk-!-width-one-half">@Model.Modified.ToGDSHelperString()</td>
+                        </tr>
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header govuk-!-width-one-half">Contact</th>
+                            <td class="govuk-table__cell govuk-!-width-one-half">
+                                @if (contactPoint is not null)
+                                {
+                                    if (string.IsNullOrEmpty(contactPoint.Email))
+                                    {
+                                        @contactPoint.Name
+                                    }
+                                    else
+                                    {
+                                        <a class="govuk-link" href="mailto:@(contactPoint.Email)">@contactPoint.Name</a>
+                                    }
+                                }
+                            </td>
+                        </tr>
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header govuk-!-width-one-half">Data Owner</th>
+                            <td class="govuk-table__cell govuk-!-width-one-half">
+                                @if (contactOwner is not null)
+                                {
+                                    if (string.IsNullOrEmpty(contactOwner.Email))
+                                    {
+                                        @contactOwner.Name
+                                    }
+                                    else
+                                    {
+                                        <a class="govuk-link" href="mailto:@(contactOwner.Email)">@contactOwner.Name</a>
+                                    }
+                                }
+                                else
+                                {
+                                    <span>The owner is the point of contact</span>
+                                }
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="govuk-button-group govuk-!-margin-bottom-8">
+                    <a class="govuk-button govuk-button--warning" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.DeleteCddoDataAssetConfirmation)" asp-route-identifier="@Model.Id" asp-route-title="@Model.Title">Delete data description</a>
+                    @if (Model.DataAssetStatus != DataAssetStatus.Archived)
+                    {
+                        <a class="govuk-button govuk-button--secondary" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.TaskList)" asp-route-identifier="@Model.Id" asp-route-isEditMode="true">Edit data description</a>
+                    }
+                    @if (Model.DataAssetStatus == DataAssetStatus.Published)
+                    {
+                        <a class="govuk-button govuk-button--secondary" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.ArchiveCddoDataAssetConfirmation)" asp-route-identifier="@Model.Id" asp-route-title="@Model.Title">Archive data description</a>
+                    }
+                    @if (Model.DataAssetStatus == DataAssetStatus.Archived)
+                    {
+                        <form asp-controller="DataDescription" asp-action="@nameof(DataDescriptionController.UpdateDataAssetStatusSubmit)" asp-route-identifier="@Model.Id" asp-route-dataAssetStatus="@DataAssetStatus.Draft" method="post">
+                            <button class="govuk-button govuk-button--secondary" type="submit">Un-archive data description</button>
+                        </form>
+                    }
+                </div>
+
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-full">
+                        <h2 class="govuk-heading-l">Data description management</h2>
+                    </div>
+                </div>
+
+                <table class="govuk-table govuk-!-margin-bottom-4">
+                    <tbody class="govuk-table__body">
+                        <tr class="govuk-table__row">
+
+                            <th scope="row" class="govuk-table__header  govuk-!-width-two-thirds">Data share request notification recipient</th>
+                            <td class="govuk-table__cell  govuk-!-width-one-third">
+                                @Html.Raw(GetDataShareRequestNotificationRecipientType())
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="govuk-button-group">
+                    <a class="govuk-button govuk-button--secondary" asp-controller="DataDescription" asp-action="@nameof(DataDescriptionController.EditDataAssetManagementSettings)" asp-route-dataAssetId="@Model.Id">
+                        Edit management settings
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}

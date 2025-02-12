@@ -1,0 +1,32 @@
+﻿@using Cddo.Data.Marketplace.Api.Dto.Responses.RequestAccess
+@using Cddo.Data.Marketplace.UI.Controllers
+@model OrganisationAccessResponse
+@{
+    ViewData["Title"] = "Access request - Reject confirmation ";
+}
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form asp-controller="RequestAccess" asp-action="@nameof(RequestAccessController.UpdateAccessStatus)" asp-route-status="Rejected" asp-route-organisationRequestID="@Model.OrganisationRequestID">
+                <div class="govuk-form-group">
+                    <h1 class="govuk-label-wrapper">
+                        <label class="govuk-label govuk-label--l" for="rejection-detail">
+                            Can you provide the reason for rejecting the request?
+                        </label>
+                    </h1>
+                    <div id="rejection-detail-hint" class="govuk-hint">
+                        Do not include personal or financial information, like your National Insurance number or credit card details
+                    </div>
+                    <textarea class="govuk-textarea" id="rejection-detail" name="Reason" rows="5" aria-describedby="rejection-detail-hint"></textarea>
+                </div>
+                <div class="govuk-button-group">
+                    <button class="govuk-button govuk-button--warning" type="submit">Confirm</button>
+                    <a class="govuk-link" asp-controller="RequestAccess" asp-action="@nameof(RequestAccessController.GetOrganisationRequest)" asp-route-organisationRequestID="@Model.OrganisationRequestID">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

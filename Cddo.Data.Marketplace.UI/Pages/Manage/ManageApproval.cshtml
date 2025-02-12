@@ -1,0 +1,134 @@
+﻿@page
+@using Cddo.Data.Marketplace.UI.Configuration
+@using Cddo.Data.Marketplace.UI.Model
+@model Cddo.Data.Marketplace.UI.Pages.Manage.ManageApprovalModel
+@{
+    ViewData["Title"] = "Manage - Approval Details";
+}
+
+<div class="govuk-width-container">
+    <a href="/manage/approvals" class="govuk-back-link">Back</a>
+
+    <div class="govuk-main-wrapper">
+        <h1 class="govuk-heading-xl">
+            <span class="govuk-caption-l">Approvals</span>
+            Approval Details
+        </h1>
+        @if (Model != null)
+        {
+            <div class="govuk-width-container">
+
+
+                @if (Model != null && Model.ApprovalDetails != null)
+                {
+                    <dl class="govuk-summary-list">
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">Approval ID</dt>
+                            <dd class="govuk-summary-list__value">@Model.ApprovalDetails.ApprovalID</dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">User name</dt>
+                            <dd class="govuk-summary-list__value">@Model.ApprovalDetails.Username</dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">Domain</dt>
+                            <dd class="govuk-summary-list__value">@Model.ApprovalDetails.DomainName</dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">Organisation</dt>
+                            <dd class="govuk-summary-list__value">@Model.ApprovalDetails.OrganisationName</dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">Role</dt>
+                            <dd class="govuk-summary-list__value">@Model.ApprovalDetails.RoleName</dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">Last Updated</dt>
+                            <dd class="govuk-summary-list__value">@Model.ApprovalDetails.UpdatedAt.ToGDSHelperString()</dd>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.ApprovalDetails.RequestReason))
+                        {
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">Request reason</dt>
+                                <dd class="govuk-summary-list__value">@Model.ApprovalDetails.RequestReason</dd>
+                            </div>
+                        }
+                    </dl>
+
+                    @if (@Model.ApprovalDetails.ApprovalStatus != UI.Model.Enum.ApprovalStatus.Pending)
+                    {
+                        <h1 class="govuk-heading-xl">
+                            <span class="govuk-caption-l">Decision</span>
+                            Approval decision
+                        </h1>
+                        <dl class="govuk-summary-list">
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">Name</dt>
+                                <dd class="govuk-summary-list__value">@Model.ApprovalDetails.ApprovedByUsername</dd>
+                            </div>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">Domain</dt>
+                                <dd class="govuk-summary-list__value">@Model.ApprovalDetails.ApprovedByDomainName</dd>
+                            </div>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">Organisation</dt>
+                                <dd class="govuk-summary-list__value">@Model.ApprovalDetails.ApprovedByOrganisationName</dd>
+                            </div>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">Decision</dt>
+                                <dd class="govuk-summary-list__value">@Model.ApprovalDetails.ApprovalStatus.ToString()</dd>
+                            </div>
+                            @if (!string.IsNullOrEmpty(Model.ApprovalDetails.RejectionComment) && Model.ApprovalDetails.ApprovalStatus == UI.Model.Enum.ApprovalStatus.Rejected)
+                            {
+                                <div class="govuk-summary-list__row">
+                                    <dt class="govuk-summary-list__key">Rejection comment</dt>
+                                    <dd class="govuk-summary-list__value">@Model.ApprovalDetails.RejectionComment</dd>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.ApprovalDetails.RejectionComment) && Model.ApprovalDetails.ApprovalStatus == UI.Model.Enum.ApprovalStatus.Approved)
+                            {
+                                <div class="govuk-summary-list__row">
+                                    <dt class="govuk-summary-list__key">Approval comment</dt>
+                                    <dd class="govuk-summary-list__value">@Model.ApprovalDetails.RejectionComment</dd>
+                                </div>
+                            }
+
+                        </dl>
+                    }
+
+
+                    <div class="govuk-form-group">
+                        @if (Model.ApprovalDetails.ApprovalStatus == UI.Model.Enum.ApprovalStatus.Pending)
+                        {
+                            <fieldset>
+                                <form method="post" id="approveForm" asp-page-handler="Approve" class="inline">
+                                    <div class="govuk-button-group">
+                                        <div id="reasonForRejection-hint" class="govuk-hint">
+                                            Provide a reason for your decision.
+                                        </div>
+                                        <textarea class="govuk-textarea" id="reasonForRejection" name="@nameof(UserRoleApprovalDetail.RejectionComment)" rows="5" aria-describedby="reasonForRejection-hint"></textarea>
+                                    </div>
+                                    <div class="govuk-button-group">
+                                        <input type="hidden" name="roleID" value="@Model.ApprovalDetails.RoleID" />
+                                        <input type="hidden" name="approvalId" value="@Model.ApprovalDetails.ApprovalID" />
+                                        <input type="hidden" name="domainId" value="@Model.ApprovalDetails.DomainID" />
+                                        <input type="hidden" name="organisationId" value="@Model.ApprovalDetails.OrganisationID" />
+                                        <button type="submit" name="approve" value="approved" class="govuk-button govuk-button--primary">Approve</button>
+                                        <button type="submit" name="reject" value="rejected" class="govuk-button govuk-button--warning">Reject</button>
+                                    </div>
+                                </form>
+                            </fieldset>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p>No approval details found.</p>
+                }
+            </div>
+        }
+        else
+        {
+            <p>No approval details found.</p>
+        }
+

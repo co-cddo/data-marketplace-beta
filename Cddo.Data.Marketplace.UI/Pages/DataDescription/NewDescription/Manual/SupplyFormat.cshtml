@@ -1,0 +1,82 @@
+﻿@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums
+@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
+@using Cddo.Data.Marketplace.UI.Controllers
+
+@model QuestionDistributionRequest
+
+@{
+    ViewData["Title"] = "Supply Format";
+    var selectedMediaType = Model?.Distribution?.FirstOrDefault()?.MediaType;
+    bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
+    bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
+    bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
+
+    string saveButtonName;
+
+    if (isCheckList)
+    {
+        saveButtonName = "isCheckList";
+    }
+    else if (isCheckAnswers)
+    {
+        saveButtonName = "isCheckAnswers";
+    }
+    else
+    {
+        saveButtonName = "isCheckList";
+    }
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddSupplyFormatSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                <input type="hidden" name="@nameof(QuestionDistributionRequest.Identifier)" value="@Model?.Identifier" />
+
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset" aria-describedby="mediaType-hint">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                            <h1 class="govuk-fieldset__heading">
+                                How is the data set made available? (optional)
+                            </h1>
+                        </legend>
+                        <div id="mediaType-hint" class="govuk-hint">
+                            Select one option.
+                        </div>
+                        <div class="govuk-radios" data-module="govuk-radios">
+                            @foreach (var mediaType in Enum.GetValues(typeof(MediaType)).Cast<MediaType>())
+                            {
+                                <div class="govuk-radios__item">
+                                    @if (selectedMediaType?.FirstOrDefault() == mediaType.ToString())
+                                    {
+                                        <input class="govuk-radios__input" id="@mediaType" name="Distribution[0].MediaType" type="radio" value="@mediaType" checked>
+                                    }
+                                    else
+                                    {
+                                        <input class="govuk-radios__input" id="@mediaType" name="Distribution[0].MediaType" type="radio" value="@mediaType">
+                                    }
+                                    <label class="govuk-label govuk-radios__label" for="@mediaType">
+                                        @mediaType
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="govuk-button-group">
+                    @if (!isEditMode)
+                    {
+                        <button type="submit" name="showNextQuestion" value="true" class="govuk-button" data-module="govuk-button">
+                            Continue
+                        </button>
+                    }
+                    <button type="submit" name="@saveButtonName" value="true" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        Save and return
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

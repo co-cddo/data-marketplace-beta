@@ -1,0 +1,71 @@
+﻿@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests.Answers.DataShareRequestQuestionAnswers
+@using Agrimetrics.DataShare.Api.Dto.Models.Questions.QuestionParts.ResponseFormats;
+@using Cddo.Data.Marketplace.UI.Pages.DataShare._Partial._ResponseFormats
+
+@model QuestionPartModel
+@{
+    var questionPartId = Model.QuestionPartId;
+    var responseFormat = Model.ResponseFormat;
+    var orderWithinQuestion = Model.OrderWithinQuestion;
+    var questionText = Model.QuestionText;
+    var hintText = Model.HintText;
+    var questionIsOptional = Model.QuestionIsOptional;
+    var multipleResponsesAreAllowed = Model.MultipleResponsesAreAllowed;
+    var itemDescriptionIfMultipleResponsesAreAllowed = Model.ItemDescriptionIfMultipleResponsesAreAllowed;
+    var questionPartResponses = Model.QuestionPartResponses;
+    var questionOrderedList = questionPartResponses;
+    var iterator = 0;
+
+}
+
+<div class="govuk-form-group">
+    <fieldset class="govuk-fieldset">
+    <input id="question-part-@orderWithinQuestion-id" name="questionPart@(orderWithinQuestion)Id" value="@questionPartId" type="hidden"/>
+    <input id="question-part-@orderWithinQuestion-format" name="questionPart@(orderWithinQuestion)Format" value="@responseFormat" type="hidden" />
+    <input id="question-part-@orderWithinQuestion-response-count" name="questionPart@(orderWithinQuestion)ResponseCount" value="@questionPartResponses.Count" type="hidden" />
+    <input id="question-part-@orderWithinQuestion-is-multi-response" name="questionPart@(orderWithinQuestion)IsMultiResponse" value="@multipleResponsesAreAllowed.ToString()" type="hidden" />
+
+    @if (questionText != null)
+    {
+        
+        <legend class="govuk-fieldset__legend @(orderWithinQuestion == 1 ? "govuk-fieldset__legend--l" : "govuk-fieldset__legend--m")">
+                <label class="govuk-fieldset__heading)" for="@questionOrderedList[iterator].inputAreaID">
+                <h1 id="QuestionHeader" class="govuk-fieldset__heading">
+                @questionText 
+                    @if (questionIsOptional)
+                    {
+                        @:(optional)
+                    }
+                </h1>
+            </label> 
+        </legend>
+
+        @if (!string.IsNullOrWhiteSpace(@hintText))
+        {
+            @Html.Raw(hintText)
+        }
+    }
+    
+    <div id="@questionPartId-responses-container">
+        @foreach (var questionPartResponse in questionPartResponses.OrderBy(x => x.ResponseNumber))
+        {
+            iterator++;
+            await Html.RenderPartialAsync("~/Pages/DataShare/_Partial/_QuestionPartResponse.cshtml", questionPartResponse);
+        }
+    </div>
+    
+    @if (multipleResponsesAreAllowed)
+    {
+        @if (@questionPartResponses.Count == 1)
+        {
+            <br />
+        }
+
+        <p class="govuk-body">
+            <a class="govuk-link add-another-answer" href="#" data-container="@questionPartId-responses-container">
+                Add another @itemDescriptionIfMultipleResponsesAreAllowed
+            </a>
+        </p>
+    }
+   </fieldset>
+</div>

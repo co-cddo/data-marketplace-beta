@@ -1,0 +1,184 @@
+﻿@using Agrimetrics.DataShare.Api.Dto.Models.Supplier.DataShareRequests.Decisions
+@using System.Security.Cryptography
+@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests
+@model Agrimetrics.DataShare.Api.Dto.Models.Supplier.DataShareRequests.CompletedSubmissionInformation
+@{
+    ViewData["Title"] = "View Completed Request";
+    bool isCreatedRequest = ViewBag.CreatedRequest ?? false;
+
+    var submissionInformation = Model;
+}
+
+@section Scripts
+{
+    <script src="~/js/Pages/DataShareRequest/download-completed-dsr.min.js" asp-add-nonce="true"></script>
+}
+
+@functions {
+
+    public static string FormatDateTime(DateTime? date)
+    {
+        if (date == null)
+            return "N/A";
+
+        var suffix = new[] { "th", "st", "nd", "rd" };
+        int day = date.Value.Day;
+        int mod100 = day % 100;
+        string formattedDate = date.Value.ToString("dd MMMM yyyy HH:mm");
+        string daySuffix;
+        if (mod100 > 10 && mod100 < 20)
+        {
+            daySuffix = suffix[0];
+        }
+        else
+        {
+            int daySuffixIndex = (day % 10) < 4 ? day % 10 : 0;
+            daySuffix = suffix[daySuffixIndex];
+        }
+
+        return day + daySuffix + " " + formattedDate.Substring(2);
+    }
+
+    public static string FormatDate(DateTime? date)
+    {
+        if (date == null)
+            return "N/A";
+
+        var suffix = new[] { "th", "st", "nd", "rd" };
+        int day = date.Value.Day;
+        int mod100 = day % 100;
+        string formattedDate = date.Value.ToString("dd MMMM yyyy");
+        string daySuffix;
+        if (mod100 > 10 && mod100 < 20)
+        {
+            daySuffix = suffix[0];
+        }
+        else
+        {
+            int daySuffixIndex = (day % 10) < 4 ? day % 10 : 0;
+            daySuffix = suffix[daySuffixIndex];
+        }
+
+        return day + daySuffix + " " + formattedDate.Substring(2);
+    }
+
+    public static string PrettifySupplierResponse(string input)
+    {
+        if (input == null) { return ""; }
+
+        return input
+            .Trim()
+            .Replace("\r\n", "<br/>");
+    }
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper ">
+    <div class="govuk-grid-row">
+        
+        @if (@submissionInformation.RequestStatus == DataShareRequestStatus.Cancelled)
+        {
+            <div class="govuk-panel govuk-panel--confirmation">
+                <h1 class="govuk-panel__title">
+                    Request was cancelled
+                </h1>
+            </div>
+        }
+
+        <div class="govuk-grid-column-two-thirds">
+            <span class="govuk-caption-l">Request ID: @submissionInformation.DataShareRequestRequestId</span>
+
+            <h1 class="govuk-heading-xl">
+                @switch (@submissionInformation.Decision)
+                {
+                    case SubmissionDecision.Accepted:
+                        @:Approved request
+                        break;
+
+                    case SubmissionDecision.Rejected:
+                        @:Rejected request
+                        break;
+
+                    default:
+                        @:Unknown decision type: @submissionInformation.Decision
+                        break;
+                }
+
+            </h1>
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h2 class="govuk-heading-m govuk-!-static-margin-bottom-1">Decision made</h2>
+            <p class="govuk-body-m">@FormatDateTime(submissionInformation.CompletedOn)</p>
+
+            <h2 class="govuk-heading-m govuk-!-static-margin-bottom-1">Feedback provided</h2>
+            <p class="govuk-body-m">@submissionInformation.FeedbackProvided</p>
+
+            <h2 class="govuk-heading-m govuk-!-static-margin-bottom-1">Notes</h2>
+            <p class="govuk-body-m">
+                @if (!string.IsNullOrWhiteSpace(@submissionInformation.SupplierNotes))
+                {
+                    @Html.Raw(@PrettifySupplierResponse(submissionInformation.SupplierNotes))
+                }
+                else
+                {
+                    @:No notes provided.
+                }
+            </p>
+
+
+            <h2 class="govuk-heading-m govuk-!-static-margin-bottom-1">What happens next</h2>
+            @switch (@submissionInformation.Decision)
+            {
+                case SubmissionDecision.Accepted:
+                    <p class="govuk-body-m">The @submissionInformation.AcquirerOrganisationName have been told that this request was approved.</p>
+                    <p class="govuk-body-m">Contact <a href="#1">@submissionInformation.AcquirerUserEmail</a> to set up the data share arrangement.</p>
+                    break;
+
+                case SubmissionDecision.Rejected:
+                    <p class="govuk-body-m">Your department does not need to do anything. The @submissionInformation.AcquirerOrganisationName has been told that their request was rejected.</p>
+                    break;
+            }
+            
+        </div>
+        <div class="govuk-grid-column-one-third">
+            <h2 class="govuk-heading-s govuk-!-static-margin-bottom-1">Requested by</h2>
+            <p class="govuk-body-m">@submissionInformation.AcquirerOrganisationName</p>
+
+            <h2 class="govuk-heading-s govuk-!-static-margin-bottom-1">Data set</h2>
+            <p class="govuk-body-m">@submissionInformation.EsdaName</p>
+
+            <h2 class="govuk-heading-s govuk-!-static-margin-bottom-1">Request received</h2>
+            <p class="govuk-body-m">@FormatDateTime(submissionInformation.SubmittedOn)</p>
+
+            <h2 class="govuk-heading-s govuk-!-static-margin-bottom-1">Date needed by</h2>
+            <p class="govuk-body-m">@FormatDate(submissionInformation.WhenNeededBy)</p>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-button-group govuk-!-static-margin-top-9">
+       
+                @if (submissionInformation.RequestStatus != DataShareRequestStatus.Cancelled)
+                {
+                    <form>
+                        <input type="hidden" name="requestId" id="request-id" value="@submissionInformation.DataShareRequestId" />
+                        <input type="hidden" name="requestRequestId" id="request-request-id" value="@submissionInformation.DataShareRequestRequestId" />
+
+                        <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button" asp-controller="DataRequest" asp-action="ViewCompletedSubmissionDetails" asp-route-requestId="@submissionInformation.DataShareRequestId">
+                            View full request
+                        </button>
+                        
+                        @if (!isCreatedRequest)
+                        {
+                            <a class="govuk-link" style="cursor: pointer;" id="download-request-control">Download request as PDF</a>
+                        }
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>

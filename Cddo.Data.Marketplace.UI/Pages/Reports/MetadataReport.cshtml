@@ -1,0 +1,446 @@
+﻿@using Agm.Catalog.DotNet.Dto.Models.CatalogData
+@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums
+@using Cddo.Data.Marketplace.Api.Dto.Requests.Reports
+@using Cddo.Data.Marketplace.Api.Dto.Responses.Reports
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Services.Interfaces
+@using System.Reflection
+@using System.ComponentModel
+@using Newtonsoft.Json
+@inject ICatalogDataService _catalogDataService
+@model QueryCatalogReportsDataResponse
+@{
+    ViewData["Title"] = "Metadata Report";
+
+    var organisations = Model.SelectableOrganisations.OrderBy(x => x);
+    var stringFyOrganisations = JsonConvert.SerializeObject(organisations);
+
+    const int maxMiddlePages = 3;
+
+    var totalResults = Model?.TotalNumberOfMatchedRecords ?? 0;
+    var currentPage = ViewBag.PageNumber;
+    var totalPages = (int)Math.Ceiling((double)totalResults / ViewBag.PageSize);
+
+    currentPage = Math.Max(1, Math.Min(currentPage, totalPages));
+
+    var middleStart = Math.Max(1, currentPage - maxMiddlePages / 2);
+    var middleEnd = Math.Min(totalPages, middleStart + maxMiddlePages - 1);
+    middleStart = Math.Max(1, middleEnd - maxMiddlePages + 1);
+
+    if (totalPages <= maxMiddlePages)
+    {
+        middleStart = 1;
+        middleEnd = totalPages;
+    }
+
+    if (currentPage < middleStart)
+    {
+        currentPage = middleStart;
+    }
+    else if (currentPage > middleEnd)
+    {
+        currentPage = middleEnd;
+    }
+}
+
+@functions {
+    public static string PrettifyString(string? input)
+    {
+        if (input == null)
+        {
+            return "";
+        }
+
+        return string.Join(" ", input.Split('-').Select(w => char.ToUpper(w[0]) + w.Substring(1)));
+    }
+
+    public static string GetEnumDescription(Enum value)
+    {
+        FieldInfo field = value.GetType().GetField(value.ToString());
+        if (field != null)
+        {
+            DescriptionAttribute attribute = (DescriptionAttribute)Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
+            if (attribute != null)
+            {
+                return attribute.Description;
+            }
+        }
+        return value.ToString();
+    }
+}
+
+@section Scripts
+{
+
+}
+
+<div class="govuk-width-container">
+    <div class="govuk-breadcrumbs">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="/">Home</a>
+            </li>
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="/manage">Marketplace management</a>
+            </li>
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="/reports/reportsList">Marketplace system reports</a>
+            </li>
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="/reports/metadataReports">Marketplace Metadata Reports</a>
+            </li>
+        </ol>
+    </div>
+    <div class="govuk-main-wrapper">
+        <span class="govuk-caption-xl">Marketplace Reports</span>
+        <h1 class="govuk-heading-xl">Metadata - @Model.ReportName</h1>
+
+        <form asp-controller="Reports" asp-action="@nameof(ReportsController.GetCatalogMetadataReportsData)" method="post">
+            <input hidden name="TotalNumberOfMatchedRecords" value="@totalResults" />
+            <input hidden name="templateId" value="@ViewBag.TemplateId" />
+            @*  <div class="govuk-grid-row mb-5">
+            <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-form-group mb-2 search-input">
+            <h2 class="govuk-label-wrapper">
+            <label class="govuk-label govuk-label--m" for="catalogDataSearchInput">
+            Search
+            </label>
+            </h2>
+            <div class="govuk-input__wrapper">
+            <input aria-label="Search data asset" class="govuk-input govuk-input--width-30" id="catalogDataSearchInput" name="SearchTerm" type="text" autocomplete="off" value="">
+            <button title="datasetSearchResultsBtn" class="search-button" type="submit" enterkeyhint="search">
+            <svg class="search-button__icon" width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+            <circle cx="12.0161" cy="11.0161" r="8.51613" stroke="currentColor" stroke-width="3"></circle>
+            <line x1="17.8668" y1="17.3587" x2="26.4475" y2="25.9393" stroke="currentColor" stroke-width="3"></line>
+            </svg>
+            </button>
+            </div>
+            </div>
+            </div>
+            </div> *@
+            <div class="filter-panel">
+                <h3 class="govuk-heading-s filter-heading">
+                    Filter by
+                    <button type="submit" class="float-end govuk-link" name="isDownload" value="true">Download report</button>
+                </h3>
+                <div class="filter-content">
+                    @*  <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-two-thirds">
+                    <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                    <div class="govuk-fieldset__heading">
+                    Select Date Range
+                    </div>
+                    </legend>
+                    <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-one-half">
+                    <div class="govuk-form-group">
+                    <label class="govuk-label" for="startDate">Start Date</label>
+                    <input type="date" class="govuk-input" id="startDate" name="StartDate" />
+                    </div>
+                    </div>
+                    <div class="govuk-grid-column-one-half">
+                    <div class="govuk-form-group">
+                    <label class="govuk-label" for="endDate">End Date</label>
+                    <input type="date" class="govuk-input" id="endDate" name="EndDate" />
+                    </div>
+                    </div>
+                    </div>
+                    </fieldset>
+                    </div>
+                    </div> *@
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-one-third">
+                            <div class="govuk-form-group">
+                                <fieldset class="govuk-fieldset">
+                                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                                        <div class="govuk-fieldset__heading">
+                                            Select Fields
+                                        </div>
+                                    </legend>
+                                    <div class="govuk-checkboxes govuk-checkboxes--small multiselect-filter" data-module="govuk-checkboxes">
+                                        @foreach (var field in Model.SelectableFields)
+                                        {
+                                            <div class="govuk-checkboxes__item">
+                                                <input class="govuk-checkboxes__input"
+                                                       id="@field.ToString()"
+                                                       name="RequiredFields"
+                                                       type="checkbox"
+                                                       value="@field.ToString()"
+                                                @(Model.SelectedFields != null && Model.SelectedFields.Contains(field) ? "checked" : "")>
+                                                <label class="govuk-label govuk-checkboxes__label" for="@field.ToString()">
+                                                    @field.ToString()
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+
+                        <div class="govuk-grid-column-one-third">
+                            <div class="govuk-form-group ">
+                                <fieldset class="govuk-fieldset">
+                                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                                        <div class="govuk-fieldset__heading">
+                                            Select Organisations
+                                        </div>
+                                    </legend>
+                                    <div class="govuk-checkboxes govuk-checkboxes--small multiselect-filter" data-module="govuk-checkboxes">
+                                        <input hidden name="SelectableOrganisations" value="@stringFyOrganisations" />
+                                        @foreach (var organisation in organisations!)
+                                        {
+                                            <div class="govuk-checkboxes__item">
+                                                <input class="govuk-checkboxes__input" id="@organisation" name="Organisations" type="checkbox"
+                                                       value="@organisation"
+                                                @(Model.Organisations == null || Model.Organisations.Contains(organisation) ? "checked" : "")
+                                                @(Model.SelectableOrganisations.Count() == 1 ? "disabled" : "") />
+                                                <label class="govuk-label govuk-checkboxes__label" for="@organisation">
+                                                    @PrettifyString(@organisation)
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+
+                        <div class="govuk-grid-column-one-third">
+                            <div class="govuk-form-group ">
+                                <fieldset class="govuk-fieldset">
+                                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                                        <div class="govuk-fieldset__heading">
+                                            Select Status
+                                        </div>
+                                    </legend>
+                                    <div class="govuk-checkboxes govuk-checkboxes--small multiselect-filter" data-module="govuk-checkboxes">
+                                        @foreach (var status in Enum.GetValues(typeof(DataAssetStatus)).Cast<DataAssetStatus>())
+                                        {
+                                            <div class="govuk-checkboxes__item">
+                                                <input class="govuk-checkboxes__input"
+                                                       id="@status.ToString()"
+                                                       name="@nameof(DataAssetStatus)"
+                                                       type="checkbox"
+                                                       value="@status.ToString()"
+                                                @(Model.SelectedStatuses == null || Model.SelectedStatuses.Contains(status) ? "checked" : "")>
+                                                <label class="govuk-label govuk-checkboxes__label" for="@status.ToString()">
+                                                    @status.ToString()
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="govuk-button-group">
+                        <button type="submit" class="govuk-button" data-module="govuk-button">
+                            Apply filter
+                        </button>
+                        <a class="govuk-link" asp-controller="Reports" asp-route-templateId="@ViewBag.TemplateId" asp-action="@nameof(ReportsController.GotoMetadataReport)">Clear all</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full">
+                    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
+                        @Model?.TotalNumberOfMatchedRecords results
+
+                    </h2>
+                    <hr />
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-one-half">
+                            <div class="govuk-form-group mb-0 d-inline-flex">
+                                <label class="govuk-label" hidden for="sortOption">Sort by</label>
+                                <div class="govuk-input__wrapper">
+                                    <select class="govuk-select" name="sortOption" id="sortOption" aria-label="Sort by">
+                                        <option value="">
+                                            Modified (newest)
+                                        </option>
+                                        <option value="">
+                                            Modified (oldest)
+                                        </option>
+                                        <option value="">
+                                            Title
+                                        </option>
+                                        <option value="">
+                                            Author
+                                        </option>
+                                        <option value="">
+                                            Organisation
+                                        </option>
+                                    </select>
+                                    <button class="govuk-button govuk-button--secondary govuk-input__suffix">Sort</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="govuk-grid-column-one-half">
+                            <div class="govuk-form-group mb-0 d-inline-flex float-end">
+                                <label class="govuk-label" for="pageSize" style="padding-right: 10px;padding-top: 7px;">
+                                    Results Per Page
+                                </label>
+                                <div class="govuk-input__wrapper">
+                                    <select class="govuk-input" id="pageSize" aria-label="Select results per page" name="@nameof(QueryCatalogReportsDataRequestFilter.PageSize)" style="min-width:2.6em;">
+                                        @foreach (var pageSizeOption in new[] { 10, 20, 50, 100 })
+                                        {
+                                            <option selected="@(ViewBag.PageSize==pageSizeOption)" value="@pageSizeOption">@pageSizeOption</option>
+                                        }
+                                    </select>
+                                    <button class="govuk-button govuk-button--secondary govuk-input__suffix" type="submit" style="max-width:5em;">
+                                        Apply
+                                        <span class="govuk-visually-hidden">
+                                            results per page
+                                        </span>
+
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dataset-result">
+                        <div class="govuk-table-wrapper">
+                            @if (Model?.CatalogReportsDataItems != null && Model?.CatalogReportsDataItems.Count > 0)
+                            {
+                                <table class="govuk-table">
+                                    <thead class="govuk-table__head">
+                                        <tr class="govuk-table__row">
+                                            @if (Model.CatalogReportsDataItems.FirstOrDefault()?.CatalogReportsDataItemFields != null)
+                                            {
+                                                @foreach (var field in Model.CatalogReportsDataItems.First().CatalogReportsDataItemFields)
+                                                {
+                                                    <th class="govuk-table__header">@field.Field</th>
+                                                }
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody class="govuk-table__body">
+                                        @{
+                                            foreach (var item in Model.CatalogReportsDataItems)
+                                            {
+
+                                                <tr class="govuk-table__row">
+                                                    @foreach (var field in item.CatalogReportsDataItemFields)
+                                                    {
+                                                        if (field != null)
+                                                        {
+                                                            <td class="govuk-table__cell">@string.Join(", ", field.Values!)</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td class="govuk-table__cell">N/A</td>
+                                                        }
+
+                                                    }
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+
+                                </table>
+                            }
+                            else
+                            {
+                                <p class="govuk-body">No data available</p>
+                            }
+                        </div>
+                    </div>
+                    @if (@Model?.TotalNumberOfMatchedRecords > 0)
+                    {
+                        <nav class="govuk-pagination" role="navigation" aria-label="Pagination">
+                            @if (currentPage != 1)
+                            {
+                                <div class="govuk-pagination__prev">
+                                    <button type="submit" class="govuk-link govuk-pagination__link" name="@nameof(QueryCatalogReportsDataRequestFilter.PageNumber)" value="@(currentPage - 1)" rel="prev">
+                                        <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                                            <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
+                                        </svg>
+                                        <span class="govuk-pagination__link-title">
+                                            <strong>Previous</strong><span class="govuk-visually-hidden"> page</span>
+                                        </span>
+                                    </button>
+                                </div>
+                            }
+                            <ul class="govuk-pagination__list">
+                                @if (middleStart > 1)
+                                {
+                                    <li class="govuk-pagination__item">
+                                        <span class="govuk-visually-hidden">Page</span>
+
+                                        <button type="submit" class="govuk-link govuk-pagination__link" name="@nameof(QueryCatalogReportsDataRequestFilter.PageNumber)" value="1">1</button>
+                                    </li>
+                                    @if (middleStart > 2)
+                                    {
+                                        <li class="govuk-pagination__item govuk-pagination__item--ellipses">...</li>
+                                    }
+                                }
+
+                                @for (int i = middleStart; i <= middleEnd; i++)
+                                {
+                                    <li class="govuk-pagination__item @(i == currentPage ? "govuk-pagination__item--current" : "")">
+                                        <span class="govuk-visually-hidden">Page</span>
+
+                                        <button type="submit" class="govuk-link govuk-pagination__link" name="@nameof(QueryCatalogReportsDataRequestFilter.PageNumber)" value="@i">@i</button>
+                                    </li>
+                                }
+
+                                @if (middleEnd < totalPages)
+                                {
+                                    @if (middleEnd < totalPages - 1)
+                                    {
+                                        <li class="govuk-pagination__item govuk-pagination__item--ellipses">...</li>
+                                    }
+                                    <li class="govuk-pagination__item">
+                                        <span class="govuk-visually-hidden">Page</span>
+
+                                        <button type="submit" class="govuk-link govuk-pagination__link" name="@nameof(QueryCatalogReportsDataRequestFilter.PageNumber)" value="@totalPages">@totalPages</button>
+                                    </li>
+                                }
+                            </ul>
+
+                            @if (currentPage != totalPages)
+                            {
+                                <div class="govuk-pagination__next">
+                                    <button type="submit" class="govuk-link govuk-pagination__link" name="@nameof(QueryCatalogReportsDataRequestFilter.PageNumber)" value="@(currentPage + 1)" rel="next">
+                                        <span class="govuk-pagination__link-title">
+                                            <strong>Next</strong><span class="govuk-visually-hidden"> page</span>
+                                        </span>
+                                        <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                                            <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            }
+                        </nav>
+                    }
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .filter-panel {
+        background-color: #f3f2f1;
+        margin-bottom: 30px;
+    }
+
+    .filter-content {
+        padding: 20px;
+    }
+
+    .filter-heading {
+        background-color: #b1b4b6;
+        padding: 10px;
+    }
+
+    .users-list .govuk-link {
+        text-decoration: none;
+    }
+
+    .multiselect-filter {
+        max-height: 200px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+    }
+</style>

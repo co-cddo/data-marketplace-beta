@@ -1,0 +1,259 @@
+﻿@page
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Pages.Shared
+@model Cddo.Data.Marketplace.UI.Pages.Reports.ReportHomeModel
+@{
+    Layout = "/Pages/Shared/_HeaderLayout.cshtml";
+    ViewData["Title"] = "Report Home";
+
+    var eventActivitySummary = "AppEvents| extend UserName = tostring(Properties.UserName), EventName = Name| where UserName != 'No User' and UserName != ''| summarize Count = count() by UserName, EventName| order by Count desc";
+}
+<div class="govuk-masterhead govuk-masterheader">
+    <div class="govuk-width-container">
+        @await Html.PartialAsync("_PhasePartial", new PhasePartialModel())
+        <div class="govuk-breadcrumbs">
+            <ol class="govuk-breadcrumbs__list">
+                <li class="govuk-breadcrumbs__list-item">
+                    <a class="govuk-breadcrumbs__link" href="/">Home</a>
+                </li>
+                <li class="govuk-breadcrumbs__list-item">
+                    <a class="govuk-breadcrumbs__link" href="/manage">Marketplace management</a>
+                </li>
+            </ol>
+        </div>
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-xl govuk-!-margin-bottom-6 mt-4">System reports</h1>
+                <p class="govuk-body-l">
+                    Analyse system report and metrics. Gain insights for performance improvements.
+                </p>                
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="govuk-width-container govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <form method="get">
+            <div class="govuk-grid-row mb-4">
+                <div class="govuk-grid-column-two-thirds">
+                    <div class="govuk-form-group search-input">
+                        <h2 class="govuk-label-wrapper">
+                            <label class="govuk-label govuk-label--m" for="">
+                                Search
+                            </label>
+                        </h2>
+                        <div class="govuk-input__wrapper">
+                            <input aria-label="Search data asset" class="govuk-input govuk-input--width-30" id="catalogDataSearchInput" name="" type="text" autocomplete="off" value="">
+                            <button title="datasetSearchResultsBtn" class="search-button" type="submit" enterkeyhint="search">
+                                <svg class="search-button__icon" width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                                    <circle cx="12.0161" cy="11.0161" r="8.51613" stroke="currentColor" stroke-width="3"></circle>
+                                    <line x1="17.8668" y1="17.3587" x2="26.4475" y2="25.9393" stroke="currentColor" stroke-width="3"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="govuk-grid-column-one-third">
+                    <div class="govuk-form-group float-end">
+                        <h2 class="govuk-label-wrapper">
+                            <label class="govuk-label hidden govuk-label mb-3" for="pageSize">Report type</label>
+                        </h2>
+                        <div class="govuk-input__wrapper">
+                            <select class="govuk-select" name="sortOption" id="sortOption" aria-label="Filter by">
+                                <option value="">
+                                    Select..
+                                </option>
+                                <option value="">
+                                    Metadata
+                                </option>
+                                <option value="">
+                                    Telemetry
+                                </option>
+                            </select>
+                            <button class="govuk-button govuk-button--secondary govuk-input__suffix">Filter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full">
+                    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
+                        20 results
+                    </h2>
+                    <hr />
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-one-half">
+                            <div class="govuk-input__wrapper">
+                                <select class="govuk-select" name="sortOption" id="sortOption" aria-label="Sort by">
+                                    <option value="">
+                                        Modified (newest)
+                                    </option>
+                                    <option value="">
+                                        Modified (oldest)
+                                    </option>
+                                    <option value="">
+                                        Title
+                                    </option>
+                                    <option value="">
+                                        Author
+                                    </option>
+                                    <option value="">
+                                        Organisation
+                                    </option>
+                                </select>
+                                <button class="govuk-button govuk-button--secondary govuk-input__suffix">Sort</button>
+                            </div>
+                        </div>
+                        <div class="govuk-grid-column-one-half">
+                            <div class="govuk-form-group mb-0 d-inline-flex float-end">
+                                <label class="govuk-label" hidden for="pageSize">Sort by</label>
+                                <label class="govuk-label"  for="pageSize" style="padding-right: 10px;padding-top: 7px;">
+                                        Results Per Page
+                                    </label>
+                                <div class="govuk-form-group mb-0 d-inline-flex float-end me-2">
+                                    <div class="govuk-input__wrapper">
+                                        <select class="govuk-input" id="pageSize" aria-label="Select results per page" name="" style="min-width:2.6em;">
+                                            @foreach (var pageSizeOption in new[] { 10, 20, 50, 100 })
+                                            {
+                                                <option value="@pageSizeOption">@pageSizeOption</option>
+                                            }
+                                        </select>
+                                        <button class="govuk-button govuk-button--secondary govuk-input__suffix"  style="max-width:5em;">
+                                            Apply
+                                         <span class="govuk-visually-hidden">
+                                         results per page
+                                         </span>e</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dataset-result">
+                        <table class="govuk-table">
+                            <thead class="govuk-table__head">
+                                <tr class="govuk-table__row">
+                                    <th class="govuk-table__header">Report</th>
+                                    <th class="govuk-table__header">Report type</th>
+                                    <th class="govuk-table__header">Created</th>
+                                    <th class="govuk-table__header">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="govuk-table__body">
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell"><a class="govuk-link" asp-controller="Reports" asp-action="@nameof(ReportsController.GotoMetadataReport)">Metadata - all records</a></td>
+                                    <td class="govuk-table__cell">Predefined</td>
+                                    <td class="govuk-table__cell">31/07/2024</td>
+                                    <td class="govuk-table__cell"><a class="govuk-link" href="#">Download</a></td>
+                                </tr>
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell"><a class="govuk-link" href="#">Metadata - Department for Education</a></td>
+                                    <td class="govuk-table__cell">Predefined</td>
+                                    <td class="govuk-table__cell">31/07/2024</td>
+                                    <td class="govuk-table__cell"><a class="govuk-link" href="#">Download</a></td>
+                                </tr>
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell"><a class="govuk-link" href="#">Metadata - Home Office</a></td>
+                                    <td class="govuk-table__cell">Predefined</td>
+                                    <td class="govuk-table__cell">30/07/2024</td>
+                                    <td class="govuk-table__cell"><a class="govuk-link" href="#">Download</a></td>
+                                </tr>
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell"><a class="govuk-link" href="#">Metadata - Office for National Statistics</a></td>
+                                    <td class="govuk-table__cell">Predefined</td>
+                                    <td class="govuk-table__cell">29/07/2024</td>
+                                    <td class="govuk-table__cell"><a class="govuk-link" href="#">Download</a></td>
+                                </tr>
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell"><a class="govuk-link" href="#">Metadata - public metadata records list</a></td>
+                                    <td class="govuk-table__cell">Predefined</td>
+                                    <td class="govuk-table__cell">28/07/2024</td>
+                                    <td class="govuk-table__cell"><a class="govuk-link" href="#">Download</a></td>
+                                </tr>
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell"><a class="govuk-link" href="#">Usage stats - metadata hits</a></td>
+                                    <td class="govuk-table__cell">Predefined</td>
+                                    <td class="govuk-table__cell">28/07/2024</td>
+                                    <td class="govuk-table__cell"><a class="govuk-link" href="#">Download</a></td>
+                                </tr>
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell">
+                                        <a class="govuk-link" asp-controller="Reports" asp-action="@nameof(ReportsController.GetTelemetryReportsData)" asp-route-searchQuery="@eventActivitySummary">User event activity summary</a>
+                                    </td>
+                                    <td class="govuk-table__cell">Telemetry</td>
+                                    <td class="govuk-table__cell">28/07/2024</td>
+                                    <td class="govuk-table__cell"><a class="govuk-link" href="#">Download</a></td>
+                                </tr>
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell"><a class="govuk-link" asp-controller="Reports" asp-action="@nameof(ReportsController.GetTelemetryReportsData)" asp-route-searchQuery="AppEvents | where Name == 'UserPageNavigation'">User page navigation events</a></td>
+                                    <td class="govuk-table__cell">Telemetry</td>
+                                    <td class="govuk-table__cell">28/07/2024</td>
+                                    <td class="govuk-table__cell"><a class="govuk-link" href="#">Download</a></td>
+                                </tr>
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell"><a class="govuk-link" asp-controller="Reports" asp-action="@nameof(ReportsController.GetTelemetryReportsData)" asp-route-searchQuery="AppEvents | where Name == 'HealthCheckReport'">Heath check report</a></td>
+                                    <td class="govuk-table__cell">Telemetry</td>
+                                    <td class="govuk-table__cell">28/07/2024</td>
+                                    <td class="govuk-table__cell"><a class="govuk-link" href="#">Download</a></td>
+                                </tr>
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell"><a class="govuk-link" asp-controller="Reports" asp-action="@nameof(ReportsController.GetTelemetryReportsData)" asp-route-searchQuery="AppEvents | where Name == 'UserFailedLoginAttempt'">Failed login attempt</a></td>
+                                    <td class="govuk-table__cell">Telemetry</td>
+                                    <td class="govuk-table__cell">28/07/2024</td>
+                                    <td class="govuk-table__cell"><a class="govuk-link" href="#">Download</a></td>
+                                </tr>
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell"><a class="govuk-link" asp-controller="Reports" asp-action="@nameof(ReportsController.GetTelemetryReportsData)" asp-route-searchQuery="AppEvents | where Name == 'UserLogin'">User login events</a></td>
+                                    <td class="govuk-table__cell">Telemetry</td>
+                                    <td class="govuk-table__cell">27/07/2024</td>
+                                    <td class="govuk-table__cell"><a class="govuk-link" href="#">Download</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav class="govuk-pagination" role="navigation" aria-label="Pagination">
+                        <div class="govuk-pagination__prev">
+                            <button type="submit" class="govuk-link govuk-pagination__link" name="" value="" rel="prev">
+                                <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                                    <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
+                                </svg>
+                                <span class="govuk-pagination__link-title">
+                                    <strong>Previous</strong><span class="govuk-visually-hidden"> page</span>
+                                </span>
+                            </button>
+                        </div>
+                        <ul class="govuk-pagination__list">
+
+                            <li class="govuk-pagination__item">
+                                <button type="submit" class="govuk-link govuk-pagination__link" name="" value="1">1</button>
+                            </li>
+
+                            <li class="govuk-pagination__item govuk-pagination__item--current">
+                                <button type="submit" class="govuk-link govuk-pagination__link" name="" value="">2</button>
+                            </li>
+
+
+
+                            <li class="govuk-pagination__item">
+                                <button type="submit" class="govuk-link govuk-pagination__link" name="" value="">3</button>
+                            </li>
+                        </ul>
+
+                        <div class="govuk-pagination__next">
+                            <button type="submit" class="govuk-link govuk-pagination__link" name="" value="" rel="next">
+                                <span class="govuk-pagination__link-title">
+                                    <strong>Next</strong><span class="govuk-visually-hidden"> page</span>
+                                </span>
+                                <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                                    <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

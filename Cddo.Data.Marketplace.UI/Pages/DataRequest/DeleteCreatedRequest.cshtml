@@ -1,0 +1,37 @@
+﻿@model Cddo.Data.Marketplace.UI.Pages.DataRequest.DeleteCreatedRequestModel
+
+@{
+    ViewData["Title"] = "Delete Data Share Request";
+
+    var dataShareRequestId = Model.DataShareRequestId;
+    var dataShareRequestRequestId = Model.DataShareRequestRequestId;
+    var esdaName = Model.EsdaName;
+}
+
+<div class="govuk-main-wrapper ">
+    <form asp-controller="DataRequest">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+
+                <span class="govuk-caption-l">Request ID: @dataShareRequestRequestId</span>
+                <h1 class="govuk-heading-xl">@esdaName</h1>
+
+                <p class="govuk-body">
+                    Confirm deletion of this draft data share request.
+                </p>
+                    
+                <div class="govuk-button-group govuk-!-margin-bottom-8">
+                    <button class="govuk-button govuk-button--warning mb-0" type="submit"
+                            asp-controller="DataRequest" asp-action="ConfirmDeleteCreatedRequest" asp-route-requestId="@dataShareRequestId">
+                        Delete
+                    </button>
+                        
+                    <button class="govuk-button govuk-button--secondary"
+                            asp-action="CancelDeleteCreatedRequest" asp-route-requestId="@dataShareRequestId">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

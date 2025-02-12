@@ -1,0 +1,85 @@
+﻿@page
+@using Cddo.Data.Marketplace.UI.Pages.Shared
+@using Cddo.Data.Marketplace.UI.Controllers
+@model Cddo.Data.Marketplace.UI.Pages.Reports.ReportsListModel
+@{
+    Layout = "/Pages/Shared/_HeaderLayout.cshtml";
+    ViewData["Title"] = "Reports";
+}
+@section Styles
+{
+    <style>
+        .manage-list-item {
+            border-top: 1px solid #b1b4b6;
+            padding: 10px 0 20px 0;
+            position: relative;
+        }
+
+        .manage-item-link {
+            font-weight: 700;
+        }
+
+        .chevron-right::after {
+            content: '›';
+            float: right;
+        }
+    </style>
+}
+
+<div class="govuk-masterhead govuk-masterheader">
+    <div class="govuk-width-container">
+        @await Html.PartialAsync("_PhasePartial", new PhasePartialModel())
+        <div class="govuk-breadcrumbs">
+            <ol class="govuk-breadcrumbs__list">
+                <li class="govuk-breadcrumbs__list-item">
+                    <a class="govuk-breadcrumbs__link" href="/">Home</a>
+                </li>
+                <li class="govuk-breadcrumbs__list-item">
+                    <a class="govuk-breadcrumbs__link" href="/manage">Marketplace management</a>
+                </li>
+            </ol>
+        </div>
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-three-quarters">
+                <h1 class="govuk-heading-xl">Marketplace System Reports</h1>
+                <p class="govuk-body-m">
+                    Explore various reports related to the Data Marketplace system, offering insights into metadata, telemetry, and Data Share Requests (DSRs). 
+                    These reports provide critical data for system monitoring and performance analysis.
+                </p>
+              @*   <a asp-controller="Reports" asp-action="@nameof(ReportsController.CreateReportDetails)" role="button" draggable="false" class="govuk-button govuk-button--start govuk-button--inverse" data-module="govuk-button">
+                    Create new report
+                    <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
+                        <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z" />
+                    </svg>
+                </a> *@
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="govuk-width-container govuk-main-wrapper">
+    <h2 class="govuk-heading-l">
+        Topics
+    </h2>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <div class="manage-list-item">
+        <p class="govuk-body"><a class="govuk-link manage-item-link chevron-right" href="/reports/metadataReports">Manage metadata reports</a></p>
+                <p class="govuk-body">Review and manage detailed reports related to the metadata in the system. Ensure data accuracy and completeness for efficient operations.</p>
+            </div>
+        </div>
+        <div class="govuk-grid-column-full">
+            <div class="manage-list-item">
+                <p class="govuk-body"><a class="govuk-link manage-item-link chevron-right" href="/reports/telemetryReports">Manage telemetry reports</a></p>
+                <p class="govuk-body">Access and manage telemetry data reports that track system performance and operational statistics to ensure optimal functioning.</p>
+            </div>
+        </div> 
+        <div class="govuk-grid-column-full">
+            <div class="manage-list-item">
+                <p class="govuk-body"><a class="govuk-link manage-item-link chevron-right" asp-controller="Reports" asp-action="@nameof(ReportsController.GetDSRReportData)">View supplier data share request status count report</a></p>
+                <p class="govuk-body">Analyze the status and count of Data Share Requests (DSRs) to track the progress and status of requests within the system, providing insights for better decision-making.</p>
+            </div>
+        </div>        
+    </div>
+</div>

@@ -1,0 +1,71 @@
+﻿@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1
+@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums
+@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
+@using Cddo.Data.Marketplace.UI.Controllers
+@model QuestionContactPointRequest
+@{
+    ViewData["Title"] = "Contact Point";
+    bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
+    bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
+    bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
+
+    var dataAssetContactPoint = Model.ContactPoint.FirstOrDefault(x => x.Role == Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ContactRoleEnum.Contact);
+    string saveButtonName;
+
+    if (isCheckList)
+    {
+        saveButtonName = "isCheckList";
+    }
+    else if (isCheckAnswers)
+    {
+        saveButtonName = "isCheckAnswers";
+    }
+    else
+    {
+        saveButtonName = "isCheckList";
+    }
+
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">
+                Who is the point of contact for the data set?
+            </h1>
+            <div id="contact-hint" class="govuk-hint">
+                Provide the name and email of the team or individual that will respond to requests for this data set. This might be different from the data owner.
+                You’ll be able to change this later, once your description is published.
+            </div>
+            <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddContactPointSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                <input type="hidden" name="identifier" value="@Model.Identifier" />
+                <div class="govuk-form-group">
+                    <label class="govuk-label govuk-label--m" for="metadataContact">
+                        Name
+                    </label>
+                    <input class="govuk-input" id="metadataContact" name="@nameof(Contact.Name)" type="text" value="@dataAssetContactPoint?.Name">
+                </div>
+                <div class="govuk-form-group">
+                    <label class="govuk-label govuk-label--m" for="metadataContactEmail">
+                        Email address
+                    </label>
+                    <input class="govuk-input" id="metadataContactEmail" name="@nameof(Contact.Email)" type="text" value="@dataAssetContactPoint?.Email">
+                </div>
+                <input hidden name="@nameof(Contact.Role)" value="@ContactRoleEnum.Contact" />
+                <div class="govuk-button-group">
+                    @if (!isEditMode)
+                    {
+                        <button type="submit" name="showNextQuestion" value="true" class="govuk-button" data-module="govuk-button">
+                            Continue
+                        </button>
+                    }
+                    <button type="submit" name="@saveButtonName" value="true" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        Save and return
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

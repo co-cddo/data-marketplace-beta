@@ -1,0 +1,49 @@
+﻿@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests
+@model Agrimetrics.DataShare.Api.Dto.Models.Supplier.DataShareRequests.Decisions.RejectedDecisionSummary
+@{
+    ViewData["Title"] = "Request Rejected";
+}
+
+<div class="govuk-main-wrapper govuk-main-wrapper--l">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            
+            @if (Model.RequestStatus == DataShareRequestStatus.Cancelled)
+            {
+                <span class="govuk-caption-l">Request ID: @Model.DataShareRequestRequestId</span>
+                <br/>
+
+                <div class="govuk-panel govuk-panel--confirmation">
+                    <h1 class="govuk-panel__title">
+                        Request was cancelled
+                    </h1>
+                </div>
+            }
+            else
+            {
+                <div class="govuk-panel govuk-panel--confirmation">
+                    <h1 class="govuk-panel__title">
+                        Request rejected
+                    </h1>
+                    <div class="govuk-panel__body">
+                        Request ID:<br><strong>@Model.DataShareRequestRequestId.ToUpper()</strong>
+                    </div>
+                </div>
+
+                <p class="govuk-body">You've told @Model.AcquirerOrganisationName why you've rejected their request.</p>
+
+                <h2 class="govuk-heading-m">What happens next</h2>
+                <p class="govuk-body">
+                    You do not need to take any further action.
+                </p>
+                <p class="govuk-body">
+                    If they address the reasons why their request was rejected, they can submit another request.
+                </p>    
+            }
+
+            <div class="govuk-button-group">
+                <a asp-controller="DataRequest" asp-action="ReceivedRequests" class="govuk-link">Return to received requests</a>
+            </div>
+        </div>
+    </div>
+</div>

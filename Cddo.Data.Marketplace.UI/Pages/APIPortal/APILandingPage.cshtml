@@ -1,0 +1,52 @@
+﻿@page
+@using Cddo.Data.Marketplace.Logic.Services.Interfaces
+@using Cddo.Data.Marketplace.UI.Controllers
+@inject IUserRoleService UserRoleService
+@model Cddo.Data.Marketplace.UI.Pages.API.ApiLandingPageModel
+@{
+}
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">
+                API
+            </h1>
+
+            <ul class="govuk-list learn-browse-list">
+                <li>
+                    <a class="govuk-link govuk-body-l" asp-controller="Support" asp-action="GetStarted">
+                        Data Marketplace API documentation
+                    </a>
+                </li>
+            </ul>
+            <p class="govuk-body-l">The Data Marketplace API allows developers to connect where they store their data, for example a data catalogue, to the Data Marketplace.</p>
+
+
+            @if (User.Identity!.IsAuthenticated)
+            {
+                var roles = new List<string>
+                {
+                    "Metadata Publisher",
+                    "Organisation Administrator"
+                };
+
+                bool isUserInRoles = await UserRoleService.IsUserInRoleAsync(roles);
+
+                @if (isUserInRoles)
+                {
+                    <div class="govuk-button-group" style="padding-top : 10px;">
+                        <a asp-controller="Developer" asp-action="ApiCredentials" class="govuk-button">Enter API Portal</a>
+                    </div>
+                }
+                else
+                {
+                    <p class="govuk-body-l">You need the Metadata Publisher role to use the API.</p>
+                    <a asp-controller="UserRoleClaim" asp-action="GetUserRoleDetails" class="govuk-button" >Request Metadata Publisher role</a>
+                }
+            }           
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,76 @@
+﻿@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
+@using Cddo.Data.Marketplace.UI.Controllers
+@model QuestionTitleRequest
+
+@{
+    ViewData["Title"] = "Title";
+    bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
+    bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
+    bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
+    string saveButtonName;
+    if (isCheckList)
+    {
+        saveButtonName = "isCheckList";
+    }
+    else if (isCheckAnswers)
+    {
+        saveButtonName = "isCheckAnswers";
+    }
+    else
+    {
+        saveButtonName = "isCheckList";
+    }
+
+    var errorMessage = ViewData.ModelState[nameof(Model.Title)]?.Errors.FirstOrDefault()?.ErrorMessage;
+    var hasTitleError = ViewData.ModelState[nameof(Model.Title)]?.Errors.Any() == true;
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddTitleSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                @Html.AntiForgeryToken()
+                @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
+
+                <input type="hidden" name="@nameof(QuestionTitleRequest.Identifier)" value="@Model?.Identifier" />
+                <input type="hidden" name="securityClassification" value="@ViewBag.securityClassification" />
+
+                <div class="govuk-form-group @(hasTitleError ? "govuk-form-group--error" : "")">
+                    <h1 class="govuk-label-wrapper">
+                        <label class="govuk-label govuk-label--l" for="Title">
+                            What is the title of the data set?
+                        </label>
+                    </h1>
+                    <div id="Title-hint" class="govuk-hint">
+                        Provide the full name. Do not use acronyms or technical jargon.
+                        Your title should help other users understand if this is the data they’re looking for. For example, ‘Student Absence Data 2020-23’ is a helpful title because it specifies the date range the data applies to.
+                    </div>
+                    @if (hasTitleError)
+                    {
+                        <p id="Title-error" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> @errorMessage
+                        </p>
+                    }
+                    <input class="govuk-input @(hasTitleError ? "govuk-input--error" : "")"
+                           id="Title"
+                           name="@nameof(QuestionTitleRequest.Title)"
+                           type="text"
+                           value="@Model?.Title" />
+                </div>
+                <div class="govuk-button-group">
+                    @if (!isEditMode)
+                    {
+                        <button type="submit" name="showNextQuestion" value="true" class="govuk-button" data-module="govuk-button">
+                            Continue
+                        </button>
+                    }
+                    <button type="submit" name="@saveButtonName" value="true" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        Save and return
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

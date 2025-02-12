@@ -1,0 +1,13 @@
+{
+  "TemplateId": "41484f4c-ba6b-4533-9f7b-6e4c684d2754",
+  "KqlQuery": "{\u0022RequiredFields\u0022:[22,37,1,18,8,3,12,6,13],\u0022Filter\u0022:{\u0022FilterByInitiatingUserPermissions\u0022:false,\u0022FieldFilters\u0022:[{\u0022Field\u0022:12,\u0022Values\u0022:[\u0022cabinet-office\u0022]},{\u0022Field\u0022:37,\u0022Values\u0022:[\u0022Draft\u0022,\u0022Published\u0022,\u0022Archived\u0022,\u0022Deleted\u0022,\u0022Withdrawn\u0022]}]}}",
+  "ReportType": 2,
+  "ReportName": "Metadata - Cabinet Office",
+  "Description": "Only Cabinet Office metadata records",
+  "CreatedOn": "2024-11-05T13:56:06.946918+00:00",
+  "UserId": 18,
+  "OrganisationId": 1,
+  "SharedWithOrganisationIds": null,
+  "SharedWithUsersIds": null,
+  "IsPredefined": true
+}

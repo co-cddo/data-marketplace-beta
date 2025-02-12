@@ -1,0 +1,237 @@
+﻿@page
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Pages.Shared
+@model Cddo.Data.Marketplace.UI.Pages.Reports.MetadataReportsModel
+@{
+    Layout = "/Pages/Shared/_HeaderLayout.cshtml";
+    ViewData["Title"] = "Metadata Reports";
+}
+
+<div class="govuk-masterhead govuk-masterheader">
+    <div class="govuk-width-container">
+        @await Html.PartialAsync("_PhasePartial", new PhasePartialModel())
+        <div class="govuk-breadcrumbs">
+            <ol class="govuk-breadcrumbs__list">
+                <li class="govuk-breadcrumbs__list-item">
+                    <a class="govuk-breadcrumbs__link" href="/">Home</a>
+                </li>
+                <li class="govuk-breadcrumbs__list-item">
+                    <a class="govuk-breadcrumbs__link" href="/manage">Marketplace management</a>
+                </li>
+                <li class="govuk-breadcrumbs__list-item">
+                    <a class="govuk-breadcrumbs__link" href="/reports/reportsList">Marketplace System Reports</a>
+                </li>
+            </ol>
+        </div>
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-xl govuk-!-margin-bottom-6 mt-4">Metadata reports</h1>
+                <p class="govuk-body-l">
+                    Review and manage detailed reports related to the metadata in the system. Ensure data accuracy and completeness for efficient operations.
+                </p>
+                @* <a href="#" role="button" draggable="false" class="govuk-button govuk-button--start govuk-button--inverse" data-module="govuk-button">
+                    Create new report
+                    <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
+                        <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z" />
+                    </svg>
+                </a> *@
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="govuk-width-container govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <form method="get">
+            <div class="govuk-grid-row mb-4">
+                <div class="govuk-grid-column-two-thirds">
+                    <div class="govuk-form-group search-input">
+                        <h2 class="govuk-label-wrapper">
+                            <label class="govuk-label govuk-label--m" for="">
+                                Search
+                            </label>
+                        </h2>
+                        <div class="govuk-input__wrapper">
+                            <input aria-label="Search data asset" class="govuk-input govuk-input--width-30" id="catalogDataSearchInput" name="searchReport" type="text" autocomplete="off" value="@Model.SearchTerm">
+                            <button title="datasetSearchResultsBtn" class="search-button" type="submit" enterkeyhint="search">
+                                <svg class="search-button__icon" width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                                    <circle cx="12.0161" cy="11.0161" r="8.51613" stroke="currentColor" stroke-width="3"></circle>
+                                    <line x1="17.8668" y1="17.3587" x2="26.4475" y2="25.9393" stroke="currentColor" stroke-width="3"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full">
+                    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
+                        @Model.Count results
+                    </h2>
+                    <hr />
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-one-half">
+                            <div class="govuk-input__wrapper">
+                                <select class="govuk-select" name="sortOption" id="sortOption" aria-label="Sort by">
+                                    <option value="">
+                                        Modified (newest)
+                                    </option>
+                                    <option value="">
+                                        Modified (oldest)
+                                    </option>
+                                    <option value="">
+                                        Title
+                                    </option>
+                                    <option value="">
+                                        Author
+                                    </option>
+                                    <option value="">
+                                        Organisation
+                                    </option>
+                                </select>
+                                <button class="govuk-button govuk-button--secondary govuk-input__suffix">Sort</button>
+                            </div>
+                        </div>
+                        <div class="govuk-grid-column-one-half">
+                            <div class="govuk-form-group mb-0 d-inline-flex float-end">
+                                <label class="govuk-label" hidden for="pageSize">Sort by</label>
+                                <label class="govuk-label"  for="pageSize" style="padding-right: 10px;padding-top: 7px;">
+                                        Results Per Page
+                                    </label>
+                                <div class="govuk-form-group mb-0 d-inline-flex float-end me-2">
+                                    <div class="govuk-input__wrapper">
+                                        <select class="govuk-input" id="pageSize" aria-label="Select results per page" name="pageSize" style="min-width:2.6em;">
+                                            @foreach (var pageSizeOption in new[] { 10, 20, 50, 100 })
+                                            {
+                                                <option selected="@(Model.PageSize==pageSizeOption)" value="@pageSizeOption">@pageSizeOption</option>
+                                            }
+                                        </select>
+                                        <button class="govuk-button govuk-button--secondary govuk-input__suffix"  style="max-width:5em;">
+                                            Apply
+                                         <span class="govuk-visually-hidden">
+                                         results per page
+                                         </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dataset-result">
+                        <table class="govuk-table">
+                            <thead class="govuk-table__head">
+                                <tr class="govuk-table__row">
+                                    <th class="govuk-table__header">Report</th>
+                                    <th class="govuk-table__header">Report type</th>
+                                    <th class="govuk-table__header">Created</th>
+                                    <th class="govuk-table__header">Owner</th>
+                                    <th class="govuk-table__header">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="govuk-table__body">
+                                @foreach (var report in Model.PagedItems)
+                                {
+                                    <tr class="govuk-table__row">
+                                        <td class="govuk-table__cell"><a class="govuk-link" asp-controller="Reports" asp-route-templateId="@report.TemplateId" asp-action="@nameof(ReportsController.GotoMetadataReport)">@report.ReportName</a></td>
+                                        <td class="govuk-table__cell">@report.ReportType</td>
+                                        <td class="govuk-table__cell">@report.CreatedOn</td>
+                                        <td class="govuk-table__cell">@report.Owner</td>
+                                        <td class="govuk-table__cell"><a class="govuk-link" asp-controller="Reports" asp-route-templateId="@report.TemplateId" asp-action="@nameof(ReportsController.DownloadMetadataReport)">Download</a></td>
+                                    </tr>
+                                }
+                                @* <tr class="govuk-table__row">
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell"><a class="govuk-link" asp-controller="Reports" asp-route-templateId="86ef337b-1432-49ae-9d96-adcfa87553c2" asp-action="@nameof(ReportsController.GetMetadataStatsReport)">Metadata - Status count report</a></td>
+                                    <td class="govuk-table__cell">Metadata</td>
+                                    <td class="govuk-table__cell">01/10/2024</td>
+                                    <td class="govuk-table__cell">@Model.PagedItems[0].Owner</td>
+                                    <td class="govuk-table__cell"><a class="govuk-link" asp-controller="Reports" asp-route-templateId="86ef337b-1432-49ae-9d96-adcfa87553c2" asp-action="@nameof(ReportsController.DownloadMetadataReport)">Download</a></td>
+                                </tr>
+                                </tr> *@
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+
+                    @{
+                        const int maxMiddlePages = 3;
+
+                        var currentPage = Model.CurrentPage;
+                        var totalPages = Model.TotalPages;
+
+                        currentPage = Math.Max(1, Math.Min(currentPage, totalPages));
+
+                        var middleStart = Math.Max(1, currentPage - maxMiddlePages / 2);
+                        var middleEnd = Math.Min(totalPages, middleStart + maxMiddlePages - 1);
+                        middleStart = Math.Max(1, middleEnd - maxMiddlePages + 1);
+                    }
+                    <nav class="govuk-pagination" role="navigation" aria-label="Pagination">
+                        @if (currentPage != 1)
+                        {
+                            <form method="get" class="govuk-pagination__prev">
+                                <button type="submit" class="govuk-link govuk-pagination__link" name="pageNumber" value="@(Model.CurrentPage - 1)" rel="prev">
+                                    <span class="govuk-pagination__link-title">
+                                        Previous<span class="govuk-visually-hidden"> page</span>
+                                    </span>
+                                </button>
+                            </form>
+                        }
+                        <ul class="govuk-pagination__list" style="display:flex;">
+                            @if (middleStart > 1)
+                            {
+                                <form method="get">
+                                <li class="govuk-pagination__item">
+                                    <span class="govuk-visually-hidden">Page</span>
+
+                                    <button type="submit" class="govuk-link govuk-pagination__link" name="pageNumber" value="1">1</button>
+                                </li>
+                                    @if (middleStart > 2)
+                                    {
+                                    <li class="govuk-pagination__item govuk-pagination__item--ellipses">...</li>
+                                    }
+                                </form>
+                            }
+
+                            @for (int i = middleStart; i <= middleEnd; i++)
+                            {
+                            <form method="get">
+                                <li class="govuk-pagination__item @(i == currentPage ? "govuk-pagination__item--current" : "")">
+                                    <span class="govuk-visually-hidden">Page</span>
+
+                                    <button type="submit" class="govuk-link govuk-pagination__link" name="pageNumber" value="@i">@i</button>
+                                </li>
+                            </form>
+                            }
+
+                            @if (middleEnd < totalPages)
+                            {
+                                @if (middleEnd < totalPages - 1)
+                                {
+                                    <li class="govuk-pagination__item govuk-pagination__item--ellipses">...</li>
+                                }
+                                <form method="get">
+                                    <li class="govuk-pagination__item">
+                                        <span class="govuk-visually-hidden">Page</span>
+
+                                        <button type="submit" class="govuk-link govuk-pagination__link" name="pageNumber" value="@totalPages">@totalPages</button>
+                                    </li>
+                                </form>
+                            }
+                        </ul>
+                        @if (currentPage != totalPages)
+                        {
+                        <form method="get" class="govuk-pagination__next">
+                            <button type="submit" name="pageNumber" value="@(Model.CurrentPage + 1)" rel="next" class="govuk-link govuk-pagination__link">
+                                <span class="govuk-pagination__link-title">
+                                    Next<span class="govuk-visually-hidden"> page</span>
+                                </span>
+                            </button>
+                        </form>
+                        }
+                    </nav>
+                </div>
+            </div>
+    </div>
+</div>

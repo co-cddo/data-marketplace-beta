@@ -1,0 +1,77 @@
+﻿@using Agrimetrics.DataShare.Api.Dto.Models.Questions.QuestionParts.ResponseFormats;
+@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests.Answers.Answers;
+
+@model SelectionOptionInSingleValueSetModel
+@{
+    var selectionOptionInputComponentId = Model.SelectionOptionInputComponentId;
+    var selectionOptionInputComponentName = Model.SelectionOptionInputComponentName;
+    var selectionOptionId = Model.SelectionOptionId;
+    var optionOrderWithinSet = Model.OptionOrderWithinSet;
+    var valueText = Model.ValueText;
+    var hintText = Model.HintText;
+    var isSelected = Model.IsSelected;
+    var isAlternativeAnswer = Model.IsAlternativeAnswer;
+
+    var supplementaryQuestionInputComponentId = Model.SupplementaryQuestionInputComponentId;
+    var supplementaryQuestionInputComponentName = Model.SupplementaryQuestionInputComponentName;
+    var supplementaryQuestionPartIdComponentId = Model.SupplementaryQuestionPartIdComponentId;
+    var supplementaryQuestionPartIdComponentName = Model.SupplementaryQuestionPartIdComponentName;
+    var supplementaryQuestionPartId = Model.SupplementaryQuestionPartId;
+    var supplementaryQuestionText = Model.SupplementaryQuestionText;
+    var supplementaryQuestionEnteredValue = Model.SupplementaryQuestionEnteredValue;
+    var supplementaryQuestionMaximumResponseLength = Model.SupplementaryQuestionMaximumResponseLength;
+
+    var selectedState = isSelected ? "checked" : string.Empty;
+    var uniqueCounter = Guid.NewGuid();
+}
+
+@if (@isAlternativeAnswer)
+{
+    <div class="govuk-checkboxes__divider">or</div>
+}
+
+<div class="govuk-radios__item">
+    <input class="govuk-radios__input @(@supplementaryQuestionText != null ? "controlling-conditional" : "")"
+           id=@selectionOptionInputComponentId
+           name=@selectionOptionInputComponentName
+           type="radio"
+    @selectedState
+           value="selection-option-@(selectionOptionId)"
+    @(supplementaryQuestionText != null ? $"data-aria-controls=conditional-option-{@optionOrderWithinSet}" : "")>
+    <label class="govuk-label govuk-radios__label" for=@selectionOptionInputComponentId>
+        @valueText
+    </label>
+
+    @if (!string.IsNullOrWhiteSpace(@hintText))
+    {
+        <div class="govuk-hint govuk-checkboxes__hint">
+            @hintText
+        </div>
+    }
+</div>
+
+@if (@supplementaryQuestionText != null)
+{
+    <input id=@supplementaryQuestionPartIdComponentId name=@supplementaryQuestionPartIdComponentName value=@supplementaryQuestionPartId type="hidden" />
+
+    <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-option-@optionOrderWithinSet">
+
+        <div class="govuk-form-group govuk-character-count" data-module="govuk-character-count" data-maxlength="@supplementaryQuestionMaximumResponseLength">
+            <label class="govuk-label" for=@supplementaryQuestionInputComponentId>
+                @supplementaryQuestionText
+            </label>
+
+            <input class="govuk-input govuk-js-character-count"
+                   id=@supplementaryQuestionInputComponentId
+                   name=@supplementaryQuestionInputComponentName
+                   type="text"
+                   spellcheck="false"
+                   value="@supplementaryQuestionEnteredValue"
+                   aria-describedby="@supplementaryQuestionInputComponentId-info" />
+            <ul id="autocomplete-suggestions-@uniqueCounter" class="autocomplete-suggestions"></ul>
+            <div id="@supplementaryQuestionInputComponentId-info" class="govuk-hint govuk-character-count__message">
+                You can enter up to @supplementaryQuestionMaximumResponseLength characters
+            </div>
+        </div>
+    </div>
+}

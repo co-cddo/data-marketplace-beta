@@ -1,0 +1,13 @@
+{
+  "TemplateId": "a3f30894-4638-4b3e-b439-31bd48a641e7",
+  "KqlQuery": "AppRequests | extend OperationName, Min='', Max='', Average = '' | where OperationName contains \u0022datamarketplaceapi\u0022 | summarize Min = round(min(DurationMs)), Max = round(max(DurationMs)), Average = round(avg(DurationMs), 2), Count =  count() by OperationName | order by Count desc",
+  "ReportType": 1,
+  "ReportName": "API Response Time Metrics",
+  "Description": "API Response Time Metrics",
+  "CreatedOn": "2024-12-04T11:11:22.2858149+00:00",
+  "UserId": 11,
+  "OrganisationId": 1,
+  "SharedWithOrganisationIds": null,
+  "SharedWithUsersIds": null,
+  "IsPredefined": true
+}

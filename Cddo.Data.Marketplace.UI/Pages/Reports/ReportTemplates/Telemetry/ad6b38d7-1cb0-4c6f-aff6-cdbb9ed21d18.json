@@ -1,0 +1,13 @@
+{
+  "TemplateId": "ad6b38d7-1cb0-4c6f-aff6-cdbb9ed21d18",
+  "KqlQuery": "AppEvents|extend UserId = tostring(Properties.UserId ), EventName = Name | where UserId != \u0027-1\u0027 and UserId != \u0027\u0027| summarize Count = count() by UserId, EventName| order by Count desc",
+  "ReportType": 1,
+  "ReportName": "User event activity summary",
+  "Description": "User event activity summary",
+  "CreatedOn": "2024-11-01T10:35:53.7026702+00:00",
+  "UserId": 11,
+  "OrganisationId": 1,
+  "SharedWithOrganisationIds": null,
+  "SharedWithUsersIds": null,
+  "IsPredefined": true
+}

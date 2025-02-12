@@ -1,0 +1,4282 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "CDDO Utilities",
+    "version": "v1"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          "Cddo.Data.Marketplace.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/DataAsset/add-profiled-data-asset": {
+      "post": {
+        "tags": [
+          "DataAsset"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.DataAssets.AddProfiledDataAssetRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.DataAssets.AddProfiledDataAssetRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.DataAssets.AddProfiledDataAssetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.AddProfiledDataAssetResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.AddProfiledDataAssetResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.AddProfiledDataAssetResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/patch-profiled-data-asset": {
+      "patch": {
+        "tags": [
+          "DataAsset"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.DataAssets.PatchProfiledDataAssetRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.DataAssets.PatchProfiledDataAssetRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.DataAssets.PatchProfiledDataAssetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.PatchProfiledDataAssetResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.PatchProfiledDataAssetResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.PatchProfiledDataAssetResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/get-profiled-data-assets": {
+      "get": {
+        "tags": [
+          "DataAsset"
+        ],
+        "parameters": [
+          {
+            "name": "ProfileId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "DataAssetTypes",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetType"
+              }
+            }
+          },
+          {
+            "name": "OnlyIncludeRecordsDiscoverableByOrganisationOfCallingUser",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "OnlyIncludeRecordsOwnedByOrganisationOfCallingUser",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetProfiledDataAssetsResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetProfiledDataAssetsResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetProfiledDataAssetsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/get-profiled-data-asset-ids": {
+      "get": {
+        "tags": [
+          "DataAsset"
+        ],
+        "parameters": [
+          {
+            "name": "ProfileId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetProfiledDataAssetIdsResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetProfiledDataAssetIdsResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetProfiledDataAssetIdsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/get-profiled-data-asset": {
+      "get": {
+        "tags": [
+          "DataAsset"
+        ],
+        "parameters": [
+          {
+            "name": "ProfileId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "DataAssetId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetProfiledDataAssetResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetProfiledDataAssetResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetProfiledDataAssetResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/delete-profiled-data-asset": {
+      "delete": {
+        "tags": [
+          "DataAsset"
+        ],
+        "parameters": [
+          {
+            "name": "DataAssetId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "ProfileId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.DeleteProfiledDataAssetResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.DeleteProfiledDataAssetResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.DeleteProfiledDataAssetResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/get-cddo-data-assets": {
+      "get": {
+        "tags": [
+          "DataAsset"
+        ],
+        "parameters": [
+          {
+            "name": "OnlyIncludeRecordsDiscoverableByOrganisationOfCallingUser",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "OnlyIncludeRecordsOwnedByOrganisationOfCallingUser",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "DataAssetTypes",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetType"
+              }
+            }
+          },
+          {
+            "name": "DataAssetStatuses",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetStatus"
+              }
+            }
+          },
+          {
+            "name": "StartRecordIndex",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "NumberOfRecords",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "SortField",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.DataAssetsSortField"
+            }
+          },
+          {
+            "name": "SortDirection",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.DataAssetsSortDirection"
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Creator",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "Themes",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "EntryTypes",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetCddoDataAssetsResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetCddoDataAssetsResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetCddoDataAssetsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/get-cddo-data-asset": {
+      "get": {
+        "tags": [
+          "DataAsset"
+        ],
+        "parameters": [
+          {
+            "name": "DataAssetId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetCddoDataAssetResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetCddoDataAssetResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetCddoDataAssetResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/get-search-suggestions-for-published-data-assets": {
+      "get": {
+        "tags": [
+          "DataAsset"
+        ],
+        "parameters": [
+          {
+            "name": "SearchText",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetSearchSuggestionsForPublishedDataAssetsResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetSearchSuggestionsForPublishedDataAssetsResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetSearchSuggestionsForPublishedDataAssetsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/get-search-suggestions-for-organisation-data-assets": {
+      "get": {
+        "tags": [
+          "DataAsset"
+        ],
+        "parameters": [
+          {
+            "name": "SearchText",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetSearchSuggestionsForOrganisationDataAssetsResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetSearchSuggestionsForOrganisationDataAssetsResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetSearchSuggestionsForOrganisationDataAssetsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/validate-cddo-data-asset": {
+      "get": {
+        "tags": [
+          "DataAsset"
+        ],
+        "parameters": [
+          {
+            "name": "dataAssetId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetCddoDataAssetValidationErrorsResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetCddoDataAssetValidationErrorsResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetCddoDataAssetValidationErrorsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/check-for-potential-duplicates-to-data-asset": {
+      "get": {
+        "tags": [
+          "DataAsset"
+        ],
+        "parameters": [
+          {
+            "name": "DataAssetId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.CheckForPotentialDuplicatesToDataAssetResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.CheckForPotentialDuplicatesToDataAssetResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.CheckForPotentialDuplicatesToDataAssetResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/validate-profiled-data-assets-spreadsheet-content": {
+      "post": {
+        "tags": [
+          "DataAsset"
+        ],
+        "parameters": [
+          {
+            "name": "dataAssetProfileId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "file"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "file",
+                    "description": "Upload File",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "file": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.ValidateProfiledDataAssetsSpreadsheetContentResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.ValidateProfiledDataAssetsSpreadsheetContentResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.ValidateProfiledDataAssetsSpreadsheetContentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/get-validated-profiled-data-assets-spreadsheet-content": {
+      "get": {
+        "tags": [
+          "DataAsset"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetValidatedProfiledDataAssetsSpreadsheetContentResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetValidatedProfiledDataAssetsSpreadsheetContentResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetValidatedProfiledDataAssetsSpreadsheetContentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/get-validated-profiled-data-assets-spreadsheet-item-content": {
+      "get": {
+        "tags": [
+          "DataAsset"
+        ],
+        "parameters": [
+          {
+            "name": "RecordId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetValidatedProfiledDataAssetsSpreadsheetItemContentResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetValidatedProfiledDataAssetsSpreadsheetItemContentResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetValidatedProfiledDataAssetsSpreadsheetItemContentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/publish-validated-profiled-data-assets-spreadsheet-content": {
+      "post": {
+        "tags": [
+          "DataAsset"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.DataAssets.PublishValidatedProfiledDataAssetsSpreadsheetContentRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.DataAssets.PublishValidatedProfiledDataAssetsSpreadsheetContentRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.DataAssets.PublishValidatedProfiledDataAssetsSpreadsheetContentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.PublishValidatedProfiledDataAssetsSpreadsheetContentResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.PublishValidatedProfiledDataAssetsSpreadsheetContentResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.PublishValidatedProfiledDataAssetsSpreadsheetContentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/clear-validated-profiled-data-assets-spreadsheet-content": {
+      "post": {
+        "tags": [
+          "DataAsset"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/check-for-potential-duplicates-in-validated-spreadsheet-content": {
+      "get": {
+        "tags": [
+          "DataAsset"
+        ],
+        "parameters": [
+          {
+            "name": "checkForPotentialDuplicatesInValidatedSpreadsheetContentRequest",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.DataAssets.CheckForPotentialDuplicatesInValidatedSpreadsheetContentRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.CheckForPotentialDuplicatesInValidatedSpreadsheetContentResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.CheckForPotentialDuplicatesInValidatedSpreadsheetContentResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.CheckForPotentialDuplicatesInValidatedSpreadsheetContentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/check-for-potential-duplicates-in-validated-spreadsheet-item": {
+      "get": {
+        "tags": [
+          "DataAsset"
+        ],
+        "parameters": [
+          {
+            "name": "RecordId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.CheckForPotentialDuplicatesInValidatedSpreadsheetItemResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.CheckForPotentialDuplicatesInValidatedSpreadsheetItemResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.CheckForPotentialDuplicatesInValidatedSpreadsheetItemResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/get-data-asset-template-spreadsheet": {
+      "get": {
+        "tags": [
+          "DataAsset"
+        ],
+        "parameters": [
+          {
+            "name": "ProfileId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/migrate-profiled-data-asset-from-1p0-to-3p1": {
+      "post": {
+        "tags": [
+          "DataAsset"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.DataAssets.MigrateProfiledDataAssetsFrom1p0To3p1Request"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.DataAssets.MigrateProfiledDataAssetsFrom1p0To3p1Request"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.DataAssets.MigrateProfiledDataAssetsFrom1p0To3p1Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.MigrateProfiledDataAssetsFrom1p0To3p1Response"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.MigrateProfiledDataAssetsFrom1p0To3p1Response"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.MigrateProfiledDataAssetsFrom1p0To3p1Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataAsset/get-esda-ownership-details": {
+      "get": {
+        "tags": [
+          "DataAsset"
+        ],
+        "parameters": [
+          {
+            "name": "DataAssetId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetEsdaOwnershipDetailsResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetEsdaOwnershipDetailsResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetEsdaOwnershipDetailsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataMarketplaceApi/data-services/{dataServiceId}": {
+      "delete": {
+        "tags": [
+          "Delete dataservice"
+        ],
+        "parameters": [
+          {
+            "name": "dataServiceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Get dataservice"
+        ],
+        "parameters": [
+          {
+            "name": "dataServiceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataService"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataService"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataService"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Update dataservice"
+        ],
+        "parameters": [
+          {
+            "name": "dataServiceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataService"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataService"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataService"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataService"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataService"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataService"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataMarketplaceApi/datasets/{datasetId}": {
+      "delete": {
+        "tags": [
+          "Delete dataset"
+        ],
+        "parameters": [
+          {
+            "name": "datasetId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Get dataset"
+        ],
+        "description": "Retrieves a dataset resource by identifier.",
+        "parameters": [
+          {
+            "name": "datasetId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.CataloguedResource"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.CataloguedResource"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.CataloguedResource"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Update dataset"
+        ],
+        "parameters": [
+          {
+            "name": "datasetId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataSet"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataSet"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataSet"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataSet"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataSet"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataSet"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Topics": {
+      "get": {
+        "tags": [
+          "Lookup"
+        ],
+        "parameters": [
+          {
+            "name": "DataAssetStatuses",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetStatus"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.Lookup.GetCddoTopicsResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.Lookup.GetCddoTopicsResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.Lookup.GetCddoTopicsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Organisations": {
+      "get": {
+        "tags": [
+          "Lookup"
+        ],
+        "parameters": [
+          {
+            "name": "DataAssetStatuses",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetStatus"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.Lookup.GetCddoOrganisationsResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.Lookup.GetCddoOrganisationsResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.Lookup.GetCddoOrganisationsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/query-catalog-reports-data": {
+      "post": {
+        "tags": [
+          "Reports"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.Reports.QueryCatalogReportsDataRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.Reports.QueryCatalogReportsDataRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.Reports.QueryCatalogReportsDataRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.Reports.QueryCatalogReportsDataResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.Reports.QueryCatalogReportsDataResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.Reports.QueryCatalogReportsDataResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/download-catalog-reports-data": {
+      "post": {
+        "tags": [
+          "Reports"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.Reports.QueryCatalogReportsDataRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.Reports.QueryCatalogReportsDataRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.Reports.QueryCatalogReportsDataRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.Reports.QueryCatalogReportsDataResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.Reports.QueryCatalogReportsDataResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.Reports.QueryCatalogReportsDataResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/perform-catalog-reports-query": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "parameters": [
+          {
+            "name": "performCatalogReportsQueryRequest",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Requests.Reports.PerformCatalogReportsQueryRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.Reports.PerformCatalogReportsQueryResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.Reports.PerformCatalogReportsQueryResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.Reports.PerformCatalogReportsQueryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataMarketplaceApi/catalogued-resources": {
+      "get": {
+        "tags": [
+          "Search your datasets"
+        ],
+        "description": "You can enter a search term to filter your organisation's datasets in the Data Marketplace.",
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.CataloguedResource"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.CataloguedResource"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.CataloguedResource"
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/DataMarketplaceApi/data-services": {
+      "post": {
+        "tags": [
+          "Submit dataservice"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataService"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataService"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataService"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataMarketplaceApi/datasets": {
+      "post": {
+        "tags": [
+          "Submit dataset"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataSet"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataSet"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataSet"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Cddo.Data.Marketplace.Api.Dto.Models.CatalogData.CatalogAssetField": {
+        "enum": [
+          "ProfileId",
+          "DataAssetType",
+          "DataAssetId",
+          "Title",
+          "AlternativeTitles",
+          "Summary",
+          "Description",
+          "Keywords",
+          "Themes",
+          "ContactPointName",
+          "ContactPointEmailAddress",
+          "Creator",
+          "Publisher",
+          "SecurityClassification",
+          "Identifier",
+          "RelatedResource",
+          "Version",
+          "Issued",
+          "Modified",
+          "Created",
+          "UpdateFrequency",
+          "Licence",
+          "AccessRights",
+          "DistributionTitle",
+          "DistributionAccessService",
+          "DistributionIdentifier",
+          "DistributionModified",
+          "DistributionIssued",
+          "DistributionLicence",
+          "DistributionByteSize",
+          "DistributionMediaType",
+          "DistributionDownloadUrl",
+          "ServiceType",
+          "ServiceStatus",
+          "EndpointUrl",
+          "EndpointDescription",
+          "ServesData",
+          "DataAssetStatus",
+          "IsOwnerPointOfContact",
+          "OwnerName",
+          "OwnerEmail",
+          "ApiType",
+          "HasPart"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.CddoDataAsset": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "organisationId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "domainId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "profileId": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataAssetType": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetType"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "alternativeTitles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "summary": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "manifestationTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "internalIdentifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "creator": {
+            "type": "string",
+            "nullable": true,
+            "deprecated": true
+          },
+          "publisher": {
+            "type": "string",
+            "nullable": true
+          },
+          "publisherPrettified": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "author": {
+            "type": "string",
+            "nullable": true
+          },
+          "authorEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataAssetContacts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.CddoDataAssetContact"
+            },
+            "nullable": true
+          },
+          "maintainer": {
+            "type": "string",
+            "nullable": true,
+            "deprecated": true
+          },
+          "maintainerEmail": {
+            "type": "string",
+            "nullable": true,
+            "deprecated": true
+          },
+          "dataOwner": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V1_0.DataAssetDataOwner"
+          },
+          "securityClassification": {
+            "type": "string",
+            "nullable": true
+          },
+          "version": {
+            "type": "string",
+            "nullable": true
+          },
+          "licenseId": {
+            "type": "string",
+            "nullable": true
+          },
+          "licenseTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "issued": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "modified": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "draftStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "publishStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataAssetStatus": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetStatus"
+          },
+          "updateFrequency": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V1_0.UpdateFrequencyEnum"
+          },
+          "updateFrequencyString": {
+            "type": "string",
+            "nullable": true
+          },
+          "accessRights": {
+            "type": "string",
+            "nullable": true
+          },
+          "endpointUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "entryType": {
+            "type": "string",
+            "nullable": true
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "themes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "relatedResources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "requiresDSR": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "allowDSRRequest": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "serviceType": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V1_0.ServiceTypeEnum"
+          },
+          "dataAssetServiceType": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetServiceType"
+          },
+          "distribution": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V1_0.DataAssetDistribution"
+          },
+          "dataAssetDistribution": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.CddoDataAssetDistribution"
+          },
+          "serviceStatus": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V1_0.ServiceStatusEnum"
+          },
+          "endpointDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataShareRequestNotificationRecipientType": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataShareRequestNotificationRecipientType"
+          },
+          "customDsrNotificationAddress": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.CddoDataAssetContact": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetContactRoleType"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.CddoDataAssetDistribution": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "accessService": {
+            "type": "string",
+            "nullable": true
+          },
+          "identifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "modified": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "issued": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "licence": {
+            "type": "string",
+            "nullable": true
+          },
+          "byteSize": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "mediaType": {
+            "type": "string",
+            "nullable": true
+          },
+          "downloadUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.DataAssetValidationPropertyError": {
+        "required": [
+          "error",
+          "errorSeverity"
+        ],
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "nullable": true
+          },
+          "errorSeverity": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetValidationPropertyErrorSeverity"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.DataAssetValidationPropertyResult": {
+        "required": [
+          "errors",
+          "propertyName"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyName": {
+            "type": "string",
+            "nullable": true
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.DataAssetValidationPropertyError"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.DataAssetsSortDirection": {
+        "enum": [
+          "Ascending",
+          "Descending"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.DataAssetsSortField": {
+        "enum": [
+          "Title",
+          "UpdatedOn",
+          "Relevance"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetContactRoleType": {
+        "enum": [
+          "Owner",
+          "Contact"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetServiceType": {
+        "enum": [
+          "Event",
+          "Rest",
+          "Soap"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetStatus": {
+        "enum": [
+          "Draft",
+          "Published",
+          "Archived",
+          "Deleted",
+          "Withdrawn"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetType": {
+        "enum": [
+          "DataSet",
+          "DataService",
+          "DataGroup",
+          "DataShare"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetValidationPropertyErrorSeverity": {
+        "enum": [
+          "Warning",
+          "Blocking"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataShareRequestNotificationRecipientType": {
+        "enum": [
+          "DomainDsrNotificationAddress",
+          "EsdaContactPointEmailAddress",
+          "EsdaCustomDsrNotificationAddress"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ManagementData.ActionPermissions": {
+        "type": "object",
+        "properties": {
+          "organisationPermissions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "nullable": true
+          },
+          "domainPermissions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ManagementData.DataShareRequestNotificationRecipient": {
+        "type": "object",
+        "properties": {
+          "dataShareRequestNotificationRecipientType": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataShareRequestNotificationRecipientType"
+          },
+          "customDsrNotificationAddress": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ManagementData.ManagementMetadataBase": {
+        "type": "object",
+        "properties": {
+          "draftStatus": {
+            "type": "string",
+            "nullable": true,
+            "deprecated": true
+          },
+          "publishedStatus": {
+            "type": "string",
+            "nullable": true,
+            "deprecated": true
+          },
+          "dataAssetStatus": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetStatus"
+          },
+          "isDraft": {
+            "type": "boolean",
+            "nullable": true,
+            "deprecated": true
+          },
+          "valid": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "productId": {
+            "type": "string",
+            "nullable": true
+          },
+          "organisationId": {
+            "type": "string",
+            "nullable": true
+          },
+          "domainId": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataOwnerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "permissions": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ManagementData.Permissions"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ManagementData.Permissions": {
+        "type": "object",
+        "properties": {
+          "discoverabilityPermissions": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ManagementData.ActionPermissions"
+          },
+          "manageabilityPermissions": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ManagementData.ActionPermissions"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.MigrateProfiledDataAssetFrom1p0To3p1Result": {
+        "required": [
+          "dataAssetV1",
+          "dataAssetV3",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "dataAssetV1": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "dataAssetV3": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ProfiledDataAsset": {
+        "required": [
+          "dataAssetType",
+          "managementMetadata",
+          "payload",
+          "profileId"
+        ],
+        "type": "object",
+        "properties": {
+          "profileId": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataAssetType": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetType"
+          },
+          "payload": {
+            "type": "string",
+            "nullable": true
+          },
+          "managementMetadata": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ManagementData.ManagementMetadataBase"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ProfiledDataAssetsSpreadsheetValidationSummary": {
+        "required": [
+          "profiledDataAssetsSpreadsheetItemValidationSummaries",
+          "spreadsheetFileName"
+        ],
+        "type": "object",
+        "properties": {
+          "spreadsheetFileName": {
+            "type": "string",
+            "nullable": true
+          },
+          "profiledDataAssetsSpreadsheetItemValidationSummaries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ValidatedProfiledDataAsset"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V1_0.DataAssetDataOwner": {
+        "required": [
+          "contactName",
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "contactName": {
+            "maxLength": 50,
+            "minLength": 1,
+            "type": "string"
+          },
+          "email": {
+            "minLength": 1,
+            "pattern": "/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$/",
+            "type": "string"
+          },
+          "isOwnerPointOfContact": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V1_0.DataAssetDistribution": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "maxLength": 250,
+            "type": "string",
+            "nullable": true
+          },
+          "accessService": {
+            "maxLength": 250,
+            "type": "string",
+            "nullable": true
+          },
+          "identifier": {
+            "maxLength": 75,
+            "type": "string",
+            "nullable": true
+          },
+          "modified": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "issued": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "licence": {
+            "maxLength": 100,
+            "type": "string",
+            "nullable": true
+          },
+          "byteSize": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "mediaType": {
+            "maxLength": 50,
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V1_0.ServiceStatusEnum": {
+        "enum": [
+          "Discovery",
+          "Alpha",
+          "Beta",
+          "PrivateBeta",
+          "PublicBeta",
+          "Live",
+          "Deprecated",
+          "Withdrawn"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V1_0.ServiceTypeEnum": {
+        "enum": [
+          "Event",
+          "Rest",
+          "Soap"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V1_0.UpdateFrequencyEnum": {
+        "enum": [
+          "Triennial",
+          "Biennial",
+          "Annual",
+          "SemiAnnual",
+          "ThreeTimesAYear",
+          "Quarterly",
+          "Bimonthly",
+          "Monthly",
+          "Semimonthly",
+          "Biweekly",
+          "ThreeTimesAMonth",
+          "Weekly",
+          "Semiweekly",
+          "ThreeTimesAWeek",
+          "Daily",
+          "Continuous",
+          "Irregular"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.CataloguedResource": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ResourceEnum"
+          },
+          "identifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "accessRights": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.AccessRightsEnum"
+          },
+          "contactPoint": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Contact"
+            },
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "keyword": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "modified": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "publisher": {
+            "type": "string",
+            "nullable": true
+          },
+          "securityClassification": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.SecurityClassificationEnum"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ResourceStatusEnum"
+          },
+          "supplierIdentifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "theme": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ThemeEnum"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Contact": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ContactRoleEnum"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataService": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ResourceEnum"
+          },
+          "identifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "accessRights": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.AccessRightsEnum"
+          },
+          "contactPoint": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Contact"
+            },
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "keyword": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "modified": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "publisher": {
+            "type": "string",
+            "nullable": true
+          },
+          "securityClassification": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.SecurityClassificationEnum"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ResourceStatusEnum"
+          },
+          "supplierIdentifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "theme": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ThemeEnum"
+            },
+            "nullable": true
+          },
+          "apiType": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ApiTypeEnum"
+          },
+          "endpointDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "endpointUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "servesDataset": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "serviceType": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ServiceTypeEnum"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.DataSet": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ResourceEnum"
+          },
+          "identifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "accessRights": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.AccessRightsEnum"
+          },
+          "contactPoint": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Contact"
+            },
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "keyword": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "modified": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "publisher": {
+            "type": "string",
+            "nullable": true
+          },
+          "securityClassification": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.SecurityClassificationEnum"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ResourceStatusEnum"
+          },
+          "supplierIdentifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "theme": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ThemeEnum"
+            },
+            "nullable": true
+          },
+          "distribution": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Distribution"
+            },
+            "nullable": true
+          },
+          "issued": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "updateFrequency": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Distribution": {
+        "type": "object",
+        "properties": {
+          "accessService": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "downloadUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "mediaType": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.AccessRightsEnum": {
+        "enum": [
+          "Internal",
+          "Open",
+          "Commercial"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ApiTypeEnum": {
+        "enum": [
+          "Rest",
+          "Soap",
+          "Event",
+          "Rpc",
+          "GraphQl"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ContactRoleEnum": {
+        "enum": [
+          "Owner",
+          "Contact"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ResourceEnum": {
+        "enum": [
+          "DataSet",
+          "DataService",
+          "DataGroup",
+          "DataShare"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ResourceStatusEnum": {
+        "enum": [
+          "Draft",
+          "Published",
+          "Withdrawn",
+          "Deleted"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.SecurityClassificationEnum": {
+        "enum": [
+          "Official",
+          "Secret",
+          "TopSecret",
+          "NotApplicable"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ServiceTypeEnum": {
+        "enum": [
+          "Bulk",
+          "Transactional",
+          "Information"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ThemeEnum": {
+        "enum": [
+          "AgricultureFisheriesAndForestry",
+          "BusinessEconomicsAndFinance",
+          "CrimeAndJustice",
+          "CultureLeisureAndSport",
+          "Education",
+          "Energy",
+          "EnvironmentAndNature",
+          "Geography",
+          "GovernmentAndPublicSector",
+          "HealthAndCare",
+          "PopulationAndSociety",
+          "ScienceAndTechnology",
+          "TransportAndInfrastructure"
+        ],
+        "type": "string"
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.ErrorMessage": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.InnerError"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.InnerError": {
+        "type": "object",
+        "properties": {
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "location": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.PublishedValidatedProfiledDataAssetsSpreadsheetContentItem": {
+        "type": "object",
+        "properties": {
+          "recordId": {
+            "type": "string",
+            "nullable": true
+          },
+          "assetTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataAssetType": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetType"
+          },
+          "publishedId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ValidatedProfiledDataAsset": {
+        "required": [
+          "assetTitle",
+          "profiledDataAsset",
+          "recordId",
+          "validationErrors"
+        ],
+        "type": "object",
+        "properties": {
+          "recordId": {
+            "type": "string",
+            "nullable": true
+          },
+          "assetTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "profiledDataAsset": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ProfiledDataAsset"
+          },
+          "validationErrors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.DataAssetValidationPropertyError"
+              }
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.Reports.CatalogData.CatalogReportsDataItem": {
+        "type": "object",
+        "properties": {
+          "catalogReportsDataItemFields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.Reports.CatalogData.CatalogReportsDataItemField"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.Reports.CatalogData.CatalogReportsDataItemField": {
+        "required": [
+          "field",
+          "values"
+        ],
+        "type": "object",
+        "properties": {
+          "field": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.CatalogData.CatalogAssetField"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.Reports.CatalogData.Filters.CatalogReportFieldFilter": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.CatalogData.CatalogAssetField"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Models.Reports.CatalogData.Filters.CatalogReportsFilter": {
+        "type": "object",
+        "properties": {
+          "filterByInitiatingUserPermissions": {
+            "type": "boolean"
+          },
+          "fieldFilters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.Reports.CatalogData.Filters.CatalogReportFieldFilter"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Requests.DataAssets.AddProfiledDataAssetRequest": {
+        "required": [
+          "dataAssetType",
+          "managementMetadata",
+          "payload",
+          "profileId"
+        ],
+        "type": "object",
+        "properties": {
+          "profileId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "dataAssetType": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetType"
+          },
+          "payload": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "managementMetadata": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ManagementData.ManagementMetadataBase"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Requests.DataAssets.CheckForPotentialDuplicatesInValidatedSpreadsheetContentRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Requests.DataAssets.MigrateProfiledDataAssetsFrom1p0To3p1Request": {
+        "required": [
+          "dataAssetIds"
+        ],
+        "type": "object",
+        "properties": {
+          "dataAssetIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Requests.DataAssets.PatchProfiledDataAssetRequest": {
+        "required": [
+          "dataAssetType",
+          "payload",
+          "profileId"
+        ],
+        "type": "object",
+        "properties": {
+          "profileId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "dataAssetType": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetType"
+          },
+          "payload": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "managementMetadata": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ManagementData.ManagementMetadataBase"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Requests.DataAssets.PublishValidatedProfiledDataAssetsSpreadsheetContentRequest": {
+        "required": [
+          "dataShareRequestNotificationRecipient"
+        ],
+        "type": "object",
+        "properties": {
+          "dataShareRequestNotificationRecipient": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ManagementData.DataShareRequestNotificationRecipient"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Requests.Reports.PerformCatalogReportsQueryRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Requests.Reports.QueryCatalogReportsDataRequest": {
+        "required": [
+          "numberOfRecords",
+          "requiredFields",
+          "startRecordIndex"
+        ],
+        "type": "object",
+        "properties": {
+          "requiredFields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.CatalogData.CatalogAssetField"
+            }
+          },
+          "filter": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.Reports.CatalogData.Filters.CatalogReportsFilter"
+          },
+          "startRecordIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "numberOfRecords": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "searchText": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.AddProfiledDataAssetResponse": {
+        "type": "object",
+        "properties": {
+          "dataAssetId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.CheckForPotentialDuplicatesInValidatedSpreadsheetContentResponse": {
+        "required": [
+          "potentialDuplicatesToSpreadsheetContent"
+        ],
+        "type": "object",
+        "properties": {
+          "potentialDuplicatesToSpreadsheetContent": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.Models.PotentialDuplicatesToSpreadsheetItemInformation"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.CheckForPotentialDuplicatesInValidatedSpreadsheetItemResponse": {
+        "required": [
+          "potentialDuplicatesToSpreadsheetItem"
+        ],
+        "type": "object",
+        "properties": {
+          "potentialDuplicatesToSpreadsheetItem": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.Models.PotentialDuplicatesToSpreadsheetItemInformation"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.CheckForPotentialDuplicatesToDataAssetResponse": {
+        "required": [
+          "potentialDuplicatesToDataAsset"
+        ],
+        "type": "object",
+        "properties": {
+          "potentialDuplicatesToDataAsset": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.Models.PotentialDuplicateDataAssetInformation"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.DeleteProfiledDataAssetResponse": {
+        "required": [
+          "dataAssetId"
+        ],
+        "type": "object",
+        "properties": {
+          "dataAssetId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetCddoDataAssetResponse": {
+        "type": "object",
+        "properties": {
+          "cddoDataAsset": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.CddoDataAsset"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetCddoDataAssetValidationErrorsResponse": {
+        "required": [
+          "propertyValidationErrors"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyValidationErrors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.DataAssetValidationPropertyResult"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetCddoDataAssetsResponse": {
+        "type": "object",
+        "properties": {
+          "totalNumberOfMatchingCddoDataAssets": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cddoDataAssets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.CddoDataAsset"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetEsdaOwnershipDetailsResponse": {
+        "required": [
+          "domainId",
+          "esdaId",
+          "organisationId",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "esdaId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "organisationId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "domainId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "contactPointName": {
+            "type": "string",
+            "nullable": true
+          },
+          "contactPointEmailAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataShareRequestNotificationRecipientType": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataShareRequestNotificationRecipientType"
+          },
+          "customDsrNotificationAddress": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetProfiledDataAssetIdsResponse": {
+        "type": "object",
+        "properties": {
+          "totalNumberOfMatchingProfiledDataAssetIds": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "profiledDataAssetIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetProfiledDataAssetResponse": {
+        "type": "object",
+        "properties": {
+          "profiledDataAsset": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ProfiledDataAsset"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetProfiledDataAssetsResponse": {
+        "type": "object",
+        "properties": {
+          "totalNumberOfMatchingProfiledDataAssets": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "profiledDataAssets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ProfiledDataAsset"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetSearchSuggestionsForOrganisationDataAssetsResponse": {
+        "type": "object",
+        "properties": {
+          "searchSuggestionsForOrganisationDataAssets": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetSearchSuggestionsForPublishedDataAssetsResponse": {
+        "type": "object",
+        "properties": {
+          "searchSuggestionsForPublishedDataAssets": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetValidatedProfiledDataAssetsSpreadsheetContentResponse": {
+        "type": "object",
+        "properties": {
+          "profiledDataAssetsSpreadsheetValidationSummary": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ProfiledDataAssetsSpreadsheetValidationSummary"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.GetValidatedProfiledDataAssetsSpreadsheetItemContentResponse": {
+        "type": "object",
+        "properties": {
+          "validatedProfiledDataAsset": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ValidatedProfiledDataAsset"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.MigrateProfiledDataAssetsFrom1p0To3p1Response": {
+        "type": "object",
+        "properties": {
+          "migrateProfiledDataAssetFrom1p0To3p1Results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.MigrateProfiledDataAssetFrom1p0To3p1Result"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.Models.PotentialDuplicateDataAssetInformation": {
+        "required": [
+          "dataAssetId",
+          "profileId",
+          "similarityDescriptions",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "dataAssetId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "profileId": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "similarityDescriptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.Models.PotentialDuplicateSpreadsheetContentItemInformation": {
+        "required": [
+          "recordId",
+          "similarityDescriptions",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "recordId": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "similarityDescriptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.Models.PotentialDuplicatesToSpreadsheetItemInformation": {
+        "required": [
+          "potentialDuplicateDataAssets",
+          "potentialDuplicateSpreadsheetContentItems",
+          "recordId"
+        ],
+        "type": "object",
+        "properties": {
+          "recordId": {
+            "type": "string",
+            "nullable": true
+          },
+          "potentialDuplicateDataAssets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.Models.PotentialDuplicateDataAssetInformation"
+            },
+            "nullable": true
+          },
+          "potentialDuplicateSpreadsheetContentItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.Models.PotentialDuplicateSpreadsheetContentItemInformation"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.PatchProfiledDataAssetResponse": {
+        "type": "object",
+        "properties": {
+          "dataAssetId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.PublishValidatedProfiledDataAssetsSpreadsheetContentResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "publishedValidatedProfiledDataAssetsSpreadsheetContentItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.PublishedValidatedProfiledDataAssetsSpreadsheetContentItem"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.DataAssets.ValidateProfiledDataAssetsSpreadsheetContentResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "profiledDataAssetsSpreadsheetValidationSummary": {
+            "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.ProfiledDataAssetsSpreadsheetValidationSummary"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.Lookup.GetCddoOrganisationsResponse": {
+        "required": [
+          "organisations"
+        ],
+        "type": "object",
+        "properties": {
+          "organisations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.Lookup.GetCddoTopicsResponse": {
+        "required": [
+          "topics"
+        ],
+        "type": "object",
+        "properties": {
+          "topics": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.Reports.PerformCatalogReportsQueryResponse": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Cddo.Data.Marketplace.Api.Dto.Responses.Reports.QueryCatalogReportsDataResponse": {
+        "type": "object",
+        "properties": {
+          "totalNumberOfMatchedRecords": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "selectableFields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.CatalogData.CatalogAssetField"
+            },
+            "nullable": true
+          },
+          "selectedFields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.CatalogData.CatalogAssetField"
+            },
+            "nullable": true
+          },
+          "selectedStatuses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.DataAssets.Enums.DataAssetStatus"
+            },
+            "nullable": true
+          },
+          "organisations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "selectableOrganisations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "reportName": {
+            "type": "string",
+            "nullable": true
+          },
+          "templateId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "catalogReportsDataItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cddo.Data.Marketplace.Api.Dto.Models.Reports.CatalogData.CatalogReportsDataItem"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Microsoft.AspNetCore.Mvc.ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": {}
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "apiKey",
+        "description": "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ]
+}

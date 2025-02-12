@@ -1,0 +1,87 @@
+﻿@page
+@using Cddo.Data.Marketplace.UI.Configuration
+@model HealthChecksModel
+@{
+    ViewData["Title"] = "Health Check Results";
+}
+
+<div class="govuk-width-container">
+    <a class="govuk-back-link" href="/Manage">Back</a>
+    <div class="govuk-main-wrapper">
+        <h1 class="govuk-heading-xl">
+            <span class="govuk-caption-l">Service Status</span>
+            Health Check
+        </h1>
+<table class="govuk-table">
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th class="govuk-table__header">Service</th>
+            <th class="govuk-table__header">Status</th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+        @foreach (var summary in Model.HealthCheckSummaries)
+        {
+            <tr class="govuk-table__row">
+                <td class="govuk-table__cell">
+                    <strong>@summary.Key:</strong> (Uptime: @summary.Duration)
+                </td>
+                <td class="govuk-table__cell">
+                    <span class="govuk-tag govuk-tag--@((summary.Status == "Healthy") ? "green" : "red")">
+                        @summary.Status
+                    </span>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@foreach (var summary in Model.HealthCheckSummaries)
+{
+    <h2 class="govuk-heading-l">@summary.Key</h2>
+    <table class="govuk-table">
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th class="govuk-table__header">Timestamp</th>
+                <th class="govuk-table__header">Status</th>
+                <th class="govuk-table__header">Total Duration</th>
+                <th class="govuk-table__header">Key</th>
+                <th class="govuk-table__header">Description</th>
+                <th class="govuk-table__header">Details</th>
+            </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+            @if (summary.HealthCheckResults.Count == 0)
+            {
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__cell" colspan="6">Health check service is unavailable.</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var result in summary.HealthCheckResults)
+                {
+                    <tr class="govuk-table__row">
+                                <td class="govuk-table__cell">@result.Timestamp.ToGDSHelperString()</td>
+                        <td class="govuk-table__cell">@result.Status</td>
+                        <td class="govuk-table__cell">@result.TotalDuration</td>
+                        <td class="govuk-table__cell">@result.Key</td>
+                        <td class="govuk-table__cell">@result.Description</td>
+                        <td class="govuk-table__cell">
+                            <ul class="govuk-list govuk-list--bullet">
+                                @if (result.Data != null)
+                                {
+                                    @foreach (var detail in result.Data)
+                                    {
+                                        <li>@detail.Key: @detail.Value</li>
+                                    }
+                                }
+                            </ul>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}

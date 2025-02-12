@@ -1,0 +1,13 @@
+{
+  "TemplateId": "0a87e370-0428-427c-8de9-313776944c35",
+  "KqlQuery": "AppEvents| extend UserId = tostring(Properties.UserId ) | where UserId == \u0027-1\u0027 or UserId == \u0027\u0027| where Name == \u0027UserFailedLoginAttempt\u0027 | summarize Count = count() by UserId | order by Count desc",
+  "ReportType": 1,
+  "ReportName": "Failed login attempt",
+  "Description": "Failed login attempt",
+  "CreatedOn": "2024-11-01T10:37:32.8129956+00:00",
+  "UserId": 11,
+  "OrganisationId": 1,
+  "SharedWithOrganisationIds": null,
+  "SharedWithUsersIds": null,
+  "IsPredefined": true
+}

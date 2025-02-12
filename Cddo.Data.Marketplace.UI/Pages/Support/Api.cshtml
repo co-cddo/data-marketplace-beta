@@ -1,0 +1,110 @@
+﻿@model List<Cddo.Data.Marketplace.UI.Configuration.TagLinks>
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Pages.Shared
+@using Cddo.Data.Marketplace.UI.Configuration
+
+@{
+    ViewData["Title"] = "Support - API";
+    Layout = "~/Pages/Shared/_SupportLayout.cshtml";
+}
+
+<div>
+    <h1 class="govuk-heading-l">
+        API
+    </h1>
+
+    <p class="govuk-body">
+        You can use the Data Marketplace API to:
+    </p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li>submit and update your data in the Data Marketplace catalogue</li>
+        <li>search for your data in the Data Marketplace catalogue using keywords and other search terms</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">API credentials</h2>
+
+    <p class="govuk-body">
+        You can <a href="@Url.Page("/ApiPortal/APILandingPage")" class="govuk-link">create credentials</a> for 2 environments:
+    </p>
+
+    <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                Sandbox
+            </dt>
+            <dd class="govuk-summary-list__value">
+                https://api.sandbox.datamarketplace.gov.uk/v1
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                Production
+            </dt>
+            <dd class="govuk-summary-list__value">
+                https://api.datamarketplace.gov.uk/v1
+            </dd>
+        </div>
+    </dl>
+
+    <h2 class="govuk-heading-m">Security scopes</h2>
+
+    <p class="govuk-body">Each API endpoint requires one of the following security scopes:</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li>
+            <strong>discover</strong> – to search and retrieve your data
+        </li>
+        <li>
+            <strong>publish</strong> – to publish or update your data
+        </li>
+        <li>
+            <strong>delete</strong> – to delete your data
+        </li>
+    </ul>
+
+    <p class="govuk-body">When you create your credentials, they'll have all 3 scopes by default. You can change this if required.</p>
+
+    <h2 class="govuk-heading-m">
+        Authentication using tokens
+    </h2>
+
+    <p class="govuk-body">You need to pass your credentials to the token endpoint to generate an access token.</p>
+
+    <p class="govuk-body">To call the token endpoint, construct a request with the following information (replacing the URL, client secret and client id):</p>
+
+    <pre style="max-width:100%; overflow: auto; border: 10px solid #eee; padding: 10px; font-size: 1rem;">
+    POST {API URL}/ClientAuth/get-token HTTP/1.1
+    Content-Type: application/x-www-form-urlencoded
+
+    grant_type=client_credentials&amp;scope=discover%2Cpublish&amp;client_id={your-client-ID}&amp;client_secret={your-client-secret}
+    </pre>
+
+    <p class="govuk-body">This request will return an access token like the one below:</p>
+
+    <pre style="max-width:100%; overflow: auto; border: 10px solid #eee; padding: 10px; font-size: 1rem;">
+    eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+    </pre>
+
+    <p class="govuk-body">You need to present the access token when you call API endpoints.</p>
+
+    <p class="govuk-body">To do this, construct a request like the one below. It needs a header called ‘Authorization’ with a value set to ‘Bearer {access token}’ with every call made to the API:</p>
+
+    <pre style="max-width:100%; overflow: auto; border: 10px solid #eee; padding: 10px; font-size: 1rem;">
+    GET {API URL}/catalogued-resources HTTP/1.1
+    Authorization: Bearer {access token}
+    </pre>
+
+    <h2 class="govuk-heading-m govuk-!-margin-top-6">
+        Endpoints
+    </h2>
+
+    <ul class="govuk-list">
+
+        @foreach (var item in Model!)
+        {
+            <li><a class="govuk-link" asp-controller="Support" asp-action="GetEndpointData" asp-route-apiPath="@item.TagLink" asp-route-operationId="@item.TagName">@item.TagLabel</a></li>
+        }
+    </ul>
+</div>
+

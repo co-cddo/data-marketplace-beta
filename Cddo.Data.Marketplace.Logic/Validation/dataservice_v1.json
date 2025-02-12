@@ -1,0 +1,211 @@
+{
+  "description": "Data Marketplace Metadata schema for the core or minimum data set",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "title",
+    "description",
+    "contactPoint",
+    "publisher",
+    "securityClassification",
+    "serviceType"
+  ],
+  "properties": {
+    "dataAssetId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "title": {
+      "description": "The full and formal name given to an information resource. A name given to the distribution.",
+      "type": "string",
+      "maxLength": 200
+    },
+    "alternativeTitle": {
+      "description": "An alternative name used as a substitute or additional access point for an information resource.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 200
+      }
+    },
+    "summary": {
+      "description": "A short textual summary of the resource with a maximum length of 250 characters.",
+      "type": "string",
+      "maxLength": 250
+    },
+    "description": {
+      "description": "A concise narrative of the content of an information resource. A free-text account of the distribution.",
+      "type": "string",
+      "maxLength": 4096
+    },
+    "keyword": {
+      "description": "Uncontrolled terms (words or phrases) assigned to describe an information resource.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 75
+      }
+    },
+    "theme": {
+      "description": "Topic: A controlled term that expresses the broad topical content of an information resource. Subject: A controlled term that expresses a topic of the intellectual content of an information resource.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Agriculture, fisheries and forestry",
+          "Business, economics and finance",
+          "Crime and justice",
+          "Culture, leisure and sport",
+          "Education",
+          "Energy",
+          "Environment and nature",
+          "Geography",
+          "Government and public sector",
+          "Health and care",
+          "Population and society",
+          "Science and technology",
+          "Transport and infrastructure"
+        ]
+      }
+    },
+    "contactPoint": {
+      "description": "Contact information",
+      "type": "object",
+      "properties": {
+        "contactName": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "email": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$"
+        }
+      },
+      "required": [
+        "contactName",
+        "email"
+      ]
+    },
+    "creator": {
+      "description": "The business entity responsible for creating or compiling the original content of an information resource..",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 75
+      }
+    },
+    "publisher": {
+      "description": "The business entity responsible for making an information resource publicly available.",
+      "type": "string",
+      "maxLength": 75
+    },
+    "securityClassification": {
+      "description": "An information security designation that identifies the minimum level of protection assigned to an information resource.",
+      "enum": [
+        "OFFICIAL",
+        "SECRET",
+        "TOP_SECRET",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "identifier": {
+      "description": "A unique number, code, or reference value assigned to an information resource within a given context.",
+      "type": "string",
+      "maxLength": 50
+    },
+    "relatedResource": {
+      "description": "A resource that bears a close relationship to the described resource.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 250
+      }
+    },
+    "DQ_RelatedResource": {
+      "description": "Does this data asset have a Data Quality Action Plan associated with it, consistent with the definition described in the Govt Data Quality Framework?",
+      "type": "boolean"
+    },
+    "version": {
+      "description": "The version indicator (name or identifier) of a resource.",
+      "type": "string",
+      "maxLength": 15
+    },
+    "issued": {
+      "description": "The date on which an information resource was originally published or otherwise made publicly available for the first time.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "modified": {
+      "description": "The date on which the content of an information resource is changed.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "created": {
+      "description": "The date on which the content of an information resource is created or compiled.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "updateFrequency": {
+      "description": "How often the data underlying this data asset is refreshed or updated.",
+      "enum": [
+        "freq:triennial",
+        "freq:biennial",
+        "freq:annual",
+        "freq:semiannual",
+        "freq:threeTimesAYear",
+        "freq:quarterly",
+        "freq:bimonthly",
+        "freq:monthly",
+        "freq:semimonthly",
+        "freq:biweekly",
+        "freq:threeTimesAMonth",
+        "freq:weekly",
+        "freq:semiweekly",
+        "freq:threeTimesAWeek",
+        "freq:daily",
+        "freq:continuous",
+        "freq:irregular"
+      ]
+    },
+    "licence": {
+      "description": "Reference to the legal document outlining access and usage rights for an information resource.",
+      "type": "string",
+      "maxLength": 250
+    },
+    "serviceType": {
+      "description": "Type of the service",
+      "enum": [
+        "EVENT",
+        "REST",
+        "SOAP"
+      ]
+    },
+    "serviceStatus": {
+      "description": "The status of the resource in the context of a particular workflow process.",
+      "enum": [
+        "DISCOVERY",
+        "ALPHA",
+        "BETA",
+        "PRIVATE_BETA",
+        "PUBLIC_BETA",
+        "LIVE",
+        "DEPRECATED",
+        "WITHDRAWN"
+      ]
+    },
+    "endpointURL": {
+      "description": "The URI or relative URI where the service can be found. See http://tools.ietf.org/html/rfc3986#section-4.1.",
+      "type": "string",
+      "format": "uri-reference"
+    },
+    "endpointDescription": {
+      "description": "A description of the service, including their operations, parameters etc. This can be a link to service documentation.",
+      "type": "string",
+      "maxLength": 250
+    },
+    "servesData": {
+      "description": "A collection of data that this data service can distribute.",
+      "type": "string"
+    }
+  }
+}

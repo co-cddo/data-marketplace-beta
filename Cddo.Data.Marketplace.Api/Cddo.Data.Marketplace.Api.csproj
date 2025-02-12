@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Agm.Catalog.DotNet" Version="12.4.0.61" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.1" />
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+    <PackageReference Include="Azure.Storage.Files.Shares" Version="12.20.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.22.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.8" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="8.0.6" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cddo.Data.Marketplace.Domain\Cddo.Data.Marketplace.Api.Dto.csproj" />
+    <ProjectReference Include="..\Cddo.Data.Marketplace.Logic\Cddo.Data.Marketplace.Logic.csproj" />
+  </ItemGroup>
+
+</Project>

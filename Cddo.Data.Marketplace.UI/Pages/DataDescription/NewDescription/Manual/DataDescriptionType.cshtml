@@ -1,0 +1,64 @@
+﻿@using Cddo.Data.Marketplace.UI.Controllers
+@model Cddo.Data.Marketplace.UI.Pages.DataDescription.NewDescription.Manual.DataDescriptionTypeModel
+@{
+    ViewData["Title"] = "Confirm Data Description";
+}
+
+<a class="govuk-back-link" asp-controller="CatalogDataDescription"
+   asp-action="@nameof(CatalogDataDescriptionController.AddNewDataDescription)">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.DataDescriptionTypeSubmit)">
+                @Html.AntiForgeryToken()
+                @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
+
+                @{
+                    var hasError = ViewData.ModelState["confirmDataDescription"]?.Errors.Any() == true;
+                }
+
+                <div class="govuk-form-group @(hasError ? "govuk-form-group--error" : "")">
+                    <fieldset class="govuk-fieldset" aria-describedby="confirm-description-hint">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                            <h1 class="govuk-fieldset__heading">
+                                Confirm the type of data you’re describing
+                            </h1>
+                        </legend>
+                        <div id="confirm-description-hint" class="govuk-hint">
+                            At the moment, you can only add descriptions of data sets (collections of data).
+                            In the future, you’ll be able to add descriptions of data services and data groups.
+                        </div>
+
+                        @if (hasError)
+                        {
+                            <span id="confirm-data-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span> Confirm that you're describing a data set
+                            </span>
+                        }
+
+                        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input @(hasError ? "govuk-input--error" : "")"
+                                       id="confirmDataDescription"
+                                       name="confirmDataDescription"
+                                       type="checkbox"
+                                       value="true"
+                                       aria-describedby="confirm-data-error">
+                                <label class="govuk-label govuk-checkboxes__label" for="confirmDataDescription">
+                                    I'm describing a data set
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <div class="govuk-button-group">
+                    <button type="submit" name="showNextQuestion" value="true" class="govuk-button" data-module="govuk-button">
+                        Continue
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

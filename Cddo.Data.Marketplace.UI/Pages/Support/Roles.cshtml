@@ -1,0 +1,53 @@
+﻿@using Cddo.Data.Marketplace.UI.Controllers
+@model Cddo.Data.Marketplace.UI.Pages.Support.RolesModel
+@{
+    ViewData["Title"] = "Support - Roles";
+    Layout = "~/Pages/Shared/_SupportLayout.cshtml";
+}
+
+<div>
+    <h1 class="govuk-heading-l">Roles</h1>
+
+    <p class="govuk-body">
+        By default, your Data Marketplace account will have the Data Explorer role. This allows you to search for and request data.
+    </p>
+
+    <p class="govuk-body">
+        From your account profile, you can also request the:
+    </p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li>Data Request Approver role to approve data requests on behalf of your organisation</li>
+        <li>Metadata Publisher role to publish listings for your organisation</li>
+    </ul>
+
+    <p class="govuk-body">
+        These requests are managed by your organisation administrator. You will need to provide a reason why you need either role.
+    </p>
+
+    <p class="govuk-body">
+        After submitting a request for one or both of these roles, you will receive:
+    </p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li>a confirmation email</li>
+        <li>an email when your organisation administrator has approved or rejected your request</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Organisation administrators</h2>
+
+    <p class="govuk-body">
+        The Organisation Administrator role allows you to manage users in your team or department.
+    </p>
+
+    <p class="govuk-body">With this role you can:</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li>approve or reject user requests for additional roles</li>
+        <li>revoke a user’s roles</li>
+    </ul>
+
+    <p class="govuk-body">
+        If you want to be an administrator for your organisation, email <a href="mailto:datamarketplace@digital.cabinet-office.gov.uk" class="govuk-link">datamarketplace@digital.cabinet-office.gov.uk</a>.
+    </p>
+</div>

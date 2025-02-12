@@ -1,0 +1,131 @@
+﻿@using Cddo.Data.Marketplace.Api.Dto.Requests.RequestAccess
+@using Cddo.Data.Marketplace.UI.Controllers
+@using GovUk.Frontend.AspNetCore.TagHelpers
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Cddo.Data.Marketplace.Api.Dto
+@using System.Reflection
+@using System.ComponentModel
+@model CreateOrganisationRequest
+
+@{
+    ViewData["Title"] = "Request Access - Add Organisation";
+
+    var organisationTypes = Enum.GetValues(typeof(OrganisationType))
+    .Cast<OrganisationType>()
+    .Select(e => new SelectListItem
+            {
+                Text = GetEnumDescription(e),
+                Value = e.ToString(),
+                Selected = Model?.OrganisationType.HasValue == true && Model.OrganisationType.Value == e
+            });
+
+    string GetEnumDescription(Enum value)
+    {
+        FieldInfo field = value.GetType().GetField(value.ToString());
+        var attribute = field.GetCustomAttribute<DescriptionAttribute>();
+        return attribute?.Description ?? value.ToString();
+    }
+
+}
+
+<a class="govuk-back-link" href="/">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            @Html.AntiForgeryToken()
+            @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
+            <h1 class="govuk-heading-l">
+                <span class="govuk-caption-l">Request access</span>
+                Add your organisation to the Data Marketplace
+            </h1>
+            <p class="govuk-body">Provide the details below so that you and colleagues from your organisation can create accounts and start using the Data Marketplace. </p>
+            <form method="post" asp-controller="OrganisationAccess" asp-action="@nameof(OrganisationAccessController.SubmitOrganisationRequest)">
+                <!-- User Name -->
+                <div class="govuk-form-group @(ViewData.ModelState[nameof(Model.UserName)]?.Errors.Any() == true ? "govuk-form-group--error" : "")">
+                    <label class="govuk-label" for="@nameof(CreateOrganisationRequest.UserName)">Your name</label>
+                    @if (ViewData.ModelState[nameof(Model.UserName)]?.Errors.Any() == true)
+                    {
+                        <p id="UserName-error" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState[nameof(Model.UserName)]?.Errors.FirstOrDefault()?.ErrorMessage
+                        </p>
+                    }
+                    <input class="govuk-input @(ViewData.ModelState[nameof(Model.UserName)]?.Errors.Any() == true ? "govuk-input--error" : "")"
+                           id="@nameof(CreateOrganisationRequest.UserName)" name="@nameof(CreateOrganisationRequest.UserName)" type="text" value="@Model?.UserName">
+                </div>
+
+                <!-- User Email Address -->
+                <div class="govuk-form-group @(ViewData.ModelState[nameof(Model.CreatedBy)]?.Errors.Any() == true ? "govuk-form-group--error" : "")">
+                    <label class="govuk-label" for="@nameof(CreateOrganisationRequest.CreatedBy)">Email address</label>
+                    @if (ViewData.ModelState[nameof(Model.CreatedBy)]?.Errors.Any() == true)
+                    {
+                        <p id="userEmail-error" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState[nameof(Model.CreatedBy)]?.Errors.FirstOrDefault()?.ErrorMessage
+                        </p>
+                    }
+                    <input class="govuk-input @(ViewData.ModelState[nameof(Model.CreatedBy)]?.Errors.Any() == true ? "govuk-input--error" : "")"
+                           id="@nameof(CreateOrganisationRequest.CreatedBy)" name="@nameof(CreateOrganisationRequest.CreatedBy)" type="text" value="@Model?.CreatedBy">
+                </div>
+
+                <!-- Organisation Name -->
+                <div class="govuk-form-group @(ViewData.ModelState[nameof(Model.OrganisationName)]?.Errors.Any() == true ? "govuk-form-group--error" : "")">
+                    <label class="govuk-label" for="@nameof(CreateOrganisationRequest.OrganisationName)">Organisation name</label>
+                    @if (ViewData.ModelState[nameof(Model.OrganisationName)]?.Errors.Any() == true)
+                    {
+                        <p id="organisationName-error" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState[nameof(Model.OrganisationName)]?.Errors.FirstOrDefault()?.ErrorMessage
+                        </p>
+                    }
+                    <input class="govuk-input @(ViewData.ModelState[nameof(Model.OrganisationName)]?.Errors.Any() == true ? "govuk-input--error" : "")"
+                           id="@nameof(CreateOrganisationRequest.OrganisationName)" name="@nameof(CreateOrganisationRequest.OrganisationName)" type="text" value="@Model?.OrganisationName">
+                </div>
+
+                <!-- Organisation Type -->
+                <div class="govuk-form-group @(ViewData.ModelState[nameof(Model.OrganisationType)]?.Errors.Any() == true ? "govuk-form-group--error" : "")">
+                    <label class="govuk-label" for="@nameof(CreateOrganisationRequest.OrganisationType)">Organisation type</label>
+                    @if (ViewData.ModelState[nameof(Model.OrganisationType)]?.Errors.Any() == true)
+                    {
+                        <p id="organisationType-error" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState[nameof(Model.OrganisationType)]?.Errors.FirstOrDefault()?.ErrorMessage
+                        </p>
+                    }
+                    <select class="govuk-select @(ViewData.ModelState[nameof(Model.OrganisationType)]?.Errors.Any() == true ? "govuk-select--error" : "")"
+                            id="@nameof(CreateOrganisationRequest.OrganisationType)"
+                            name="@nameof(CreateOrganisationRequest.OrganisationType)">
+                        <option value="" disabled selected="selected">Please select an organisation type</option>
+                        @foreach (var item in organisationTypes)
+                        {
+                            if (Model?.OrganisationType?.ToString() == item.Value)
+                            {
+                                <option value="@item.Value" selected="selected">@item.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <!-- Domain Name -->
+                <div class="govuk-form-group @(ViewData.ModelState[nameof(Model.DomainName)]?.Errors.Any() == true ? "govuk-form-group--error" : "")">
+                    <label class="govuk-label" for="@nameof(CreateOrganisationRequest.DomainName)">Domain name</label>
+                    @if (ViewData.ModelState[nameof(Model.DomainName)]?.Errors.Any() == true)
+                    {
+                        <p id="domainName-error" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState[nameof(Model.DomainName)]?.Errors.FirstOrDefault()?.ErrorMessage
+                        </p>
+                    }
+                    <input class="govuk-input @(ViewData.ModelState[nameof(Model.DomainName)]?.Errors.Any() == true ? "govuk-input--error" : "")"
+                           id="@nameof(CreateOrganisationRequest.DomainName)" name="@nameof(CreateOrganisationRequest.DomainName)" type="text" value="@Model?.DomainName">
+                </div>
+
+                <!-- Submit Button -->
+                <div class="govuk-button-group">
+                    <button type="submit" class="govuk-button" data-module="govuk-button">Submit</button>
+                    <a class="govuk-link" href="/">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

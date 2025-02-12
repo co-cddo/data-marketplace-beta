@@ -1,0 +1,50 @@
+﻿@using Cddo.Data.Marketplace.UI.Controllers
+@model Cddo.Data.Marketplace.UI.Pages.Support.DataShareArrangementModel
+@{
+    ViewData["Title"] = "Support - Setup Datashare Arrangement";
+    Layout = "~/Pages/Shared/_SupportLayout.cshtml";
+}
+
+<div>
+    <h1 class="govuk-heading-l">
+        Set up a data share arrangement
+    </h1>
+
+    <h2 class="govuk-heading-m">1. Find the data you need</h2>
+
+    <p class="govuk-body">
+        The Data Marketplace is a place for people who work in government to find and request data from other government organisations.<br />
+        <br />
+        Start by <a class="govuk-link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartCddoDataAssetsSearch)">searching the data catalogue</a> to find data assets that you’re interested in. Data assets include data sets and data services.
+    </p>
+
+    <h2 class="govuk-heading-m">2. Submit a data share request</h2>
+
+    <p class="govuk-body">
+        When you’ve found a data asset you would like to request, select the link on that screen to begin the data share request process.<br />
+        <br />
+        This involves answering a <a class="govuk-link" asp-controller="Support" asp-action="@nameof(SupportController.DataShareQuestions)">list of questions</a> to ensure your request meets data protection and data sharing standards.<br />
+        <br />
+        Your answers will be reviewed by the organisation that owns the data – the data supplier. It can take time for them to make a decision, and they may ask you for more information.
+    </p>
+
+    <h2 class="govuk-heading-m">3. Complete a DPIA and MOU</h2>
+
+    <p class="govuk-body">
+        If the data asset you’re requesting contains personal data, the data supplier may ask for a <a class="govuk-link" rel="noopener" target="_blank" href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/accountability-and-governance/data-protection-impact-assessments-dpias/what-is-a-dpia/">Data Protection Impact Assessment (DPIA) (opens in new tab)</a>. Make sure you speak with a data protection specialist in your organisation as early in the process as possible to help you complete this.<br />
+        <br />
+        If your request is approved, you’ll need to agree a memorandum of understanding (MOU) with the data supplier.<br />
+        <br />
+        An MOU is a statement of intent between 2 or more organisations. Your MOU will cover the details of your data sharing agreement. Many organisations and departments have their own MOU templates.
+    </p>
+
+    <h2 class="govuk-heading-m">4. Gain access to the data</h2>
+
+    <p class="govuk-body">
+        Once your MOU and, if required, DPIA are in place, the data supplier will speak with you about how you can access their data.<br />
+        <br />
+        This will vary depending on the available formats of the data and how it can be delivered.<br />
+        <br />
+        Data sharing itself happens outside the Data Marketplace because each organisation manages data transfers differently.
+    </p>
+</div>

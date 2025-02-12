@@ -1,0 +1,309 @@
+﻿@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests
+@using Cddo.Data.Marketplace.Api.Dto.Models.DataShareRequests
+@using Cddo.Data.Marketplace.Api.Dto.Requests.ManageUser
+@using Cddo.Data.Marketplace.Logic.Services.Interfaces
+@using Cddo.Data.Marketplace.UI.Controllers
+@inject IManageOrganisationService _manageUserService
+@model Agrimetrics.DataShare.Api.Dto.Responses.Acquirer.DataShareRequests.GetDataShareRequestAdminSummariesResponse
+@{
+    ViewData["Title"] = "Received Requests";
+
+    var dataShareRequestSummaries = Model?.DataShareRequestAdminSummaries?.DataShareRequestAdminSummaries ?? new List<DataShareRequestAdminSummary>();
+
+    var pendingList = new List<DataShareRequestStatus> { DataShareRequestStatus.Returned, DataShareRequestStatus.Submitted, DataShareRequestStatus.InReview };
+    var completedList = new List<DataShareRequestStatus> { DataShareRequestStatus.Accepted, DataShareRequestStatus.Rejected };
+
+    var selectableStatuses = new List<DataShareRequestStatus>
+    {
+        DataShareRequestStatus.Accepted,
+        DataShareRequestStatus.Rejected,
+        DataShareRequestStatus.Returned,
+        DataShareRequestStatus.Submitted,
+        DataShareRequestStatus.InReview
+    };
+
+    var manageOrganisationRequest = new ManageOrganisationsRequest
+            {
+                PageNumber = 1,
+                PageSize = int.MaxValue
+            };
+    var organisationList = await _manageUserService.GetManageOrganisationsAsync(manageOrganisationRequest);
+
+
+}
+
+@functions
+{
+    private static string GetNonBreakingStatusDescription(DataShareRequestStatus dataShareRequestStatus)
+    {
+        var description = GetStatusDescription(dataShareRequestStatus);
+
+        return description.Replace(" ", "&nbsp");
+    }
+
+    private static string GetStatusDescription(DataShareRequestStatus dataShareRequestStatus)
+    {
+        return dataShareRequestStatus switch
+        {
+            DataShareRequestStatus.Submitted => "New",
+            DataShareRequestStatus.InReview => "In Progess",
+            DataShareRequestStatus.Accepted => "Approved",
+            DataShareRequestStatus.Rejected => "Rejected",
+            DataShareRequestStatus.Returned => "Returned With Comments",
+            _ => dataShareRequestStatus.ToString()
+        };
+    }
+
+    public static string FormatDate(DateTime? date)
+    {
+        if (date == null)
+            return "N/A";
+
+        var suffix = new[] { "th", "st", "nd", "rd" };
+        int day = date.Value.Day;
+        int mod100 = day % 100;
+        string formattedDate = date.Value.ToString("dd MMMM yyyy");
+        string daySuffix;
+        if (mod100 > 10 && mod100 < 20)
+        {
+            daySuffix = suffix[0];
+        }
+        else
+        {
+            int daySuffixIndex = (day % 10) < 4 ? day % 10 : 0;
+            daySuffix = suffix[daySuffixIndex];
+        }
+
+        return day + daySuffix + " " + formattedDate.Substring(2);
+    }
+}
+
+<a class="govuk-back-link" href="@Url.Page("/Manage/Index")">Back</a>
+
+<div class="govuk-main-wrapper ">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <span class="govuk-caption-l">Manage data share requests</span>
+            <h1 class="govuk-heading-xl">Received requests</h1>
+        </div>
+    </div>
+    <form asp-controller="ManageDataRequest" asp-action="@nameof(ManageDataRequestController.GotoManageReceivedDataShare)" method="get">
+        <div class="filter-panel">
+            <h3 class="govuk-heading-s filter-heading">Filter by</h3>
+            <div class="filter-content">
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-two-thirds">
+                        <div class="govuk-form-group">
+                            @if (organisationList != null && organisationList.Orgs.Any())
+                            {
+                                <label for="organisationName" class="govuk-label fw-bold">Select Organisation</label>
+                                <select class="govuk-select govuk-!-width-three-quarters" id="organisationName" name="SupplierOrganisationId">
+                                    <option value="">Select..</option>
+                                    @foreach (var organisation in organisationList.Orgs)
+                                    {
+                                        <option value="@organisation.OrganisationId" selected="@(Convert.ToString(ViewData["SupplierOrganisationId"]) == organisation.OrganisationId.ToString())">
+                                            @organisation.OrganisationName
+                                        </option>
+                                    }
+                                </select>
+                            }
+                            else
+                            {
+                                <h2 class="govuk-heading-l">@Convert.ToString(ViewData["OrganisationName"])</h2>
+                                <input hidden value="@Convert.ToString(ViewData["SupplierOrganisationId"])" name="SupplierOrganisationId">
+                            }
+                        </div>
+                    </div>
+                    <div class="govuk-grid-column-full">
+                        <div class="govuk-form-group">
+                            <fieldset class="govuk-fieldset">
+                                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                                    <h3 class="govuk-fieldset__heading">
+                                        Select Status
+                                    </h3>
+                                </legend>
+
+                                <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                    @foreach (var status in selectableStatuses)
+                                    {
+                                        <div class="govuk-grid-column-one-third">
+                                            <div class="govuk-checkboxes__item">
+                                                <input class="govuk-checkboxes__input" id="status-@(status)" name="DataShareRequestStatuses" type="checkbox" value="@(status)" @(ViewBag?.DataShareRequestStatuses?.Contains(@status) ? "checked" : "")>
+                                                <label class="govuk-label govuk-checkboxes__label" for="status-@(status)">
+                                                    @Html.Raw(GetNonBreakingStatusDescription(status))
+                                                </label>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="govuk-button-group">
+                    <button type="submit" class="govuk-button" data-module="govuk-button">
+                        Apply filter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="govuk-tabs" data-module="govuk-tabs">
+        <h2 class="govuk-tabs__title">
+            Contents
+        </h2>
+        <ul class="govuk-tabs__list">
+            <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+                <a class="govuk-tabs__tab" href="#pending-requests">
+                    Pending
+                </a>
+            </li>
+            <li class="govuk-tabs__list-item">
+                <a class="govuk-tabs__tab" href="#completed-requests">
+                    Completed
+                </a>
+            </li>
+        </ul>
+        <div class="govuk-tabs__panel" id="pending-requests">
+            <h2 class="govuk-heading-l">Current requests</h2>
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th class="govuk-table__header" scope="col">Request ID</th>
+                        <th class="govuk-table__header" scope="col">Data asset</th>
+                        <th class="govuk-table__header" scope="col">Received</th>
+                        <th class="govuk-table__header" scope="col">Needed by</th>
+                        <th class="govuk-table__header" scope="col">Contact</th>
+                        <th class="govuk-table__header" scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var request in dataShareRequestSummaries.Where(x => pendingList.Contains(x.DataShareRequestStatus)))
+                    {
+                        var statusDescription = GetStatusDescription(request.DataShareRequestStatus);
+
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">
+                                <a class="govuk-link" asp-controller="DataRequest" asp-action="RequestTasksReadAnswers" asp-route-requestId="@request.Id">@request.RequestId</a>
+                            </td>
+                            <td class="govuk-table__cell">
+                                @request.EsdaName
+                            </td>
+                            <td class="govuk-table__cell">
+                                @FormatDate(request.WhenSubmittedUtc)
+                            </td>
+                            <td class="govuk-table__cell">
+                                @FormatDate(request.WhenNeededByUtc)
+                            </td>
+                            <td class="govuk-table__cell">
+                                @request.CreatedByUserEmailAddress
+                            </td>
+                            <td class="govuk-table__cell">
+                                @switch (request.DataShareRequestStatus)
+                                {
+                                    case DataShareRequestStatus.Submitted:
+                                        <strong class="govuk-tag govuk-tag--blue">
+                                            @Html.Raw(statusDescription)
+                                        </strong>
+                                        break;
+                                    case DataShareRequestStatus.InReview:
+                                        <strong class="govuk-tag govuk-tag--light-blue">
+                                            @Html.Raw(statusDescription)
+                                        </strong>
+                                        break;
+                                    case DataShareRequestStatus.Returned:
+                                        <strong class="govuk-tag govuk-tag--orange">
+                                            @Html.Raw(statusDescription)
+                                        </strong>
+                                        break;
+                                    default:
+                                        @Html.Raw(statusDescription)
+                                        break;
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="completed-requests">
+            <h2 class="govuk-heading-l">Completed requests</h2>
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th class="govuk-table__header" scope="col">Request ID</th>
+                        <th class="govuk-table__header" scope="col">Data asset</th>
+                        <th class="govuk-table__header" scope="col">Received</th>
+                        <th class="govuk-table__header" scope="col">Needed by</th>
+                        <th class="govuk-table__header" scope="col">Contact</th>
+                        <th class="govuk-table__header" scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var request in dataShareRequestSummaries.Where(x => completedList.Contains(x.DataShareRequestStatus)))
+                    {
+                        var statusDescription = GetStatusDescription(request.DataShareRequestStatus);
+
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">
+                                <a class="govuk-link" asp-controller="DataRequest" asp-action="RequestTasksReadAnswers" asp-route-requestId="@request.Id">@request.RequestId</a>
+                            </td>
+                            <td class="govuk-table__cell">
+                                @request.EsdaName
+                            </td>
+                            <td class="govuk-table__cell">
+                                @FormatDate(request.WhenSubmittedUtc)
+                            </td>
+                            <td class="govuk-table__cell">
+                                @FormatDate(request.WhenNeededByUtc)
+                            </td>
+                            <td class="govuk-table__cell">
+                                @request.CreatedByUserEmailAddress
+                            </td>
+                            <td class="govuk-table__cell">
+                                @switch (request.DataShareRequestStatus)
+                                {
+                                    case DataShareRequestStatus.Rejected:
+                                        <strong class="govuk-tag govuk-tag--red">
+                                            @Html.Raw(statusDescription)
+                                        </strong>
+                                        break;
+                                    case DataShareRequestStatus.Accepted:
+                                        <strong class="govuk-tag govuk-tag--green">
+                                            @Html.Raw(statusDescription)
+                                        </strong>
+                                        break;
+                                    default:
+                                        @Html.Raw(statusDescription)
+                                        break;
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .filter-panel {
+        background-color: #f3f2f1;
+        margin-bottom: 30px;
+    }
+
+    .filter-content {
+        padding: 20px;
+    }
+
+    .filter-heading {
+        background-color: #b1b4b6;
+        padding: 10px;
+    }
+
+    .users-list .govuk-link {
+        text-decoration: none;
+    }
+</style>

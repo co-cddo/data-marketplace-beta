@@ -1,0 +1,582 @@
+﻿@using Agm.Catalog.DotNet.Dto.Models.CatalogData
+@using Agm.Catalog.DotNet.Dto.Models.DataAssets
+@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums
+@using Cddo.Data.Marketplace.Api.Dto.Responses.EventLogs
+@using Cddo.Data.Marketplace.Logic.Services.DataAssets
+@using Cddo.Data.Marketplace.UI.Controllers
+@using System.Text.RegularExpressions
+@model PaginatedLogsDataResult
+@{
+    ViewData["Title"] = "Telemetry Report";
+
+    bool isFilterReport = Model.TemplateId.ToString() == "6806d74c-a510-4add-b8ce-ee808dd6efc7";
+}
+
+@section Scripts {
+    <script>
+        const xValues = ["Jasmeet Kaur", "Adam Roper", "Agrimetrics TestUser", "Elliot Rice", "Tom Redfern"];
+
+        new Chart("userEventChart", {
+            type: "bar",
+            data: {
+                labels: xValues,
+                datasets: [
+                    {
+                        "label": "AdminAddNewAccessRights",
+                        "data": [0, 0, 6, 0, 0],
+                        "backgroundColor": "rgba(66, 133, 244, 0.7)", // Google Blue
+                        "borderColor": "rgba(66, 133, 244, 1)",
+                        "borderWidth": 1
+                    },
+                    {
+                        "label": "AdminAddNewContactPoint",
+                        "data": [0, 0, 6, 0, 0],
+                        "backgroundColor": "rgba(234, 67, 53, 0.7)", // Google Red
+                        "borderColor": "rgba(234, 67, 53, 1)",
+                        "borderWidth": 1
+                    },
+                    {
+                        "label": "UserAccessAllowed",
+                        "data": [92, 0, 0, 17, 0],
+                        "backgroundColor": "rgba(251, 188, 5, 0.7)", // Google Yellow
+                        "borderColor": "rgba(251, 188, 5, 1)",
+                        "borderWidth": 1
+                    },
+                    {
+                        "label": "UserLogin",
+                        "data": [14, 5, 0, 0, 0],
+                        "backgroundColor": "rgba(15, 157, 88, 0.7)", // Google Green
+                        "borderColor": "rgba(15, 157, 88, 1)",
+                        "borderWidth": 1
+                    },
+                    {
+                        "label": "UserProfileViewed",
+                        "data": [15, 7, 0, 5, 0],
+                        "backgroundColor": "rgba(223, 227, 236, 0.7)", // Google Light Grey
+                        "borderColor": "rgba(223, 227, 236, 1)",
+                        "borderWidth": 1
+                    },
+                    {
+                        "label": "UserSetQuestionAnswerInvalid",
+                        "data": [0, 50, 0, 0, 0],
+                        "backgroundColor": "rgba(96, 125, 139, 0.7)", // Google Blue Grey
+                        "borderColor": "rgba(96, 125, 139, 1)",
+                        "borderWidth": 1
+                    },
+                    {
+                        "label": "AdminAddNewServiceType",
+                        "data": [0, 0, 6, 0, 0],
+                        "backgroundColor": "rgba(0, 188, 212, 0.7)", // Google Cyan
+                        "borderColor": "rgba(0, 188, 212, 1)",
+                        "borderWidth": 1
+                    },
+                    {
+                        "label": "AdminAddNewKeywords",
+                        "data": [0, 0, 6, 0, 0],
+                        "backgroundColor": "rgba(156, 39, 176, 0.7)", // Google Purple
+                        "borderColor": "rgba(156, 39, 176, 1)",
+                        "borderWidth": 1
+                    },
+                    {
+                        "label": "UserAccessDenied",
+                        "data": [0, 0, 0, 4, 0],
+                        "backgroundColor": "rgba(255, 193, 7, 0.7)", // Google Amber
+                        "borderColor": "rgba(255, 193, 7, 1)",
+                        "borderWidth": 1
+                    },
+                    {
+                        "label": "UserPageNavigation",
+                        "data": [196, 90, 40, 38, 4],                        
+                        "backgroundColor": "rgba(255, 87, 34, 0.7)", // Google Deep Orange
+                        "borderColor": "rgba(255, 87, 34, 1)",
+                        "borderWidth": 1
+                    },
+                    {
+                        "label": "UserManagementPageAccess",
+                        "data": [92, 7, 7, 5, 1],
+                        "backgroundColor": "rgba(76, 175, 80, 0.7)", // Google Light Green
+                        "borderColor": "rgba(76, 175, 80, 1)",
+                        "borderWidth": 1
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Item Count'
+                        },
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                }
+            }
+        });
+    </script>
+}
+
+<div class="govuk-width-container">
+    <div class="govuk-breadcrumbs">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="/">Home</a>
+            </li>
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="/manage">Marketplace management</a>
+            </li>
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="/reports/reportsList">Marketplace System Reports</a>
+            </li>
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="/reports/telemetryReports">Marketplace Telemetry Reports</a>
+            </li>
+        </ol>
+    </div>
+    <div class="govuk-main-wrapper">
+        <span class="govuk-caption-xl">Marketplace Reports</span>
+        <h1 class="govuk-heading-xl">Telemetry - @ViewBag.ReportName</h1>
+      @*   <form asp-controller="Reports" asp-action="@nameof(ReportsController.GetTelemetryReportsData)" method="get">
+            <div class="govuk-grid-row mb-5">
+                <div class="govuk-grid-column-two-thirds">
+                    <div class="govuk-form-group mb-2 search-input">
+                        <h2 class="govuk-label-wrapper">
+                            <label class="govuk-label govuk-label--m" for="">
+                                Search
+                            </label>
+                        </h2>
+                        <div class="govuk-input__wrapper">
+                            <input aria-label="Search data asset" class="govuk-input govuk-input--width-30" id="catalogDataSearchInput" name="SearchTerm" type="text" autocomplete="off" value="">
+                            <button title="datasetSearchResultsBtn" class="search-button" type="submit" enterkeyhint="search">
+                                <svg class="search-button__icon" width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                                    <circle cx="12.0161" cy="11.0161" r="8.51613" stroke="currentColor" stroke-width="3"></circle>
+                                    <line x1="17.8668" y1="17.3587" x2="26.4475" y2="25.9393" stroke="currentColor" stroke-width="3"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </form>
+ *@
+        
+            <div class="filter-panel">
+                <h3 class="govuk-heading-s filter-heading">
+                Search @(isFilterReport ? "filter" : "query")
+                    <span class="float-end">
+                    <a class="govuk-link" asp-controller="Reports" asp-action="@nameof(ReportsController.DownloadTelemetryData)" asp-route-timeRange="@ViewBag.TimeRange" asp-route-searchQuery="@ViewBag.SearchQuery" asp-route-reportName="@Model.ReportName">Download</a>
+                    </span>
+                </h3>
+            <form asp-controller="Reports" asp-action="@nameof(ReportsController.QueryTelemetryData)" method="post">
+            <input hidden name="timeRange" value="@ViewBag.TimeRange" />
+
+                <div class="filter-content">
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-full">
+                            @if (!isFilterReport)
+                        {
+                                
+                            <div class="govuk-form-group">
+                                <label for="organisationName" class="govuk-label">Search query</label>
+                                <textarea id="query-textarea" class="govuk-textarea" rows="5" name="searchQuery" spellcheck="false">@ViewBag.SearchQuery</textarea>
+                            </div>
+                        }else{
+                                <input hidden name="templateId" value="@Model!.TemplateId" />
+                            <div class="govuk-form-group">
+                                    <label class="govuk-label" for="DataAssetAction">Ingestion method </label>
+                                    <select class="govuk-select" name="DataAssetAction" id="DataAssetAction">
+                                    <option value="">Select..</option>
+                                    @foreach (var item in Enum.GetValues<DataAssetActionSourceEnum>())
+                                    {
+                                        <option selected="@(Convert.ToString(ViewData["DataAssetAction"]) == item.ToString())" value="@item">@Regex.Replace(item.ToString(), "(?<!^)([A-Z])", " $1")</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="govuk-form-group">
+                                    <label class="govuk-label" for="Propertype">Error Type </label>
+                                    <select class="govuk-select" name="Propertype" id="Propertype">
+                                    <option value="">Select..</option>
+                                    @foreach (var item in Enum.GetValues<DataAssetPropertyValidationErrorType>())
+                                    {
+                                        <option selected="@(Convert.ToString(ViewData["Propertype"]) == item.ToString())" value="@item">@Regex.Replace(item.ToString(), "(?<!^)([A-Z])", " $1")</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="govuk-form-group">
+                                    <label class="govuk-label" for="DataAssertField">Field </label>
+                                    <select class="govuk-select" name="DataAssertField" id="DataAssertField">
+                                    <option value="">Select..</option>
+                                    @foreach (var item in Enum.GetValues<CatalogAssetField>())
+                                    {
+                                        <option selected="@(Convert.ToString(ViewData["DataAssertField"]) == item.ToString())" value="@item">@Regex.Replace(item.ToString(), "(?<!^)([A-Z])", " $1")</option>
+                                    }
+                                </select>
+                            </div>
+                        }
+                    </div>
+                </div>
+                    <div class="govuk-button-group">
+                        <button type="submit" class="govuk-button" data-module="govuk-button">
+                            Apply @(isFilterReport ? "filter" : "query")
+                        </button>
+                        <script>
+                            function clearTextbox() {
+                                document.getElementById("query-textarea").value = "";
+                            }
+                        </script>
+                        @if (isFilterReport)
+                        {
+                            <a type="submit" class="govuk-button govuk-button--secondary" asp-controller="Reports" asp-action="@nameof(ReportsController.ClearViewBagAndRefresh)" method="post" style="text-decoration:none;">Clear filter</a>
+                        }
+                        else
+                        {
+                            <a class="govuk-button govuk-button--secondary" onclick="clearTextbox()" style="text-decoration:none;">Clear query</a>
+                        }
+                    </div>
+                </div>
+            </form>
+            </div>
+        
+        <form asp-controller="Reports" asp-action="@nameof(ReportsController.QueryTelemetryData)" method="post">
+            <input hidden name="templateId" value="@Model!.TemplateId" />
+            <input hidden name="searchQuery" value="@ViewBag.searchQuery" />
+            <input hidden name="DataAssetAction" value="@ViewData["DataAssetAction"]" />
+            <input hidden name="Propertype" value="@ViewData["Propertype"]" />
+            <input hidden name="DataAssertField" value="@ViewData["DataAssertField"]" />
+
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full">
+                    <div class="govuk-tabs" data-module="govuk-tabs">
+                        <h2 class="govuk-tabs__title">
+                            Contents
+                        </h2>
+                        <ul class="govuk-tabs__list">
+                            <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+                                <a class="govuk-tabs__tab" href="#past-day">
+                                    Results
+                                </a>
+                            </li>
+                            <li class="govuk-tabs__list-item">
+                                <a class="govuk-tabs__tab" href="#past-week">
+                                    Chart
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="govuk-tabs__panel" id="past-day">
+                            <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
+                                @Model.TotalRecodsCount results
+                            </h2>
+                            <hr />
+                            <div class="govuk-grid-row">
+                                <div class="govuk-grid-column-one-half">
+                                    <div class="govuk-form-group mb-0 d-inline-flex">
+                                        <label class="govuk-label" hidden for="timeRange">Time range</label>
+                                        <div class="govuk-input__wrapper">
+                                            <select class="govuk-select" name="timeRange" id="timeRange" aria-label="Time range">
+                                                <option value="0.00:30:00" selected="@(Convert.ToString(ViewData["TimeRange"]) == "0.00:30:00")">
+                                                    Last 30 minutes
+                                                </option>
+                                                <option value="0.01:00:00" selected="@(Convert.ToString(ViewData["TimeRange"]) == "0.01:00:00")">
+                                                    Last hour
+                                                </option>
+                                                <option value="0.04:00:00" selected="@(Convert.ToString(ViewData["TimeRange"]) == "0.04:00:00")">
+                                                    Last 4 hours
+                                                </option>
+                                                <option value="0.12:00:00" selected="@(Convert.ToString(ViewData["TimeRange"]) == "0.12:00:00")">
+                                                    Last 12 hours
+                                                </option>
+                                                <option value="1.00:00:00" selected="@(Convert.ToString(ViewData["TimeRange"]) == "1.00:00:00")">
+                                                    Last 24 hours
+                                                </option>
+                                                <option value="2.00:00:00" selected="@(Convert.ToString(ViewData["TimeRange"]) == "2.00:00:00")">
+                                                    Last 48 hours
+                                                </option>
+                                                <option value="3.00:00:00" selected="@(Convert.ToString(ViewData["TimeRange"]) == "3.00:00:00")">
+                                                    Last 3 days
+                                                </option>
+                                                <option value="7.00:00:00" selected="@(Convert.ToString(ViewData["TimeRange"]) == "7.00:00:00")">
+                                                    Last 7 days
+                                                </option>
+                                               @*  <option value="">
+                                                    Custom
+                                                </option> *@
+                                            </select>
+                                            <button class="govuk-button govuk-button--secondary govuk-input__suffix">Apply</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="govuk-grid-column-one-half">
+                                    <div class="govuk-form-group mb-0 d-inline-flex float-end">
+                                        <label class="govuk-label"  for="pageSize" style="padding-right: 10px;padding-top: 7px;">
+                                        Results Per Page
+                                    </label>
+                                        <div class="govuk-input__wrapper">
+                                            <select class="govuk-input" id="pageSize" aria-label="Select results per page" name="pageSize" style="min-width:2.6em;">
+                                                @foreach (var pageSizeOption in new[] { 10, 20, 50, 100 })
+                                                {
+                                                    <option selected="@(Model.PageSize==pageSizeOption)"value="@pageSizeOption">@pageSizeOption</option>
+                                                }
+                                            </select>
+                                            <button class="govuk-button govuk-button--secondary govuk-input__suffix"  style="max-width:5em;">
+                                                Apply
+                                         <span class="govuk-visually-hidden">
+                                         results per page
+                                         </span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @if (Model != null && Model.Results?.TotalNumberOfResults > 0)
+                            {
+                                <div class="govuk-table-wrapper">
+                                    <table class="govuk-table">
+                                        <thead class="govuk-table__head">
+                                            <tr class="govuk-table__row">
+                                                @foreach (var column in Model?.Results.ColumnData.Columns!)
+                                                {
+                                                    <th scope="col" class="govuk-table__header">@column.Name</th>
+                                                }
+                                            </tr>
+                                        </thead>
+                                        <tbody class="govuk-table__body">
+                                            @foreach (var row in Model?.Results.RowData.Rows!)
+                                            {
+                                                <tr class="govuk-table__row">
+                                                    @foreach (var rowValue in row.RowValues)
+                                                    {
+                                                        <td class="govuk-table__cell">@rowValue.Value</td>
+                                                    }
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="govuk-body">No data available</p>
+                            }
+                            </div>
+                            </div>
+                </div>
+            </div>
+        </form>
+                            @{
+                                const int maxMiddlePages = 3;
+
+                                var currentPage = Model.PageNumber;
+                                var totalPages = Model.TotalPages;
+
+                                currentPage = Math.Max(1, Math.Min(currentPage, totalPages));
+
+                                var middleStart = Math.Max(1, currentPage - maxMiddlePages / 2);
+                                var middleEnd = Math.Min(totalPages, middleStart + maxMiddlePages - 1);
+                                middleStart = Math.Max(1, middleEnd - maxMiddlePages + 1);
+                            }
+                            <nav class="govuk-pagination" role="navigation" aria-label="Pagination">                            
+                            @if (currentPage != 1)
+                            {
+                <form asp-controller="Reports" asp-action="@nameof(ReportsController.QueryTelemetryData)" method="post" class="govuk-pagination__prev">
+                                    <input hidden name="templateId" value="@Model!.TemplateId" />
+                                    <input hidden name="pageSize" value="@Model!.PageSize" />
+                                    <input hidden name="timeRange" value="@ViewBag.TimeRange" />
+                                    <input hidden name="searchQuery" value="@ViewBag.searchQuery" />
+                                    <input hidden name="DataAssetAction" value="@ViewData["DataAssetAction"]" />
+                                    <input hidden name="Propertype" value="@ViewData["Propertype"]" />
+                                    <input hidden name="DataAssertField" value="@ViewData["DataAssertField"]" />
+
+                                    <button type="submit" class="govuk-link govuk-pagination__link" name="pageNumber" value="@(currentPage - 1)" rel="prev">
+                                        <span class="govuk-pagination__link-title">
+                                            Previous<span class="govuk-visually-hidden"> page</span>
+                                        </span>
+                                    </button>
+                                </form>
+                            }
+                            <ul class="govuk-pagination__list" style="display:flex;">
+                                    @if (middleStart > 1)
+                                    {
+                <form asp-controller="Reports" asp-action="@nameof(ReportsController.QueryTelemetryData)" method="post">
+                                            <input hidden name="templateId" value="@Model!.TemplateId" />
+                                            <input hidden name="timeRange" value="@ViewBag.TimeRange" />
+                                            <input hidden name="searchQuery" value="@ViewBag.searchQuery" />
+                                            <input hidden name="pageSize" value="@Model!.PageSize" />
+                                            <input hidden name="DataAssetAction" value="@ViewData["DataAssetAction"]" />
+                                            <input hidden name="Propertype" value="@ViewData["Propertype"]" />
+                                            <input hidden name="DataAssertField" value="@ViewData["DataAssertField"]" />
+
+                                            <li class="govuk-pagination__item">
+                                                <span class="govuk-visually-hidden">Page</span>
+
+                                                <button type="submit" class="govuk-link govuk-pagination__link" name="pageNumber" value="1">1</button>
+                                            </li>
+                                            @if (middleStart > 2)
+                                            {
+                                                <li class="govuk-pagination__item govuk-pagination__item--ellipses">...</li>
+                                            }
+                                        </form>
+                                    }
+
+                                    @for (int i = middleStart; i <= middleEnd; i++)
+                                    {
+                <form asp-controller="Reports" asp-action="@nameof(ReportsController.QueryTelemetryData)" method="post">
+                                            <input hidden name="templateId" value="@Model!.TemplateId" />
+                                            <input hidden name="timeRange" value="@ViewBag.TimeRange" />
+                                            <input hidden name="searchQuery" value="@ViewBag.searchQuery" />
+                                            <input hidden name="pageSize" value="@Model!.PageSize" />
+                                            <input hidden name="DataAssetAction" value="@ViewData["DataAssetAction"]" />
+                                            <input hidden name="Propertype" value="@ViewData["Propertype"]" />
+                                            <input hidden name="DataAssertField" value="@ViewData["DataAssertField"]" />
+
+                                            
+                                            <li class="govuk-pagination__item @(i == currentPage ? "govuk-pagination__item--current" : "")">
+                                                <span class="govuk-visually-hidden">Page</span>
+
+                                                <button type="submit" class="govuk-link govuk-pagination__link" name="pageNumber" value="@i">@i</button>
+                                            </li>
+                                        </form>
+                                    }
+
+                                    @if (middleEnd < totalPages)
+                                    {
+                                        @if (middleEnd < totalPages - 1)
+                                        {
+                                            <li class="govuk-pagination__item govuk-pagination__item--ellipses">...</li>
+                                        }
+                <form asp-controller="Reports" asp-action="@nameof(ReportsController.QueryTelemetryData)" method="post">
+                                            <input hidden name="templateId" value="@Model!.TemplateId" />
+                                            <input hidden name="timeRange" value="@ViewBag.TimeRange" />
+                                            <input hidden name="searchQuery" value="@ViewBag.searchQuery" />
+                                            <input hidden name="pageSize" value="@Model!.PageSize" />
+                                            <input hidden name="DataAssetAction" value="@ViewData["DataAssetAction"]" />
+                                            <input hidden name="Propertype" value="@ViewData["Propertype"]" />
+                                            <input hidden name="DataAssertField" value="@ViewData["DataAssertField"]" />
+
+                                            <li class="govuk-pagination__item">
+                                                <span class="govuk-visually-hidden">Page</span>
+
+                                                <button type="submit" class="govuk-link govuk-pagination__link" name="pageNumber" value="@totalPages">@totalPages</button>
+                                            </li>
+                                        </form>
+                                    }
+                                    </ul>
+                                    @if (currentPage != totalPages)
+                                    {
+            <form asp-controller="Reports" asp-action="@nameof(ReportsController.QueryTelemetryData)" method="post" class="govuk-pagination__next">
+                                            <input hidden name="templateId" value="@Model!.TemplateId" />
+                                            <input hidden name="timeRange" value="@ViewBag.TimeRange" />
+                                            <input hidden name="searchQuery" value="@ViewBag.searchQuery" />
+                                            <input hidden name="pageSize" value="@Model!.PageSize" />
+                    <input hidden name="DataAssetAction" value="@ViewData["DataAssetAction"]" />
+                    <input hidden name="Propertype" value="@ViewData["Propertype"]" />
+                    <input hidden name="DataAssertField" value="@ViewData["DataAssertField"]" />
+
+                                            <button type="submit" name="pageNumber" value="@(currentPage + 1)" rel="next" class="govuk-link govuk-pagination__link">
+                                                <span class="govuk-pagination__link-title">
+                                                    Next<span class="govuk-visually-hidden"> page</span>
+                                                </span>
+                                            </button>
+                                        </form>
+                                    }
+                            </nav>
+                            
+
+                        </div>
+
+                        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="past-week">
+                            <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
+                                3 results
+                            </h2>
+                            <hr />
+                            <div class="govuk-grid-row">
+                                <div class="govuk-grid-column-full">
+                                    <div class="govuk-form-group mb-0 d-inline-flex float-end">
+                                        <label class="govuk-label" hidden for="timeRange">Time range</label>
+                                        <form asp-controller="Reports" asp-action="@nameof(ReportsController.GetTelemetryReportsData)" method="get">
+                                        <div class="govuk-input__wrapper">
+                                            <select class="govuk-select" name="timeRange" id="timeRange" aria-label="Time range">
+                                                <option value="0.00:30:00" selected="@(Convert.ToString(ViewData["TimeRange"]) == "0.00:30:00")">
+                                                    Last 30 minutes
+                                                </option>
+                                                <option value="0.01:00:00" selected="@(Convert.ToString(ViewData["TimeRange"]) == "0.01:00:00")">
+                                                    Last hour
+                                                </option>
+                                                <option value="0.04:00:00" selected="@(Convert.ToString(ViewData["TimeRange"]) == "0.04:00:00")">
+                                                    Last 4 hours
+                                                </option>
+                                                <option value="0.12:00:00" selected="@(Convert.ToString(ViewData["TimeRange"]) == "0.12:00:00")">
+                                                    Last 12 hours
+                                                </option>
+                                                <option value="1.00:00:00" selected="@(Convert.ToString(ViewData["TimeRange"]) == "1.00:00:00")">
+                                                    Last 24 hours
+                                                </option>
+                                                <option value="2.00:00:00" selected="@(Convert.ToString(ViewData["TimeRange"]) == "2.00:00:00")">
+                                                    Last 48 hours
+                                                </option>
+                                                <option value="3.00:00:00" selected="@(Convert.ToString(ViewData["TimeRange"]) == "3.00:00:00")">
+                                                    Last 3 days
+                                                </option>
+                                                <option value="7.00:00:00" selected="@(Convert.ToString(ViewData["TimeRange"]) == "7.00:00:00")">
+                                                    Last 7 days
+                                                </option>
+                                                <option value="">
+                                                    Custom
+                                                </option>
+                                            </select>
+                                            <input hidden name="templateId" value="@Model!.TemplateId" />
+                                            <input hidden name="pageSize" value="@Model!.PageSize" />
+                                            <input hidden name="DataAssetAction" value="@ViewData["DataAssetAction"]" />
+                                            <input hidden name="Propertype" value="@ViewData["Propertype"]" />
+                                            <input hidden name="DataAssertField" value="@ViewData["DataAssertField"]" />
+
+                                            <button class="govuk-button govuk-button--secondary govuk-input__suffix">range</button>
+                                        </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="govuk-grid-column-full column-full">
+                                    <canvas id="userEventChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+       
+<style>
+    .filter-panel {
+        background-color: #f3f2f1;
+        margin-bottom: 30px;
+    }
+
+    .filter-content {
+        padding: 20px;
+    }
+
+    .filter-heading {
+        background-color: #b1b4b6;
+        padding: 10px;
+    }
+
+    .users-list .govuk-link {
+        text-decoration: none;
+    }
+
+    .column-full {
+        overflow: hidden;
+    }
+
+    .responsive-img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+</style>

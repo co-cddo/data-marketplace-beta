@@ -1,0 +1,74 @@
+﻿@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests.Answers.DataShareRequestQuestionAnswers
+@using Agrimetrics.DataShare.Api.Dto.Models.Questions.QuestionParts.ResponseFormats
+
+@model QuestionPartResponseItemFreeFormCountry
+@{
+    var countryInputComponentId = Model.CountryInputComponentId;
+    var countryInputComponentName = Model.CountryInputComponentName;
+    var enteredValue = Model.EnteredValue;
+    var uniqueCounter = Guid.NewGuid();
+}
+
+<div class="autocomplete-container">
+    <input class="govuk-input govuk-!-margin-top-2"
+           id="@($"{countryInputComponentId}_{uniqueCounter}")"
+           name="@countryInputComponentName"
+           type="text"
+           value="@enteredValue"
+           aria-describedby="@($"{countryInputComponentId}-info")"
+           aria-autocomplete="list"
+           autocomplete="off"
+           oninput="filterSuggestions(event, '@uniqueCounter')"
+           data-suggestions-id="autocomplete-suggestions-@uniqueCounter">
+    <ul id="autocomplete-suggestions-@uniqueCounter" class="autocomplete-suggestions"></ul>
+</div>
+
+<head>
+    <title>Country</title>
+    <link rel="stylesheet" href="~/css/accessible-autocomplete.css" />
+</head>
+
+<script>
+    var countries = @Html.Raw(Json.Serialize(Model.SelectableCountries.Select(c => c.CountryName).ToList()));
+
+    function filterSuggestions(event, uniqueCounter) {
+        var input = event.target;
+        var query = input.value.toLowerCase();
+        var suggestionsListId = "autocomplete-suggestions-" + uniqueCounter;
+        var suggestionsList = document.getElementById(suggestionsListId);
+
+        suggestionsList.innerHTML = '';
+
+        if (query.length > 0) {
+            var filteredCountries = countries.filter(function (country) {
+                return country.toLowerCase().includes(query);
+            });
+
+            filteredCountries.forEach(function (country) {
+                var li = document.createElement('li');
+                li.textContent = country;
+                li.classList.add('autocomplete-suggestion');
+                li.onclick = function () {
+                    selectSuggestion(country, input, suggestionsListId);
+                };
+                suggestionsList.appendChild(li);
+            });
+        }
+    }
+
+    function selectSuggestion(country, input, suggestionsListId) {
+        input.value = country;
+        var suggestionsList = document.getElementById(suggestionsListId);
+        suggestionsList.innerHTML = '';
+    }
+
+    document.addEventListener('click', function (event) {
+        var containers = document.querySelectorAll('.autocomplete-container');
+        containers.forEach(function (container) {
+            var suggestionsList = container.querySelector('.autocomplete-suggestions');
+            if (!container.contains(event.target)) {
+                suggestionsList.innerHTML = '';
+            }
+        });
+    });
+</script>

@@ -1,0 +1,12 @@
+﻿<script src="~/js/govuk-frontend-5.7.1.min.js"></script>
+<script type="module" asp-add-nonce="true">
+    import { initAll } from '/js/govuk-frontend-5.7.1.min.js';
+    initAll();
+</script>
+<script asp-add-nonce="true">
+    document.body.className += " js-enabled" + ("noModule" in HTMLScriptElement.prototype ? " govuk-frontend-supported" : "");
+</script>
+<script asp-add-nonce="true" src="~/js/cddo.min.js"></script>
+<script asp-add-nonce="true" src="~/lib/jquery/dist/jquery.min.js"></script>
+<script asp-add-nonce="true" src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script asp-append-version="true" src="~/lib/chartjs/Chart.min.js"></script>

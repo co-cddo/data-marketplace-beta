@@ -1,0 +1,129 @@
+﻿@using Cddo.Data.Marketplace.UI.Controllers
+@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums
+@using System.ComponentModel;
+@using System.Reflection;
+
+@model Cddo.Data.Marketplace.UI.Pages.DataDescription.NewDescription.Upload.DataShareRequestNotificationsSelectionModel
+@{
+    ViewData["Title"] = "Data Share Request Notifications Selection";
+
+    var domainInformation = Model.UserDomainInformation;
+    var domainDsrMailboxAddress = domainInformation.DataShareRequestMailboxAddress;
+    var userDomainHasRegisteredDataShareRequestMailboxAddress = !string.IsNullOrWhiteSpace(domainDsrMailboxAddress);
+
+    var selectedOption = Model.SelectedRecipientType;
+
+    var customAddress = Model.EnteredCustomAddress;
+    var customAddressIsInvalid = (selectedOption == DataShareRequestNotificationRecipientType.EsdaCustomDsrNotificationAddress
+                                  && ViewData.ModelState.TryGetValue("custom-address", out _));
+}
+
+@functions
+{
+    private static string? GetEnumDescription(Enum enumValue)
+    {
+        var fieldInfo = enumValue.GetType().GetField(enumValue.ToString());
+
+        if (fieldInfo != null)
+        {
+            var attribute = fieldInfo.GetCustomAttribute(typeof(DescriptionAttribute), false) as DescriptionAttribute;
+            if (attribute != null)
+            {
+                return attribute.Description;
+            }
+        }
+
+        return enumValue.ToString();
+    }
+}
+
+<a class="govuk-back-link" asp-controller="CatalogSpreadsheet"
+   asp-action="@nameof(CatalogSpreadsheetController.GetValidatedDataAssetsSpreadsheet)">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-xl">Data share request notifications</h1>
+        </div>
+    </div>
+
+    @Html.AntiForgeryToken()
+    @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
+    
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            
+            <form method="post">
+                <div class="govuk-form-group">
+                    <div id="dsr-notification-options-hint" class="govuk-hint">
+                        Select an email address for receiving notifications about this data share request.
+                    </div>
+                    
+                    <div class="govuk-radios" data-module="govuk-radios" id="dsr-notification-options">
+                        @if (userDomainHasRegisteredDataShareRequestMailboxAddress)
+                        {
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" type="radio" name="dsr-notification-option"
+                                       id="dsr-notification-domain-address"
+                                       @(selectedOption == @DataShareRequestNotificationRecipientType.DomainDsrNotificationAddress ? "checked" : "")
+                                       value="@DataShareRequestNotificationRecipientType.DomainDsrNotificationAddress"
+                                       aria-describedby="dsr-notification-domain-address-hint">
+                                <label class="govuk-label govuk-radios__label" for="dsr-notification-domain-address">
+                                    Data share request notification address of your domain
+                                </label>
+                                <div class="govuk-hint govuk-checkboxes__hint" id="dsr-notification-domain-address-hint">
+                                    This is currently @domainDsrMailboxAddress.
+                                </div>
+                            </div>
+                        }
+                        
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" type="radio" name="dsr-notification-option"
+                                   id="dsr-notification-esda-contact-point-address"
+                                   @(selectedOption == @DataShareRequestNotificationRecipientType.EsdaContactPointEmailAddress ? "checked" : "")
+                                   value="@DataShareRequestNotificationRecipientType.EsdaContactPointEmailAddress"
+                                   aria-describedby="dsr-notification-esda-contact-point-address-hint">
+                            <label class="govuk-label govuk-radios__label" for="dsr-notification-esda-contact-point-address">
+                                Contact point address on the data descriptions in the spreadsheet
+                            </label>
+                            <div class="govuk-hint govuk-checkboxes__hint" id="dsr-notification-esda-contact-point-address-hint">
+                                As configured in the spreadsheet.
+                            </div>
+                        </div>
+                        
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" type="radio" name="dsr-notification-option"
+                                   id="dsr-notification-esda-custom-address"
+                                   value="@DataShareRequestNotificationRecipientType.EsdaCustomDsrNotificationAddress"
+                                   @(selectedOption == @DataShareRequestNotificationRecipientType.EsdaCustomDsrNotificationAddress ? "checked" : "")
+                                   aria-controls="conditional-@DataShareRequestNotificationRecipientType.EsdaCustomDsrNotificationAddress"
+                                   aria-describedby="domain-hint">
+                            <label class="govuk-label govuk-radios__label" for="dsr-notification-esda-custom-address">
+                                Another address
+                            </label>
+                        </div>
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@DataShareRequestNotificationRecipientType.EsdaCustomDsrNotificationAddress">
+                            <div class="govuk-form-group govuk-character-count" data-module="govuk-character-count" data-maxlength="255">
+                                <input class="govuk-input govuk-js-character-count @(customAddressIsInvalid ? "govuk-input--error": "")" id="custom-address" name="custom-address"
+                                       spellcheck="false" aria-describedby="custom-address-info"
+                                       value="@customAddress" />
+                                <div id="custom-address-info" class="govuk-hint govuk-character-count__message">
+                                    You can enter up to 255 characters
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <div class="govuk-form-group">
+                    <button class="govuk-button" data-module="govuk-button"
+                            asp-controller="CatalogSpreadsheet" asp-action="@nameof(CatalogSpreadsheetController.PublishSpreadsheetDataAssets)">
+                        Publish data descriptions
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>

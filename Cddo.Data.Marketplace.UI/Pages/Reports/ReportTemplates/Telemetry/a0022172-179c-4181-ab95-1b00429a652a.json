@@ -1,0 +1,13 @@
+{
+  "TemplateId": "a0022172-179c-4181-ab95-1b00429a652a",
+  "KqlQuery": "AppEvents| extend Name| where Properties.Subject == \u0027IngestionApiError\u0027| summarize Count = count() by Name | order by Count desc",
+  "ReportType": 1,
+  "ReportName": "Ingestion API Errors",
+  "Description": "Ingestion API Error logs",
+  "CreatedOn": "2024-12-02T13:46:16.8106269+00:00",
+  "UserId": 11,
+  "OrganisationId": 1,
+  "SharedWithOrganisationIds": null,
+  "SharedWithUsersIds": null,
+  "IsPredefined": true
+}

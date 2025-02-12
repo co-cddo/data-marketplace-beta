@@ -1,0 +1,314 @@
+﻿@page
+@using Cddo.Data.Marketplace.UI.Model
+@model ApprovalListModel
+@{
+    ViewData["Title"] = "Manage - Approvals";
+
+    var pendingRequests = Model.PendingApprovals;
+    var completedRequests = Model.Approvals;
+}
+
+<div class="govuk-width-container">
+    <a class="govuk-back-link" href="/Manage">Back</a>
+    <div class="govuk-main-wrapper">
+        <h1 class="govuk-heading-xl">
+            <span class="govuk-caption-l">Manage User Approvals</span>
+            Manage User Approvals
+        </h1>
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <h2 class="govuk-heading-l">Pending requests</h2>
+
+                <h3 class="govuk-heading-s mb-0">
+                    @pendingRequests.Count() results
+                </h3>
+                @if (pendingRequests != null && pendingRequests.Any())
+            {
+        <table class="govuk-table">
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th class="govuk-table__header">User Name</th>
+                    <th class="govuk-table__header">Domain</th>
+                    <th class="govuk-table__header">Organisation</th>
+                    <th class="govuk-table__header">Role</th>
+                    <th class="govuk-table__header">Approval Status</th>
+                    <th class="govuk-table__header">Approved By</th>
+                    <th class="govuk-table__header">Actions</th>
+                </tr>
+            </thead>
+                    
+                <tbody class="govuk-table__body">
+                            @foreach (var approval in pendingRequests)
+                    {
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">@approval.Username</td>
+                            <td class="govuk-table__cell">@approval.DomainName</td>
+                            <td class="govuk-table__cell">@approval.OrganisationName</td>
+                            <td class="govuk-table__cell">@approval.RoleName</td>
+                            <td class="govuk-table__cell">@approval.ApprovalStatus.ToString()</td>
+                            <td class="govuk-table__cell">@approval.ApprovedByUsername</td>
+                            <td class="govuk-table__cell">
+                                <a class="govuk-link" href="/manage/manageapproval?id=@approval.ApprovalID">Manage</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>
+                        There are currently no pending requests for approval.
+                    </p>
+                }
+
+            </div>
+        </div>
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <h2 class="govuk-heading-l">Completed requests</h2>
+
+                <form method="get">
+                    <div class="govuk-grid-row mb-5">
+                        <div class="govuk-grid-column-two-thirds">
+                            <div class="govuk-form-group mb-2 search-input">
+                                <div class="govuk-input__wrapper">
+                                    <input class="govuk-input govuk-input--width-30" id="extendedText" name="SearchTerm" type="search" list="searchList" autocomplete="off" value="@Model.SearchTerm" aria-label="Search for user approvals">
+                                    <button title="approvalsSearchBtn" class="search-button" aria-label="Search for user approvals" type="submit" enterkeyhint="searchTerm">
+                                        <svg class="search-button__icon" width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                                            <circle cx="12.0161" cy="11.0161" r="8.51613" stroke="currentColor" stroke-width="3"></circle>
+                                            <line x1="17.8668" y1="17.3587" x2="26.4475" y2="25.9393" stroke="currentColor" stroke-width="3"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-panel">
+                        <h3 class="govuk-heading-s filter-heading">Filter by</h3>
+                        <div class="filter-content">
+                            <div class="govuk-form-group">
+                                <label for="organisationName" class="govuk-label">Select Organisation</label>
+                                <div class="govuk-input__wrapper">
+                                    <select class="govuk-select" id="organisationName" name="SelectedOrganisationId" aria-label="Select organisation">
+                                        <option value="">Select..</option>
+                                        @foreach (var organisation in Model.Organisations.Orgs)
+                                        {
+                                            var selectedAttribute = Model.SelectedOrganisationId == organisation.OrganisationId ? "selected='selected'" : "";
+                                            var optionHtml = $"<option value=\"{organisation.OrganisationId}\" {selectedAttribute}>{Html.Encode(organisation.OrganisationName)}</option>";
+                                            @Html.Raw(optionHtml)
+                                        }
+                                    </select>
+                                    <button class="govuk-button govuk-button--secondary govuk-input__suffix">Apply</button>
+                                </div>
+                            </div>
+                            <div class="govuk-grid-row">
+                                <div class="govuk-grid-column-one-third">
+                                    <div class="govuk-form-group">
+                                        <label for="domainName" class="govuk-label">Select Domain</label>
+                                        <select class="govuk-select" id="domainName" name="SelectedDomainId" @(Model.Domains.Any() ? "" : "disabled")>
+                                            <option value="">
+                                                @if (Model.SelectedOrganisationId.HasValue && Model.Domains.Any())
+                                                {
+                                                    @:Select a domain
+                                                }
+                                                else if (Model.SelectedOrganisationId.HasValue)
+                                                {
+                                                    @:No domains available
+                                                }
+                                                else
+                                                {
+                                                    @:Select an organisation first
+                                                }
+                                            </option>
+                                            @foreach (var domain in Model.Domains)
+                                            {
+                                                var selectedAttribute = Model.SelectedDomainId == domain.DomainId ? "selected='selected'" : "";
+                                                var optionHtml = $"<option value=\"{domain.DomainId}\" {selectedAttribute}>{Html.Encode(domain.DomainName)}</option>";
+                                                @Html.Raw(optionHtml)
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="govuk-grid-column-one-third">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="sortField">Sort by</label>
+                                        <select class="govuk-select" id="sortField" name="SortBy">
+                                            @{
+                                                var sortByOptions = new List<(string value, string text)>
+                                            {
+                                            ("username", "Username"),
+                                            ("approvalStatus", "Approval Status"),
+                                            ("createdAt", "Created At")
+                                            };
+
+                                                foreach (var option in sortByOptions)
+                                                {
+                                                    var selectedAttribute = Model.SortBy == option.value ? "selected='selected'" : "";
+                                                    var optionHtml = $"<option value=\"{option.value}\" {selectedAttribute}>{option.text}</option>";
+                                                    @Html.Raw(optionHtml)
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="govuk-grid-column-one-third">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="sortOrder">Order by</label>
+                                        <select class="govuk-select" id="sortOrder" name="SortOrder">
+                                            @{
+                                                var sortOrderOptions = new List<(string value, string text)>
+                                            {
+                                            ("asc", "Ascending"),
+                                            ("desc", "Descending")
+                                            };
+
+                                                foreach (var option in sortOrderOptions)
+                                                {
+                                                    var selectedAttribute = Model.SortOrder == option.value ? "selected='selected'" : "";
+                                                    var optionHtml = $"<option value=\"{option.value}\" {selectedAttribute}>{option.text}</option>";
+                                                    @Html.Raw(optionHtml)
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="govuk-button-group">
+                                <button type="submit" class="govuk-button" data-module="govuk-button">
+                                    Apply filter
+                                </button>
+                                <a class="govuk-link" href="/Manage/Approvals">Clear all</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <h3 class="govuk-heading-s mb-0">
+                    @Model.TotalCount results
+                </h3>
+
+        <table class="govuk-table">
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th class="govuk-table__header">User Name</th>
+                    <th class="govuk-table__header">Domain</th>
+                    <th class="govuk-table__header">Organisation</th>
+                    <th class="govuk-table__header">Role</th>
+                    <th class="govuk-table__header">Approval Status</th>
+                    <th class="govuk-table__header">Approved By</th>
+                    <th class="govuk-table__header">Actions</th>
+                </tr>
+            </thead>
+                    @if (completedRequests != null && completedRequests.Any())
+            {
+                <tbody class="govuk-table__body">
+                            @foreach (var approval in completedRequests)
+                    {
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">@approval.Username</td>
+                            <td class="govuk-table__cell">@approval.DomainName</td>
+                            <td class="govuk-table__cell">@approval.OrganisationName</td>
+                            <td class="govuk-table__cell">@approval.RoleName</td>
+                            <td class="govuk-table__cell">@approval.ApprovalStatus.ToString()</td>
+                            <td class="govuk-table__cell">@approval.ApprovedByUsername</td>
+                            <td class="govuk-table__cell">
+                                <a class="govuk-link" href="/manage/manageapproval?id=@approval.ApprovalID">Manage</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            }
+        </table>
+            </div>
+        </div>
+        <div class="govuk-grid-row">
+            @{
+                var baseQuery = new System.Text.StringBuilder($"pageSize={Model.PageSize}");
+                if (Model.SelectedDomainId.HasValue) baseQuery.Append($"&domainId={Model.SelectedDomainId}");
+                if (Model.SelectedOrganisationId.HasValue) baseQuery.Append($"&organisationId={Model.SelectedOrganisationId}");
+                if (!string.IsNullOrEmpty(Model.SortBy)) baseQuery.Append($"&sortBy={Model.SortBy}");
+                if (!string.IsNullOrEmpty(Model.SortOrder)) baseQuery.Append($"&sortOrder={Model.SortOrder}");
+                if (!string.IsNullOrEmpty(Model.SearchTerm)) baseQuery.Append($"&searchTerm={Model.SearchTerm}");
+                string BuildPageLink(int page) => $"?currentPage={page}&" + baseQuery.ToString();
+            }
+            @if (Model.TotalPages > 1)
+            {
+                <nav class="govuk-pagination" aria-label="Pagination">
+                    <!-- Previous Page Link -->
+                    @if (Model.CurrentPage > 1)
+                    {
+                        <a class="govuk-link govuk-pagination__link govuk-pagination__prev" href="@BuildPageLink(Model.CurrentPage - 1)">
+                            <span class="govuk-pagination__link-title">
+                                Previous<span class="govuk-visually-hidden"> page</span>
+                            </span>
+                        </a>
+                    }
+                    <ul class="govuk-pagination__list">
+                        <!-- Link to the First Page -->
+                        @if (Model.CurrentPage > 3)
+                        {
+                            <li class="govuk-pagination__item">
+                                <span class="govuk-visually-hidden">Page</span>
+
+                                <a class="govuk-link govuk-pagination__link" href="@BuildPageLink(1)">1</a>
+                            </li>
+                        }
+                        @if (Model.CurrentPage > 4)
+                        {
+                            <li class="govuk-pagination__item govuk-pagination__item--ellipses">...</li>
+                        }
+                        <!-- Current Page and Up To Two Following Pages -->
+                        @for (int i = Model.CurrentPage; i <= Model.CurrentPage + 2 && i <= Model.TotalPages; i++)
+                        {
+                            <li class="govuk-pagination__item @(i == Model.CurrentPage ? "govuk-pagination__item--current" : "")">
+                                <span class="govuk-visually-hidden">Page</span>
+
+                                <a class="govuk-link govuk-pagination__link" href="@BuildPageLink(i)">@i</a>
+                            </li>
+                        }
+                        <!-- Link to the Last Page -->
+                        @if (Model.CurrentPage < Model.TotalPages - 3)
+                        {
+                            <li class="govuk-pagination__item govuk-pagination__item--ellipses">...</li>
+                            <li class="govuk-pagination__item">
+                                <a class="govuk-link govuk-pagination__link" href="@BuildPageLink(Model.TotalPages)">@Model.TotalPages</a>
+                            </li>
+                        }
+                    </ul>
+                    <!-- Next Page Link -->
+                    @if (Model.CurrentPage < Model.TotalPages)
+                    {
+                        <a class="govuk-link govuk-pagination__link govuk-pagination__next" href="@BuildPageLink(Model.CurrentPage + 1)">
+                            <span class="govuk-pagination__link-title">
+                                Next<span class="govuk-visually-hidden"> page</span>
+                            </span>
+                        </a>
+                    }
+                </nav>
+            }
+        </div>
+    </div>
+</div>
+<style>
+    .filter-panel {
+        background-color: #f3f2f1;
+        margin-bottom: 30px;
+    }
+
+    .filter-content {
+        padding: 20px;
+    }
+
+    .filter-heading {
+        background-color: #b1b4b6;
+        padding: 10px;
+    }
+
+    .users-list .govuk-link {
+        text-decoration: none;
+    }
+</style>

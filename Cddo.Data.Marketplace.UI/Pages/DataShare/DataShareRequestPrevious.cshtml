@@ -1,0 +1,98 @@
+﻿@using Agrimetrics.DataShare.Api.Dto.Responses.Acquirer.DataShareRequests;
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Pages.DataShare;
+
+@model DataShareRequestPreviousModel
+@{
+    ViewData["Title"] = "Datashare Request Previous";
+    var esdaName = Model.EsdaName;
+    var dataShareRequestSummaries = Model.DataShareRequestSummaries;
+}
+
+@functions {
+    public static string PrettifyString(string input)
+    {
+        if (input == null)
+        {
+            return "";
+        }
+        return string.Join(" ", input.Split(' ').Select(w => char.ToUpper(w[0]) + w.Substring(1)));
+    }
+
+    public static string FormatDateTime(DateTime? date)
+    {
+        if (date == null)
+            return "N/A";
+
+        var suffix = new[] { "th", "st", "nd", "rd" };
+        int day = date.Value.Day;
+        int mod100 = day % 100;
+        string formattedDate = date.Value.ToString("dd MMMM yyyy HH:mm");
+        string daySuffix;
+        if (mod100 > 10 && mod100 < 20)
+        {
+            daySuffix = suffix[0];
+        }
+        else
+        {
+            int daySuffixIndex = (day % 10) < 4 ? day % 10 : 0;
+            daySuffix = suffix[daySuffixIndex];
+        }
+
+        return day + daySuffix + " " + formattedDate.Substring(2);
+    }
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h2 id="pendingRequests" class="govuk-heading-l">Requests for @PrettifyString(esdaName) data</h2>
+            <table class="govuk-table" style="font-size: 18px;">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th class="govuk-table__header" scope="col">Request ID</th>
+                        <th class="govuk-table__header" scope="col">Date started</th>
+                        <th class="govuk-table__header" scope="col">Date submitted</th>
+                        <th class="govuk-table__header" scope="col">User</th>
+                        <th class="govuk-table__header" scope="col">Contact</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var row in dataShareRequestSummaries.DataShareRequestRaisedForEsdaByAcquirerOrganisationSummaries.OrderBy(x => x.DateStarted))
+                    {
+                        <tr class="govuk-table__row">
+                        
+                            <td class="govuk-table__cell">
+                                @row.RequestId
+                            </td>
+
+                            <td class="govuk-table__cell">
+                                @FormatDateTime(@row.DateStarted)
+                            </td>
+                            <td class="govuk-table__cell">
+                                @if (@row.DateSubmitted != null)
+                                {
+                                    @FormatDateTime(@row.DateSubmitted)
+                                }
+                                else
+                                {
+                                    @:Not submitted
+                                }
+                            </td>
+
+                            <td class="govuk-table__cell">
+                                @row.OriginatingAcquirerContactDetails.UserName
+                            </td>
+
+                            <td class="govuk-table__cell">
+                                @row.OriginatingAcquirerContactDetails.EmailAddress
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

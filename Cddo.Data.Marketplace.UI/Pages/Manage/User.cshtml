@@ -1,0 +1,151 @@
+﻿@page
+@using Cddo.Data.Marketplace.UI.Model.Enum
+@model UserModel
+@{
+}
+@{
+    ViewData["Title"] = "User Profile Management";
+}
+
+@functions {
+    private static (string tagClass, string tagText) GetApprovalStatusDetails(ApprovalStatus status)
+    {
+        return status switch
+        {
+            ApprovalStatus.Pending => ("govuk-tag govuk-tag--blue", "Pending"),
+            ApprovalStatus.Approved => ("govuk-tag govuk-tag--green", "Approved"),
+            ApprovalStatus.Rejected => ("govuk-tag govuk-tag--red", "Rejected"),
+            ApprovalStatus.Revoked => ("govuk-tag govuk-tag--red", "Revoked"),
+            _ => ("govuk-tag", "Unknown")
+        };
+    }
+}
+<div class="govuk-width-container">
+    <a class="govuk-back-link" href="/Manage/Users">Back</a>
+    <div class="govuk-main-wrapper">
+        <h1 class="govuk-heading-xl">
+            User Details
+        </h1>
+
+        <div class="govuk-summary-card">
+            <div class="govuk-summary-card__title-wrapper">
+                <h2 class="govuk-summary-card__title">
+                    @Model.Subject.User!.UserName
+                </h2>
+            </div>
+            <div class="govuk-summary-card__content">
+                <dl class="govuk-summary-list">                   
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Email
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @Model.Subject.User.UserEmail
+                        </dd>                      
+                    </div>                    
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Domain
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            <strong class="govuk-tag @(Model.Subject.Domain.IsEnabled ? "govuk-tag--green" : "govuk-tag--red")">
+                                @(Model.Subject.Domain.IsEnabled ? "Enabled" : "Disabled")
+                            </strong>
+                            @Model.Subject.Domain.DomainName
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Organisation
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            <strong class="govuk-tag @(Model.Subject.Organisation.IsEnabled ? "govuk-tag--green" : "govuk-tag--red")">
+                                @(Model.Subject.Organisation.IsEnabled ? "Enabled" : "Disabled")
+                            </strong>
+                            @Model.Subject.Organisation.OrganisationName
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Last Login
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @Model.Subject.LastLogin.ToString("f")
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <h2 class="govuk-heading-l">Roles</h2>
+        <form method="post">
+            <table class="govuk-table">
+                <thead>
+                    <tr>
+                        <th class="govuk-table__header">Role Name</th>
+                        <th class="govuk-table__header">Description</th>
+                        <th class="govuk-table__header">Comments</th>
+                        <th class="govuk-table__header">Status</th>
+                        <th class="govuk-table__header">Last Updated</th>
+                        <th class="govuk-table__header">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var roleViewModel in Model.Roles)
+                    {
+                        <tr>
+                            <td class="govuk-table__cell">@roleViewModel.Role.RoleName</td>
+                            <td class="govuk-table__cell">@roleViewModel.Role.Description</td>
+                            <td class="govuk-table__cell">
+                                @if (roleViewModel?.UserRoleApproval != null)
+                                {
+                                    if (roleViewModel?.UserRoleApproval.ApprovalStatus == ApprovalStatus.Rejected || roleViewModel?.UserRoleApproval.ApprovalStatus == ApprovalStatus.Revoked)
+                                    {
+                                        @roleViewModel?.UserRoleApproval.RejectionComment
+                                    }
+                                }
+                            </td>
+                            <td class="govuk-table__cell">
+                                @if (roleViewModel?.UserRoleApproval != null)
+                                {
+                                    var (metadataPublisherTagClass, metadataPublisherTagText) = GetApprovalStatusDetails(roleViewModel.UserRoleApproval.ApprovalStatus);
+
+                                    if (roleViewModel?.UserRoleApproval.ApprovalStatus == ApprovalStatus.Rejected || roleViewModel.UserRoleApproval.ApprovalStatus == ApprovalStatus.Revoked)
+                                    {
+                                        <strong class="@metadataPublisherTagClass">
+                                            @metadataPublisherTagText
+                                        </strong>
+                                    }
+                                }
+                            </td>
+                            <td class="govuk-table__cell">
+                                @if (roleViewModel?.UserRoleApproval?.ApprovalStatus == ApprovalStatus.Rejected || roleViewModel?.UserRoleApproval?.ApprovalStatus == ApprovalStatus.Revoked)
+                                {
+                                <span>@(roleViewModel?.UserRoleApproval?.UpdatedAt.ToString("dd/MM/yyyy") ?? "")</span>
+                                }
+                            </td>
+                            <td class="govuk-table__cell">
+                                
+
+                                @if (roleViewModel.IsAssigned)
+                                {
+                                    @* <button type="submit" asp-page-handler="RemoveRole" asp-route-userId="@Model.Subject.User.UserId" asp-route-roleId="@roleViewModel.Role.RoleId" class="govuk-button govuk-button--warning mb-0">Remove</button> *@
+                                    <a class="govuk-link" href="/manage/revokerole?userId=@Model.Subject.User.UserId&roleId=@roleViewModel.Role.RoleId">Revoke</a>
+                                    <span class="govuk-visually-hidden">@roleViewModel.Role.RoleName</span>
+                                    @* <button type="submit" asp-page-handler="RevokeRole" asp-route-userId="@Model.Subject.User.UserId" asp-route-roleId="@roleViewModel.Role.RoleId" class="govuk-button govuk-button--secondary mb-0">Revoke</button> *@
+                                }
+                                else
+                                {
+                                    <button type="submit" asp-page-handler="AddRole" asp-route-userId="@Model.Subject.User.UserId" asp-route-roleId="@roleViewModel.Role.RoleId" class="govuk-button govuk-button--secondary mb-0">Add</button>
+                                    <span class="govuk-visually-hidden">@roleViewModel.Role.RoleName</span>
+
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+</div>

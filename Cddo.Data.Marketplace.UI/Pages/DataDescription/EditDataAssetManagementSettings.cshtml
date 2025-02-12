@@ -1,0 +1,116 @@
+﻿@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums
+@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Pages.DataDescription
+
+@model EditDataAssetManagementSettingsModel
+
+@{
+    var cddoDataAsset = Model.CddoDataAsset;
+    var esdaDomainInformation = Model.EsdaDomainInformation;
+
+    var selectedDsrNotificationOption = Model.CddoDataAsset.DataShareRequestNotificationRecipientType;
+    var customDsrNotificationAddressIsInvalid = (selectedDsrNotificationOption == DataShareRequestNotificationRecipientType.EsdaCustomDsrNotificationAddress
+                                                 && ViewData.ModelState.TryGetValue(nameof(DataShareRequestNotificationsRequest.CustomDsrNotificationAddress), out _));
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-width-container">
+    <div class="govuk-main-wrapper">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <h1 class="govuk-heading-xl">Manage @cddoDataAsset.Title</h1>
+            </div>
+        </div>
+        
+        @Html.AntiForgeryToken()
+        @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <h2 class="govuk-heading-m">Data share request notifications</h2>
+                <form method="post">
+                    <div class="govuk-form-group">
+                        <div id="dsr-notification-options-hint" class="govuk-hint">
+                            Select an email address for receiving notifications about this data share request.
+                        </div>
+                    </div>
+                    
+                    <div class="govuk-radios" data-module="govuk-radios" id="dsr-notification-options"
+                         name="dsr-notification-options">
+                         
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" type="radio" name="@nameof(DataAssetManagementSettingsRequest.SelectedDataShareRequestNotificationRecipientType)"
+                                   id="dsr-notification-domain-address"
+                                   @(selectedDsrNotificationOption == @DataShareRequestNotificationRecipientType.DomainDsrNotificationAddress ? "checked" : "")
+                                   value="@DataShareRequestNotificationRecipientType.DomainDsrNotificationAddress"
+                                   aria-describedby="dsr-notification-domain-address-hint">
+                            <label class="govuk-label govuk-radios__label" for="dsr-notification-domain-address">
+                                Data share request notification address of your domain
+                            </label>
+                            <div class="govuk-hint govuk-checkboxes__hint" id="dsr-notification-domain-address-hint">
+                                This is currently @(string.IsNullOrWhiteSpace(esdaDomainInformation.DataShareRequestMailboxAddress) ? "not configured" : esdaDomainInformation.DataShareRequestMailboxAddress).
+                            </div>
+                        </div>
+                        
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" type="radio" name="@nameof(DataAssetManagementSettingsRequest.SelectedDataShareRequestNotificationRecipientType)"
+                                   id="dsr-notification-esda-contact-point-address"
+                                   @(selectedDsrNotificationOption == @DataShareRequestNotificationRecipientType.EsdaContactPointEmailAddress ? "checked" : "")
+                                   value="@DataShareRequestNotificationRecipientType.EsdaContactPointEmailAddress"
+                                   aria-describedby="dsr-notification-esda-contact-point-address-hint">
+                            <label class="govuk-label govuk-radios__label" for="dsr-notification-esda-contact-point-address">
+                                Contact point address on the data description
+                            </label>
+                            <div class="govuk-hint govuk-checkboxes__hint" id="dsr-notification-esda-contact-point-address-hint">
+                                This is @(cddoDataAsset.DataAssetContacts.FirstOrDefault(x => x.Role.HasValue && x.Role.Value == DataAssetContactRoleType.Contact)?.Email ?? "not configured").
+                            </div>
+                        </div>
+                        
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" type="radio" name="@nameof(DataAssetManagementSettingsRequest.SelectedDataShareRequestNotificationRecipientType)"
+                                   id="dsr-notification-esda-custom-address"
+                                   value="@DataShareRequestNotificationRecipientType.EsdaCustomDsrNotificationAddress"
+                                   @(selectedDsrNotificationOption == @DataShareRequestNotificationRecipientType.EsdaCustomDsrNotificationAddress ? "checked" : "")
+                                   aria-controls="conditional-@DataShareRequestNotificationRecipientType.EsdaCustomDsrNotificationAddress"
+                                   aria-describedby="domain-hint">
+                            <label class="govuk-label govuk-radios__label" for="dsr-notification-esda-custom-address">
+                                Another address
+                            </label>
+                        </div>
+                        
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@DataShareRequestNotificationRecipientType.EsdaCustomDsrNotificationAddress">
+                            <div class="govuk-form-group govuk-character-count" data-module="govuk-character-count" data-maxlength="255">
+                                <input class="govuk-input govuk-js-character-count @(customDsrNotificationAddressIsInvalid ? "govuk-input--error": "")"
+                                       id="custom-address"
+                                       name="@nameof(DataAssetManagementSettingsRequest.CustomDsrNotificationAddress)"
+                                       spellcheck="false" aria-describedby="custom-address-info"
+                                       value="@cddoDataAsset.CustomDsrNotificationAddress" />
+                                <div id="custom-address-info" class="govuk-hint govuk-character-count__message">
+                                    You can enter up to 255 characters
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="govuk-button-group govuk-!-margin-top-4">
+                        <input type="hidden" name="@nameof(DataAssetManagementSettingsRequest.Identifier)" value="@cddoDataAsset.Id" />
+                        <input type="hidden" name="@nameof(DataAssetManagementSettingsRequest.DataAssetType)" value="@cddoDataAsset.DataAssetType" />
+                        <input type="hidden" name="@nameof(DataAssetManagementSettingsRequest.MaintainerEmailAddress)" value="@cddoDataAsset.MaintainerEmail" />
+                        <input type="hidden" name="@nameof(DataAssetManagementSettingsRequest.DomainDsrNotificationMailboxAddress)" value="@esdaDomainInformation.DataShareRequestMailboxAddress" />
+                        
+                        <button class="govuk-button" data-module="govuk-button" type="submit"
+                                asp-controller="DataDescription" asp-action="@nameof(DataDescriptionController.EditDataAssetManagementSettingsSubmit)">
+                            Submit and return
+                        </button>
+
+                        <a class="govuk-button govuk-button--secondary" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssetByUser)" asp-route-identifier="@cddoDataAsset.Id">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

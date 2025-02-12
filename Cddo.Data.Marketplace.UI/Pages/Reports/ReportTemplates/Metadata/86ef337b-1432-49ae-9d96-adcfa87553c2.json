@@ -1,0 +1,14 @@
+{
+  "TemplateId": "86ef337b-1432-49ae-9d96-adcfa87553c2",
+  "KqlQuery": "{\r\n    \u0022Filter\u0022: {\r\n        \u0022FieldFilters\u0022: [\r\n        ],\r\n        \u0022FilterByInitiatingUserPermissions\u0022: false\r\n    },\r\n    \u0022RequiredFields\u0022: [\r\n        2,\r\n 12,\r\n ]\r\n}",
+  "ReportType": 2,
+  "ReportName": "Metadata - Status count report",
+  "Description": "Counts metadata records by status",
+  "CreatedOn": "2024-11-08T12:01:04.8874486+00:00",
+  "UserId": 11,
+  "OrganisationId": 1,
+  "SharedWithOrganisationIds": null,
+  "SharedWithUsersIds": null,
+  "IsPredefined": true,
+  "Owner": null
+}

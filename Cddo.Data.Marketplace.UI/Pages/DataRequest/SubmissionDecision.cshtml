@@ -1,0 +1,155 @@
+﻿@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests
+@using Cddo.Data.Marketplace.UI.Controllers
+@model Agrimetrics.DataShare.Api.Dto.Models.Supplier.DataShareRequests.SubmissionInformation
+@{
+    ViewData["Title"] = "Submission Decision";
+    var submissionInformation = Model;
+}
+
+<a class="govuk-back-link" asp-controller="DataRequest"
+   asp-action="@nameof(DataRequestController.ReviewInProgressReceivedRequest)"
+   asp-route-requestId="@submissionInformation.DataShareRequestId">Back</a>
+
+<div class="govuk-main-wrapper ">
+
+    <form method="post" novalidate>
+        <div class="govuk-form-group">
+            <fieldset class="govuk-fieldset" aria-describedby="your-decision-hint">
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="govuk-error-summary validation-summary-errors" data-module="govuk-error-summary">
+                        <div role="alert">
+                            <h2 class="govuk-error-summary__title">
+                                There is a problem
+                            </h2>
+                            <div class="govuk-error-summary__body">
+                                <ul class="govuk-list govuk-error-summary__list">
+                                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                    {
+                                        <li>
+                                            <a href="#">@error.ErrorMessage</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (submissionInformation.RequestStatus == DataShareRequestStatus.Cancelled)
+                {
+                    <div class="govuk-panel govuk-panel--confirmation">
+                        <h1 class="govuk-panel__title">
+                            Request was cancelled
+                        </h1>
+                    </div>
+
+                    <span class="govuk-caption-l">Request ID: @submissionInformation.DataShareRequestRequestId</span>
+                }
+                else
+                {
+                    <input type="hidden" name="request-status" value="@submissionInformation.RequestStatus" />
+
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <span class="govuk-caption-l">Request ID: @Model.DataShareRequestRequestId</span>
+                        <h1 class="govuk-fieldset__heading">
+                            What is your decision?
+                        </h1>
+                    </legend>
+                    <div id="your-decision-hint" class="govuk-hint">
+                        Choose your decision and add your comments. This will be sent to the person or team making the request.
+                    </div>
+
+                    <br>
+                    <div class="govuk-radios" data-module="govuk-radios">
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input"
+                                   id="decision-return"
+                                   name="decision-option"
+                                   type="radio"
+                            @(ViewData.ModelState["decision-return"]?.Errors.Any() == true ? "checked" : "")
+                                   value="return"
+                                   aria-describedby="decision-return-item-hint"
+                                   aria-controls="conditional-return">
+                            <label class="govuk-label govuk-radios__label" for="decision-return">
+                                <strong>Return with comments</strong>
+                            </label>
+                            <div id="decision-return-item-hint" class="govuk-hint govuk-radios__hint">
+                                Some details are missing. A decision cannot be made without them. If they provide this information, you will progress the request.
+                            </div>
+                        </div>
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-return">
+                            <div class="govuk-form-group govuk-character-count" data-module="govuk-character-count" data-maxlength="4000">
+                                <label class="govuk-label" for="return-comments-details">
+                                    <strong>Comments</strong>
+                                </label>
+                                <textarea class="govuk-textarea govuk-js-character-count @(ViewData.ModelState["decision-return"]?.Errors.Any() == true ? "govuk-textarea--error" : "")" id="return-feedback-for-acquirer" name="return-feedback-for-acquirer" spellcheck="false" rows="6" aria-describedby="return-feedback-for-acquirer-info"></textarea>
+                                <div id="return-feedback-for-acquirer-info" class="govuk-hint govuk-character-count__message">
+                                    You can enter up to 4000 characters
+                                </div>
+
+                                <button class="govuk-button" data-module="govuk-button" asp-controller="DataRequest" asp-action="ReturnReceivedRequest" asp-route-requestId="@submissionInformation.DataShareRequestId">
+                                    Return with comments
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="decision-approve" name="decision-option" type="radio" value="accept" aria-describedby="decision-approve-item-hint" aria-controls="conditional-accept">
+                            <label class="govuk-label govuk-radios__label" for="decision-approve">
+                                <strong>Approve data share request</strong>
+                            </label>
+                            <div id="decision-approve-item-hint" class="govuk-hint govuk-radios__hint">
+                                Approve and arrange a meeting to discuss the next steps.
+                            </div>
+                        </div>
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-accept">
+                            <div class="govuk-form-group govuk-character-count" data-module="govuk-character-count" data-maxlength="4000">
+                                <label class="govuk-label" for="return-accept-details">
+                                    <strong>Comments</strong>
+                                </label>
+                                <textarea class="govuk-textarea govuk-js-character-count" id="acceptance-feedback-for-acquirer" name="acceptance-feedback-for-acquirer" spellcheck="false" rows="6" aria-describedby="acceptance-feedback-for-acquirer-info"></textarea>
+                                <div id="acceptance-feedback-for-acquirer-info" class="govuk-hint govuk-character-count__message">
+                                    You can enter up to 4000 characters
+                                </div>
+                                <button class="govuk-button" data-module="govuk-button" asp-controller="DataRequest" asp-action="AcceptReceivedRequest" asp-route-requestId="@submissionInformation.DataShareRequestId">
+                                    Approve
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="decision-reject" name="decision-option" type="radio" value="reject" aria-describedby="decision-reject-item-hint" aria-controls="conditional-reject">
+                            <label class="govuk-label govuk-radios__label" for="decision-reject">
+                                <strong>Reject data share request</strong>
+                            </label>
+                            <div id="decision-reject-item-hint" class="govuk-hint govuk-radios__hint">
+                                There are fundamental problems with this request that cannot be solved. Use the comments box to tell the department why you have rejected their request.
+                            </div>
+                        </div>
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-reject">
+                            <div class="govuk-form-group govuk-character-count" data-module="govuk-character-count" data-maxlength="4000">
+                                <label class="govuk-label" for="return-reject-details">
+                                    <strong>Comments</strong>
+                                </label>
+                                <textarea class="govuk-textarea govuk-js-character-count" id="rejection-feedback-for-acquirer" name="rejection-feedback-for-acquirer" spellcheck="false" rows="6" aria-describedby="rejection-feedback-for-acquirer-info"></textarea>
+                                <div id="rejection-feedback-for-acquirer-info" class="govuk-hint govuk-character-count__message">
+                                    You can enter up to 4000 characters
+                                </div>
+                                <button class="govuk-button" data-module="govuk-button" asp-controller="DataRequest" asp-action="RejectReceivedRequest" asp-route-requestId="@submissionInformation.DataShareRequestId">
+                                    Reject
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            </fieldset>
+        </div>
+        <div class="govuk-button-group">
+            <a asp-controller="DataRequest" asp-action="ReceivedRequests" class="govuk-link">Return to received requests</a>
+        </div>
+    </form>
+
+</div>

@@ -1,0 +1,100 @@
+﻿@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums
+@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
+@using Cddo.Data.Marketplace.UI.Controllers
+@using GovUk.Frontend.AspNetCore.TagHelpers
+@using NPOI.HPSF
+@model QuestionSecurityClassificationRequest
+
+@{
+    ViewData["Title"] = "Security Classification";
+
+    bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
+    bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
+    bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
+
+    string saveButtonName;
+
+    if (isCheckList)
+    {
+        saveButtonName = "isCheckList";
+    }
+    else if (isCheckAnswers)
+    {
+        saveButtonName = "isCheckAnswers";
+    }
+    else
+    {
+        saveButtonName = "isCheckList";
+    }
+
+
+    var isOfficial = Model?.SecurityClassification == SecurityClassificationEnum.Official;
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.SecurityClassificationSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                @Html.AntiForgeryToken()
+                @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
+                @{
+                    var hasError = ViewData.ModelState[nameof(Model.SecurityClassification)]?.Errors.Any();
+                }
+
+                <input type="hidden" name="@nameof(QuestionSecurityClassificationRequest.Identifier)" value="@Model.Identifier" />
+                <div class="govuk-form-group @(hasError.GetValueOrDefault() ? "govuk-form-group--error" : "")">
+                    <fieldset class="govuk-fieldset" aria-describedby="SecurityClassification-hint">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                            <h1 class="govuk-fieldset__heading">
+                                Confirm the security classification of the data set
+                            </h1>
+                        </legend>
+                        <div id="SecurityClassification-hint" class="govuk-hint">
+                            You can only add descriptions of data that has an OFFICIAL classification, rather than SECRET or TOP SECRET.
+                            <a class="govuk-link" target="_blank" href="https://www.gov.uk/government/publications/government-security-classifications/government-security-classifications-policy-html#definitions-for-official-secret-and-top-secret">
+                                Find out more about these definitions (opens in new tab)
+                            </a>.
+                        </div>
+                        @if (hasError.GetValueOrDefault())
+                        {
+                            <p id="metadataTitle-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState[nameof(Model.SecurityClassification)]?.Errors.FirstOrDefault()?.ErrorMessage
+                            </p>
+                        }
+                        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input"
+                                       id="SecurityClassification"
+                                       name="@nameof(QuestionSecurityClassificationRequest.SecurityClassification)"
+                                       type="checkbox"
+                                       value="OFFICIAL"
+                                       aria-describedby="confirm-data-error"
+                                @(isOfficial ? "checked" : "")>
+                                <label class="govuk-label govuk-checkboxes__label" for="SecurityClassification">
+                                    The security classification of this data set is OFFICIAL
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <div class="govuk-button-group">
+                    @if (!isEditMode)
+                    {
+                        <button type="submit" name="showNextQuestion" value="true" class="govuk-button" data-module="govuk-button">
+                            Continue
+                        </button>
+                    }
+                    @if (!string.IsNullOrEmpty(@Model.Identifier))
+                    {
+                        <button type="submit" name="@saveButtonName" value="true" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                            Save and return
+                        </button>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

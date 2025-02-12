@@ -1,0 +1,97 @@
+﻿@page
+@using Cddo.Data.Marketplace.Api.Dto
+@using System.ComponentModel
+@using System.Reflection
+@model Cddo.Data.Marketplace.UI.Pages.Manage.EditOrganisationModel
+@{
+    ViewData["Title"] = "Manage - Edit Organisation";
+    var departmentId = ViewData["DepartmentId"] != null ? ViewData["DepartmentId"] : null;
+
+
+    var organisationTypes = Enum.GetValues(typeof(OrganisationType)).Cast<OrganisationType>().Select(e => new SelectListItem
+            {
+                Text = GetEnumDescription(e),
+                Value = e.ToString(),
+                Selected = Model?.Organisation?.OrganisationType != null &&
+                                                                   Enum.TryParse(typeof(OrganisationType), Model.Organisation.OrganisationType.ToString(), true, out var parsedValue) &&
+                                                                   (OrganisationType)parsedValue == e
+
+            });
+
+    int? selectedDepartment = null;
+    if (Model?.Organisation?.OrgDepartment?.Id != null)
+    {
+        selectedDepartment = (int)Model.Organisation.OrgDepartment.Id;
+    }
+
+    string GetEnumDescription(Enum value)
+    {
+        FieldInfo field = value.GetType().GetField(value.ToString());
+        var attribute = field.GetCustomAttribute<DescriptionAttribute>();
+
+        return attribute?.Description ?? value.ToString();
+    }
+}
+
+<div class="govuk-width-container">
+    <a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+    <div class="govuk-main-wrapper">
+        <h1 class="govuk-heading-l">
+            <span class="govuk-caption-l">Edit Organisation</span>
+            Organisation Details
+        </h1>
+        
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <form method="post">
+                    <input hidden value="@Model.Organisation.OrganisationId" name="OrganisationId" />
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="organisationName">Organisation Name</label>
+                        <input class="govuk-input" id="organisationName" name="OrganisationName" type="text" required value="@Model.Organisation.OrganisationName">
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="organisationType">Organisation Type</label>
+                        <select class="govuk-select" id="organisationType" name="OrganisationType" required>
+                            <option value="">Select..</option>
+                            @foreach (var item in organisationTypes)
+                            {
+                                <option value="@item.Value" selected="@item.Selected">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="organisationFormat">Link organisation to a department</label>
+                        <select class="govuk-select" id="departmentNameDropDown" name="selectedDepartmentId" aria-label="Link organisation to a department">
+                            <option value="0">Select..</option>
+                            @foreach (var org in Model.AllDepartments!)
+                            {
+                                <option value="@org.Id" selected="@(selectedDepartment == org.Id)">@org.DepartmentName</option>
+                            }
+                        </select>
+                    </div>
+                   @*  <div class="govuk-form-group">
+                        <label class="govuk-label" for="domainName">Domain Name</label>
+                        <input class="govuk-input" id="domainName" name="DomainName" type="text" required value="@Model.Organisation.Domains.FirstOrDefault().DomainName">
+                    </div> *@
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="allowList">Allow List</label>
+                        <select class="govuk-select" id="allowList" name="Allowed" required>
+                            <option value="true" selected="@(Model.Organisation.Allowed)">Yes</option>
+                            <option value="false" selected="@(!Model.Organisation.Allowed)">No</option>
+                        </select>
+                    </div>
+                    <div class="govuk-button-group">
+                        <a href="@HttpContext.Request.Headers["Referer"]" class="govuk-button govuk-button--secondary">Cancel</a>
+                        <button class="govuk-button" data-module="govuk-button" type="submit">
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

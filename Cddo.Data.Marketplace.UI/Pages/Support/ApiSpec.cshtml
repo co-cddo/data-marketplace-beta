@@ -1,0 +1,475 @@
+﻿@using Cddo.Data.Marketplace.UI.Pages.Shared
+@using System.Text.Json
+@using Markdig
+@using Microsoft.AspNetCore.Html
+@using Microsoft.OpenApi.Any
+@using Microsoft.OpenApi.Models
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@model Cddo.Data.Marketplace.UI.Configuration.EndpointOperation
+@{
+    ViewData["Title"] = "Support";
+    Layout = "~/Pages/Shared/_SupportLayout.cshtml";
+}
+@functions
+{
+    public static string Dump(object value, int depth = 2)
+    {
+
+        if (value != null)
+        {
+            object jsonString = "";
+            var ourType = value.GetType();
+            if (ourType.Name == "OpenApiExample")
+            {
+                jsonString = ConvertOpenApiExampleObjectToDictionary((OpenApiExample)value);
+                return JsonConvert.SerializeObject(jsonString, Formatting.Indented);
+            }
+            if (IsOpenApiObject((IOpenApiAny)value))
+            {
+                jsonString = ConvertOpenApiObjectToDictionary((OpenApiObject)value); // ((OpenApiArray)value);
+            }
+            else
+            {
+                jsonString = ConvertOpenApiArrayToList((OpenApiArray)value); // ((OpenApiArray)value);
+            }
+
+            return JsonConvert.SerializeObject(jsonString, Formatting.Indented);
+        }
+
+        return JsonConvert.SerializeObject(value);
+    }
+
+    static bool IsOpenApiObject(IOpenApiAny value)
+    {
+        return value is OpenApiObject;
+    }
+
+    private static List<object> ConvertOpenApiArrayToList(OpenApiArray openApiArray)
+    {
+        var result = new List<object>();
+        foreach (var item in openApiArray)
+        {
+            if (item is OpenApiString openApiString)
+            {
+                result.Add(openApiString.Value);
+            }
+            else if (item is OpenApiInteger openApiInteger)
+            {
+                result.Add(openApiInteger.Value);
+            }
+            else if (item is OpenApiBoolean openApiBoolean)
+            {
+                result.Add(openApiBoolean.Value);
+            }
+            else if (item is OpenApiDouble openApiDouble)
+            {
+                result.Add(openApiDouble.Value);
+            }
+            else if (item is OpenApiObject openApiObject)
+            {
+                result.Add(ConvertOpenApiObjectToDictionary(openApiObject));
+            }
+            else
+            {
+                result.Add(item.ToString()); // Default to string representation for other types
+            }
+        }
+        return result;
+    }
+
+    // Helper method to convert OpenApiObject to a dictionary
+    private static Dictionary<string, object> ConvertOpenApiObjectToDictionary(OpenApiObject openApiObject)
+    {
+        var dictionary = new Dictionary<string, object>();
+        foreach (var property in openApiObject)
+        {
+            if (property.Value is OpenApiString openApiString)
+            {
+                dictionary[property.Key] = openApiString.Value;
+            }
+            else if (property.Value is OpenApiInteger openApiInteger)
+            {
+                dictionary[property.Key] = openApiInteger.Value;
+            }
+            else if (property.Value is OpenApiBoolean openApiBoolean)
+            {
+                dictionary[property.Key] = openApiBoolean.Value;
+            }
+            else if (property.Value is OpenApiDouble openApiDouble)
+            {
+                dictionary[property.Key] = openApiDouble.Value;
+            }
+            else if (property.Value is OpenApiArray openApiArray)
+            {
+                dictionary[property.Key] = ConvertOpenApiArrayToList(openApiArray);
+            }
+            else if (property.Value is OpenApiDateTime openApiDateTime)
+            {
+                dictionary[property.Key] = "2024-12-16T00:00:00Z";
+            }
+            else
+            {
+                dictionary[property.Key] = property.Value.ToString(); // Default to string representation
+            }
+        }
+        return dictionary;
+    }
+
+    private static Dictionary<string, object> ConvertOpenApiExampleObjectToDictionary(OpenApiExample openApiObject)
+    {
+        if (openApiObject?.Value is OpenApiObject apiObject)
+        {
+            return ConvertOpenApiObject(apiObject);
+        }
+
+        // Return an empty dictionary if it's not an OpenApiObject
+        return new Dictionary<string, object>();
+    }
+
+    private static Dictionary<string, object> ConvertOpenApiObject(OpenApiObject apiObject)
+    {
+        var result = new Dictionary<string, object>();
+
+        foreach (var property in apiObject)
+        {
+            result[property.Key] = ConvertOpenApiValue(property.Value);
+        }
+
+        return result;
+    }
+
+    private static object ConvertOpenApiValue(IOpenApiAny value)
+    {
+        return value switch
+        {
+            OpenApiString str => str.Value,
+            OpenApiInteger integer => integer.Value,
+            OpenApiBoolean boolean => boolean.Value,
+            OpenApiDouble doubleVal => doubleVal.Value,
+            OpenApiArray array => ConvertOpenApiArray(array),
+            OpenApiObject obj => ConvertOpenApiObject(obj),
+            _ => value?.ToString() // Fallback for unsupported types
+        };
+    }
+
+    private static List<object> ConvertOpenApiArray(OpenApiArray array)
+    {
+        var result = new List<object>();
+        foreach (var item in array)
+        {
+            result.Add(ConvertOpenApiValue(item));
+        }
+        return result;
+    }
+
+    public static IHtmlContent Safe(string input)
+    {
+        return new HtmlString(input);
+    }
+}
+<div>
+
+    <span class="govuk-caption-xl">
+        API endpoints
+    </span>
+
+    <h1 class="govuk-heading-xl">
+        @Model.Title
+    </h1>
+    <p class="govuk-body">@Html.Raw(Markdown.ToHtml(Model.Operation.Value.Description))</p>
+    <p class="govuk-body">
+        <strong class="govuk-tag">
+            @Model.Operation.Key
+        </strong>
+        <code>
+            @Model.OperationPath
+        </code>
+    </p>
+
+    @if (Model.Operation.Value.Parameters.Any())
+    {
+        <h2 class="govuk-heading-l">Parameters</h2>
+
+        <dl class="govuk-summary-list">
+
+            @foreach (var param in Model.Operation.Value.Parameters)
+            {
+                <div class="govuk-summary-list__row">
+
+                    <dt class="govuk-summary-list__key">
+                        @param.Name
+                    </dt>
+
+                    <dd class="govuk-summary-list__value">
+                        <strong class="govuk-tag govuk-tag--yellow govuk-!-margin-bottom-2">
+                            @param.Schema.Type.ToLower()
+                        </strong>
+                        <div class="govuk-body">
+                            <p class="govuk-body">@Html.Raw(Markdown.ToHtml(param.Description))</p>
+                        </div>
+                    </dd>
+                </div>
+            }
+        </dl>
+    }
+    @if (Model.Operation.Value.RequestBody != null)
+    {
+        <h2 class="govuk-heading-l">
+            Request body
+        </h2>
+        var schema = Model.Operation.Value.RequestBody.Content["application/json"].Schema;
+
+        var properties = schema.Properties; 
+
+        <dl class="govuk-summary-list">
+
+            @foreach (var name in properties)
+            {
+                <div class="govuk-summary-list__row">
+
+                    @{
+                        var property = schema.Properties[name.Key];
+
+                        <dt class="govuk-summary-list__key">
+                            @name.Key
+
+                            @if (schema.Required != null && schema.Required.Contains(name.Key))
+                            {
+                                    <strong class="govuk-tag govuk-tag--green govuk-!-margin-top-1">
+                                        required
+                                    </strong>
+                            }
+                        </dt>
+
+                        <dd class="govuk-summary-list__value">
+
+                            @{
+                                var type = property.Type;
+                                if (type == "array" && property.Items.Type == "object")
+                                {
+                                    type = "array of objects";
+                                }
+                                if (type == "array" && property.Items.Type == "string")
+                                {
+                                    type = "array of strings";
+                                }
+                                if (property.AnyOf != null)
+                                {
+                                    type = "date time string";
+                                }
+                                <strong class="govuk-tag govuk-tag--yellow govuk-!-margin-bottom-2">
+                                    @type
+                                </strong>
+
+                                if (property.MaxLength != null)
+                                {
+                                    <strong class="govuk-tag govuk-tag--yellow">
+                                        max length: @property.MaxLength
+                                    </strong>
+                                }
+                                if (property.Enum.Any())
+                                {
+                                    <p class="govuk-body">
+                                        Values: @string.Join(", ", property.Enum.Select(ConvertOpenApiValue))
+                                    </p>
+                                }
+
+                                if (property.Items != null && property.Items.Enum.Any())
+                                {
+                                    <p class="govuk-body">
+                                        Values: @string.Join(", ", property.Items.Enum.Select(ConvertOpenApiValue))
+                                    </p>
+                                }
+
+                                <p class="govuk-body">@Html.Raw(Markdown.ToHtml(property.Description ?? ""))</p>
+
+                                if (property.Items != null && property.Items.Type == "object")
+                                {
+                                    <p class="govuk-body">
+                                        Object parameters:
+                                    </p>
+                                }
+                                foreach (var subPropertyName in property.Items?.Properties?.Keys ?? Enumerable.Empty<string>())
+                                {
+                                    var subProperty = property.Items.Properties[subPropertyName];
+                                    string subType = subProperty.Type;
+
+                                    <p class="govuk-body">
+                                        <strong class="govuk-!-margin-right-2">@subPropertyName</strong>
+                                        @{
+                                            var subtype = subProperty.Type;
+
+                                            if (subtype == "array" && subProperty.Items.Type == "object")
+                                            {
+                                                subtype = "array of objects";
+                                            }
+
+                                            if (subtype == "array" && subProperty.Items.Type == "string")
+                                            {
+                                                subtype = "array of strings";
+                                            }
+
+                                            if (property.AnyOf.Any())
+                                            {
+                                                subtype = "date time string";
+                                            }
+
+                                            <strong class="govuk-tag govuk-tag--yellow govuk-!-margin-bottom-2">
+                                                @subtype
+                                            </strong>
+                                            @if (property.Items.Required != null && property.Items.Required.Contains(subPropertyName))
+                                            {
+                                                <strong class="govuk-tag govuk-tag--green">
+                                                    required
+                                                </strong>
+                                            }
+                                        }
+                                    </p>
+
+                                    <p class="govuk-body">@Html.Raw(Markdown.ToHtml(subProperty.Description ?? ""))</p>
+                                }
+                            }
+                        </dd>
+                    }
+                </div>
+            }
+        </dl>
+
+        var examples = Model.Operation.Value.RequestBody.Content["application/json"].Examples;
+
+        if (examples != null)
+        {
+            @if (examples.Count() > 1)
+            {
+                <h4 class="govuk-heading-m">
+                    Examples
+                </h4>
+            }
+            else
+            {
+                <h4 class="govuk-heading-m">
+                    Example
+                </h4>
+            }
+
+            @foreach (var exampleName in examples)
+            {
+                <p class="govuk-body">@Html.Raw(Markdown.ToHtml(exampleName.Value.Summary))</p>
+                <pre style="max-width:100%; overflow: auto; border: 10px solid #eee; padding: 10px; font-size: 1rem;">
+                <code>@Safe(Dump(exampleName.Value, 2));</code>
+                                                                        </pre>
+            }
+        }
+    }
+
+    <h2 class="govuk-heading-l">
+        Responses
+    </h2>
+
+    @foreach (var response in Model.Operation.Value.Responses)
+    {
+        <h3 class="govuk-heading-m">
+            @response.Key
+        </h3>
+
+        <p class="govuk-body">@Html.Raw(Markdown.ToHtml(response.Value.Description))</p>
+
+        if (response.Value.Content.Any())
+        {
+            var responseDetail = response.Value.Content["application/json"];
+            <p class="govuk-body">
+                application/json
+            </p>
+            <p class="govuk-body">
+                @responseDetail.Schema?.Type
+                @if (responseDetail.Schema?.MaxItems != null)
+                {
+                <p class="govuk-body">
+                    (max items @responseDetail.Schema?.MaxItems)
+                </p>
+                }
+            </p>
+
+            <dl class="govuk-summary-list">
+                @if (responseDetail.Schema != null)
+                {
+                    var properties = responseDetail.Schema.Items != null ? responseDetail.Schema.Items.Properties : responseDetail.Schema.Properties;
+                    @foreach (var propertyName in properties)
+                    {
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                @propertyName.Key
+                            </dt>
+
+                            <dd class="govuk-summary-list__value">
+                                @{
+                                    var property = properties[propertyName.Key];
+                                    var type = property.Type;
+                                    if (type == "array" && property.Items.Type == "object")
+                                    {
+                                        <strong class="govuk-tag govuk-tag--yellow govuk-!-margin-bottom-2">
+                                            array of objects
+                                        </strong>
+                                    }
+                                    else if (type == "array" && property.Items.Type == "string")
+                                    {
+                                        <strong class="govuk-tag govuk-tag--yellow govuk-!-margin-bottom-2">
+                                            array of strings
+                                        </strong>
+                                    }                                    
+                                    else if (type == null && property.AnyOf != null)
+                                    {
+                                        <strong class="govuk-tag govuk-tag--yellow govuk-!-margin-bottom-2">
+                                            date time string
+                                        </strong>
+                                    }
+                                    else
+                                    {
+                                        <strong class="govuk-tag govuk-tag--yellow govuk-!-margin-bottom-2">
+                                            @type
+                                        </strong>
+                                    }
+
+                                    <p class="govuk-body">
+                                        @Html.Raw(Markdown.ToHtml(property.Description ?? ""))
+                                    </p>
+                                }
+
+                            </dd>
+                        </div>
+                    }
+                }
+
+            </dl>
+
+
+            var examples = responseDetail.Examples;
+
+            if (examples != null)
+            {
+                @if (examples.Count() > 1)
+                {
+                    <h4 class="govuk-heading-m">
+                        Examples
+                    </h4>
+                }
+                else
+                {
+                    <h4 class="govuk-heading-m">
+                        Example
+                    </h4>
+                }
+
+                @foreach (var exampleName in examples)
+                {
+                    <p class="govuk-body">@Html.Raw(Markdown.ToHtml(exampleName.Value.Summary))</p>
+
+                        <pre style="max-width:100%; overflow: auto; border: 10px solid #eee; padding: 10px; font-size: 1rem;">
+                        <code>@Safe(Dump(exampleName.Value.Value, 2));</code></pre>
+                }
+            }
+        }
+    }
+</div>
+

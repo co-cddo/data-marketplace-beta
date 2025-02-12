@@ -1,0 +1,44 @@
+﻿@{
+    var pageTitle = ViewData["Title"]?.ToString() ?? "Landing";
+}
+
+@{
+    var analyticsCookiesAreAccepted = Context.Request.Cookies["cddo-analytics-cookies-acceptance"] == "True";
+    var siteSettingsCookiesAreAccepted = Context.Request.Cookies["cddo-sitesettings-cookies-acceptance"] == "True";
+
+    // Check if all necessary cookies are accepted
+    var allCookiesAccepted = analyticsCookiesAreAccepted && siteSettingsCookiesAreAccepted;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>@pageTitle</title>
+    @await Html.PartialAsync("_HeadPartial", new HeadPartialModel())
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    @if (!allCookiesAccepted)
+    {
+        @await Html.PartialAsync("_CookieBannerPartial.cshtml", new CookieBannerPartialModel())
+    }
+    @await Html.PartialAsync("_HeaderPartial", new HeaderPartialModel())
+    @await Html.PartialAsync("_NavbarPartial", new NavbarPartialModel())
+
+    <main role="main" id="main-content">
+        @RenderBody()
+    </main>
+
+    @await Html.PartialAsync("_FooterPartial", new FooterPartialModel())
+
+    <script src="~/js/govuk-frontend-5.7.1.min.js"></script>
+    <script type="module" asp-add-nonce="true">
+        import { initAll } from '/js/govuk-frontend-5.7.1.min.js';
+        initAll();
+    </script>
+    <script asp-add-nonce="true" src="~/js/cddo.min.js"></script>
+    <script asp-add-nonce="true" src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script asp-add-nonce="true" src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

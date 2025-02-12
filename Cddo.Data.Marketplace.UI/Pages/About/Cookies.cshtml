@@ -1,0 +1,115 @@
+﻿@using Cddo.Data.Marketplace.UI.Controllers
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@model Cddo.Data.Marketplace.UI.Pages.About.CookiesModel
+@{
+    ViewData["Title"] = "Cookies";
+    string? analyticsCookieAcceptance = HttpContextAccessor.HttpContext?.Request.Cookies["cddo-analytics-cookies-acceptance"];
+    bool analyticsCookieIsAccepted = analyticsCookieAcceptance?.Equals("True") ?? false;
+    bool analyticsCookieIsRejected = analyticsCookieAcceptance?.Equals("False") ?? false;
+
+    string? siteSettingsCookieAcceptance = HttpContextAccessor.HttpContext?.Request.Cookies["cddo-sitesettings-cookies-acceptance"];
+    bool siteSettingsCookieIsAccepted = siteSettingsCookieAcceptance?.Equals("True") ?? false;
+    bool siteSettingsCookieIsRejected = siteSettingsCookieAcceptance?.Equals("False") ?? false;
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper ">
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl">Cookies on the Data Marketplace</h1>
+            <p class="govuk-body">Cookies are small files saved on your phone, tablet or computer when you visit a website.</p>
+            <p class="govuk-body">We use them to collect and store information about how you use the Data Marketplace. You can opt out of some cookies, while others are necessary for us to deliver this service.</p>
+            <p class="govuk-body">This page has a brief explanation of each type of cookie we use. For more details, <a class="govuk-link" asp-controller="Link" asp-action="@nameof(LinkController.CookieDetailsPage)">read our detailed cookie information</a>.</p>
+            @* Cookie settings *@
+            <h2 class="govuk-heading-l">Cookie settings</h2>
+            <p class="govuk-body">We use 3 types of cookie. You can choose which cookies you're happy for us to use.</p>
+
+
+            <form asp-controller="Cookie">
+                @* Cookies that measure website use *@
+                <h3 class="govuk-heading-m">Cookies that measure website use</h3>
+                <p class="govuk-body">We use Google Analytics and Hotjar cookies to measure how you use this website, so we can improve the service.</p>
+                <p class="govuk-body">
+                    These cookies collect information about:
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>how you got to these sites</li>
+                        <li>the pages you visit and how long you spend on each page</li>
+                        <li>what you click on while you’re visiting this site</li>
+                    </ul>
+                </p>
+                <p class="govuk-body">Google Analytics cookies also collect and store information about how well pages performed on your device, including whether there were any performance bottlenecks or JavaScript errors.</p>
+                <p class="govuk-body">We do not allow Google to use or share this data for their own purposes.</p>
+
+                <div class="govuk-form-group">
+                    <div class="govuk-radios" data-module="govuk-radios">
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="acceptAnalyticsCookie" name="acceptAnalyticsCookiesDecision" type="radio" value="True"
+                            @if (analyticsCookieIsAccepted)
+                            {
+                                <text>checked</text>
+                            }/>
+                            <label class="govuk-label govuk-radios__label" for="acceptAnalyticsCookie">
+                                Use cookies that measure my website use
+                            </label>
+                        </div>
+
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="rejectAnalyticsCookie" name="acceptAnalyticsCookiesDecision" type="radio" value="False"
+                            @if (analyticsCookieIsRejected)
+                            {
+                                <text>checked</text>
+                            }/>
+                            <label class="govuk-label govuk-radios__label" for="rejectAnalyticsCookie">
+                                Do not use cookies that measure my website use
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                @* Cookies that remember your settings *@
+                <h3 class="govuk-heading-m">Cookies that remember your settings</h3>
+                <p class="govuk-body">These cookies do things like remember your preferences and the choices you make, to personalise your experience of using the site.</p>
+
+                <div class="govuk-form-group">
+                    <div class="govuk-radios" data-module="govuk-radios">
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="acceptSiteSettingsCookie" name="acceptSiteSettingsCookiesDecision" type="radio" value="True"
+                            @if (siteSettingsCookieIsAccepted)
+                            {
+                                <text>checked</text>
+                            }/>
+                            <label class="govuk-label govuk-radios__label" for="acceptSiteSettingsCookie">
+                                Use cookies that remember my settings on the site
+                            </label>
+                        </div>
+
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="rejectSiteSettingsCookie" name="acceptSiteSettingsCookiesDecision" type="radio" value="False"
+                            @if (siteSettingsCookieIsRejected)
+                            {
+                                <text>checked</text>
+                            }/>
+                            <label class="govuk-label govuk-radios__label" for="rejectSiteSettingsCookie">
+                                Do not use cookies that remember my settings on the site
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                @* Strictly necessary cookies *@
+                <h3 class="govuk-heading-m">Strictly necessary cookies</h3>
+                <p class="govuk-body">These do essential things like remembering your progress through a form. They are always on.</p>
+                <p class="govuk-body">We do not use cookies that are set by third-party websites that help with communications and marketing.</p>
+                <button class="govuk-button" asp-controller="Cookie" asp-action="@nameof(CookieController.ApplyCookiesAcceptanceDecisionsFromCookiesPage)">Save changes</button>
+            </form>
+
+            @* Updates to this page *@
+            <h3 class="govuk-heading-m">Updates to this page</h3>
+            <p class="govuk-body">If we make changes to cookies on the Data Marketplace, including changes that affect how we process your personal data, we’ll update this page.</p>
+            <p class="govuk-body">We encourage you to review this page regularly so that you’re aware of what information we collect, how we use it, and under what circumstances we’ll share it with other parties.</p>
+            <p class="govuk-body">Last updated: 5 December 2024</p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,41 @@
+﻿@using System.Text.Json
+@using System.Text.Json.Serialization
+@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests
+@using Agrimetrics.DataShare.Api.Dto.Models.Questions.QuestionParts.ResponseFormats
+@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests.Answers.DataShareRequestAnswerSummaries
+@inject IConfiguration Configuration
+@model SubmissionDeclarationModel
+@{
+    ViewData["Title"] = "Submission Declaration";
+    var dataShareRequestId = Model.DataShareRequestId;
+}
+
+<div class="govuk-width-container">
+    <a class="govuk-back-link" asp-controller="DataRequest" asp-action="RequestTasksReviewAnswers" asp-route-requestId="@dataShareRequestId">Back</a>
+
+    <div class="govuk-main-wrapper ">
+        
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                
+                <h1 class="govuk-heading-l">Declaration</h1>
+                <p class="govuk-body-m">By sending this, you confirm you have considered how the:</p>
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>technology</li>
+                    <li>data security</li>
+                    <li>data protection</li>
+                    <li>legal</li>
+                    <li>data governance</li>
+                </ul>
+                <p class="govuk-body-m">aspects might impact your request.</p>
+                <br>
+                <form method="post" novalidate>
+                    <button class="govuk-button" data-module="govuk-button" asp-controller="DataRequest" asp-action="DeclareRequestSubmission" asp-route-requestId="@dataShareRequestId">
+                        Submit the data share request
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div> 
