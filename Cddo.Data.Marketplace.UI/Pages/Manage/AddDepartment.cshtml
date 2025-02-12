@@ -1,0 +1,35 @@
+﻿@using Cddo.Data.Marketplace.Api.Dto.Responses.ManageUser
+@using Cddo.Data.Marketplace.UI.Controllers
+@model ManageDepartmentsResponse
+@{
+    ViewData["Title"] = "Add - Departments";
+
+}
+
+<div class="govuk-width-container">
+    <a class="govuk-back-link" asp-controller="ManageDepartment" asp-action="GetDepartments">Back</a>
+
+    <div class="govuk-main-wrapper">
+        <h1 class="govuk-heading-l">
+            <span class="govuk-caption-l">Add New Department</span>
+            Add New Department
+        </h1>
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <form asp-controller="ManageDepartment" asp-action="@nameof(ManageDepartmentController.PostAddDepartments)" method="post">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="departmentName">Department Name</label>
+                        <input class="govuk-input" id="departmentName" name="DepartmentName" type="text" required>
+                    </div>                   
+                    <div class="govuk-button-group">
+                        <button class="govuk-button" data-module="govuk-button" type="submit" asp-controller="ManageDepartment" asp-action="PostAddDepartments">
+                            Add
+                        </button> 
+                        <a class="govuk-button govuk-button--secondary" asp-controller="ManageDepartment" asp-action="GetDepartments">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

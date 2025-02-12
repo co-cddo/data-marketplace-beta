@@ -1,0 +1,39 @@
+﻿@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests.Answers.DataShareRequestQuestionAnswers
+@using Agrimetrics.DataShare.Api.Dto.Models.Questions.QuestionParts.ResponseFormats;
+
+@model QuestionPartResponseItemFreeFormText
+@{
+    var textInputComponentId = Model.TextInputComponentId;
+    var textInputComponentName = Model.TextInputComponentName;
+
+    var isShortAnswer = Model.IsShortAnswer;
+    var enteredValue = Model.EnteredValue;
+
+    var responseIsInvalid = Model.ResponseIsInvalid;
+
+    var maximumResponseLength = Model.MaximumResponseLength;
+    var uniqueCounter = Guid.NewGuid();
+}
+
+@if (isShortAnswer)
+{
+    <input class="govuk-input @(responseIsInvalid ? "govuk-input--error" : "") govuk-js-character-count"
+           id=@textInputComponentId
+           name=@textInputComponentName
+           type="text"
+           spellcheck="false"
+           value="@enteredValue"
+           aria-describedby="@textInputComponentId-info" />
+}
+else
+{
+    <textarea class="govuk-textarea @(responseIsInvalid ? "govuk-textarea--error" : "") govuk-js-character-count"
+              id=@textInputComponentId
+              name=@textInputComponentName
+              rows="5"
+              aria-describedby="@textInputComponentId-info">@enteredValue</textarea>
+}
+<ul id="autocomplete-suggestions-@uniqueCounter" class="autocomplete-suggestions"></ul>
+<div id="@textInputComponentId-info" class="govuk-hint govuk-character-count__message">
+    You can enter up to @maximumResponseLength characters
+</div>

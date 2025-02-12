@@ -1,0 +1,179 @@
+﻿@using System.Text.Json
+@using System.Text.Json.Serialization
+@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests
+@using Agrimetrics.DataShare.Api.Dto.Models.Questions.QuestionParts.ResponseFormats
+@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests.Answers.DataShareRequestAnswerSummaries
+@inject IConfiguration Configuration
+
+@model ReviewReadOnlyAnswersModel
+@{
+    ViewData["Title"] = "Review Read Answers";
+
+    var dataShareRequestId = Model.DataShareRequestId;
+    var answersSummary = Model.AnswersSummary;
+    var userCanDeleteDataShareRequest = Model.UserCanDeleteDataShareRequest;
+
+    var dataShareRequestCanBeDeleted = answersSummary.DataShareRequestStatus == DataShareRequestStatus.Draft &&
+                                       userCanDeleteDataShareRequest;
+}
+
+@functions {
+
+    public static string FormatFreeFormDate(string? dateString)
+    {
+        if (string.IsNullOrWhiteSpace(dateString))
+            return "N/A";
+
+        var yearPart = dateString.Substring(0, 4);
+        var monthPart = dateString.Substring(4, 2);
+        var dayPart = dateString.Substring(6, 2);
+
+        return dayPart + '/' + monthPart + '/' + yearPart;
+    }
+
+    public static string PrettifyString(string? input)
+    {
+        if (input == null)
+        {
+            return "";
+        }
+
+        return string.Join(" ", input.Split('-').Select(w => char.ToUpper(w[0]) + w.Substring(1)));
+    }
+}
+
+<div class="govuk-width-container">
+    <a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+    
+    <form asp-controller="DataRequest">
+        <div class="govuk-main-wrapper govuk-main-wrapper--l">
+            <div class="govuk-grid-row">
+                
+                @if (answersSummary.DataShareRequestStatus == DataShareRequestStatus.Deleted)
+                {
+                    <div class="govuk-panel govuk-panel--confirmation">
+                        <h1 class="govuk-panel__title">
+                            Request deleted
+                        </h1>
+                    </div>
+                }
+                else
+                {
+                    <div class="govuk-grid-column-two-thirds">
+                        <span class="govuk-caption-l">Request ID: @answersSummary.RequestId</span>
+                    </div>
+
+                    <div class="govuk-grid-column-full">
+                        @foreach (var answerSection in answersSummary.SummarySections.OrderBy(x => x.OrderWithinSummary))
+                        {
+                            <h2 class="govuk-heading-l">@answerSection.SectionHeader</h2>
+
+                            <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+                                @foreach (var answer in answerSection.SummaryQuestionGroups.OrderBy(x => x.OrderWithinSection))
+                                {
+                                    var mainQuestionParts = answer.MainQuestionSummary.SummaryQuestionParts.OrderBy(x => x.OrderWithinQuestion);
+                                    var backingQuestionParts = answer.BackingQuestionSummaries.SelectMany(x => x.SummaryQuestionParts.OrderBy(x => x.OrderWithinQuestion));
+
+                                    <div class="govuk-summary-list__row">
+
+                                        <dt class="govuk-summary-list__key">
+                                            @if (mainQuestionParts.Any())
+                                            {
+                                                @mainQuestionParts.First()?.QuestionPartText
+                                            }
+                                            else
+                                            {
+                                                <span class="govuk-body-s">No data available</span>
+                                            }
+                                        </dt>
+
+                                        <dd class="govuk-summary-list__value">
+                                            @foreach (var mainQuestionPart in mainQuestionParts)
+                                            {
+                                                var responseItems = mainQuestionPart.Responses
+                                                .OrderBy(x => x.OrderWithinQuestionPartAnswer)
+                                                .Select(response => response.QuestionPartAnswerResponseItem)
+                                                .ToList();
+
+                                                foreach (var responseItem in responseItems)
+                                                {
+                                                    switch (responseItem.InputType)
+                                                    {
+                                                        case QuestionPartResponseInputType.FreeForm:
+                                                            var freeFormResponseItem = (DataShareRequestAnswersSummaryQuestionPartAnswerResponseItemFreeForm)responseItem;
+
+                                                            switch (mainQuestionPart.ResponseFormatType)
+                                                            {
+                                                                case QuestionPartResponseFormatType.Text:
+                                                                    <p>@Html.Raw(freeFormResponseItem.AnswerValue.ReplaceLineEndings().Replace(Environment.NewLine, "<br/>"))</p>
+                                                                    break;
+
+                                                                case QuestionPartResponseFormatType.Date:
+                                                                    <p>@FormatFreeFormDate(freeFormResponseItem.AnswerValue)</p>
+                                                                    break;
+                                                            }
+                                                            break;
+
+                                                        case QuestionPartResponseInputType.OptionSelection:
+                                                            var optionSelectionResponseItem = (DataShareRequestAnswersSummaryQuestionPartAnswerResponseOptionSelection)responseItem;
+                                                            foreach (var selectedOption in optionSelectionResponseItem.SelectedOptions.OrderBy(x => x.OrderWithinAnswerPart))
+                                                            {
+                                                                <p>
+                                                                    @selectedOption.SelectionOptionText
+                                                                    @if (selectedOption.SupplementaryAnswerText != null)
+                                                                    {
+                                                                        <ul class="govuk-list govuk-list--bullet govuk-body-s caption-color">
+                                                                            <li><i>@selectedOption.SupplementaryAnswerText</i></li>
+                                                                        </ul>
+                                                                    }
+                                                                </p>
+                                                            }
+                                                            break;
+                                                    }
+                                                }
+                                            }
+
+
+                                            @foreach (var backingQuestionPart in backingQuestionParts)
+                                            {
+                                                @if (@backingQuestionPart.MultipleResponsesAllowed && backingQuestionPart.Responses.Any())
+                                                {
+                                                    <p class="govuk-body-s caption-color">@PrettifyString(@backingQuestionPart.MultipleResponsesCollectionHeaderIfMultipleResponsesAllowed):</p>
+                                                    <ul class="govuk-list govuk-list--bullet govuk-body-s caption-color">
+                                                        @foreach (var freeFormResponseItem in backingQuestionPart.Responses
+                                                       .OrderBy(x => x.OrderWithinQuestionPartAnswer)
+                                                       .Select(response => response.QuestionPartAnswerResponseItem)
+                                                       .OfType<DataShareRequestAnswersSummaryQuestionPartAnswerResponseItemFreeForm>())
+                                                        {
+                                                            <li>@freeFormResponseItem.AnswerValue</li>
+                                                        }
+                                                    </ul>
+                                                }
+                                            }
+                                        </dd>
+
+                                        <dd class="govuk-summary-list__actions">
+                                        </dd>
+
+                                    </div>
+                                }
+                            </dl>
+                        }
+                        
+                        @if (@dataShareRequestCanBeDeleted)
+                        {
+                            <input type="hidden" name="dataShareRequestRequestId" value="@answersSummary.RequestId" />
+                            <input type="hidden" name="esdaName" value="@answersSummary.EsdaName" />
+
+                            <button class="govuk-button govuk-button--warning mb-0" type="submit"
+                                    asp-action="DeleteReadAnswersRequest"
+                                    asp-route-requestId="@dataShareRequestId">
+                                Delete Draft Data Share Request
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </form>
+</div>

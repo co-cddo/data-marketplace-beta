@@ -1,0 +1,13 @@
+{
+  "TemplateId": "b42e155c-68a5-45f2-8cfe-23b4d88b4780",
+  "KqlQuery": "AppEvents| extend UserId = tostring(Properties.UserId )| where UserId != \u0027-1\u0027 and UserId != \u0027\u0027 | where Name == \u0027UserLogin\u0027 | summarize Count = count() by UserId | order by Count desc",
+  "ReportType": 1,
+  "ReportName": "User login events",
+  "Description": "User login events",
+  "CreatedOn": "2024-11-01T10:38:04.9264179+00:00",
+  "UserId": 11,
+  "OrganisationId": 1,
+  "SharedWithOrganisationIds": null,
+  "SharedWithUsersIds": null,
+  "IsPredefined": true
+}

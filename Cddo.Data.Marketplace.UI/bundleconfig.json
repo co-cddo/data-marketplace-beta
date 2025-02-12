@@ -1,0 +1,38 @@
+[
+  {
+    "outputFileName": "wwwroot/js/Pages/NewDataDescription/alternative-titles.min.js",
+    "inputFiles": [
+      "wwwroot/js/Pages/NewDataDescription/alternative-titles.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/Pages/NewDataDescription/keywords.min.js",
+    "inputFiles": [
+      "wwwroot/js/Pages/NewDataDescription/keywords.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/cddo.min.js",
+    "inputFiles": [
+      "wwwroot/js/cddo.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/Pages/NewDataDescription/creator.min.js",
+    "inputFiles": [
+      "wwwroot/js/Pages/NewDataDescription/creator.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/Pages/DataShareRequest/data-share-request-question.min.js",
+    "inputFiles": [
+      "wwwroot/js/Pages/DataShareRequest/data-share-request-question.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/Pages/DataShareRequest/download-completed-dsr.min.js",
+    "inputFiles": [
+      "wwwroot/js/Pages/DataShareRequest/download-completed-dsr.js"
+    ]
+  }
+]

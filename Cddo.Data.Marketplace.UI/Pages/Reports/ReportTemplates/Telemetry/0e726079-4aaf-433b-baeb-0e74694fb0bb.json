@@ -1,0 +1,13 @@
+﻿{
+  "TemplateId": "0e726079-4aaf-433b-baeb-0e74694fb0bb",
+  "KqlQuery": "AppEvents| extend UserId = tostring(Properties.UserId )| where UserId != \u0027-1\u0027 and UserId != \u0027\u0027| where coalesce(tostring(Properties.UserRoles), \u0027No Role\u0027) contains 'Admin' and Name == 'UserLogin'| summarize Count = count() by UserId | order by Count desc",
+  "ReportType": 1,
+  "ReportName": "Admin login events",
+  "Description": "Admin login events",
+  "CreatedOn": "2024-11-01T10:38:04.9264179+00:00",
+  "UserId": 11,
+  "OrganisationId": 1,
+  "SharedWithOrganisationIds": null,
+  "SharedWithUsersIds": null,
+  "IsPredefined": true
+}

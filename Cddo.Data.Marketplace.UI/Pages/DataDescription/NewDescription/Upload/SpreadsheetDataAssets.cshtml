@@ -1,0 +1,183 @@
+﻿@using Agm.Catalog.DotNet.Dto.Models.DataAssets
+@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums
+@using Agm.Catalog.DotNet.Dto.Responses.DataAssets.Models
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Pages.Shared
+@using System.ComponentModel;
+@using System.Reflection;
+
+@model Cddo.Data.Marketplace.UI.Pages.DataDescription.NewDescription.Upload.SpreadsheetDataAssetsModel
+@{
+    ViewData["Title"] = "Spreadsheet Data Descriptions";
+
+    var validationSummaries = Model.ValidationSummary.ProfiledDataAssetsSpreadsheetItemValidationSummaries;
+    var potentialDuplicatesToSpreadsheetItems = Model.PotentialDuplicatesToSpreadsheetContentItems.ToList();
+
+    bool hasDataAssets = validationSummaries.Any();
+
+    bool hasValidationErrors = validationSummaries.Any(x => x.ValidationErrors.Any());
+
+    var spreadsheetFilename = Model.ValidationSummary.SpreadsheetFileName;
+}
+
+@functions
+{
+    private static string? GetEnumDescription(Enum enumValue)
+    {
+        var fieldInfo = enumValue.GetType().GetField(enumValue.ToString());
+
+        if (fieldInfo != null)
+        {
+            var attribute = fieldInfo.GetCustomAttribute(typeof(DescriptionAttribute), false) as DescriptionAttribute;
+            if (attribute != null)
+            {
+                return attribute.Description;
+            }
+        }
+
+        return enumValue.ToString();
+    }
+}
+
+<a class="govuk-back-link" asp-controller="CatalogSpreadsheet"
+   asp-action="@nameof(CatalogSpreadsheetController.AddNewUploadSpreadsheet)">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl">Upload summary</h1>
+        </div>
+    </div>
+
+    @Html.AntiForgeryToken()
+    @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <p class="govuk-body">File: <strong>@spreadsheetFilename</strong></p>
+            <p class="govuk-body">
+                @if (hasValidationErrors)
+                {
+                    <span>There are some errors in the file. Correct the errors and re-upload the file.</span>
+                }
+                else if (hasDataAssets)
+                {
+                    <span>
+                        Your file passed validation. Check that the records below are correct.
+                        You can then publish your data descriptions, or upload the file again if you need to make changes.
+                    </span>
+                }
+            </p>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <table class="govuk-table" style="font-size: 18px;">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th class="govuk-table__header" scope="col">Data description</th>
+                        <th class="govuk-table__header" scope="col">Asset type</th>
+                        <th class="govuk-table__header" scope="col">Error count</th>
+                        <th class="govuk-table__header" scope="col">Status</th>
+                        <th class="govuk-table__header" scope="col">Possible duplicate</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @if (validationSummaries != null && validationSummaries.Any())
+                    {
+                        @foreach (var validatedDataAsset in validationSummaries)
+                        {
+                            var potentialDuplicatesToDataAsset = potentialDuplicatesToSpreadsheetItems.FirstOrDefault(x => x.RecordId == validatedDataAsset.RecordId);
+
+                            var potentialDuplicateDataAssets = potentialDuplicatesToDataAsset?.PotentialDuplicateDataAssets ?? new List<PotentialDuplicateDataAssetInformation>();
+                            var potentialDuplicateSpreadsheetItems = potentialDuplicatesToDataAsset?.PotentialDuplicateSpreadsheetContentItems ?? new List<PotentialDuplicateSpreadsheetContentItemInformation>();
+
+                            <tr class="govuk-table__row">
+                                
+                                <!-- Data description -->
+                                <td class="govuk-table__cell">
+                                    <a class="govuk-link" data-module="govuk-button" asp-controller="CatalogSpreadsheet"
+                                       asp-action="@nameof(CatalogSpreadsheetController.GetValidatedDataAssetSpreadsheet)"
+                                       asp-route-recordId="@validatedDataAsset.RecordId">
+                                        @if (string.IsNullOrWhiteSpace(validatedDataAsset.AssetTitle))
+                                        {
+                                            @:No title provided
+                                        }
+                                        else
+                                        {
+                                            @validatedDataAsset.AssetTitle
+                                        }
+                                    </a>
+                                </td>
+                                
+                                <!-- Asset type -->
+                                <td class="govuk-table__cell">
+                                    @{
+                                        var displayValue = validatedDataAsset.ProfiledDataAsset.DataAssetType switch
+                                        {
+                                            DataAssetType.DataSet => "Data set",
+                                            DataAssetType.DataService => "Data service",
+                                            _ => validatedDataAsset.ProfiledDataAsset.DataAssetType.ToString()
+                                        };
+                                    }
+                                    <span>@displayValue</span>
+                                </td>
+                                
+                                <!-- Error count -->
+                                <td class="govuk-table__cell">
+                                    @validatedDataAsset.ValidationErrors.Count()
+                                </td>
+
+                                <!-- Status -->
+                                <td class="govuk-table__cell">
+                                    <strong class="govuk-tag govuk-tag--@(validatedDataAsset.ValidationErrors.Any() ? "red" : "green")">
+                                        @(validatedDataAsset.ValidationErrors.Any() ? "Error" : "Pass")
+                                    </strong>
+                                </td>
+                                
+                                <!-- Potential duplicates -->
+                                <td class="govuk-table__cell">
+                                    @if (potentialDuplicateDataAssets.Any() || potentialDuplicateSpreadsheetItems.Any())
+                                    {
+                                        <strong class="govuk-tag govuk-tag--orange">Yes</strong>
+                                    }
+                                    else
+                                    {
+                                        <strong class="govuk-tag govuk-tag--green">No</strong>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell" colspan="4">
+                                No data available
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+            <div class="govuk-button-group">
+                @if (!hasValidationErrors && hasDataAssets)
+                {
+                    <a class="govuk-button" data-module="govuk-button" asp-controller="CatalogSpreadsheet"
+                       asp-action="@nameof(CatalogSpreadsheetController.DataShareRequestNotificationsSelection)">
+                        Continue
+                    </a>
+                }
+                <a class="govuk-button govuk-button--secondary" data-module="govuk-button" asp-controller="CatalogSpreadsheet"
+                   asp-action="@nameof(CatalogSpreadsheetController.ClearSpreadsheetDataAssets)">
+                    Cancel
+                </a>
+                <a class="govuk-button govuk-button--secondary" data-module="govuk-button" asp-controller="CatalogSpreadsheet"
+                   asp-action="@nameof(CatalogSpreadsheetController.AddNewUploadSpreadsheet)">
+                    Re-upload file
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

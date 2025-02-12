@@ -1,0 +1,91 @@
+﻿@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Model.Enum
+@using GovUk.Frontend.AspNetCore.TagHelpers
+
+@model QuestionUpdateFrequencyRequest
+@{
+    // Get the list of enum names
+    var enumNames = Enum.GetNames(typeof(UpdateFrequency));
+
+    // Check if the current UpdateFrequency is in the enum list
+    var isOtherSelected = !enumNames.Contains(Model.UpdateFrequency);
+    bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
+    bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
+    bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
+    string saveButtonName;
+    if (isCheckList)
+    {
+        saveButtonName = "isCheckList";
+    }
+    else if (isCheckAnswers)
+    {
+        saveButtonName = "isCheckAnswers";
+    }
+    else
+    {
+        saveButtonName = "isCheckList";
+    }
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddFrequencySubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                <input type="hidden" name="@nameof(QuestionUpdateFrequencyRequest.Identifier)" value="@Model.Identifier" />
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset" aria-describedby="metadataFrequency-hint">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                            <h1 class="govuk-fieldset__heading">
+                                How often is the data set updated? (optional)
+                            </h1>
+                        </legend>
+                        <div id="metadataFrequency-hint" class="govuk-hint">
+                            Select one option.
+                        </div>
+                        <div class="govuk-radios" data-module="govuk-radios">
+                            @foreach (var updateFrequency in Enum.GetValues(typeof(UpdateFrequency)).Cast<UpdateFrequency>())
+                            {
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="@updateFrequency" name="@nameof(QuestionUpdateFrequencyRequest.UpdateFrequency)" type="radio" value="@updateFrequency"
+                                           data-aria-controls="conditional-@updateFrequency"
+                                    @(Model.UpdateFrequency == updateFrequency.ToString() ? "checked" : "")
+                                    @(!string.IsNullOrEmpty(Model.UpdateFrequency) && isOtherSelected && updateFrequency.ToString() == "Other" ? "checked" : "")>
+                                    <label class="govuk-label govuk-radios__label" for="@updateFrequency">
+                                        @updateFrequency
+                                    </label>
+                                </div>
+
+                                @* Check if the current option is "Other" to add conditional input *@
+                                @if (updateFrequency == UpdateFrequency.Other)
+                                {
+                                    <div class="govuk-radios__conditional @(isOtherSelected ? "" : "govuk-radios__conditional--hidden")" id="conditional-Other">
+                                        <div class="govuk-form-group">
+                                            <label class="govuk-label" for="otherUpdateFrequency">
+                                                Enter a custom time period, for example ‘weekly’ or ‘every 3 years’.
+                                            </label>
+                                            <input class="govuk-input" id="otherUpdateFrequency" name="otherFrequency" type="text"
+                                                   value="@(isOtherSelected ? Model.UpdateFrequency : "")" spellcheck="false" />
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="govuk-button-group">
+                    @if (!isEditMode)
+                    {
+                        <button type="submit" name="showNextQuestion" value="true" class="govuk-button" data-module="govuk-button">
+                            Continue
+                        </button>
+                    }
+                    <button type="submit" name="@saveButtonName" value="true" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        Save and return
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

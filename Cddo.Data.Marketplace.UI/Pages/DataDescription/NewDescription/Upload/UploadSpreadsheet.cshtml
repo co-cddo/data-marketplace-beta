@@ -1,0 +1,30 @@
+﻿@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Pages.Shared
+@model Cddo.Data.Marketplace.UI.Pages.DataDescription.NewDescription.Upload.UploadSpreadsheetModel
+@{
+    ViewData["Title"] = "Upload Spreadsheet";
+}
+
+<a class="govuk-back-link" asp-controller="CatalogDataDescription"
+   asp-action="@nameof(CatalogDataDescriptionController.AddNewDataDescription)">Back</a>
+
+<div class="govuk-main-wrapper ">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form asp-controller="CatalogSpreadsheet" asp-action="@nameof(CatalogSpreadsheetController.AddNewUploadSubmit)" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
+                <h1 class="govuk-heading-l">
+                    Upload a spreadsheet of data descriptions
+                </h1>
+                <p class="govuk-body">First, <a class="govuk-link" asp-controller="CatalogSpreadsheet" asp-action="@nameof(CatalogSpreadsheetController.DownloadSpreadsheetTemplate)">download the spreadsheet template</a> and add your data descriptions.</p>
+                <p class="govuk-body">Then upload the file, where it will be checked for errors. The file must be in CSV, XML or XLSX format.</p>
+                
+                <div class="govuk-form-group">
+                    <input class="govuk-file-upload" id="file-upload" name="fileUpload" type="file">
+                </div>
+                <button class="govuk-button" data-module="govuk-button">Continue</button>
+            </form>
+        </div>
+    </div>
+</div>

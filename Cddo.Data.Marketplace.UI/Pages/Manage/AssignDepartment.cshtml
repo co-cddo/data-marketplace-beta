@@ -1,0 +1,53 @@
+﻿@page
+@model Cddo.Data.Marketplace.UI.Pages.Manage.AssignDepartmentModel
+@{
+    ViewData["Title"] = "Assign Department";
+    var currentDepartment = Model!.OrganisationDetails!.OrgDepartment == null ? "Not Assigned" : Model.OrganisationDetails.OrgDepartment.DepartmentName;
+    int currentDepartmentID = Model!.OrganisationDetails!.OrgDepartment == null ? 0 : Model.OrganisationDetails.OrgDepartment.Id;
+    bool noDepartment = currentDepartmentID == 0;
+}
+
+
+<a class="govuk-back-link" asp-controller="ManageOrganisation" asp-action="Index">Back</a>
+<div class="govuk-width-container">
+    <div class="govuk-main-wrapper">
+        <h1 class="govuk-heading-xl">
+            <span class="govuk-caption-l">Assign Department</span>
+            @Model.OrganisationDetails!.OrganisationName</h1>
+        <h2 class="govuk-heading-m">Currently assigned department : @currentDepartment</h2>
+        
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <!-- List Departments -->
+               <div class="govuk-form-group">                
+                    <form method="post" asp-page-handler="AssignDepartment">
+                    <input hidden value=@Model.OrganisationDetails.OrganisationId name="organisationId"/>
+                    <input hidden value=@currentDepartmentID name="currentDepartmentId"/>
+                    <label for="organisationName" class="govuk-label">Select Department</label>
+                    <div class="govuk-input__wrapper">
+                        <select class="govuk-select" id="departmentNameDropDown" name="selectedDepartmentId" aria-label="Select Department" >
+                            <option value="">Select..</option>
+                                @foreach (var department in Model.Departments!)
+                                {
+                                    var selectedAttribute = currentDepartmentID == department.Id ? "selected" : ""; 
+                                    var optionHtml = $"<option value=\"{department.Id}\" {selectedAttribute}>{Html.Encode(department.DepartmentName)}</option>";
+                                    @Html.Raw(optionHtml)
+                                }
+                            </select>
+                    </div>
+                    <div class="govuk-button-group" style="padding-top : 10px;">
+                          <button type="submit" class="govuk-button" data-module="govuk-button">Save</button>
+                          </form>
+                    <a class="govuk-button govuk-button--secondary" asp-controller="ManageOrganisation" asp-action="Index">Cancel</a>
+                    </div>
+                    <form method="post" asp-page-handler="UnassignDepartment">
+                        <input hidden value=@Model.OrganisationDetails.OrganisationId name="organisationId"/>
+                        <input hidden value=@currentDepartmentID name="currentDepartmentId"/>
+                        <button type="submit" class="govuk-button govuk-button--warning" data-module="govuk-button" disabled=@noDepartment>Unassign Department</button>
+                    </form>              
+               </div>                
+            </div>
+        </div>
+    </div>
+</div>
+

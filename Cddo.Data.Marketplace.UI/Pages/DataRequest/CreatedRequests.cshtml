@@ -1,0 +1,188 @@
+﻿@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests
+@using Cddo.Data.Marketplace.UI.Controllers
+@model Agrimetrics.DataShare.Api.Dto.Responses.Acquirer.DataShareRequests.GetDataShareRequestSummariesResponse
+@{
+    ViewData["Title"] = "Created Request";
+    var requests = new List<DataShareRequestSummary>(0);
+    if (Model != null && Model.DataShareRequestSummaries != null && Model.DataShareRequestSummaries.DataShareRequestSummaries != null)
+    {
+        requests = Model.DataShareRequestSummaries.DataShareRequestSummaries;
+    }
+
+    var pendingList = new List<DataShareRequestStatus> { DataShareRequestStatus.Draft, DataShareRequestStatus.Returned };
+    var submittedList = new List<DataShareRequestStatus> { DataShareRequestStatus.Submitted, DataShareRequestStatus.InReview };
+    var completedList = new List<DataShareRequestStatus> { DataShareRequestStatus.Accepted, DataShareRequestStatus.Rejected, DataShareRequestStatus.Cancelled };
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper ">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <span class="govuk-caption-l">Manage data share requests</span>
+            <h1 class="govuk-heading-xl">Created requests</h1>
+        </div>
+
+        <div class="govuk-grid-column-one-third">
+            <aside class="related-items">
+                <nav role="navigation" aria-labelledby="subsection-title">
+                    <ul class="govuk-list">
+                        <li><a asp-controller="DataRequest" asp-action="ReceivedRequests" class="govuk-link">View received requests</a></li>
+                        <li><a asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartCddoDataAssetsSearch)" class="govuk-link">Find data to request</a></li>
+                    </ul>
+                </nav>
+            </aside>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h2 id="pendingRequests" class="govuk-heading-l">Pending requests</h2>
+            <table class="govuk-table" style="font-size: 18px;">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th class="govuk-table__header" scope="col">Request ID</th>
+                        <th class="govuk-table__header" scope="col">Data asset</th>
+                        <th class="govuk-table__header" scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var request in requests.Where(x => pendingList.Contains(x.DataShareRequestStatus)))
+                    {
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">
+                                <a class="govuk-link" asp-controller="DataRequest" asp-action="RequestTasks" asp-route-requestId="@request.Id">@request.RequestId</a>
+                            </td>
+                            <td class="govuk-table__cell">
+                                @request.EsdaName
+                            </td>
+                            <td class="govuk-table__cell">
+                                @switch (request.DataShareRequestStatus)
+                                {
+                                    case DataShareRequestStatus.Draft:
+                                        <strong class="govuk-tag govuk-tag--grey">
+                                            Draft
+                                        </strong>
+                                        break;
+                                    case DataShareRequestStatus.Returned:
+                                        <strong class="govuk-tag govuk-tag--orange">
+                                            Returned with comments
+                                        </strong>
+                                        break;
+                                    default:
+                                        @request.DataShareRequestStatus
+                                        break;
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <br>
+    <br>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h2 id="submittedRequests" class="govuk-heading-l">Submitted requests</h2>
+            <table class="govuk-table" style="font-size: 18px;">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th class="govuk-table__header" scope="col">Request ID</th>
+                        <th class="govuk-table__header" scope="col">Data asset</th>
+                        <th class="govuk-table__header" scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var request in requests.Where(x => submittedList.Contains(x.DataShareRequestStatus)))
+                    {
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">
+                                <a class="govuk-link" asp-controller="DataRequest" asp-action="RequestTasksReviewAnswers" asp-route-requestId="@request.Id">@request.RequestId</a>
+                            </td>
+                            <td class="govuk-table__cell">
+                                @request.EsdaName
+                            </td>
+                            <td class="govuk-table__cell">
+                                @switch (request.DataShareRequestStatus)
+                                {
+                                    case DataShareRequestStatus.Submitted:
+                                        <strong class="govuk-tag govuk-tag--blue">
+                                            Submitted
+                                        </strong>
+                                        break;
+                                    case DataShareRequestStatus.InReview:
+                                        <strong class="govuk-tag govuk-tag--light-blue">
+                                            In Review
+                                        </strong>
+                                        break;
+                                    default:
+                                        @request.DataShareRequestStatus
+                                        break;
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <br>
+    <br>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h2 id="completedRequests" class="govuk-heading-l">Completed requests</h2>
+            <table class="govuk-table" style="font-size: 18px;">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th class="govuk-table__header" scope="col">Request ID</th>
+                        <th class="govuk-table__header" scope="col">Data asset</th>
+                        <th class="govuk-table__header" scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var request in requests.Where(x => completedList.Contains(x.DataShareRequestStatus)))
+                    {
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">
+                                <a class="govuk-link" asp-controller="DataRequest" asp-action="RequestTasksReviewAnswers" asp-route-requestId="@request.Id">@request.RequestId</a>
+                            </td>
+                            <td class="govuk-table__cell">
+                                @request.EsdaName
+                            </td>
+                            <td class="govuk-table__cell">
+                                @switch (request.DataShareRequestStatus)
+                                {
+                                    case DataShareRequestStatus.Rejected:
+                                        <strong class="govuk-tag govuk-tag--red">
+                                            Rejected
+                                        </strong>
+                                        break;
+                                    case DataShareRequestStatus.Accepted:
+                                        <strong class="govuk-tag govuk-tag--green">
+                                            Approved
+                                        </strong>
+                                        break;
+                                    case DataShareRequestStatus.Cancelled:
+                                        <strong class="govuk-tag govuk-tag--grey">
+                                            Cancelled
+                                        </strong>
+                                        break;
+                                    default:
+                                        @request.DataShareRequestStatus
+                                        break;
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+</div>

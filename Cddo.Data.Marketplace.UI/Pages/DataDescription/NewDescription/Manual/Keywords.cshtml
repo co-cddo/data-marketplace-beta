@@ -1,0 +1,100 @@
+﻿@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
+@using Cddo.Data.Marketplace.UI.Controllers
+@model QuestionKeywordRequest
+@{
+    ViewData["Title"] = "Keywords";
+    bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
+    bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
+    bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
+
+    string saveButtonName;
+
+    if (isCheckList)
+    {
+        saveButtonName = "isCheckList";
+    }
+    else if (isCheckAnswers)
+    {
+        saveButtonName = "isCheckAnswers";
+    }
+    else
+    {
+        saveButtonName = "isCheckList";
+    }
+
+}
+@section Scripts
+{
+    <script src="~/js/Pages/NewDataDescription/keywords.js" asp-add-nonce="true"></script>
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddKeywordsSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                @Html.AntiForgeryToken()
+                @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
+
+                <input type="hidden" name="@nameof(QuestionKeywordRequest.Identifier)" value="@Model.Identifier" />
+
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset" aria-describedby="question-hint" id="keyword-addition">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                            <h1 class="govuk-fieldset__heading">
+                                What keywords are associated with the data set?
+                            </h1>
+                        </legend>
+                        <p class="govuk-body">
+                            Enter at least 5 keywords to help other users find this data set. Add one word or phrase at a time, for example ‘schools’, ‘exam results’ or ‘Covid-19’.
+                        </p>
+                        <div id="question-hint" class="govuk-hint">
+                            Only use alphanumeric characters, spaces, hyphens and underscores.
+                        </div>
+
+                        @if (Model.Keyword != null && Model.Keyword.Any())
+                        {
+                            @for (var i = 0; i < Model.Keyword.Count; i++)
+                            {
+                                <div class="govuk-form-group @(ViewData.ModelState[$"Keyword_{i}"]?.Errors.Any() == true ? "govuk-form-group--error" : "")">
+                                    @if (ViewData.ModelState[$"Keyword_{i}"]?.Errors.Any() == true)
+                                    {
+                                        <p class="govuk-error-message">
+                                            <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState[$"Keyword_{i}"].Errors[0].ErrorMessage
+                                        </p>
+                                    }
+                                    <label class="govuk-label govuk-visually-hidden" for="Keyword_@i">Keyword</label>
+                                    <div class="govuk-input__wrapper">
+                                        <input class="govuk-input me-2" id="Keyword_@i" name="Keyword" type="text" value="@Model.Keyword[@i]">
+
+                                        <button type="button" class="remove-input govuk-button govuk-button--secondary mb-0">Remove</button>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-visually-hidden" for="Keyword_0">Keyword</label>
+                                <input class="govuk-input" id="Keyword_0" name="Keyword" type="text">
+                            </div>
+                        }
+                    </fieldset>
+                </div>
+                <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-4" id="add-another-keyword" type="button">Add another keyword</button><br />
+                <div class="govuk-button-group">
+                    @if (!isEditMode)
+                    {
+                        <button type="submit" name="showNextQuestion" value="true" class="govuk-button" data-module="govuk-button">
+                            Continue
+                        </button>
+                    }
+                    <button type="submit" name="@saveButtonName" value="true" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        Save and return
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,75 @@
+﻿@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums
+
+@inject Agm.Catalog.DotNet.Core.Utilities.IEnumMemberConverter EnumMemberConverter
+
+@model QuestionThemeRequest
+@{
+    ViewData["Title"] = "Themes";
+    bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
+    bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
+    bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
+    string saveButtonName;
+    if (isCheckList)
+    {
+        saveButtonName = "isCheckList";
+    }
+    else if (isCheckAnswers)
+    {
+        saveButtonName = "isCheckAnswers";
+    }
+    else
+    {
+        saveButtonName = "isCheckList";
+    }
+}
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddThemesSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                <input type="hidden" name="@nameof(QuestionThemeRequest.Identifier)" value="@Model.Identifier" />
+
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset" aria-describedby="metadataThemes-hint">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                            <h1 class="govuk-fieldset__heading">
+                                What themes are associated with the data set?
+                            </h1>
+                        </legend>
+                        <div id="metadataThemes-hint" class="govuk-hint">
+                            Identify relevant themes to help other users find this data set in the Data Marketplace’s catalogue.
+                            Select all that apply.
+                        </div>
+                        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                            @foreach (var theme in Enum.GetValues(typeof(ThemeEnum)).Cast<ThemeEnum>())
+                            {
+                                var isChecked = Model.Theme != null && Model.Theme.Contains(theme);
+                                <div class="govuk-checkboxes__item">
+                                    <input class="govuk-checkboxes__input" id="@theme" name="@nameof(QuestionThemeRequest.Theme)" type="checkbox" value="@theme"
+                                    @(isChecked ? "checked" : "")>
+                                    <label class="govuk-label govuk-checkboxes__label" for="@theme">
+                                        @EnumMemberConverter.GetEnumDescription(@theme)
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="govuk-button-group">
+                    @if (!isEditMode)
+                    {
+                        <button type="submit" name="showNextQuestion" value="true" class="govuk-button" data-module="govuk-button">
+                            Continue
+                        </button>
+                    }
+                    <button type="submit" name="@saveButtonName" value="true" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        Save and return
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

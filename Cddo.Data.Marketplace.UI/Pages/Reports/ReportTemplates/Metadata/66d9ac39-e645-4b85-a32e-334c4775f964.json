@@ -1,0 +1,13 @@
+{
+  "TemplateId": "66d9ac39-e645-4b85-a32e-334c4775f964",
+  "KqlQuery": "{\u0022RequiredFields\u0022:[22,37,1,22,18,8,3,12,6,13],\u0022Filter\u0022:{\u0022FilterByInitiatingUserPermissions\u0022:false,\u0022FieldFilters\u0022:[]}}",
+  "ReportType": 2,
+  "ReportName": "Metadata - all records",
+  "Description": "All metadata records includes drafts",
+  "CreatedOn": "2024-11-05T10:51:44.8102772+00:00",
+  "UserId": 11,
+  "OrganisationId": 1,
+  "SharedWithOrganisationIds": null,
+  "SharedWithUsersIds": null,
+  "IsPredefined": true
+}

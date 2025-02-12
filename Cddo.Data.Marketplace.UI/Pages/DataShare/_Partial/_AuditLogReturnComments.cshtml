@@ -1,0 +1,59 @@
+﻿@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests;
+@using Cddo.Data.Marketplace.UI.Configuration;
+@using Cddo.Data.Marketplace.UI.Pages.DataShare._Partial;
+
+@model AuditLogReturnCommentsModel
+@{
+    var dataShareRequestAuditLog = Model.DataShareRequestAuditLog;
+}
+
+@functions
+{
+    public static string PrettifySupplierResponse(string input)
+    {
+        if (input == null) { return ""; }
+
+        return input
+            .Trim()
+            .Replace("\r\n", "<br/>");
+    }
+}
+
+<section class="govuk-notification-banner" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+    <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+            Comments made by the supplier
+        </h2>
+    </div>
+    <div class="govuk-notification-banner__content">
+        <details class="govuk-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+                Supplier comments
+            </span>
+        </summary>
+
+        <div class="govuk-details__text">
+            <div class="govuk-summary-list">
+                @foreach (var logEntry in dataShareRequestAuditLog.AuditLogEntries.OrderByDescending(x => x.ChangedOnUtc))
+                {
+                    <div class="govuk-summary-list__row">
+
+                        <h2 class="govuk-heading-s govuk-!-margin-top-2 govuk-!-margin-bottom-2">
+                            @logEntry.ChangedOnUtc.ToGDSHelperString()
+                        </h2>
+
+                        <div>
+                            @foreach (var logEntryComment in logEntry.Comments.OrderBy(x => x.CommentOrder))
+                            {
+                                <p class="govuk-body govuk-!-margin-bottom-2">
+                                    @Html.Raw(@PrettifySupplierResponse(logEntryComment.Comment))
+                                </p>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>

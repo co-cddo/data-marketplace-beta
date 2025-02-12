@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Embedded Resources\2024-08 ESDA Template Revision.xlsx" />
+    <None Remove="Embedded Resources\EsdaUploadTemplate.xlsx" />
+    <None Remove="Embedded Resources\ValidationSchemas\dataservice_v1.json" />
+    <None Remove="Embedded Resources\ValidationSchemas\dataset_v1.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Embedded Resources\2024-08 ESDA Template Revision.xlsx" />
+    <EmbeddedResource Include="Embedded Resources\EsdaUploadTemplate.xlsx" />
+    <EmbeddedResource Include="Embedded Resources\ValidationSchemas\DcatUkApV1\dataservice_dcatukapv1.json" />
+    <EmbeddedResource Include="Embedded Resources\ValidationSchemas\DcatUkApV1\dataset_dcatukapv1.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+	  <PackageReference Include="Agm.Catalog.DotNet" Version="12.4.0.61" />
+	  <PackageReference Include="Azure.Identity" Version="1.12.1" />
+	  <PackageReference Include="Azure.Search.Documents" Version="11.6.0" />
+	  <PackageReference Include="Azure.Storage.Files.Shares" Version="12.20.0" />
+	  <PackageReference Include="CsvHelper" Version="32.0.3" />
+	  <PackageReference Include="EPPlus.Core.Extensions" Version="2.4.0" />
+	  <PackageReference Include="F23.StringSimilarity" Version="6.0.0" />
+	  <PackageReference Include="Flurl.Http" Version="4.0.2" />
+	  <PackageReference Include="LibreOfficeLibrary" Version="1.0.7" />
+	  <PackageReference Include="Microsoft.ApplicationInsights" Version="2.22.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.3" />
+	  <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
+	  <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.43.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.16" />
+    <PackageReference Include="NPOI" Version="2.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cddo.Data.Marketplace.Domain\Cddo.Data.Marketplace.Api.Dto.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Validation\dataset_v1.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+	<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+	  <_Parameter1>Cddo.Data.Marketplace.Logic.Test</_Parameter1>
+	</AssemblyAttribute>
+	<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+	  <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
+	</AssemblyAttribute>
+  </ItemGroup>
+</Project>

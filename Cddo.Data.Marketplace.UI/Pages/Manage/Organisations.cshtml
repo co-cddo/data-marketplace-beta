@@ -1,0 +1,345 @@
+﻿@using Cddo.Data.Marketplace.Api.Dto
+@using Cddo.Data.Marketplace.Api.Dto.Requests.ManageUser
+@using Cddo.Data.Marketplace.Api.Dto.Responses.ManageUser
+@using Cddo.Data.Marketplace.UI.Controllers
+@using System.Text
+@inject Agm.Catalog.DotNet.Core.Utilities.IEnumMemberConverter EnumMemberConverter
+@model ManageOrganisationsResponse
+@{
+    ViewData["Title"] = "Find Organisations";
+    const int maxMiddlePages = 3;
+    var middleStart = Math.Max(1, Model.CurrentPage - maxMiddlePages / 2);
+    var middleEnd = Math.Min(Model.TotalPages, middleStart + maxMiddlePages - 1);
+    middleStart = Math.Max(1, middleEnd - maxMiddlePages + 1);
+
+    var organisationTypes = Enum.GetValues(typeof(OrganisationType)).Cast<OrganisationType>().Select(e => new SelectListItem
+            {
+                Text = @EnumMemberConverter.GetEnumDescription(e),
+                Value = e.ToString(),
+            });
+
+    var sortOption = Context.Request.Query["sortOption"].ToString();
+    if (!string.IsNullOrEmpty(sortOption) && sortOption.Contains('|'))
+    {
+        var sortParts = sortOption.Split('|');
+        ViewData["SortBy"] = Enum.Parse(typeof(SortBy), sortParts[0]);
+        ViewData["SortDirection"] = Enum.Parse(typeof(SortDirection), sortParts[1]);
+    }
+    else
+    {
+        ViewData["SortBy"] = SortBy.Modified;
+        ViewData["SortDirection"] = SortDirection.Descending;
+    }
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/css/dataset-results.min.css" />
+}
+
+<div class="govuk-width-container">
+    <a href="/Manage" class="govuk-back-link">Back</a>
+
+    <div class="govuk-main-wrapper">
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
+            Find organisations
+        </h1>
+        <form asp-controller="ManageOrganisation" asp-action="@nameof(ManageOrganisationController.GetManageOrganisations)" method="get">
+            <div class="govuk-grid-row mb-5">
+                <div class="govuk-grid-column-two-thirds">
+                    <div class="govuk-form-group search-input">
+                        <div class="govuk-input__wrapper">
+                            <input class="govuk-input" id="searchTerm" name="@nameof(ManageOrganisationsRequest.SearchTerm)" aria-label="Search for organisations" type="text" spellcheck="false" autocomplete="off" value="@ViewBag.SearchTerm">
+                            <button title="searchBtn" class="search-button" aria-label="Search for organisations" type="submit" enterkeyhint="searchTerm">
+                                <svg class="search-button__icon" width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                                    <circle cx="12.0161" cy="11.0161" r="8.51613" stroke="currentColor" stroke-width="3"></circle>
+                                    <line x1="17.8668" y1="17.3587" x2="26.4475" y2="25.9393" stroke="currentColor" stroke-width="3"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="govuk-grid-column-one-third">
+                    <a href="/Manage/AddOrganisation" class="govuk-button govuk-button--secondary float-end" data-module="govuk-button">Add organisation</a>
+                    <a class="govuk-link" asp-controller="ManageDepartment" asp-action="GetDepartments">Manage departments</a>
+                </div>
+            </div>
+
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-one-third">
+                    <div class="accordion accordion-flush accordion-filter" id="accordionFlushExample">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="flush-topics">
+                                <button class="accordion-button collapsed govuk-link" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTopics" aria-controls="flush-collapseTopics">
+                                    List type
+                                </button>
+                            </h2>
+                            <div id="flush-collapseTopics" class="accordion-collapse collapse" aria-labelledby="flush-topics" data-bs-parent="#accordionFlushExample">
+                                <div class="accordion-body">
+                                    <div class="govuk-form-group">
+                                        <fieldset class="govuk-fieldset">
+                                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m visually-hidden">
+                                                <h1 class="govuk-fieldset__heading">
+                                                    List
+                                                </h1>
+                                            </legend>
+                                            <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                                <div class="govuk-checkboxes__item">
+                                                    <input class="govuk-checkboxes__input" id="allowed" name="@nameof(ManageOrganisationsRequest.AllowListTrue)" type="checkbox" value="true" @(ViewBag?.AllowListTrue ? "checked" : "")>
+                                                    <label class="govuk-label govuk-checkboxes__label" for="allowed">Allowed</label>
+                                                </div>
+                                                <div class="govuk-checkboxes__item">
+                                                    <input class="govuk-checkboxes__input" id="notAllowed" name="@nameof(ManageOrganisationsRequest.AllowListFalse)" type="checkbox" value="true" @(ViewBag?.AllowListFalse ? "checked" : "")>
+                                                    <label class="govuk-label govuk-checkboxes__label text-nowrap" for="notAllowed">Not Allowed</label>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="flush-organisations">
+                                <button class="accordion-button collapsed govuk-link" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOrganisations" aria-controls="flush-collapseOrganisations">
+                                    Organisation type
+                                </button>
+                            </h2>
+                            <div id="flush-collapseOrganisations" class="accordion-collapse collapse" aria-labelledby="flush-organisations" data-bs-parent="#accordionFlushExample">
+                                <div class="accordion-body">
+                                    <div class="govuk-form-group">
+                                        <fieldset class="govuk-fieldset">
+                                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m visually-hidden">
+                                                <h1 class="govuk-fieldset__heading">
+                                                    Organisations
+                                                </h1>
+                                            </legend>
+                                            <div class="govuk-checkboxes govuk-checkboxes--small filter-list" data-module="govuk-checkboxes">
+                                                @if (organisationTypes.Any())
+                                                {
+                                                    @foreach (var organisation in organisationTypes)
+                                                    {
+                                                        <div class="govuk-checkboxes__item">
+                                                            <input class="govuk-checkboxes__input" id="@organisation.Value" name="OrganisationType" type="checkbox" value="@organisation.Value"
+                                                            @(ViewBag.OrganisationType != null && ((List<Cddo.Data.Marketplace.Api.Dto.OrganisationType>)ViewBag.OrganisationType)
+                                                                .Contains((Cddo.Data.Marketplace.Api.Dto.OrganisationType)Enum.Parse(typeof(Cddo.Data.Marketplace.Api.Dto.OrganisationType), organisation.Value)) ? "checked" : "")>
+                                                            <label class="govuk-label govuk-checkboxes__label" for="@organisation.Value">
+                                                                @organisation.Text
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                }
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="govuk-button-group">
+                        <button type="submit" class="govuk-button" data-module="govuk-button">
+                            Apply filter
+                        </button>
+                        <a class="govuk-link" asp-controller="ManageOrganisation" asp-action="@nameof(ManageOrganisationController.GetManageOrganisations)">Clear all</a>
+                    </div>
+                </div>
+
+                <div class="govuk-grid-column-two-thirds">
+                    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
+                        @Model.TotalCount results
+                    </h2>
+                    <hr />
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-one-half">
+                            <div class="govuk-form-group mb-0 d-inline-flex">
+                                <label class="govuk-label" hidden for="pageSize">Sort by</label>
+                                <div class="govuk-input__wrapper">
+                                    <select class="govuk-select" name="sortOption" id="sortOption" aria-label="Sort by">
+                                        <option value="@SortBy.OrganisationName|@SortDirection.Ascending"
+                                                selected="@(Convert.ToString(ViewData["SortBy"]) == SortBy.OrganisationName.ToString() &&
+                                                Convert.ToString(ViewData["SortDirection"]) == SortDirection.Ascending.ToString())">
+                                            Alphabetical A-Z
+                                        </option>
+                                        <option value="@SortBy.OrganisationName|@SortDirection.Descending"
+                                                selected="@(Convert.ToString(ViewData["SortBy"]) == SortBy.OrganisationName.ToString() &&
+                                                Convert.ToString(ViewData["SortDirection"]) == SortDirection.Descending.ToString())">
+                                            Alphabetical Z-A
+                                        </option>
+                                        <option value="@SortBy.Modified|@SortDirection.Descending"
+                                                selected="@(Convert.ToString(ViewData["SortBy"]) == SortBy.Modified.ToString() &&
+                                                Convert.ToString(ViewData["SortDirection"]) == SortDirection.Descending.ToString())">
+                                            Modified (newest)
+                                        </option>
+                                        <option value="@SortBy.Modified|@SortDirection.Ascending"
+                                                selected="@(Convert.ToString(ViewData["SortBy"]) == SortBy.Modified.ToString() &&
+                                                Convert.ToString(ViewData["SortDirection"]) == SortDirection.Ascending.ToString())">
+                                            Modified (oldest)
+                                        </option>
+                                    </select>
+                                    <button class="govuk-button govuk-button--secondary govuk-input__suffix"
+                                            asp-controller="ManageOrganisation" asp-action="@nameof(ManageOrganisationController.GetManageOrganisations)">
+                                        Sort
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="govuk-grid-column-one-half">
+                            <div class="govuk-form-group mb-0 d-inline-flex float-end">
+                                <label class="govuk-label" for="pageSize" style="padding-right: 10px;padding-top: 7px;">
+                                    Results Per Page
+                                </label>
+                                <div class="govuk-input__wrapper">
+                                    <select class="govuk-input" id="pageSize" aria-label="Select results per page" name="@nameof(ManageOrganisationsRequest.PageSize)" style="min-width:2.6em;">
+                                        @foreach (var pageSizeOption in new[] { 10, 20, 50, 100 })
+                                        {
+                                            if (Model.PageSize == pageSizeOption)
+                                            {
+                                                <option value="@pageSizeOption" selected>@pageSizeOption</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@pageSizeOption">@pageSizeOption</option>
+                                            }
+                                        }
+                                    </select>
+                                    <button class="govuk-button govuk-button--secondary govuk-input__suffix mb-0" style="max-width:5em;">
+                                        Apply
+                                        <span class="govuk-visually-hidden">
+                                            results per page
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dataset-result">
+                        <ul class="govuk-!-margin-bottom-5">
+                            @if (Model?.Orgs?.Any() == true)
+                            {
+                                @foreach (var org in Model.Orgs)
+                                {
+                                    <li class="dataset-result__list">
+                                        <div class="d-flex justify-content-between align-items-center mb-0">
+                                            <h3 class="dataset-title govuk-heading-s mb-0">
+                                                <a class="govuk-link" asp-controller="ManageOrganisation" asp-action="@nameof(ManageOrganisationController.ManageOrganisation)" asp-route-OrganisationId="@org.OrganisationId">@org.OrganisationName</a>
+                                            </h3>
+                                            @if (org.OrganisationType != null)
+                                            {
+                                                <strong class="govuk-tag govuk-tag--blue">@EnumMemberConverter.GetEnumDescription(@org.OrganisationType!)</strong>
+                                            }
+                                        </div>
+
+                                        <p class="mb-1">
+                                            <span class="govuk-visually-hidden">Organisation Department: </span>
+                                            @if (!string.IsNullOrEmpty(org.OrgDepartment?.DepartmentName))
+                                            {
+                                                <span class="govuk-!-font-size-16 govuk-!-font-weight-bold govuk-hint"><strong>Department: </strong>@org.OrgDepartment.DepartmentName</span>
+                                            }
+                                            else
+                                            {
+                                                <a class="govuk-link" href="/Manage/AssignDepartment?id=@org.OrganisationId">
+                                                    Assign department
+                                                </a>
+                                            }
+                                        </p>
+
+                                        @if (org?.Modified != null)
+                                        {
+                                            <div class="govuk-!-margin-bottom-2 govuk-!-margin-top-2">
+                                                <p class="govuk-hint govuk-!-font-size-16">Last updated: @org?.Modified</p>
+                                            </div>
+                                        }
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                <li class="dataset-result__list">
+                                    <p class="govuk-body">No results found.</p>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+
+                    @if (@Model?.TotalCount > 0)
+                    {
+                        <nav class="govuk-pagination" role="navigation" aria-label="Pagination">
+                            @if (@Model?.CurrentPage != 1)
+                            {
+                                <div class="govuk-pagination__prev">
+                                    <button type="submit" class="govuk-link govuk-pagination__link" name="@nameof(ManageOrganisationsRequest.PageNumber)" value="@(@Model?.CurrentPage - 1)" rel="prev">
+                                        <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                                            <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
+                                        </svg>
+                                        <span class="govuk-pagination__link-title">
+                                            <strong>Previous</strong><span class="govuk-visually-hidden"> page</span>
+                                        </span>
+                                    </button>
+                                </div>
+                            }
+                            <ul class="govuk-pagination__list">
+                                @if (middleStart > 1)
+                                {
+                                    <li class="govuk-pagination__item">
+                                        <span class="govuk-visually-hidden">Page</span>
+
+                                        <button type="submit" class="govuk-link govuk-pagination__link" name="@nameof(ManageOrganisationsRequest.PageNumber)" value="1">1</button>
+                                    </li>
+                                    @if (middleStart > 2)
+                                    {
+                                        <li class="govuk-pagination__item govuk-pagination__item--ellipses">...</li>
+                                    }
+                                }
+
+                                @for (int i = middleStart; i <= middleEnd; i++)
+                                {
+                                    <li class="govuk-pagination__item @(i == Model?.CurrentPage ? "govuk-pagination__item--current" : "")">
+                                        <span class="govuk-visually-hidden">Page</span>
+
+                                        <button type="submit" class="govuk-link govuk-pagination__link" name="@nameof(ManageOrganisationsRequest.PageNumber)" value="@i">@i</button>
+                                    </li>
+                                }
+
+                                @if (middleEnd < Model?.TotalPages)
+                                {
+                                    @if (middleEnd < Model?.TotalPages - 1)
+                                    {
+                                        <li class="govuk-pagination__item govuk-pagination__item--ellipses">...</li>
+                                    }
+                                    <li class="govuk-pagination__item">
+                                        <span class="govuk-visually-hidden">Page</span>
+
+                                        <button type="submit" class="govuk-link govuk-pagination__link" name="@nameof(ManageOrganisationsRequest.PageNumber)" value="@Model?.TotalPages">@Model?.TotalPages</button>
+                                    </li>
+                                }
+                            </ul>
+
+                            @if (@Model?.CurrentPage != Model?.TotalPages)
+                            {
+                                <div class="govuk-pagination__next">
+                                    <button type="submit" class="govuk-link govuk-pagination__link" name="@nameof(ManageOrganisationsRequest.PageNumber)" value="@(Model?.CurrentPage + 1)" rel="next">
+                                        <span class="govuk-pagination__link-title">
+                                            <strong>Next</strong><span class="govuk-visually-hidden"> page</span>
+                                        </span>
+                                        <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                                            <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            }
+                        </nav>
+                    }
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<style scoped>
+    .govuk-tag {
+        max-width: 140px !important;
+    }
+</style>
+
+
+
+

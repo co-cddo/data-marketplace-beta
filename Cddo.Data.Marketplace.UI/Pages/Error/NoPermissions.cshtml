@@ -1,0 +1,24 @@
+﻿@page
+@model Cddo.Data.Marketplace.UI.Pages.Error.NoPermissionsModel
+@{
+    ViewData["Title"] = "Error - No permissions";
+
+    var requiredPermission = Model.RequiredPermission;
+    var requiredRolePermission = Model.RequiredRolePermission;
+}
+
+<div class="govuk-width-container">
+    <a href="@HttpContext.Request.Headers["Referer"]" class="govuk-back-link">Back</a>
+<div class="govuk-width-container">
+    <div class="govuk-main-wrapper govuk-main-wrapper--l">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-l">You need permission to @requiredPermission</h1>
+                <p class="govuk-body">
+                        <a class="govuk-link" href="~/userprofile">Go to your profile</a> to request the @requiredRolePermission role to be added to your account.
+                </p>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>

@@ -1,0 +1,93 @@
+﻿@page "{id:int?}"
+@model Cddo.Data.Marketplace.UI.Pages.Manage.ManageDepartmentModel
+@{
+    ViewData["Title"] = "Manage - Department";
+
+}
+
+<a class="govuk-back-link" asp-controller="ManageDepartment" asp-action="GetDepartments">Back</a>
+<div class="govuk-width-container">
+    <div class="govuk-main-wrapper">
+               <h1 class="govuk-heading-l">
+            <span class="govuk-caption-l">Manage Department</span>
+            @Model.DepartmentDetails!.DepartmentName
+        </h1>
+        <div class="govuk-grid-row mb-4">
+            <div class="govuk-grid-column-two-thirds">
+                <div class="govuk-form-group">         
+                    <h2 hidden class="govuk-heading-m">Assigned an Organisation to this Department</h2>
+                        <form method="post" asp-page-handler="AssignOrganisation">
+                        <input hidden value=@Model.DepartmentDetails.Id name="DepartmentId"/>
+                        <label for="organisationName" class="govuk-label">Select Organisation</label>
+                        <div class="govuk-input__wrapper">
+                            <select class="govuk-select" id="organisationNameDropDown" name="selectedOrganisationId" aria-label="Select Organisation" >
+                                <option value="">Select..</option>
+                                @foreach (var org in Model.AllOrganisations!)
+                                {
+                                    var optionHtml = $"<option name=\"organisationId\" value=\"{org.OrganisationId}\" >{Html.Encode(org.OrganisationName)}</option>";
+                                    @Html.Raw(optionHtml)
+                                }
+                                </select>
+                        </div>
+                        <div class="govuk-button-group" style="padding-top : 10px;">
+                              <button type="submit" class="govuk-button" data-module="govuk-button">Assign</button>
+                              </form> 
+                              @* <a class="govuk-button govuk-button--secondary" asp-controller="ManageDepartment" asp-action="Index">Cancel</a> *@
+                        </div>             
+                   </div> 
+             </div>
+            <div class="govuk-grid-column-one-third">
+                <a href="/Manage/AddOrganisation?departmentId=@Model.DepartmentDetails.Id" class="govuk-button govuk-button--secondary float-end mt-4" data-module="govuk-button">Add Organisation</a>
+            </div>
+        </div>
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <!-- List orgs -->
+                <h2 class="govuk-heading-m">Assigned Organisations</h2>
+                <table class="govuk-table">
+                    <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th class="govuk-table__header">Organisation</th>
+                            <th class="govuk-table__header">Action</th>
+                            <th class="govuk-table__header">Unassign</th>
+                            <th class="govuk-table__header"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="govuk-table__body">
+                        @if (Model.Organisations != null && Model.Organisations.Count > 0)
+                        {
+                            @foreach (var org in Model.Organisations)
+                            {
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell">@org.OrganisationName</td>    
+                                    <td class="govuk-table__cell">
+                                            <a class="govuk-link" href="/Manage/ManageOrganisation?id=@org.OrganisationId">
+                                                Manage
+                                                <span class="govuk-visually-hidden">
+                                                    @org.OrganisationName
+                                                </span>
+                                            </a>
+                                        </td>
+                                    <td class="govuk-table__cell">
+                                        <form method="post" asp-page-handler="UnassignOrganisation">
+                                            <input hidden value=@Model.DepartmentDetails.Id name="departmentId"/>
+                                            <input hidden value=@org.OrganisationId name="organisationId"/>
+                                            <button type="submit" class="govuk-button govuk-button--warning" data-module="govuk-button" >Unassign Organisation</button>
+                                        </form>
+                                    </td>    
+                                </tr>      
+                                     
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="govuk-table__cell">No organisations available.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table
+            </div>
+        </div>
+    </div>
+</div>

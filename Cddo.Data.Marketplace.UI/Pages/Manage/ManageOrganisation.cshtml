@@ -1,0 +1,149 @@
+﻿@page "{id:int?}"
+@using Cddo.Data.Marketplace.UI.Model
+@using System.Reflection
+@using System.ComponentModel
+@model Cddo.Data.Marketplace.UI.Pages.Manage.ManageOrganisationModel
+@{
+    ViewData["Title"] = "Manage - Organisation";
+
+    string GetEnumDescription(Enum value)
+    {
+        FieldInfo field = value.GetType().GetField(value.ToString());
+        var attribute = field.GetCustomAttribute<DescriptionAttribute>();
+        return attribute?.Description ?? value.ToString();
+    }
+}
+
+<a class="govuk-back-link" asp-controller="ManageOrganisation" asp-action="Index">Back</a>
+<div class="govuk-width-container">
+    <div class="govuk-main-wrapper">
+        <h1 class="govuk-heading-l">
+            <span class="govuk-caption-l">Manage Organisation</span>
+            @Model.OrganisationDetails!.OrganisationName
+        </h1>
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Type
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @GetEnumDescription(Model!.OrganisationDetails!.OrganisationType)
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Modified
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @Model!.OrganisationDetails!.Modified
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Allowed
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @(Model.OrganisationDetails!.Allowed.HasValue && Model.OrganisationDetails!.Allowed.Value ? "Yes" : "No")
+                        </dd>
+                    </div>
+                </dl>
+                @if(Model.SavedYes != null)
+                {
+                    <div class="govuk-warning-text">
+                        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                        <strong class="govuk-warning-text__text">
+                            <span class="govuk-visually-hidden">Warning</span>
+                            Associated domain statuses need to be updated manually.
+                        </strong>
+                    </div>
+                }
+                <a href="/Manage/EditOrganisation?organisationId=@Model.OrganisationDetails!.OrganisationId" class="govuk-button govuk-button--secondary" data-module="govuk-button">Edit organisation</a>
+            </div>
+        </div>
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <h2 class="govuk-heading-m">Add New Domain</h2>
+                <form method="post" asp-page-handler="AddDomain">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="DomainName">Domain Name</label>
+                        <input class="govuk-input govuk-!-width-one-half" id="DomainName" name="DomainName" type="text" required>
+                    </div>
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Add Domain</button>
+                    <input type="hidden" name="OrganisationId" value="@Model.OrganisationDetails.OrganisationId" />
+                    @if (Model.OrganisationDetails.Domains != null && Model.OrganisationDetails.Domains.Count > 0)
+                    {
+                        <input type="hidden" name="OrganisationFormat" value="@Model.OrganisationDetails.Domains[0].OrganisationFormat" />
+                        <input type="hidden" name="OrganisationType" value="@Model.OrganisationDetails.Domains[0].OrganisationType" />
+                    }
+                </form>
+            </div>
+        </div>
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <!-- List Domains -->
+                <h2 class="govuk-heading-m">Domains</h2>
+                <table class="govuk-table">
+                    <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th class="govuk-table__header">Domain</th>
+                            <th class="govuk-table__header">Format</th>
+                            <th class="govuk-table__header">Type</th>
+                            <th class="govuk-table__header">Enabled</th>
+                            <th class="govuk-table__header">Status</th>
+                            <th class="govuk-table__header">Delete</th>
+                            <th class="govuk-table__header"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="govuk-table__body">
+                        @if (Model.OrganisationDetails.Domains != null && Model.OrganisationDetails.Domains.Count > 0)
+                        {
+                            @foreach (var domain in Model.OrganisationDetails.Domains)
+                            {
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell">@domain.DomainName</td>
+                                    <td class="govuk-table__cell">@domain.OrganisationFormat</td>
+                                    <td class="govuk-table__cell">@GetEnumDescription(domain!.OrganisationType!)</td>
+                                    <td class="govuk-table__cell">
+                                        @(domain.AllowList ? "Access Granted" : "Access Denied")
+                                    </td>
+                                    <td class="govuk-table__cell">
+                                        <form method="post" asp-page-handler="ToggleAllowList" class="govuk-!-margin-right-1" style="display:inline;">
+                                            <input type="hidden" name="OrganisationId" value="@Model.OrganisationDetails.OrganisationId" />
+                                            <input type="hidden" name="domainId" value="@domain.DomainId" />
+                                            <input type="hidden" name="allow" value="@(domain.AllowList ? "false" : "true")" />
+                                            <button class="govuk-button @(domain.AllowList ? "govuk-button--secondary" : "") mb-0" type="submit">
+                                                @(domain.AllowList ? "Disallow" : "Allow")
+                                            </button>
+                                        </form>
+                                    </td>
+                                    <td class="govuk-table__cell">
+                                        <form method="post" asp-page-handler="DeleteDomain" style="display:inline;">
+                                            <input type="hidden" name="OrganisationId" value="@Model.OrganisationDetails.OrganisationId" />
+                                            <input type="hidden" name="domainId" value="@domain.DomainId" />
+                                            <button class="govuk-button govuk-button--warning mb-0" type="submit">Delete</button>
+                                        </form>
+                                    </td>
+                                    <td class="govuk-table__cell">
+                                        <form method="post" asp-page-handler="ManageDomain" class="govuk-!-margin-right-1" style="display:inline;">
+                                            <input type="hidden" name="organisationId" value="@Model.OrganisationDetails.OrganisationId" />
+                                            <input type="hidden" name="domainId" value="@domain.DomainId" />
+                                            <button class="govuk-button govuk-button--secondary mb-0" type="submit">Manage</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="govuk-table__cell">No domains available.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

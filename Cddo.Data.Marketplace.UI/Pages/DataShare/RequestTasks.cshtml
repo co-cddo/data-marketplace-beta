@@ -1,0 +1,221 @@
+﻿@using Agrimetrics.DataShare.Api.Dto.Models.Questions
+@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests
+@using Cddo.Data.Marketplace.UI.Configuration
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Pages.DataShare._Partial
+@using EnumsNET
+
+@model RequestTasksModel
+@{
+    ViewData["Title"] = "Request Tasks";
+
+    var dataShareRequestId = Model.DataShareRequestId;
+    var dataShareRequestRequestId = Model.DataShareRequestRequestId;
+    var esdaName = Model.EsdaName;
+    var questionSetSummary = Model.QuestionSetSummary;
+    var dataShareRequestAuditLog = Model.DataShareRequestAuditLog;
+    var userCanDeleteDataShareRequest = Model.UserCanDeleteDataShareRequest;
+
+    var totalNumberOfSections = questionSetSummary.SectionSummaries.Count + 1; // +1 for the Answers section
+    var numberOfCompletedQuestionSections = questionSetSummary.SectionSummaries.Count(x => x.SectionIsComplete);
+    var totalNumberOfCompletedSections = questionSetSummary.AnswersSectionComplete ? numberOfCompletedQuestionSections + 1 : numberOfCompletedQuestionSections;
+
+    var dataShareRequestCanBeDeleted = questionSetSummary.DataShareRequestStatus == DataShareRequestStatus.Draft &&
+                                       userCanDeleteDataShareRequest;
+
+    var taskListTag = string.Empty;
+}
+
+@functions
+{
+    public static string PrettifySupplierResponse(string input)
+    {
+        if (input == null) { return ""; }
+
+        return input
+            .Trim()
+            .Replace("\r\n", "<br/>");
+    }
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper ">
+    <form asp-controller="DataRequest">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                
+                @if (@questionSetSummary.DataShareRequestStatus == DataShareRequestStatus.Deleted)
+                {
+                    <div class="govuk-panel govuk-panel--confirmation">
+                        <h1 class="govuk-panel__title">
+                            Request deleted
+                        </h1>
+                    </div>
+                }
+                else
+                {
+                    @switch (@questionSetSummary.DataShareRequestStatus)
+                    {
+                        case DataShareRequestStatus.Accepted:
+                            <div class="govuk-panel govuk-panel--confirmation">
+                                <h1 class="govuk-panel__title">
+                                    Request approved
+                                </h1>
+                                <div class="govuk-panel__body">
+                                    @Html.Raw(@PrettifySupplierResponse(questionSetSummary.SubmissionResponseFromSupplier))
+                                </div>
+                            </div>
+                            break;
+
+                        case DataShareRequestStatus.Rejected:
+                            <div class="govuk-panel govuk-panel--confirmation">
+                                <h1 class="govuk-panel__title">
+                                    Request rejected
+                                </h1>
+                                <div class="govuk-panel__body">
+                                    @Html.Raw(@PrettifySupplierResponse(questionSetSummary.SubmissionResponseFromSupplier))
+                                </div>
+                            </div>
+                            break;
+
+                        case DataShareRequestStatus.Cancelled:
+                            <div class="govuk-panel govuk-panel--confirmation">
+                                <h1 class="govuk-panel__title">
+                                    Request was cancelled
+                                </h1>
+                            </div>
+                            break;
+                    }
+
+                    @if (dataShareRequestAuditLog.AuditLogEntries?.Any() == true)
+                    {
+                        await Html.RenderPartialAsync("~/Pages/DataShare/_Partial/_AuditLogReturnComments.cshtml", new AuditLogReturnCommentsModel
+                        {
+                            DataShareRequestAuditLog = @dataShareRequestAuditLog
+                        });
+                    }
+                    
+                    <span class="govuk-caption-l">Request ID: @dataShareRequestRequestId</span>
+                    <h1 class="govuk-heading-xl">@esdaName</h1>
+
+                    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
+                        @if (totalNumberOfCompletedSections == totalNumberOfSections)
+                        {
+                            @:Request complete
+                        }
+                        else
+                        {
+                            @:Request incomplete
+                        }
+                    </h2>
+                    <p class="govuk-body govuk-!-margin-bottom-2">You have completed @totalNumberOfCompletedSections of @totalNumberOfSections sections.</p>
+                    
+                    <ol class="govuk-list">
+
+                        @foreach (var sectionSummary in questionSetSummary.SectionSummaries.OrderBy(x => x.SectionNumber))
+                        {
+                            <li>
+                                <h2 class="govuk-heading-m">
+                                    @(sectionSummary.SectionNumber).  @sectionSummary.SectionHeader
+                                </h2>
+
+                                <ul class="govuk-task-list">
+                                    @foreach (var question in sectionSummary.QuestionSummaries)
+                                    {
+                                        <li class="govuk-task-list__item ">
+                                            <div class="govuk-task-list__name-and-hint">
+                                                @if (question.QuestionCanBeAnswered)
+                                                {
+                                                    <a class="govuk-link govuk-task-list__link" asp-action="RequestQuestion" asp-route-questionId="@question.QuestionId" asp-route-requestId="@dataShareRequestId">
+                                                        @question.QuestionHeader
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    @question.QuestionHeader
+                                                }
+                                            </div>
+                                            <div class="govuk-task-list__status" id="question-@question.QuestionHeader.Replace(" ", "-")-status">
+                                                @{
+                                                    taskListTag = question.QuestionStatus switch
+                                                    {
+                                                        QuestionStatus.NoResponseNeeded => "govuk-tag govuk-tag--light-blue",
+                                                        QuestionStatus.NotStarted => "govuk-tag govuk-tag--grey",
+                                                        QuestionStatus.CannotStartYet => "govuk-tag govuk-tag--grey",
+                                                        QuestionStatus.Completed => "govuk-tag govuk-tag--green",
+                                                        QuestionStatus.NotApplicable => "govuk-tag govuk-tag--grey",
+
+                                                        _ => question.QuestionStatus.ToString()
+                                                    };
+                                                }
+                                                <strong class="govuk-tag @taskListTag">
+                                                    @question.QuestionStatus.AsString(EnumFormat.Description)
+                                                </strong>
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+
+                        <li>
+                            <h2 class="govuk-heading-m">
+                                Review and send
+                            </h2>
+                            <ul class="govuk-task-list">
+                                <li class="govuk-task-list__item govuk-task-list__item--with-link">
+                                    <div class="govuk-task-list__name-and-hint">
+                                        @if (questionSetSummary.QuestionsRemainThatRequireAResponse)
+                                        {
+                                            @:Check answers
+                                        }
+                                        else
+                                        {
+                                            <a class="govuk-link govuk-task-list__link" asp-action="RequestTasksReviewAnswers" asp-route-requestId="@dataShareRequestId" aria-describedby="review-and-send-status">
+                                                Check answers
+                                            </a>
+                                        }
+                                    </div>
+                                    <div class="govuk-task-list__status" id="review-and-send-status">
+                                        @if (questionSetSummary.AnswersSectionComplete)
+                                        {
+                                            <span class="govuk-tag govuk-tag--green">
+                                                Completed
+                                            </span>
+                                        }
+                                        else if (questionSetSummary.QuestionsRemainThatRequireAResponse)
+                                        {
+                                            <span class="govuk-tag govuk-tag--grey">
+                                                Cannot start yet
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="govuk-tag govuk-tag--grey">
+                                                Not started
+                                            </span>
+                                        }
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ol>
+                }
+            </div>
+        </div>
+    
+        @if (@dataShareRequestCanBeDeleted)
+        {
+            <input type="hidden" name="dataShareRequestRequestId" value="@dataShareRequestRequestId" />
+            <input type="hidden" name="esdaName" value="@esdaName" />
+
+            <button class="govuk-button govuk-button--warning mb-0" type="submit"
+                    asp-action="DeleteCreatedRequest"
+                    asp-route-requestId="@dataShareRequestId">
+                Delete Draft Data Share Request
+            </button>
+        }
+    </form>
+    
+</div>

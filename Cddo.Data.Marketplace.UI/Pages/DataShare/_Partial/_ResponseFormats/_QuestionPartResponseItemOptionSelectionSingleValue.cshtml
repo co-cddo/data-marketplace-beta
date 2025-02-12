@@ -1,0 +1,16 @@
+﻿@using Agrimetrics.DataShare.Api.Dto.Models.Questions.QuestionParts.ResponseFormats;
+@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests.Answers.Answers;
+
+@model QuestionPartResponseItemOptionSelectionSingleValue
+@{
+    var selectionOptions = Model.SelectionOptions;
+}
+
+<div class="govuk-radios" data-module="govuk-radios">
+    
+    @foreach (var selectionOption in selectionOptions.OrderBy(x => x.OptionOrderWithinSet))
+    {
+        await Html.RenderPartialAsync("~/Pages/DataShare/_Partial/_ResponseFormats/_SelectionOptionInSingleValueSet.cshtml", selectionOption);
+    }
+
+</div>

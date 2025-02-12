@@ -1,0 +1,127 @@
+﻿@page
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Pages.Shared
+@using Cddo.Data.Marketplace.Logic.Services.Interfaces
+@inject IUserRoleService UserRoleService
+@model Cddo.Data.Marketplace.UI.Pages.Manage.IndexModel
+@{
+    Layout = "/Pages/Shared/_HeaderLayout.cshtml";
+    ViewData["Title"] = "Manage Home";
+    bool? isAdministrator = await UserRoleService.IsUserRoleAdmin();
+
+    bool? isSystemAdmin = await UserRoleService.IsUserRoleSystemAdmin();
+
+    bool? isSupplier = await UserRoleService.IsUserRoleSupplier();
+}
+@section Styles
+{
+    <style>
+        .manage-list-item {
+            border-top: 1px solid #b1b4b6;
+            padding: 10px 0 20px 0;
+            position: relative;
+        }
+
+        .manage-item-link {
+            font-weight: 700;
+        }
+
+        .chevron-right::after {
+            content: '›';
+            float: right;
+        }
+    </style>
+}
+
+<div class="govuk-masterhead govuk-masterheader">
+    <div class="govuk-width-container">
+        @await Html.PartialAsync("_PhasePartial", new PhasePartialModel())
+        <div class="govuk-breadcrumbs">
+            <ol class="govuk-breadcrumbs__list">
+                <li class="govuk-breadcrumbs__list-item">
+                    <a class="govuk-breadcrumbs__link" href="/">Home</a>
+                </li>
+            </ol>
+        </div>
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-three-quarters">
+                <h1 class="govuk-heading-xl">Data Marketplace Management</h1>
+                <p class="govuk-body-m">
+                    This page allows you to manage key aspects of the Data Marketplace, including overseeing organisations, managing user roles,
+                    auditing system activities, and reviewing performance reports to ensure effective platform operations.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="govuk-width-container govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        @if (isSystemAdmin.Value)
+        {
+            <div class="govuk-grid-column-one-third">
+                <div class="manage-list-item">
+                    <p class="govuk-body">
+                        <a class="govuk-link manage-item-link chevron-right" asp-controller="ManageOrganisation" asp-action="@nameof(ManageOrganisationController.GetManageOrganisations)">Manage organisations</a>
+                    </p>
+                    <p class="govuk-body">Oversee organisations, domains, and access permissions to ensure effective collaboration.</p>
+                </div>
+            </div>
+            <div class="govuk-grid-column-one-third">
+                <div class="manage-list-item">
+                    <p class="govuk-body"><a class="govuk-link manage-item-link chevron-right" asp-controller="RequestAccess" asp-action="@nameof(RequestAccessController.GetOrganisationsRequest)">Manage organisation requests</a></p>
+                    <p class="govuk-body">Oversee organisation requests and access permissions to ensure effective collaboration.</p>
+                </div>
+            </div>
+        }
+        @if (isSystemAdmin.Value || isAdministrator.Value)
+        {
+            <div class="govuk-grid-column-one-third">
+                <div class="manage-list-item">
+                    <p class="govuk-body"><a class="govuk-link manage-item-link chevron-right" href="/manage/users">Manage marketplace users</a></p>
+                    <p class="govuk-body">Control user roles, accounts, and permissions to ensure secure and appropriate access.</p>
+                </div>
+            </div>
+            <div class="govuk-grid-column-one-third">
+                <div class="manage-list-item">
+                    <p class="govuk-body"><a class="govuk-link manage-item-link chevron-right" href="/manage/approvals">Manage user role approvals</a></p>
+                    <p class="govuk-body">Review and approve requests for user roles, maintaining role integrity and compliance.</p>
+                </div>
+            </div>
+        }
+        @if (isSystemAdmin.Value)
+        {
+            <div class="govuk-grid-column-one-third">
+                <div class="manage-list-item">
+                    <p class="govuk-body"><a class="govuk-link manage-item-link chevron-right" href="/manage/healthchecks">View system status</a></p>
+                    <p class="govuk-body">Check real-time system health and availability, ensuring optimal performance and uptime.</p>
+                </div>
+            </div>
+        }
+        @if (isSystemAdmin.Value || isAdministrator.Value || isSupplier.Value)
+        {
+            <div class="govuk-grid-column-one-third">
+                <div class="manage-list-item">
+                    <p class="govuk-body"><a class="govuk-link manage-item-link chevron-right" href="/reports/reportsList">View system reports</a></p>
+                    <p class="govuk-body">Analyse reports and system metrics to gain insights and identify areas for performance improvements.</p>
+                </div>
+            </div>
+        }
+        @if (isSystemAdmin.Value)
+        {
+            <div class="govuk-grid-column-one-third">
+                <div class="manage-list-item">
+                    <p class="govuk-body"><a class="govuk-link manage-item-link chevron-right" asp-controller="ManageDataRequest" asp-action="GotoManageReceivedDataShare">Manage received DSRs</a></p>
+                    <p class="govuk-body">Oversee received Data Share Requests, reviewing and managing shared data requests within the system.</p>
+                </div>
+            </div>
+            <div class="govuk-grid-column-one-third">
+                <div class="manage-list-item">
+                    <p class="govuk-body"><a class="govuk-link manage-item-link chevron-right" asp-controller="ManageDataRequest" asp-action="GotoManageCreatedDataShare">Manage created DSRs</a></p>
+                    <p class="govuk-body">Manage Data Share Requests created by your organisation, ensuring that they are properly handled and processed.</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>

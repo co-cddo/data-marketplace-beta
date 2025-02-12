@@ -1,0 +1,70 @@
+﻿@using Cddo.Data.Marketplace.UI.Pages.DataShare._Partial
+@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests.Answers.DataShareRequestQuestionAnswers
+
+@model QuestionModel
+@{
+    ViewData["Title"] = "Question";
+    var dataShareRequestId = Model.DataShareRequestId;
+    var questionId = Model.QuestionId;
+    var footer = Model.Footer;
+    var questionParts = Model.QuestionParts;
+}
+
+@section Scripts
+{
+    <script src="~/js/Pages/DataShareRequest/data-share-request-question.min.js" asp-add-nonce="true"></script>
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+<div class="govuk-main-wrapper ">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+            <form method="post" novalidate>
+                
+                <input id="data-share-request-id" name="dataShareRequestId" value="@dataShareRequestId" type="hidden" />
+                <input id="question-id" name="questionId" value="@questionId" type="hidden" />
+                <input id="question-part-count" name="questionPartCount" value="@questionParts.Count" type="hidden" />
+                
+                @foreach (var questionPart in questionParts)
+                {
+                    await Html.RenderPartialAsync("~/Pages/DataShare/_Partial/_QuestionPart.cshtml", questionPart);
+                    ViewData["Title"] = "Question: " + questionPart.QuestionText;
+
+                }
+                
+                <div class="govuk-button-group">
+                    <button class="govuk-button" data-module="govuk-button" asp-controller="DataRequest" asp-action="SetQuestionAnswerAndContinue" asp-route-requestId="@dataShareRequestId" asp-route-questionId="@questionId">
+                        Save and continue
+                    </button>
+                    
+                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button" asp-controller="DataRequest" asp-action="SetQuestionAnswerAndReturn" asp-route-requestId="@dataShareRequestId" asp-route-questionId="@questionId">
+                        Save and return
+                    </button>
+                </div>
+
+                @if (footer is not null)
+                {
+                    <br />
+
+                    <div>
+                        @if (footer.FooterHeader is not null)
+                        {
+                            <h2 class="govuk-heading-m">@footer.FooterHeader</h2>
+                        }
+
+                        @if (footer.FooterItems is not null)
+                        {
+                            <ul class="govuk-list">
+                                @foreach (var footerItem in footer.FooterItems.OrderBy(x => x.OrderWithinFooter))
+                                {
+                                    <li>@Html.Raw(footerItem.Text)</li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                }
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,185 @@
+﻿@using Cddo.Data.Marketplace.UI.Controllers
+@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests
+@model Agrimetrics.DataShare.Api.Dto.Models.Supplier.DataShareRequests.SubmissionInformation
+@{
+    ViewData["Title"] = "Review New Recieved Request";
+    var submissionInformation = Model;
+}
+
+@functions {
+
+    public static string FormatDateTime(DateTime? date)
+    {
+        if (date == null)
+            return "N/A";
+
+        var suffix = new[] { "th", "st", "nd", "rd" };
+        int day = date.Value.Day;
+        int mod100 = day % 100;
+        string formattedDate = date.Value.ToString("dd MMMM yyyy HH:mm");
+        string daySuffix;
+        if (mod100 > 10 && mod100 < 20)
+        {
+            daySuffix = suffix[0];
+        }
+        else
+        {
+            int daySuffixIndex = (day % 10) < 4 ? day % 10 : 0;
+            daySuffix = suffix[daySuffixIndex];
+        }
+
+        return day + daySuffix + " " + formattedDate.Substring(2);
+    }
+
+    public static string FormatDate(DateTime? date)
+    {
+        if (date == null)
+            return "N/A";
+
+        var suffix = new[] { "th", "st", "nd", "rd" };
+        int day = date.Value.Day;
+        int mod100 = day % 100;
+        string formattedDate = date.Value.ToString("dd MMMM yyyy");
+        string daySuffix;
+        if (mod100 > 10 && mod100 < 20)
+        {
+            daySuffix = suffix[0];
+        }
+        else
+        {
+            int daySuffixIndex = (day % 10) < 4 ? day % 10 : 0;
+            daySuffix = suffix[daySuffixIndex];
+        }
+
+        return day + daySuffix + " " + formattedDate.Substring(2);
+    }
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper ">
+
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            
+            @if (submissionInformation.RequestStatus == DataShareRequestStatus.Cancelled)
+            {
+                <span class="govuk-caption-l">Request ID: @submissionInformation.DataShareRequestRequestId</span>
+                <br />
+
+                <div class="govuk-panel govuk-panel--confirmation">
+                    <h1 class="govuk-panel__title">
+                        Request was cancelled
+                    </h1>
+                </div>
+            }
+            else
+            {
+                <span class="govuk-caption-l">Request ID: @submissionInformation.DataShareRequestRequestId</span>
+                <h1 class="govuk-heading-l">
+                    @submissionInformation.AcquirerOrganisationName is requesting access to access @submissionInformation.EsdaName
+                </h1>
+
+                <div>
+                    <h2 class="govuk-heading-m govuk-!-static-margin-bottom-1">
+                        Project aims
+                    </h2>
+
+                    <p class="govuk-body">
+                        @submissionInformation.ProjectAims
+                    </p>
+            
+                    <h2 class="govuk-heading-m govuk-!-static-margin-bottom-1">
+                        Data Types
+                    </h2>
+            
+                    @foreach (var dataType in @submissionInformation.DataTypes)
+                    {
+                        <p class="govuk-body">
+                            @dataType
+                        </p>
+                    }
+
+                    <h2 class="govuk-heading-m govuk-!-static-margin-bottom-1">
+                        Received
+                    </h2>
+
+                    <p class="gouvk-body">
+                        @FormatDateTime(submissionInformation.SubmittedOn)
+                    </p>
+            
+                    <h2 class="govuk-heading-m govuk-!-static-margin-bottom-1">
+                        Needed By
+                    </h2>
+
+                    <p class="gouvk-body">
+                        @FormatDate(submissionInformation.WhenNeededBy)
+                    </p>
+
+                    <h2 class="govuk-heading-m govuk-!-static-margin-bottom-1">
+                        Contact
+                    </h2>
+
+                    <p class="govuk-!-static-margin-bottom-6">
+                        <a class="govuk-link" href="mailto:#">@submissionInformation.AcquirerEmailAddress</a>
+                    </p>
+
+                    @if (@submissionInformation.AnswerHighlights.Any())
+                    {
+                        @foreach (var answerHighlight in @submissionInformation.AnswerHighlights)
+                        {
+                            <div class="govuk-warning-text govuk-!-static-margin-bottom-1">
+                                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                <strong class="govuk-warning-text__text">
+                                    <span class="govuk-warning-text__assistive">Warning</span>
+                                    @answerHighlight
+                                </strong>
+                            </div>
+                        }
+                        <br/>                        
+                    }
+                </div>
+            }
+
+            <div class="govuk-button-group">
+                @if (submissionInformation.RequestStatus != DataShareRequestStatus.Cancelled)
+                {
+                    <form method="post" novalidate>
+                        <input type="hidden" name="requestId" value="@submissionInformation.DataShareRequestId"/>
+                        <button type="submit" class="govuk-button" data-module="govuk-button" asp-controller="DataRequest" asp-action="StartSubmissionReview" asp-route-requestId="@submissionInformation.DataShareRequestId">
+                            Continue
+                        </button>
+                    </form>
+                }
+
+                <a class="govuk-link" asp-controller="DataRequest" asp-action="ReceivedRequests">Returned to received requests</a>
+            </div>
+
+            @if (submissionInformation.RequestStatus != DataShareRequestStatus.Cancelled)
+            {
+                <h2 class="govuk-heading-m">More information</h2>
+
+                <details class="govuk-details" data-module="govuk-details">
+                    <summary class="govuk-details__summary">
+                        <span class="govuk-details__summary-text">
+                            Your decision options
+                        </span>
+                    </summary>
+                    <div class="govuk-details__text">
+                        <p>You're about to review a data share request. You'll need to decide if it meets your requirements so you can draft a data sharing agreement with @submissionInformation.AcquirerOrganisationName.</p>
+
+                        <p>When you've reviewed the request, you can choose to:</p>
+                        <ul class="govuk-list govuk-list--bullet">
+                            <li>Approve the data share request</li>
+                            <li>Reject the data share request</li>
+                        </ul>
+                    </div>
+                </details>
+            }
+
+        </div>
+    </div>
+
+
+</div>

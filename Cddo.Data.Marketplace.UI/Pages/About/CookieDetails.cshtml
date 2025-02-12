@@ -1,0 +1,100 @@
+﻿@using Cddo.Data.Marketplace.UI.Controllers
+@model Cddo.Data.Marketplace.UI.Pages.About.CookieDetailsModel
+@{
+    ViewData["Title"] = "Cookies Details";
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper ">
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+            <h1 class="govuk-heading-xl">Details about cookies on the Data Marketplace</h1>
+            <p class="govuk-body">
+                Find out which cookies we use, what they’re for and when they expire.
+            </p>
+
+            <h2 class="govuk-heading-l">Strictly necessary cookies</h2>
+            <p class="govuk-body">We use some essential cookies to make this service work. They help us keep your information secure, and remember notifications you’ve seen so that we do not show them to you again. We do not need to ask for your permission to use these cookies.</p>
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Name</th>
+                        <th scope="col" class="govuk-table__header">Purpose</th>
+                        <th scope="col" class="govuk-table__header">Expires</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">session_cookie</td>
+                        <td class="govuk-table__cell">To keep you signed in</td>
+                        <td class="govuk-table__cell">20 hours</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">cddo-analytics-cookies-acceptance</td>
+                        <td class="govuk-table__cell">Saves your cookie consent settings relating to cookies that measure website use</td>
+                        <td class="govuk-table__cell">1 year</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">cddo-sitesettings-cookies-acceptance</td>
+                        <td class="govuk-table__cell">Saves your cookie consent settings relating to cookies that remember your settings</td>
+                        <td class="govuk-table__cell">1 year</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">_AspNetCore.Cookies</td>
+                        <td class="govuk-table__cell">Authentication</td>
+                        <td class="govuk-table__cell">20 hours</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">_AspNetCore.CookiesC1</td>
+                        <td class="govuk-table__cell">Authentication</td>
+                        <td class="govuk-table__cell">20 hours</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">_AspNetCore.CookiesC2</td>
+                        <td class="govuk-table__cell">Authentication</td>
+                        <td class="govuk-table__cell">20 hours</td>
+                    </tr>
+                </tbody>
+            </table>
+            <hr />
+            <h2 class="govuk-heading-l">Analytics cookies</h2>
+            <p class="govuk-body">We use analytics cookies to measure the performance of this website, and to improve the service. We need your consent before we collect data using these cookies.</p>
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Name</th>
+                        <th scope="col" class="govuk-table__header">Purpose</th>
+                        <th scope="col" class="govuk-table__header">Expires</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">_ga_*</td>
+                        <td class="govuk-table__cell">To store and count page views</td>
+                        <td class="govuk-table__cell">1 year, 1 month and 4 days</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">_ga</td>
+                        <td class="govuk-table__cell">To calculate visitor, session and campaign data and to track site usage for the site's analytics report</td>
+                        <td class="govuk-table__cell">1 year, 1 month and 4 days</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">_hjSessionUser_*</td>
+                        <td class="govuk-table__cell">To ensure data from subsequent visits to the site is attributed to the same user</td>
+                        <td class="govuk-table__cell">1 year</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">_hjSession_*</td>
+                        <td class="govuk-table__cell">To ensure data from subsequent visits to the site is attributed to the same user</td>
+                        <td class="govuk-table__cell">1 hour</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p class="govuk-body">You can <a class="govuk-link" asp-controller="Link" asp-action="@nameof(LinkController.Cookies)">change which cookies you’re happy for us to use</a>.</p>
+        </div>
+    </div>
+</div>

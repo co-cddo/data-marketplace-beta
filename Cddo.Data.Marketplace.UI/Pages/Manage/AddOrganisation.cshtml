@@ -1,0 +1,118 @@
+﻿@page
+@using Cddo.Data.Marketplace.Api.Dto
+@using System.Reflection
+@using System.ComponentModel
+@model Cddo.Data.Marketplace.UI.Pages.Manage.AddOrganisationModel
+@{
+    ViewData["Title"] = "Manage - Add Organisation";
+    var departmentId = ViewData["DepartmentId"] != null ? ViewData["DepartmentId"] : null;
+
+
+    var organisationTypes = Enum.GetValues(typeof(OrganisationType)).Cast<OrganisationType>().Select(e => new SelectListItem
+            {
+                Text = GetEnumDescription(e),
+                Value = e.ToString(),
+                Selected = Model?.OrganisationType != null &&
+                                                           Enum.TryParse(typeof(OrganisationType), Model.OrganisationType, true, out var parsedValue) &&
+                                                           (OrganisationType)parsedValue == e
+
+            });
+
+    int? selectedDepartment = null; 
+    if(Model.DepartmentId != null)
+    {
+        selectedDepartment = (int)Model.DepartmentId;
+    } 
+
+    string GetEnumDescription(Enum value)
+    {
+        FieldInfo field = value.GetType().GetField(value.ToString());
+        var attribute = field.GetCustomAttribute<DescriptionAttribute>();
+
+        return attribute?.Description ?? value.ToString();
+    }
+}
+
+<div class="govuk-width-container">
+    <a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+    <div class="govuk-main-wrapper">
+        <h1 class="govuk-heading-l">
+            <span class="govuk-caption-l">Add Organisation</span>
+            Organisation Details
+        </h1>
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                @Html.AntiForgeryToken()
+                @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
+                <form method="post">
+                    <input hidden value="@departmentId" name="DepartmentId" />
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="organisationName">Organisation Name</label>
+                        <input class="govuk-input" id="organisationName" name="OrganisationName" type="text" required>
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="organisationType">Organisation Type</label>
+                        <select class="govuk-select" id="organisationType" name="OrganisationType" required>
+                            <option value="">Select..</option>
+                            @foreach (var item in organisationTypes)
+                            {
+                                <option value="@item.Value" selected="@item.Selected">@item.Text</option>
+                            }                           
+                        </select>
+                       
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="organisationFormat">Link organisation to a department</label>
+                        <select class="govuk-select" id="departmentNameDropDown" name="selectedDepartmentId" aria-label="Link organisation to a department">
+                            <option value="0">Select..</option>
+                            @foreach (var org in Model.AllDepartments!)
+                            {
+                                <option value="@org.Id" selected="@(selectedDepartment == org.Id)">@org.DepartmentName</option>                         
+                            }
+                        </select>
+                        </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="organisationFormat">Organisation Format</label>
+                        <select class="govuk-select" id="organisationFormat" name="OrganisationFormat" required>
+                            <option value="">Select..</option>
+                            <option value="Advisory non-departmental public body">Advisory non-departmental public body</option>
+                            <option value="Commission">Commission</option>
+                            <option value="Devolved administration">Devolved administration</option>
+                            <option value="Executive agency">Executive agency</option>
+                            <option value="Executive non-departmental public body">Executive non-departmental public body</option>
+                            <option value="Independent monitoring body">Independent monitoring body</option>
+                            <option value="Ministerial department">Ministerial department</option>
+                            <option value="Non-ministerial department">Non-ministerial department</option>
+                            <option value="Other">Other</option>
+                            <option value="Sub-organisation">Sub-organisation</option>
+                            <option value="Tribunal">Tribunal</option>
+                        </select>
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="domainName">Domain Name</label>
+                        <input class="govuk-input" id="domainName" name="DomainName" type="text" required>
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="allowList">Allow List</label>
+                        <select class="govuk-select" id="allowList" name="AllowList" required>
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+                    <div class="govuk-button-group">
+                        <a href="@HttpContext.Request.Headers["Referer"]" class="govuk-button govuk-button--secondary">Cancel</a>
+                        <button class="govuk-button" data-module="govuk-button" type="submit">
+                            Save
+                        </button>                        
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

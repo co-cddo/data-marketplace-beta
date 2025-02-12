@@ -1,0 +1,115 @@
+﻿@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums;
+
+@model DataShareRequestNotificationsSelectionRequest
+@{
+    var identifier = Model.Identifier;
+    var domainDsrMailboxAddress = Model.DomainDsrNotificationMailboxAddress;
+    var userDomainHasRegisteredDataShareRequestMailboxAddress = !string.IsNullOrWhiteSpace(domainDsrMailboxAddress);
+    var selectedOption = Model.SelectedRecipientType;
+    var maintainerEmailAddress = Model.MaintainerEmailAddress;
+    var customAddress = Model.EnteredCustomAddress;
+    var customAddressIsInvalid = (selectedOption == DataShareRequestNotificationRecipientType.EsdaCustomDsrNotificationAddress
+                                  && ViewData.ModelState.TryGetValue(nameof(DataShareRequestNotificationsRequest.CustomDsrNotificationAddress), out _));
+    var customAddressError = ViewData.ModelState[nameof(DataShareRequestNotificationsRequest.CustomDsrNotificationAddress)]?.Errors.FirstOrDefault()?.ErrorMessage;
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+<div class="govuk-main-wrapper">
+    @Html.AntiForgeryToken()
+    @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form method="post">
+                <div class="govuk-form-group">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h1 class="govuk-fieldset__heading">
+                            Data share request notifications
+                        </h1>
+                    </legend>
+                    <div id="dsr-notification-options-hint" class="govuk-hint">
+                        Select an email address for receiving notifications about this data share request.
+                    </div>
+
+                    <div class="govuk-radios" data-module="govuk-radios" id="dsr-notification-options"
+                         name="dsr-notification-options">
+                        @if (userDomainHasRegisteredDataShareRequestMailboxAddress)
+                        {
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" type="radio" name="@nameof(DataShareRequestNotificationsRequest.SelectedDataShareRequestNotificationRecipientType)"
+                                       id="dsr-notification-domain-address"
+                                @(selectedOption == @DataShareRequestNotificationRecipientType.DomainDsrNotificationAddress ? "checked" : "")
+                                       value="@DataShareRequestNotificationRecipientType.DomainDsrNotificationAddress"
+                                       aria-describedby="dsr-notification-domain-address-hint">
+                                <label class="govuk-label govuk-radios__label" for="dsr-notification-domain-address">
+                                    Data share request notification address of your domain
+                                </label>
+                                <div class="govuk-hint govuk-checkboxes__hint" id="dsr-notification-domain-address-hint">
+                                    This is currently @domainDsrMailboxAddress.
+                                </div>
+                            </div>
+                        }
+
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" type="radio" name="@nameof(DataShareRequestNotificationsRequest.SelectedDataShareRequestNotificationRecipientType)"
+                                   id="dsr-notification-esda-contact-point-address"
+                            @(selectedOption == @DataShareRequestNotificationRecipientType.EsdaContactPointEmailAddress ? "checked" : "")
+                                   value="@DataShareRequestNotificationRecipientType.EsdaContactPointEmailAddress"
+                                   aria-describedby="dsr-notification-esda-contact-point-address-hint">
+                            <label class="govuk-label govuk-radios__label" for="dsr-notification-esda-contact-point-address">
+                                Point of contact address in this data description
+                            </label>
+                            <div class="govuk-hint govuk-checkboxes__hint" id="dsr-notification-esda-contact-point-address-hint">
+                                This is @maintainerEmailAddress.
+                            </div>
+                        </div>
+
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" type="radio" name="@nameof(DataShareRequestNotificationsRequest.SelectedDataShareRequestNotificationRecipientType)"
+                                   id="dsr-notification-esda-custom-address"
+                                   value="@DataShareRequestNotificationRecipientType.EsdaCustomDsrNotificationAddress"
+                            @(selectedOption == @DataShareRequestNotificationRecipientType.EsdaCustomDsrNotificationAddress ? "checked" : "")
+                                   aria-controls="conditional-@DataShareRequestNotificationRecipientType.EsdaCustomDsrNotificationAddress"
+                                   aria-describedby="domain-hint">
+                            <label class="govuk-label govuk-radios__label" for="dsr-notification-esda-custom-address">
+                                Another address
+                            </label>
+                        </div>
+
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@DataShareRequestNotificationRecipientType.EsdaCustomDsrNotificationAddress">
+                            <div class="govuk-form-group govuk-character-count @(customAddressIsInvalid ? "govuk-form-group--error" : "")" data-module="govuk-character-count" data-maxlength="255">
+                                @if (customAddressIsInvalid && !string.IsNullOrEmpty(customAddressError))
+                                {
+                                    <p id="CustomDsrNotificationAddress-error" class="govuk-error-message">
+                                        <span class="govuk-visually-hidden">Error:</span> @customAddressError
+                                    </p>
+                                }
+                                <input class="govuk-input govuk-js-character-count @(customAddressIsInvalid ? "govuk-input--error" : "")"
+                                       id="CustomDsrNotificationAddress"
+                                       name="@nameof(DataShareRequestNotificationsRequest.CustomDsrNotificationAddress)"
+                                       spellcheck="false" aria-describedby="CustomDsrNotificationAddress-info"
+                                       value="@customAddress" />                                
+                                <div id="CustomDsrNotificationAddress-info" class="govuk-hint govuk-character-count__message">
+                                    You can enter up to 255 characters
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="govuk-form-group">
+                    <input type="hidden" name="@nameof(DataShareRequestNotificationsRequest.Identifier)" value="@identifier" />
+                    <input type="hidden" name="@nameof(DataShareRequestNotificationsRequest.DomainDsrNotificationMailboxAddress)" value="@domainDsrMailboxAddress" />
+                    <input type="hidden" name="@nameof(DataShareRequestNotificationsRequest.MaintainerEmailAddress)" value="@maintainerEmailAddress" />
+                    <button class="govuk-button" data-module="govuk-button" type="submit"
+                            asp-controller="DataDescription" asp-action="@nameof(DataDescriptionController.DataShareRequestNotificationsSelectionSubmit)"
+                            asp-route-dataAssetType="@ViewBag.DataAssetType">
+                        Publish data description
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

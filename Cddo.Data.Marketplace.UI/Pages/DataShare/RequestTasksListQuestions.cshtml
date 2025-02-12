@@ -1,0 +1,60 @@
+﻿@model Agrimetrics.DataShare.Api.Dto.Responses.Acquirer.DataShareRequests.GetEsdaQuestionSetOutlineResponse
+@{
+    ViewData["Title"] = "Request Tasks List Questions";
+    var esdaName = ViewBag.EsdaName.ToString() ?? string.Empty;
+    var isData = !string.IsNullOrWhiteSpace(esdaName) && Model.QuestionSetOutline != null;
+}
+
+<a class="govuk-back-link" href="/Dataset/DatasetSummary?datasetId=@esdaName">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl">
+                Check questions for a data share request before you start
+            </h1>
+            <p class="govuk-body">
+                These are some common questions asked when requesting data from another government organisation.
+            </p>
+            <p class="govuk-body">
+                Questions may differ slightly based on:
+            </p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>Unique requirements for a particular department.</li>
+                <li>The sensitivity of the data you're requesting.</li>
+                <li>Whether it will travel outside the UK.</li>
+            </ul>
+            <p class="govuk-body">
+                You'll need to ensure your request meets data protection (GDPR) and data sharing standards.
+            </p>
+            <p class="govuk-body">
+                Some questions may require support from people with skills in:
+            </p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>Technology.</li>
+                <li>Data security.</li>
+                <li>Data protection.</li>
+                <li>Legal.</li>
+                <li>Data governance.</li>
+            </ul>
+            <h2 class="govuk-heading-l">
+                The questions you will be asked
+            </h2>
+            
+            @if (isData)
+            {
+                @foreach (var sectionOutline in Model.QuestionSetOutline.Sections.OrderBy(x => x.OrderWithinQuestionSetOutline))
+                {
+                    <h3 class="govuk-heading-m">@sectionOutline.Header</h3>
+
+                    <ul class="govuk-list govuk-list--bullet">
+                        @foreach (var question in sectionOutline.Questions.OrderBy(x => x.OrderWithinQuestionSetSection))
+                        {
+                            <li>@question.QuestionText</li>
+                        }
+                    </ul>
+                }
+            }
+        </div>
+    </div>
+</div>

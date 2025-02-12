@@ -1,0 +1,75 @@
+﻿@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Model
+@model ReportTemplate
+@{
+    ViewData["Title"] = "Create Report";
+}
+
+<div class="govuk-width-container">
+    <div class="govuk-breadcrumbs">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="/">Home</a>
+            </li>
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="/reports/reportsList">Reports</a>
+            </li>
+            <li class="govuk-breadcrumbs__list-item">
+                Create report details
+            </li>
+        </ol>
+    </div>
+        <form asp-controller="Reports" method="post" asp-action="@nameof(ReportsController.CreateReportDetailsTemplate)">
+            <div class="govuk-grid-row govuk-main-wrapper">
+                <div class="govuk-grid-column-two-thirds">
+                    <h2 class="govuk-heading-l">
+                        Step 1 : Give report a name, description and select data source
+                    </h2>
+                    <p class="govuk-body">Select the data source the report uses and give it an easy to identify name and a brief description on what the report is about.</p>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="report-type">
+                            Data source
+                        </label>
+                        <select class="govuk-select" id="report-type" name=@nameof(ReportTemplate.ReportType) required>
+                            <option value="" selected>Select..</option>
+
+                            <option value="@ReportType.Telemetry">Telemetry</option>
+                            <option value="@ReportType.Metadata">Metadata</option>
+                            <option value="@ReportType.Users">Users</option>
+                            <option value="@ReportType.Datasharerequests">Datashare Requests</option>
+                        </select>
+                    </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="report-name">
+                            Report name
+                        </label>
+                        <input class="govuk-input" id="report-name" name=@nameof(ReportTemplate.ReportName) type="text" autocomplete="off" required>
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="report-description">
+                            Report description
+                        </label>
+                        <textarea class="govuk-textarea" id="report-description" name=@nameof(ReportTemplate.Description) aria-describedby="more-detail-hint" required></textarea>
+                    </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="report-query">
+                            Report query
+                        </label>
+                        <textarea class="govuk-textarea" id="report-query" name=@nameof(ReportTemplate.KqlQuery) aria-describedby="more-detail-hint"></textarea>
+                    </div>
+                    <div class="govuk-button-group">
+                        <button type="submit" class="govuk-button" data-module="govuk-button">
+                            Save and continue
+                        </button>
+                        <a class="govuk-button govuk-button--secondary" href="/Report/ReportHome">
+                            Back
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+ 
+</div>
+
+

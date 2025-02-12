@@ -1,0 +1,32 @@
+﻿@model Cddo.Data.Marketplace.UI.Pages.DataRequest.CancelCreatedRequestModel
+@{
+    ViewData["Title"] = "Cancel Share Request";
+}
+
+<div class="govuk-main-wrapper ">
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h2 id="submittedRequests" class="govuk-heading-l">Cancellation</h2>
+
+            <form method="post" novalidate>
+                <div class="govuk-form-group govuk-character-count" data-module="govuk-character-count" data-maxlength="4000">
+                    <p class="govuk-body-m">Give the reasons why you wish to cancel this data share request.</p>
+                </div>
+
+                <textarea class="govuk-textarea govuk-js-character-count" id="cancellation-reasons-text-area" name="cancellation-reasons" spellcheck="false" rows="6" aria-describedby="cancellation-reasons-info"></textarea>
+                <div id="cancellation-reasons-info" class="govuk-hint govuk-character-count__message">
+                    You can enter up to 4000 characters
+                </div>
+
+                <div class="govuk-button-group">
+                    <button type="submit" class="govuk-button" data-module="govuk-button" asp-controller="DataRequest" asp-action="ConfirmCancelCreatedRequest" asp-route-requestId="@Model.DataShareRequestId">
+                        Confirm cancellation
+                    </button>
+
+                    <a asp-controller="DataRequest" asp-action="RequestTasksReviewAnswers" asp-route-requestId="@Model.DataShareRequestId" class="govuk-link">Return to request summary</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

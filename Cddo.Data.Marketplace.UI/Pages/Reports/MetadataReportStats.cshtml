@@ -1,0 +1,366 @@
+﻿@using Cddo.Data.Marketplace.Api.Dto.ManageUser
+@using Cddo.Data.Marketplace.Api.Dto.Requests.ManageUser
+@using Cddo.Data.Marketplace.Api.Dto.Requests.Reports
+@using Cddo.Data.Marketplace.Api.Dto.Responses.ManageUser
+@using Cddo.Data.Marketplace.Logic.Services.Interfaces
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Pages.Shared 
+@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums;
+@inject IManageOrganisationService _manageUserService
+@inject IUserRoleService UserRoleService
+@model MetadataReportsStats
+@{
+    Layout = "/Pages/Shared/_HeaderLayout.cshtml";
+    ViewData["Title"] = "Metadata Stats Reports";
+
+    var selectedOption = new { PublisherOrganisationId = 1, To = DateTime.Now, MinimumDuration = "1.00:00:00", MaximumDuration = "1.00:00:00" };
+
+    var manageOrganisationRequest = new ManageOrganisationsRequest
+            {
+                PageNumber = 1,
+                PageSize = int.MaxValue
+            };
+    var organisationList = await _manageUserService.GetManageOrganisationsAsync(manageOrganisationRequest);
+
+    bool isAdministrator = await UserRoleService.IsUserRoleAdmin();
+
+    bool isSystemAdministrator = await UserRoleService.IsUserRoleSystemAdmin();
+
+    bool isSupplier = await UserRoleService.IsUserRoleSupplier();
+
+    string organisationId = String.Empty;
+    var userOrganisation = new OrganisationDetail();
+
+    if (!isSystemAdministrator)
+    {
+        var user = await UserRoleService.GetUserProfileAsync();
+        organisationId = user.Organisation!.OrganisationId.ToString();
+        userOrganisation = organisationList.Orgs.FirstOrDefault(o => o.OrganisationId.ToString() == organisationId);
+
+    }
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+
+            const data = [
+                { status: 'Submitted', count: @Model?.TotalPublished, color: 'rgba(234, 67, 53, 0.7)' }, // Red
+                { status: 'Approved', count: @Model?.TotalPublished, color: 'rgba(251, 188, 5, 0.7)' }, // Yellow
+                { status: 'Rejected', count: @Model?.TotalPublished, color: 'rgba(15, 157, 88, 0.7)' }, // Green
+                { status: 'Cancelled', count: @Model?.TotalPublished, color: 'rgba(223, 227, 236, 0.7)' }, // Light Grey
+                { status: 'Returned with comments', count: @Model?.TotalPublished, color: 'rgba(255, 165, 0, 0.7)' } // Orange
+            ];
+
+            if (Boolean(@isSystemAdministrator.ToString().ToLower())) {
+                data.push({ status: 'Draft', count: @Model?.TotalDraft, color: 'rgba(66, 133, 244, 0.7)' }); // Blue)
+            };
+
+            const datasets = data.map(item => ({
+                label: item.status,
+                data: [item.count],
+                backgroundColor: item.color,
+                borderColor: item.color.replace('0.7', '1'),
+                borderWidth: 1
+            }));
+
+            const ctx = document.getElementById('dataShareRequestChart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Status'],
+                    datasets: datasets
+                },
+                options: {
+                    scales: {
+                        x: {
+                            stacked: true,
+                            title: {
+                                display: true,
+                                text: 'Status'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Count'
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}
+
+<div class="govuk-masterhead govuk-masterheader">
+    <div class="govuk-width-container">
+        @await Html.PartialAsync("_PhasePartial", new PhasePartialModel())
+        <div class="govuk-breadcrumbs">
+            <ol class="govuk-breadcrumbs__list">
+                <li class="govuk-breadcrumbs__list-item">
+                    <a class="govuk-breadcrumbs__link" href="/">Home</a>
+                </li>
+                <li class="govuk-breadcrumbs__list-item">
+                    <a class="govuk-breadcrumbs__link" href="/manage">Marketplace management</a>
+                </li>
+                <li class="govuk-breadcrumbs__list-item">
+                    <a class="govuk-breadcrumbs__link" href="/reports/reportsList">Marketplace System Reports</a>
+                </li>
+                <li class="govuk-breadcrumbs__list-item">
+                    <a class="govuk-breadcrumbs__link" href="/reports/metadataReports">Marketplace Metadata Reports</a>
+                </li>
+            </ol>
+        </div>
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-xl govuk-!-margin-bottom-6 mt-4">Metadata Status Report</h1>
+                <p class="govuk-body-l">
+                    This report displays a summary of metadata counts categorized by status. It provides real-time data to give users an overview of metadata statuses.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="govuk-width-container govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <form method="post" asp-controller="Reports" asp-action="@nameof(ReportsController.MetadataStatsPost)">
+            <input hidden value="@Model.TemplateId" name="templateId" />
+            <div class="filter-panel">
+                <h3 class="govuk-heading-s filter-heading">
+                    Filter by organisation
+                    <button class="float-end govuk-link" type="submit" name="downloadCsv" value="true">Download CSV</button>
+                </h3>
+                <div class="filter-panel">
+                    <div class="filter-content">
+                        <input hidden name="isSystemAdministrator" value="@isSystemAdministrator.ToString().ToLower()" />
+                        <div class="govuk-grid-row">
+                            <div class="govuk-grid-column-two-thirds">
+                        @if (isSystemAdministrator)
+                        {
+                            <!-- Select organisation -->
+                            
+                                    <div class="govuk-form-group">
+                                        <label for="organisationName" class="govuk-label fw-bold">Select Supplier Organisation</label>
+                                        <select class="govuk-select govuk-!-width-three-quarters" id="organisationName" name="OrganisationName">
+                                            <option value="">Select..</option>
+                                            @if (organisationList != null && organisationList.Orgs.Any())
+                                            {
+                                                foreach (var organisation in organisationList.Orgs)
+                                                {
+                                                    <option value="@organisation.OrganisationName" selected="@(ViewBag.OrganisationName == organisation.OrganisationName)">
+                                                        @organisation.OrganisationName
+                                                    </option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <input hidden value="@userOrganisation.OrganisationName" name="OrganisationName" />
+                                    <h3 class="govuk-heading-s">@userOrganisation.OrganisationName</h3>
+                                }
+                            </div>
+                        </div><div class="govuk-grid-row">
+                            <div class="govuk-grid-column-two-thirds">
+                        @if (isSystemAdministrator)
+                        {
+                            <!-- Select Data Asset Typw -->
+                            
+                            <div class="govuk-form-group">
+                                <label for="organisationName" class="govuk-label fw-bold">Select Data Asset Type</label>
+                                <select class="govuk-select govuk-!-width-three-quarters" id="dataAssetType" name="DataAssetType">
+                                    <option value="">Select..</option>
+                                            @foreach (var assetType in Enum.GetValues(typeof(DataAssetType)))
+                                    {
+                                        <option value="@assetType" selected="@(ViewBag.DataAssetType == assetType.ToString())">
+                                            @assetType.ToString()
+                                        </option>
+                                    }
+                                            
+                                </select>
+                            </div>
+                        }
+                            </div>
+                        </div>
+                       @*  <div class="govuk-grid-row">
+                            <!-- Date Range Section -->
+                            <div class="govuk-grid-column-one-half">
+                                <fieldset class="govuk-fieldset">
+                                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                                        <div class="govuk-fieldset__heading">Select Date Range</div>
+                                    </legend>
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="From">Start Date</label>
+                                        <input type="date" class="govuk-input govuk-input--width-10" id="From" name="startDate" value="" />
+                                    </div>
+
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="To">End Date</label>
+                                        <input type="date" class="govuk-input govuk-input--width-10" id="To" name="endDate" value="@selectedOption?.To.ToString("yyyy-MM-dd")" />
+                                    </div>
+                                </fieldset>
+                            </div>
+
+                            <!-- Time Range Section -->
+                           @*  <div class="govuk-grid-column-one-half">
+                                <fieldset class="govuk-fieldset">
+                                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                                        <div class="govuk-fieldset__heading">Select Time Range</div>
+                                    </legend>
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="minimumDuration">Minimum Duration</label>
+                                        <select class="govuk-select" name="minimumDuration" id="minimumDuration">
+                                            <option value="">Select duration..</option>
+                                            <option value="00:30:00" selected="@(Convert.ToString(selectedOption?.MinimumDuration) == "00:30:00")">30 minutes</option>
+                                            <option value="01:00:00" selected="@(Convert.ToString(selectedOption?.MinimumDuration) == "01:00:00")">1 hour</option>
+                                            <option value="1.00:00:00" selected="@(Convert.ToString(selectedOption?.MinimumDuration) == "1.00:00:00")">1 day</option>
+                                            <option value="10.00:00:00" selected="@(Convert.ToString(selectedOption?.MinimumDuration) == "10.00:00:00")">10 days</option>
+                                        </select>
+                                    </div>
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="maximumDuration">Maximum Duration</label>
+                                        <select class="govuk-select" name="maximumDuration" id="maximumDuration">
+                                            <option value="">Select duration..</option>
+                                            <option value="1.00:00:00" selected="@(Convert.ToString(selectedOption?.MaximumDuration) == "1.00:00:00")">1 day</option>
+                                            <option value="10.00:00:00" selected="@(Convert.ToString(selectedOption?.MaximumDuration) == "10.00:00:00")">10 days</option>
+                                            <option value="20.00:00:00" selected="@(Convert.ToString(selectedOption?.MaximumDuration) == "20.00:00:00")">20 days</option>
+                                        </select>
+                                    </div>
+                                </fieldset>
+                            </div> *@
+                        </div> 
+
+                        <div class="govuk-button-group">
+                            <button type="submit" class="govuk-button" data-module="govuk-button">Apply Filter</button>
+                        <a class="govuk-link" asp-controller="Reports" asp-route-templateId="86ef337b-1432-49ae-9d96-adcfa87553c2" asp-action="@nameof(ReportsController.GetMetadataStatsReport)">Clear all</a>
+                        </div>
+                    </div>
+                </div>
+        </form>
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <div class="govuk-tabs" data-module="govuk-tabs">
+                    <h2 class="govuk-tabs__title">
+                        Contents
+                    </h2>
+                    <ul class="govuk-tabs__list">
+                        <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+                            <a class="govuk-tabs__tab" href="#table">
+                                Tabular
+                            </a>
+                        </li>
+                        <li class="govuk-tabs__list-item">
+                            <a class="govuk-tabs__tab" href="#chart">
+                                Chart
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="govuk-tabs__panel" id="table">
+                        <h2 class="govuk-heading-l">Metadata Status Report</h2>
+                        <div class="govuk-summary-card">
+                            <div class="govuk-summary-card__title-wrapper">
+                                <h2 class="govuk-summary-card__title">
+                                    Metadata Status Count
+                                </h2>
+                            </div>
+                            <div class="govuk-summary-card__content">
+                                <table class="govuk-table">
+                                    <thead class="govuk-table__head">
+                                        <tr class="govuk-table__row">
+                                            <th scope="col" class="govuk-table__header">Status</th>
+                                            <th scope="col" class="govuk-table__header govuk-table__header--numeric">Count</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="govuk-table__body">
+                                       
+                                            <tr class="govuk-table__row">
+                                                <th scope="row" class="govuk-table__header">Draft</th>
+                                                <td class="govuk-table__cell govuk-table__cell--numeric">@Model?.TotalDraft</td>
+                                            </tr>
+                                        <tr class="govuk-table__row">
+                                            <th scope="row" class="govuk-table__header">Published</th>
+                                            <td class="govuk-table__cell govuk-table__cell--numeric">@Model?.TotalPublished</td>
+                                           @*  @if (isSystemAdministrator)
+                                            {
+                                                <td class="govuk-table__cell govuk-table__cell--numeric">@Model?.AcceptedIntermediateCount</td>
+                                            } *@
+                                        </tr>
+                                        <tr class="govuk-table__row">
+                                            <th scope="row" class="govuk-table__header">Edited</th>
+                                            <td class="govuk-table__cell govuk-table__cell--numeric">@Model?.TotalEdited</td>
+                                            @*  @if (isSystemAdministrator)
+                                            {
+                                            <td class="govuk-table__cell govuk-table__cell--numeric">@Model?.AcceptedIntermediateCount</td>
+                                            } *@
+                                        </tr>
+                                        <tr class="govuk-table__row">
+                                            <th scope="row" class="govuk-table__header">Archived</th>
+                                            <td class="govuk-table__cell govuk-table__cell--numeric">@Model?.TotalArchived</td>
+                                           @*  @if (isSystemAdministrator)
+                                            {
+                                                <td class="govuk-table__cell govuk-table__cell--numeric">@Model?.RejectedIntermediateCount</td>
+                                            } *@
+                                        </tr>
+                                        <tr class="govuk-table__row">
+                                            <th scope="row" class="govuk-table__header">
+                                                 Deleted
+                                            </th>
+                                            <td class="govuk-table__cell govuk-table__cell--numeric">@Model?.Totaldeleted</td>
+                                            @* @if (isSystemAdministrator)
+                                            {
+                                                <td class="govuk-table__cell govuk-table__cell--numeric">@Model?.CancelledIntermediateCount</td>
+                                            } *@
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="chart">
+                        <h2 class="govuk-heading-l">Metadata Status Report</h2>
+                        <canvas id="dataShareRequestChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .filter-panel {
+        background-color: #f3f2f1;
+        margin-bottom: 30px;
+    }
+
+    .filter-content {
+        padding: 20px;
+    }
+
+    .filter-heading {
+        background-color: #b1b4b6;
+        padding: 10px;
+    }
+
+    .users-list .govuk-link {
+        text-decoration: none;
+    }
+
+    .multiselect-filter {
+        max-height: 200px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+    }
+</style>

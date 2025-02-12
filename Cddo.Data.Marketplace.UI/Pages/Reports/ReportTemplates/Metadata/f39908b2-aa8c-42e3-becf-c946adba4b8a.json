@@ -1,0 +1,13 @@
+{
+  "TemplateId": "f39908b2-aa8c-42e3-becf-c946adba4b8a",
+  "KqlQuery": "{\u0022RequiredFields\u0022:[22,37,1,18,8,3,12,6,13],\u0022Filter\u0022:{\u0022FilterByInitiatingUserPermissions\u0022:false,\u0022FieldFilters\u0022:[{\u0022Field\u0022:12,\u0022Values\u0022:[\u0022academy-for-social-justice\u0022]},{\u0022Field\u0022:37,\u0022Values\u0022:[\u0022Draft\u0022,\u0022Published\u0022,\u0022Archived\u0022,\u0022Deleted\u0022,\u0022Withdrawn\u0022]}]}}",
+  "ReportType": 2,
+  "ReportName": "Metadata - Department for Social Justice",
+  "Description": "Only Department for Social Justice Metadata records",
+  "CreatedOn": "2024-11-05T13:59:49.451403+00:00",
+  "UserId": 18,
+  "OrganisationId": 1,
+  "SharedWithOrganisationIds": null,
+  "SharedWithUsersIds": null,
+  "IsPredefined": true
+}

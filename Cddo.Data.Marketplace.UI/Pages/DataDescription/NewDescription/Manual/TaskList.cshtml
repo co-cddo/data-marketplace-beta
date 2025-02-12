@@ -1,0 +1,268 @@
+﻿@using Agm.Catalog.DotNet.Dto.Models.DataAssets
+@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Microsoft.CodeAnalysis.CSharp.Syntax
+@model TaskListModel
+@{
+    ViewData["Title"] = "Data Asset Task List";
+
+    var dataAsset = Model.DataAsset;
+
+    var potentialDuplicatesToDataAsset = Model.PotentialDuplicatesToDataAsset;
+
+    bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
+}
+
+@functions
+{
+    private static string PrettifyDuplicateSimilarityDescriptions(
+        IEnumerable<string> similarityDescriptions)
+    {
+        var formattedSimilarityDescriptions = similarityDescriptions.Select(x => x.ToLower()).ToList();
+
+        var numberOfFormattedSimilarityDescriptions = formattedSimilarityDescriptions.Count;
+
+        switch (numberOfFormattedSimilarityDescriptions)
+        {
+            case 0: return string.Empty;
+
+            case 1: return formattedSimilarityDescriptions.First();
+
+            default:
+            {
+                var finalFormattedSimilarityDescription = formattedSimilarityDescriptions.Last();
+
+                var otherFormattedSimilarityDescriptions = formattedSimilarityDescriptions.Take(formattedSimilarityDescriptions.Count - 1).ToList();
+
+                return $"{string.Join(", ", otherFormattedSimilarityDescriptions)} and {finalFormattedSimilarityDescription}";
+            }
+        }
+    }
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <span class="govuk-caption-xl">
+                @if (ViewBag.isEditMode)
+                {
+                    <span>Edit data description</span>
+                }
+                else
+                {
+                    <span>
+                        Create new data description
+                    </span>
+                }
+            </span>
+            
+            <br/>
+
+            @* Potential Duplicates Section *@
+            @if (potentialDuplicatesToDataAsset.Any())
+            {
+                <div class="govuk-grid-row">
+                    <section class="govuk-notification-banner" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                        <div class="govuk-notification-banner__header">
+                            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                                <div class="govuk-warning-text govuk-!-static-margin-bottom-1">
+                                    <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                    <strong class="govuk-warning-text__text">
+                                        <span class="govuk-warning-text__assistive">Warning</span>
+                                        This record might be a duplicate.
+                                    </strong>
+                                </div>
+                            </h2>
+                        </div>
+                        <div class="govuk-notification-banner__content">
+
+                            <p class="govuk-body">
+                                The details you’ve provided seem to match with the following data description(s) in the Data Marketplace’s catalogue:
+                            </p>
+
+                            <ul class="govuk-list govuk-list--bullet">
+                                @foreach (var potentialDuplicateToDataAsset in potentialDuplicatesToDataAsset)
+                                {
+                                    <li>
+                                        <a class="govuk-link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssetByUser)" asp-route-identifier="@potentialDuplicateToDataAsset.DataAssetId">
+                                            @potentialDuplicateToDataAsset.Title
+                                        </a>
+                                        (based on your @PrettifyDuplicateSimilarityDescriptions(potentialDuplicateToDataAsset.SimilarityDescriptions))
+                                    </li>
+                                }
+                            </ul>
+
+                            <p class="govuk-body">
+                                You can choose to either update that data description by following the link above, or continue with creating a new data description.
+                            </p>
+                        </div>
+                    </section>
+                </div>
+            }
+
+            <h1 class="govuk-heading-xl">Data set questions</h1>
+
+            @* General Section *@
+            <h3 class="govuk-heading-m">General</h3>
+            <ul class="govuk-task-list">
+                @foreach (var item in new[] {
+                new { Title = "Security classification", Action = nameof(CatalogDataDescriptionController.SecurityClassification), Completed = !string.IsNullOrEmpty(dataAsset.SecurityClassification) },
+                new { Title = "Title", Action = nameof(CatalogDataDescriptionController.AddTitle), Completed = !string.IsNullOrEmpty(dataAsset.Title) },
+                new { Title = "Description", Action = nameof(CatalogDataDescriptionController.AddDescription), Completed = !string.IsNullOrEmpty(dataAsset.Description) },
+                new { Title = "Internal identifier", Action = nameof(CatalogDataDescriptionController.AddInternalIdentifier), Completed = !string.IsNullOrEmpty(dataAsset.InternalIdentifier) }
+                })
+                {
+                    <li class="govuk-task-list__item govuk-task-list__item--with-link">
+                        <div class="govuk-task-list__name-and-hint">
+                            <a class="govuk-link govuk-task-list__link"
+                               asp-controller="CatalogDataDescription"
+                               asp-action="@item.Action"
+                               asp-route-identifier="@dataAsset.Id"
+                               asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                                @item.Title
+                            </a>
+                        </div>
+                        <div class="govuk-task-list__status">
+                            @if (item.Completed)
+                            {
+                                <span>Completed</span>
+                            }
+                            else
+                            {
+                                <strong class="govuk-tag govuk-tag--blue">Incomplete</strong>
+                            }
+                        </div>
+                    </li>
+                }
+            </ul>
+
+            @* Themes and Keywords Section *@
+            <h3 class="govuk-heading-m">Themes and keywords</h3>
+            <ul class="govuk-task-list">
+                @foreach (var item in new[] {
+
+                new { Title = "Themes", Action = nameof(CatalogDataDescriptionController.AddThemes), Completed = dataAsset.Themes.Any() },
+                new { Title = "Keywords", Action = nameof(CatalogDataDescriptionController.AddKeywords), Completed = dataAsset.Keywords.Any() }
+                })
+                {
+                    <li class="govuk-task-list__item govuk-task-list__item--with-link">
+                        <div class="govuk-task-list__name-and-hint">
+                            <a class="govuk-link govuk-task-list__link"
+                               asp-controller="CatalogDataDescription"
+                               asp-action="@item.Action"
+                               asp-route-identifier="@dataAsset.Id"
+                               asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                                @item.Title
+                            </a>
+                        </div>
+                        <div class="govuk-task-list__status">
+                            @if (item.Completed)
+                            {
+                                <span>Completed</span>
+                            }
+                            else
+                            {
+                                <strong class="govuk-tag govuk-tag--blue">Incomplete</strong>
+                            }
+                        </div>
+                    </li>
+                }
+            </ul>
+
+            @* Contact and Owner Section *@
+            <h3 class="govuk-heading-m">Contact and owner</h3>
+            <ul class="govuk-task-list">
+                @foreach (var item in new[] {
+                new { Title = "Point of contact", Action = nameof(CatalogDataDescriptionController.AddContactPoint), Completed = dataAsset.DataAssetContacts.Any(x=>x.Role==DataAssetContactRoleType.Contact) },
+                new { Title = "Data owner", Action = nameof(CatalogDataDescriptionController.AddDataOwner), Completed = dataAsset.DataAssetContacts.Any() }
+                })
+                {
+                    <li class="govuk-task-list__item govuk-task-list__item--with-link">
+                        <div class="govuk-task-list__name-and-hint">
+                            <a class="govuk-link govuk-task-list__link"
+                               asp-controller="CatalogDataDescription"
+                               asp-action="@item.Action"
+                               asp-route-identifier="@dataAsset.Id"
+                               asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                                @item.Title
+                            </a>
+                        </div>
+                        <div class="govuk-task-list__status">
+                            @if (item.Completed)
+                            {
+                                <span>Completed</span>
+                            }
+                            else
+                            {
+                                <strong class="govuk-tag govuk-tag--blue">Incomplete</strong>
+                            }
+                        </div>
+                    </li>
+                }
+            </ul>
+
+            @* Additional Information Section *@
+            <h3 class="govuk-heading-m">Additional information</h3>
+            <ul class="govuk-task-list">
+                @foreach (var item in new[] {
+                new { Title = "Date first made available", Action = nameof(CatalogDataDescriptionController.AddPublishedDate), Completed = dataAsset.Issued != null },
+                new { Title = "Frequency of update", Action = nameof(CatalogDataDescriptionController.AddFrequency), Completed = !string.IsNullOrEmpty(dataAsset.UpdateFrequencyString) },
+                new { Title = "Supply format", Action = nameof(CatalogDataDescriptionController.AddSupplyFormat), Completed = dataAsset.DataAssetDistribution?.MediaType is not null }
+                })
+                {
+                    <li class="govuk-task-list__item govuk-task-list__item--with-link">
+                        <div class="govuk-task-list__name-and-hint">
+                            <a class="govuk-link govuk-task-list__link"
+                               asp-controller="CatalogDataDescription"
+                               asp-action="@item.Action"
+                               asp-route-identifier="@dataAsset.Id"
+                               asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                                @item.Title
+                            </a>
+                        </div>
+                        <div class="govuk-task-list__status">
+                            @if (item.Completed)
+                            {
+                                <span>Completed</span>
+                            }
+                            else
+                            {
+                                <strong class="govuk-tag govuk-tag--blue">Incomplete</strong>
+                            }
+                        </div>
+                    </li>
+                }
+            </ul>
+            
+            @* Buttons Section *@
+            <div class="govuk-button-group">
+                <a class="govuk-button"
+                   asp-controller="CatalogDataDescription"
+                   asp-action="@nameof(CatalogDataDescriptionController.CheckAnswers)"
+                   asp-route-identifier="@dataAsset.Id"
+                   asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                    Review and submit
+                </a>
+                <a class="govuk-button govuk-button--secondary"
+                   asp-controller="CatalogDataDescription"
+                   asp-action="@nameof(CatalogDataDescriptionController.DataDescriptionDashboard)">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<style scoped="">
+    .govuk-tag {
+        text-transform: capitalize;
+        font-weight: 400;
+        font-size: 1.1875rem;
+    }
+
+    .govuk-tag--blue {
+        color: #0c2d4a;
+        background-color: #bbd4ea;
+    }
+</style>

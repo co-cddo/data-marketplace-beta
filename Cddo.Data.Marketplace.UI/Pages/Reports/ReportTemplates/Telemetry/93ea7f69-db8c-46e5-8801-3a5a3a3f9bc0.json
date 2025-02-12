@@ -1,0 +1,13 @@
+{
+  "TemplateId": "93ea7f69-db8c-46e5-8801-3a5a3a3f9bc0",
+  "KqlQuery": "AppEvents| extend UserId = tostring(Properties.UserId ), EventName = Name, PageName = tostring(Properties.PageName)|  where UserId != \u0027-1\u0027 and UserId != \u0027\u0027| where Name == \u0027UserPageNavigation\u0027 | summarize Count = count() by UserId, EventName, PageName | order by Count desc",
+  "ReportType": 1,
+  "ReportName": "User page navigation events",
+  "Description": "User page navigation events",
+  "CreatedOn": "2024-11-01T10:36:32.0507685+00:00",
+  "UserId": 11,
+  "OrganisationId": 1,
+  "SharedWithOrganisationIds": null,
+  "SharedWithUsersIds": null,
+  "IsPredefined": true
+}

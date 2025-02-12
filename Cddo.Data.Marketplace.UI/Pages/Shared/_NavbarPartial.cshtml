@@ -1,0 +1,107 @@
+﻿@page
+@using Cddo.Data.Marketplace.Logic.Services.Interfaces
+@using Cddo.Data.Marketplace.UI.Controllers
+@inject IUserRoleService UserRoleService
+@model NavbarPartialModel
+@{
+}
+<nav id="app-navigation" class="app-navigation js-app-navigation govuk-clearfix" role="navigation" aria-labelledby="app-navigation-heading">
+    <h2 class="govuk-visually-hidden" id="app-navigation-heading">Menu</h2>
+    <div class="govuk-width-container">
+        <ul class="app-navigation__list landing-navigation__list app-width-container float-start">
+            <li class="app-navigation__list-item">
+                <a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link" href="/">
+                    Home
+                </a>
+            </li>
+
+            <li class="app-navigation__list-item ">
+                <a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartCddoDataAssetsSearch)">
+                    Find data assets
+                </a>
+            </li>
+            @if (User.Identity!.IsAuthenticated)
+            {
+                <li class="app-navigation__list-item ">
+                    <a href="@Url.Page("/ApiPortal/APILandingPage")" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link">
+                        API
+                    </a>
+                </li>
+
+            }
+            <li class="app-navigation__list-item ">
+                <a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link" asp-controller="Support" asp-action="@nameof(SupportController.GetStarted)">
+                    Support
+                </a>
+            </li>
+
+            
+        </ul>
+
+        <ul class="app-navigation__list app-width-container float-end">
+            @if (User.Identity!.IsAuthenticated)
+            {
+                // List of all possible roles for the user
+                var roles = new List<string>
+            {
+            "Organisation Administrator",
+            "Metadata Publisher",
+            "Data Explorer",
+            "System Administrator",
+            "Data Request Approver"
+            };
+
+                // Check if the user is in one of the administrator roles
+                var adminRoles = new List<string> { "System Administrator", "Organisation Administrator" };
+                bool isAGMAdministrator = await UserRoleService.IsUserInRoleAsync(adminRoles);
+
+                // Check if the user is in any of the specified roles
+                bool? isUserInRoles = await UserRoleService.IsUserInRoleAsync(roles);
+
+                bool isSupplier = await UserRoleService.IsUserRoleSupplier();
+
+                // Show Manage link if the user is an administrator
+                if (isAGMAdministrator || isSupplier)
+                {
+                    <li class="app-navigation__list-item">
+                        <a href="@Url.Page("/Manage/Index")" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link">Manage</a>
+                    </li>
+                }
+
+                // Show the user's display name if they have any roles, or "Not Enrolled" if they have none
+                if (isUserInRoles.HasValue && isUserInRoles.Value)
+                {
+                    <li class="app-navigation__list-item">
+                        <a asp-controller="UserRoleClaim" asp-action="@nameof(UserRoleClaimController.GetUserRoleDetails)" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link">
+                            @User.Claims.FirstOrDefault(c => c.Type == "display_name")?.Value
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li class="app-navigation__list-item">
+                        <span class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link">Organisation Not Enrolled</span>
+                    </li>
+                    <li class="app-navigation__list-item ">
+                        <a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link" asp-controller="OrganisationAccess" asp-action="@nameof(OrganisationAccessController.RequestOrganisationAccess)">
+                            Request access
+                        </a>
+                    </li>
+                }
+
+                // Sign out link is always visible
+                <li class="app-navigation__list-item">
+                    <a href="@Url.Page("/Auth/SignOut", "SignOut")" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link">Sign out</a>
+                </li>
+            }
+            else
+            {
+                // If user is not authenticated, show sign-in link
+                <li class="app-navigation__list-item">
+                    <a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link" href="@Url.Page("/Auth/SignIn")">Sign in</a>
+                </li>
+            }
+        </ul>
+
+    </div>
+</nav>

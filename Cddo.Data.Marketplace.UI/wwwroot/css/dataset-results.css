@@ -1,0 +1,79 @@
+﻿.dataset-result .dataset-result__list {
+  margin-bottom: 25px;
+  padding-top: 10px;
+  border-top: 1px solid #b1b4b6;
+}
+
+.dataset-result ul {
+  list-style: none;
+  padding: 0;
+}
+
+.dataset-result .dataset-title a {
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.search-input button {
+  background-color: #1d70b8;
+  color: #fff;
+  border: none;
+}
+
+.search-input button:focus {
+  border-color: #ffdd00;
+  outline: 3px solid transparent;
+  box-shadow: inset 0 0 0 1px #ffdd00;
+}
+
+.search-input .search-button__icon {
+  height: 20px;
+  width: 30px;
+}
+
+.govuk-link:visited {
+  color: #1d70b8 !important;
+}
+
+.govuk-pagination__item--current .govuk-link {
+  color: #fff;
+}
+
+.govuk-tag.govuk-tag--black {
+  background-color: #0b0c0c !important;
+  color: white !important;
+}
+
+.accordion-filter {
+  margin-bottom: 20px;
+}
+.accordion-filter .accordion-button {
+  padding: 1rem 0.5rem;
+  font-size: 1.1875rem;
+  text-decoration: none;
+  background-color: none !important;
+}
+.accordion-filter .accordion-button::after {
+  order: -1;
+  margin-right: 0.85rem;
+  margin-left: 0.15rem;
+}
+.accordion-filter .accordion-button[aria-expanded=true] {
+  color: #1d70b8;
+  background-color: none !important;
+  box-shadow: none;
+}
+.accordion-filter .accordion-body {
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.accordion-filter .accordion-body .govuk-form-group {
+  margin-bottom: 0;
+}
+.accordion-filter .govuk-checkboxes__label {
+  max-width: none;
+}
+.accordion-filter .accordion-item {
+  border-bottom: 1px solid #b1b4b6 !important;
+}

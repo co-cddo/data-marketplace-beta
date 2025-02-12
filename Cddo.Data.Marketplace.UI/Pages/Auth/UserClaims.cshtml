@@ -1,0 +1,289 @@
+﻿@using Cddo.Data.Marketplace.Api.Dto.Requests.ManageUser
+@using Cddo.Data.Marketplace.Api.Dto.Responses.ManageUser
+@using Cddo.Data.Marketplace.UI.Configuration
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Services.Interfaces
+@inject IUserRoleClaimService _userRoleClaimService
+@model UserProfileResponse
+@{
+    ViewData["Title"] = "User Profile";
+
+    var approvals = await _userRoleClaimService.GetUserRoleApprovalListAsync(Model.User!.UserId);
+
+    var metadataPublisherApproval = approvals?.FirstOrDefault(x => x.RoleID == 4);
+    var dataRequestApproval = approvals?.FirstOrDefault(x => x.RoleID == 7);
+
+    var agmEmailAddresses = new List<string>
+        {
+            "testuser@digital.cabinet-office.gov.uk",
+            "declan.kavanagh@digital.cabinet-office.gov.uk",
+            "adam.roper@digital.cabinet-office.gov.uk",
+            "jasmeet.kaur@digital.cabinet-office.gov.uk",
+            "charlotte.butler@digital.cabinet-office.gov.uk",
+            "spencer.mabanga@digital.cabinet-office.gov.uk",
+            "liam.tonner@digital.cabinet-office.gov.uk",
+        };
+
+    var publisherText = TempData?["reasonPublisherRequest"];
+    var approverText = TempData?["reasonDataApproverRequest"];
+
+    var requiredRoles = new List<int> { 4, 7 };
+    var userMissingAtleastOneRole = Model.Roles == null || requiredRoles.Any(requiredId => !Model.Roles.Any(userRole => userRole?.RoleId == requiredId));
+
+    bool hasPublisher = false;
+    if (TempData?["metadataPublisher"] != null)
+    {
+        hasPublisher = true;
+    }
+    bool hasApprover = false;
+    if (TempData?["dataRequestApprover"] != null)
+    {
+        hasApprover = true;
+    }
+
+    var letsShowButton = false;
+    if (metadataPublisherApproval == null || metadataPublisherApproval.ApprovalStatus == ApprovalStatus.NotRequested || metadataPublisherApproval.ApprovalStatus == ApprovalStatus.Rejected || metadataPublisherApproval.ApprovalStatus == ApprovalStatus.Revoked)
+    {
+        letsShowButton = true;
+    }
+    if (dataRequestApproval == null || dataRequestApproval.ApprovalStatus == ApprovalStatus.NotRequested || dataRequestApproval.ApprovalStatus == ApprovalStatus.Rejected || dataRequestApproval.ApprovalStatus == ApprovalStatus.Revoked)
+    {
+        letsShowButton = true;
+    }
+    if (letsShowButton && !userMissingAtleastOneRole)
+    {
+        letsShowButton = false;
+    }
+}
+
+@functions {
+    private static (string tagClass, string tagText) GetApprovalStatusDetails(ApprovalStatus status)
+    {
+        return status switch
+        {
+            ApprovalStatus.Pending => ("govuk-tag govuk-tag--blue", "Pending"),
+            ApprovalStatus.Approved => ("govuk-tag govuk-tag--green", "Approved"),
+            ApprovalStatus.Rejected => ("govuk-tag govuk-tag--red", "Rejected"),
+            ApprovalStatus.Revoked => ("govuk-tag govuk-tag--red", "Revoked"),
+            _ => ("govuk-tag", "Unknown")
+        };
+    }
+}
+
+<div class="govuk-width-container">
+    <div class="govuk-main-wrapper">
+        <span class="govuk-caption-xl">@Model.Organisation?.OrganisationName</span>
+        <h1 class="govuk-heading-xl">@Model.User?.UserName</h1>
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <div class="govuk-summary-card">
+                    <div class="govuk-summary-card__title-wrapper">
+                        <h2 class="govuk-summary-card__title">
+                            User Profile
+                        </h2>
+                        <ul class="govuk-summary-card__actions">
+                            <li class="govuk-summary-card__action">
+                                <form method="post" asp-controller="UserRoleClaim" asp-action="@nameof(UserRoleClaimController.SetUserEmailNotification)" asp-route-userId="@Model.User?.UserId">
+                                    <button class="govuk-link" data-module="govuk-button" name="notificationDecision" value="@(Model.EmailNotification ? "false" : "true")">
+                                        @(Model.EmailNotification ? "Turn off email notifications" : "Turn on email notifications")
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="govuk-summary-card__content">
+                        <dl class="govuk-summary-list">
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                    Email
+                                </dt>
+                                <dd class="govuk-summary-list__value">
+                                    @Model.User?.UserEmail
+                                </dd>
+                            </div>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                    Organisation
+                                </dt>
+                                <dd class="govuk-summary-list__value">
+                                    @Model.Organisation?.OrganisationName
+                                </dd>
+                            </div>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                    Email Notifications
+                                </dt>
+                                <dd class="govuk-summary-list__value">
+                                    @(Model.EmailNotification ? "On (Emails will be sent)" : "Off (No Emails will be sent)")
+
+                                </dd>
+                            </div>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                    Assigned Roles
+                                </dt>
+                                <dd class="govuk-summary-list__value">
+                                    <ul class="govuk-list govuk-list--bullet">
+                                        @foreach (var role in Model?.Roles!)
+                                        {
+                                            <li>@role.RoleName - @role.Description</li>
+                                        }
+                                    </ul>
+                                </dd>
+                            </div>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                    Last Login
+                                </dt>
+                                <dd class="govuk-summary-list__value">
+                                    @Model.LastLogin.ToGDSHelperString()
+                                </dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="govuk-grid-column-full">
+                @if (agmEmailAddresses.Contains(@Model.User?.UserEmail!))
+                {
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="token">
+                            Token
+                        </label>
+                        <textarea class="govuk-textarea" id="token" name="token" rows="5">@Model.Token</textarea>
+                    </div>
+                }
+            </div>
+            <div class="govuk-grid-column-full">
+                <h2 class="govuk-heading-l">Manage User Role Permissions</h2>
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Metadata Publisher Role</dt>
+                        <dd class="govuk-summary-list__value">
+                            @if (metadataPublisherApproval != null)
+                            {
+                                var (metadataPublisherTagClass, metadataPublisherTagText) = GetApprovalStatusDetails(metadataPublisherApproval.ApprovalStatus);
+
+                                <strong class="@metadataPublisherTagClass">
+                                    @metadataPublisherTagText
+                                </strong>
+                                if (metadataPublisherApproval.ApprovalStatus == ApprovalStatus.Rejected || metadataPublisherApproval.ApprovalStatus == ApprovalStatus.Revoked)
+                                {
+                                    <span class="ms-4">Reason: @metadataPublisherApproval.RejectionComment</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="govuk-body">No request submitted</span>
+                            }
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Data Request Approval Role</dt>
+                        <dd class="govuk-summary-list__value">
+                            @if (dataRequestApproval != null)
+                            {
+                                var (dataRequestApproverTagClass, dataRequestApproverTagText) = GetApprovalStatusDetails(dataRequestApproval.ApprovalStatus);
+
+                                <strong class="@dataRequestApproverTagClass">
+                                    @dataRequestApproverTagText
+                                </strong>
+                                if (dataRequestApproval.ApprovalStatus == ApprovalStatus.Rejected || dataRequestApproval.ApprovalStatus == ApprovalStatus.Revoked)
+                                {
+                                    <span class="ms-4">Reason: @dataRequestApproval.RejectionComment</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="govuk-body">No request submitted</span>
+                            }
+                        </dd>
+                    </div>
+                </dl>
+
+
+                <form method="post" asp-controller="UserRoleClaim" asp-action="@nameof(UserRoleClaimController.SetUserApprovalRequest)">
+                    <input type="hidden" name="@nameof(UserRoleApprovalRequest.UserId)" value="@Model.User?.UserId" />
+                    <input type="hidden" name="@nameof(UserRoleApprovalRequest.DomainId)" value="@Model.Domain?.DomainId" />
+                    <input type="hidden" name="@nameof(UserRoleApprovalRequest.OrganisationId)" value="@Model.Organisation?.OrganisationId" />
+
+                    @if (ViewBag.ErrorMessage != null)
+                    {
+                        <div class="govuk-error-summary" role="alert" aria-labelledby="error-summary-title" data-module="govuk-error-summary">
+                            <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+                            <div class="govuk-error-summary__body">
+                                <ul class="govuk-list govuk-list--bullet">
+                                    <li>@ViewBag.ErrorMessage</li>
+                                </ul>
+                            </div>
+                        </div>
+                    }
+                    @if (metadataPublisherApproval is null || dataRequestApproval is null || metadataPublisherApproval.ApprovalStatus != ApprovalStatus.NotRequested || metadataPublisherApproval.ApprovalStatus == ApprovalStatus.Rejected
+                    || dataRequestApproval.ApprovalStatus == ApprovalStatus.NotRequested || dataRequestApproval.ApprovalStatus == ApprovalStatus.Rejected || dataRequestApproval.ApprovalStatus == ApprovalStatus.Revoked || metadataPublisherApproval.ApprovalStatus == ApprovalStatus.Revoked)
+                    {
+                        @if (letsShowButton)
+                        {
+                            <div class="govuk-form-group">
+                                <fieldset class="govuk-fieldset">
+                                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                        <h1 class="govuk-fieldset__heading">
+                                            User Role Permissions
+                                        </h1>
+                                    </legend>
+
+                                    <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                        @if (metadataPublisherApproval == null || metadataPublisherApproval.ApprovalStatus == ApprovalStatus.NotRequested || metadataPublisherApproval.ApprovalStatus == ApprovalStatus.Rejected || metadataPublisherApproval.ApprovalStatus == ApprovalStatus.Revoked)
+                                        {
+                                            <div class="govuk-checkboxes__item">
+                                                <input class="govuk-checkboxes__input" id="metadataPublisher" name="@nameof(UserRoleApprovalRequest.MetadataPublisher)" type="checkbox" value="true" @(hasPublisher ? " checked" : "")>
+                                                <label class="govuk-label govuk-checkboxes__label" for="metadataPublisher">
+                                                    Metadata Publisher Role
+                                                </label>
+                                                <div class="govuk-inset-text">
+                                                    <div class="govuk-form-group">
+                                                        <label class="govuk-label" for="reasonMetadataPublisher">
+                                                            Provide reason for requesting this permission
+                                                        </label>
+                                                        <textarea class="govuk-textarea" id="reasonMetadataPublisher" name="@nameof(UserRoleApprovalRequest.ReasonPublisherRequest)" rows="3">@publisherText</textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+
+                                        @if (dataRequestApproval == null || dataRequestApproval.ApprovalStatus == ApprovalStatus.NotRequested || dataRequestApproval.ApprovalStatus == ApprovalStatus.Rejected || dataRequestApproval.ApprovalStatus == ApprovalStatus.Revoked)
+                                        {
+                                            <div class="govuk-checkboxes__item">
+                                                <input class="govuk-checkboxes__input" id="dataRequestApprover" name="@nameof(UserRoleApprovalRequest.DataRequestApprover)" type="checkbox" value="true" @(hasApprover ? " checked" : "")>
+                                                <label class="govuk-label govuk-checkboxes__label" for="dataRequestApprover">
+                                                    Data Request Approval Role
+                                                </label>
+                                                <div class="govuk-inset-text">
+                                                    <div class="govuk-form-group">
+                                                        <label class="govuk-label" for="reasonDataRequestApprover">
+                                                            Provide reason for requesting this permission
+                                                        </label>
+                                                        <textarea class="govuk-textarea" id="reasonDataRequestApprover" name="@nameof(UserRoleApprovalRequest.ReasonDataApproverRequest)" rows="3">@approverText</textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </fieldset>
+                            </div>
+
+                            <button class="govuk-button">Submit request</button>
+                        }
+                    }
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+<style scoped>
+    .govuk-checkboxes--small .govuk-checkboxes__item {
+        float: none;
+    }
+</style>

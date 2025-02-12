@@ -1,0 +1,46 @@
+﻿@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests
+@model Agrimetrics.DataShare.Api.Dto.Models.Supplier.DataShareRequests.Decisions.ReturnedDecisionSummary
+@{
+    
+}
+
+<div class="govuk-main-wrapper govuk-main-wrapper--l">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            
+            @if (Model.RequestStatus == DataShareRequestStatus.Cancelled)
+            {
+                <div class="govuk-panel govuk-panel--confirmation">
+                    <h1 class="govuk-panel__title">
+                        Request was cancelled
+                    </h1>
+                </div>
+
+                <span class="govuk-caption-l">Request ID: @Model.DataShareRequestRequestId</span>
+                <br/>
+            }
+            else
+            {
+                <div class="govuk-panel govuk-panel--confirmation">
+                    <h1 class="govuk-panel__title">
+                        Request returned with comments
+                    </h1>
+                    <div class="govuk-panel__body">
+                        Request ID:<br><strong>@Model.DataShareRequestRequestId.ToUpper()</strong>
+                    </div>
+                </div>
+
+                <p class="govuk-body">You've told @Model.AcquirerOrganisationName that you need more information before you can make a decision.</p>
+
+                <h2 class="govuk-heading-m">What happens next</h2>
+                <p class="govuk-body">
+                    If @Model.AcquirerOrganisationName supplies the information you need, you will reconsider their request.
+                </p>
+            }
+
+            <div class="govuk-button-group">
+                <a asp-controller="DataRequest" asp-action="ReceivedRequests" class="govuk-link">Return to received requests</a>
+            </div>
+        </div>
+    </div>
+</div>

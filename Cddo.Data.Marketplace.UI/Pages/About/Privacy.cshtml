@@ -1,0 +1,167 @@
+﻿@using Cddo.Data.Marketplace.UI.Configuration
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Microsoft.Extensions.Options
+@inject IOptions<HotjarSettings> HotjarConfig
+@model Cddo.Data.Marketplace.UI.Pages.About.PrivacyModel
+@{
+    ViewData["Title"] = "Privacy";
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper ">
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl">Privacy notice</h1>
+            <p class="govuk-body">
+                This privacy notice explains your rights and how we use your personal data.
+            </p>
+            <p class="govuk-body">
+                This notice is made under Articles 13 and 14 of the UK General Data Protection Regulation (UK GDPR). For the purpose of this legislation, the Department for Science, Innovation and Technology (DSIT) is the data controller for the Data Marketplace. A data controller determines how and why personal data is processed.
+            </p>
+            <p class="govuk-body">
+                When we refer to ‘we’, ‘us’ or ‘our’ in this notice, we mean DSIT. We’re committed to protecting the privacy of your personal information.
+            </p>
+            <p class="govuk-body">
+                If you have any questions or concerns, contact us by emailing <a class="govuk-link" href="mailto:dataprotection@dsit.gov.uk">dataprotection@dsit.gov.uk</a>.
+            </p>
+
+            @* What data we collect *@
+            <h2 class="govuk-heading-l">What data we collect</h2>
+            <p class="govuk-body">
+                When you create a Data Marketplace account, we ask you to provide your:
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>full name</li>
+                    <li>work email address</li>
+                    <li>organisation</li>
+                    <li>primary skill</li>
+                </ul>
+            </p>
+            <p class="govuk-body">
+                These details are added to your account profile. They help us deliver the service.
+            </p>
+            <p class="govuk-body">
+                If you contact us using the Data Marketplace support form, we ask for your:
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>full name</li>
+                    <li>work email address</li>
+                </ul>
+            </p>
+            <p class="govuk-body">
+                While you’re visiting the Data Marketplace, we may use cookies and page tagging to collect information about how you use the website.
+            </p>
+            <p class="govuk-body">
+                If you give your consent, we also use Google Analytics cookies, which includes IP addresses.
+            </p>
+            <p class="govuk-body">
+                Google Analytics processes information about:
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>the pages you visit on the Data Marketplace</li>
+                    <li>how long you spend on each page</li>
+                    <li>how you got to the website</li>
+                    <li>what you click on while you’re on the website</li>
+                </ul>
+            </p>
+            <p class="govuk-body">
+                Read more about <a class="govuk-link" asp-controller="Link" asp-action="@nameof(LinkController.Cookies)">our use of cookies on the Data Marketplace</a>.
+            </p>
+
+            @* Why we need your data *@
+            <h2 class="govuk-heading-l">Why we need your data</h2>
+            <p class="govuk-body">
+                We need to process some personal data to help you get the most out of the service.
+            </p>
+            <p class="govuk-body">
+                For example, we collect contact details so that organisations can submit data requests and set up data sharing arrangements.
+            </p>
+
+            @* Our legal basis for processing your personal data *@
+            <h2 class="govuk-heading-l">Our legal basis for processing your personal data</h2>
+            <p class="govuk-body">
+                The legal basis for us to process your personal data is you giving us your consent.
+            </p>
+            <p class="govuk-body">
+                This applies to the personal data you provide when you create a Data Marketplace account, and if you give your consent for data to be collected by cookies, including Google Analytics.
+            </p>
+
+            @* How long we keep your data *@
+            <h2 class="govuk-heading-l">How long we keep your data</h2>
+            <p class="govuk-body">
+                We will only keep your personal data for as long as:
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>the law requires us to</li>
+                    <li>we need to for the purposes explained above</li>
+                </ul>
+            </p>
+            <p class="govuk-body">
+                This means we will only hold your personal data for a minimum of 1 year and a maximum of 7 years.
+            </p>
+            <p class="govuk-body">
+                In some circumstances we may anonymise your personal data (so that it can no longer be associated with you) for research or statistical purposes. In these cases, we may use this information indefinitely without giving you further notice.
+            </p>
+
+            @* Where your data is processed and stored *@
+            <h2 class="govuk-heading-l">Where your data is processed and stored</h2>
+            <p class="govuk-body">
+                We design, build and run our systems to make sure your data is as safe as possible at any stage – both while it is processed and when it is stored.
+            </p>
+            <p class="govuk-body">
+                If your personal data is transferred outside the United Kingdom, we will make sure you are given the same level of technical and legal protection as you are within the United Kingdom.
+            </p>
+
+            @* How we protect your data and keep it secure *@
+            <h2 class="govuk-heading-l">How we protect your data and keep it secure</h2>
+            <p class="govuk-body">
+                We’re committed to doing all that we can to keep your data secure. We’ve set up systems and processes to prevent unauthorised access or disclosure of your data.
+            </p>
+            <p class="govuk-body">
+                For example, we protect your data using varying levels of encryption. We also make sure that when we deal with third parties, all the personal data that they process on our behalf is kept secure.
+            </p>
+
+            @* Your rights *@
+            <h2 class="govuk-heading-l">Your rights</h2>
+            <p class="govuk-body">
+                You have the right to request:
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>information about how your personal data is processed</li>
+                    <li>a copy of that personal data</li>
+                    <li>that anything inaccurate in your personal data is corrected without undue delay</li>
+                </ul>
+            </p>
+            <p class="govuk-body">
+                You can also:
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>raise an objection to how your personal data is processed</li>
+                    <li>request that your personal data is erased if there is no longer a justification for it</li>
+                    <li>ask that the processing of your personal data is restricted in certain circumstances</li>
+                </ul>
+            </p>
+            <p class="govuk-body">
+                If your personal data is processed on the basis of consent, you have the right to:
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>withdraw consent to the processing of your personal data at any time</li>
+                    <li>request a copy of your personal data</li>
+                </ul>
+            </p>
+            <p class="govuk-body">
+                If you would like to make any of these requests, contact us by emailing <a class="govuk-link" href="mailto:dataprotection@dsit.gov.uk">dataprotection@dsit.gov.uk</a>.
+            </p>
+            <p class="govuk-body">
+                <a class="govuk-link" href="https://ico.org.uk/for-the-public/">Find out more about your privacy rights</a>.
+            </p>
+
+            @* Updates to this page *@
+            <h2 class="govuk-heading-l">Updates to this page</h2>
+            <p class="govuk-body">
+                If we make changes to our privacy policy, including changes that affect how we process your personal data, we’ll update this page.
+            </p>
+            <p class="govuk-body">
+                We encourage you to review this page regularly so that you’re aware of what information we collect, how we use it, and under what circumstances we will share it with other parties.
+            </p>
+            <p class="govuk-body">
+                Last updated: 5 December 2024
+            </p>
+        </div>
+    </div>
+</div>

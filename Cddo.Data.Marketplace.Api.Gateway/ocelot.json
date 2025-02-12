@@ -1,0 +1,75 @@
+{
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:7252"
+  },
+  "Routes": [
+    {
+      "UpstreamPathTemplate": "/catalog-data/v1/get/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamPathTemplate": "/catalog-data/get-catalog-data-record-item/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7276
+        }
+      ],
+      "SwaggerKey": "catalog-data"
+    },
+    {
+      "UpstreamPathTemplate": "/catalog-data/v1/add",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamPathTemplate": "/catalog-data/add-catalog-data-record-item",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7276
+        }
+      ],
+      "SwaggerKey": "catalog-data"
+    },
+    {
+      "UpstreamPathTemplate": "/catalog-data/v1/patch",
+      "UpstreamHttpMethod": [ "PATCH" ],
+      "DownstreamPathTemplate": "/catalog-data/patch-catalog-data-record-item",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7276
+        }
+      ],
+      "SwaggerKey": "catalog-data"
+    },
+    {
+      "UpstreamPathTemplate": "/catalog-data/v1/delete/{everything}",
+      "UpstreamHttpMethod": [ "DELETE" ],
+      "DownstreamPathTemplate": "/catalog-data/delete-catalog-data-record-item/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7276
+        }
+      ],
+      "SwaggerKey": "catalog-data"
+    }
+  ],
+  "AuthenticationOptions": {
+    "AuthenticationProviderKeys": [ "Bearer" ],
+    "AllowedScopes": []
+  },
+  "SwaggerEndPoints": [
+    {
+      "Key": "catalog-data",
+      "Config": [
+        {
+          "Name": "Catalog Data API",
+          "Version": "v1",
+          "Url": "https://localhost:7276/swagger/v1/swagger.json"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+﻿@using Agrimetrics.DataShare.Api.Dto.Models.Questions.QuestionParts.ResponseFormats;
+@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests.Answers.Answers;
+
+@model QuestionPartResponseItemOptionSelectionMultiValue
+@{
+    var selectionOptions = Model.SelectionOptions;
+}
+
+<div class="govuk-checkboxes" data-module="govuk-checkboxes">
+
+    @foreach (var selectionOption in selectionOptions.OrderBy(x => x.OptionOrderWithinSet))
+    {
+        await Html.RenderPartialAsync("~/Pages/DataShare/_Partial/_ResponseFormats/_SelectionOptionInMultiValueSet.cshtml", selectionOption);
+    }
+</div>

@@ -1,0 +1,238 @@
+﻿@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests
+@using Agrimetrics.DataShare.Api.Dto.Models.Supplier.DataShareRequests.Decisions;
+@using Cddo.Data.Marketplace.UI.Configuration
+
+@model Agrimetrics.DataShare.Api.Dto.Models.Supplier.DataShareRequests.SubmissionSummariesSet
+@{
+    ViewData["Title"] = "Recieved Requests";
+    var receivedRequests = Model.PendingSubmissionSummaries;
+    var completedRequests = Model.CompletedSubmissionSummaries;
+}
+
+@functions {
+
+    public static string FormatDateTime(DateTime? date)
+    {
+        if (date == null)
+            return "N/A";
+
+        var suffix = new[] { "th", "st", "nd", "rd" };
+        int day = date.Value.Day;
+        int mod100 = day % 100;
+        string formattedDate = date.Value.ToString("dd MMMM yyyy HH:mm");
+        string daySuffix;
+        if (mod100 > 10 && mod100 < 20)
+        {
+            daySuffix = suffix[0];
+        }
+        else
+        {
+            int daySuffixIndex = (day % 10) < 4 ? day % 10 : 0;
+            daySuffix = suffix[daySuffixIndex];
+        }
+
+        return day + daySuffix + " " + formattedDate.Substring(2);
+    }
+
+    public static string FormatDate(DateTime? date)
+    {
+        if (date == null)
+            return "N/A";
+
+        var suffix = new[] { "th", "st", "nd", "rd" };
+        int day = date.Value.Day;
+        int mod100 = day % 100;
+        string formattedDate = date.Value.ToString("dd MMMM yyyy");
+        string daySuffix;
+        if (mod100 > 10 && mod100 < 20)
+        {
+            daySuffix = suffix[0];
+        }
+        else
+        {
+            int daySuffixIndex = (day % 10) < 4 ? day % 10 : 0;
+            daySuffix = suffix[daySuffixIndex];
+        }
+
+        return day + daySuffix + " " + formattedDate.Substring(2);
+    }
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper ">
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <span class="govuk-caption-l">Manage data share requests</span>
+            <h1 class="govuk-heading-xl">Received requests</h1>
+        </div>
+
+        <div class="govuk-grid-column-one-third">
+            <aside class="related-items">
+                <nav role="navigation" aria-labelledby="subsection-title">
+                    <ul class="govuk-list">
+                        <li><a asp-controller="DataRequest" asp-action="CreatedRequests" class="govuk-link">View created requests</a></li>
+                    </ul>
+                </nav>
+            </aside>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h2 class="govuk-heading-l">Current requests</h2>
+            <table class="govuk-table" style="font-size: 18px;">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th class="govuk-table__header" scope="col">Request ID</th>
+                        <th class="govuk-table__header" scope="col">From</th>
+                        <th class="govuk-table__header" scope="col">Data asset</th>
+                        <th class="govuk-table__header" scope="col">Received</th>
+                        <th class="govuk-table__header" scope="col">Needed by</th>
+                        <th class="govuk-table__header" scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var receivedRequest in receivedRequests.OrderBy(x => x.SubmittedOn))
+                    {
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">
+                                @switch (@receivedRequest.RequestStatus)
+                                {
+                                    case DataShareRequestStatus.Submitted:
+                                        <a class="govuk-link" asp-controller="DataRequest" asp-action="ReviewNewReceivedRequest" asp-route-requestId="@receivedRequest.DataShareRequestId">@receivedRequest.DataShareRequestRequestId</a>
+                                        break;
+
+                                    case DataShareRequestStatus.InReview:
+                                        <a class="govuk-link" asp-controller="DataRequest" asp-action="ReviewInProgressReceivedRequest" asp-route-requestId="@receivedRequest.DataShareRequestId">@receivedRequest.DataShareRequestRequestId</a>
+                                        break;
+
+                                    case DataShareRequestStatus.Returned:
+                                        <a class="govuk-link" asp-controller="DataRequest" asp-action="ViewReturnedRequest" asp-route-requestId="@receivedRequest.DataShareRequestId">@receivedRequest.DataShareRequestRequestId</a>
+                                        break;
+
+                                    default:
+                                        @receivedRequest.DataShareRequestRequestId
+                                        break;
+                                }
+                                
+                            </td>
+
+                            <td class="govuk-table__cell">
+                                @receivedRequest.AcquirerOrganisationName
+                            </td>
+
+                            <td class="govuk-table__cell">
+                                @receivedRequest.EsdaName
+                            </td>
+
+                            <td class="govuk-table__cell">
+                                @receivedRequest.SubmittedOn.ToGDSHelperString()
+                            </td>
+
+                            <td class="govuk-table__cell">
+                                @receivedRequest.WhenNeededBy.ToDateStringAsDDMMYYYY()
+                            </td>
+
+                            <td class="govuk-table__cell">
+                                @switch (receivedRequest.RequestStatus)
+                                {
+                                    case DataShareRequestStatus.Submitted:
+                                        <strong class="govuk-tag govuk-tag--blue">
+                                            New
+                                        </strong>
+                                        break;
+
+                                    case DataShareRequestStatus.InReview:
+                                        <strong class="govuk-tag govuk-tag--light-blue">
+                                            In Progress
+                                        </strong>
+                                        break;
+
+                                    case DataShareRequestStatus.Returned:
+                                        <strong class="govuk-tag govuk-tag--orange">
+                                            Returned with comments
+                                        </strong>
+                                        break;
+
+                                    default:
+                                        @receivedRequest.RequestStatus
+                                        break;
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <br>
+    <br>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h2 class="govuk-heading-l">Completed requests</h2>
+            <table class="govuk-table" style="font-size: 18px;">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th class="govuk-table__header" scope="col">Request ID</th>
+                        <th class="govuk-table__header" scope="col">From</th>
+                        <th class="govuk-table__header" scope="col">Data asset</th>
+                        <th class="govuk-table__header" scope="col">Received</th>
+                        <th class="govuk-table__header" scope="col">Completed</th>
+                        <th class="govuk-table__header" scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var completedRequest in completedRequests.OrderBy(x => x.SubmittedOn))
+                    {
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">
+                                <a class="govuk-link" asp-controller="DataRequest" asp-action="ViewCompletedReceivedRequest" asp-route-requestId="@completedRequest.DataShareRequestId">@completedRequest.DataShareRequestRequestId</a>
+                            </td>
+
+                            <td class="govuk-table__cell">
+                                @completedRequest.AcquirerOrganisationName
+                            </td>
+
+                            <td class="govuk-table__cell">
+                                @completedRequest.EsdaName
+                            </td>
+
+                            <td class="govuk-table__cell">
+                                @completedRequest.SubmittedOn.ToGDSHelperString()
+                            </td>
+
+                            <td class="govuk-table__cell">
+                                @completedRequest.CompletedOn.ToGDSHelperString()
+                            </td>
+
+                            <td class="govuk-table__cell">
+                                @switch (completedRequest.Decision)
+                                {
+                                    case SubmissionDecision.Accepted:
+                                        <strong class="govuk-tag govuk-tag--green">
+                                            Approved
+                                        </strong>
+                                        break;
+
+                                    case SubmissionDecision.Rejected:
+                                        <strong class="govuk-tag govuk-tag--orange">
+                                            Rejected
+                                        </strong>
+                                        break;
+
+                                    default:
+                                        @completedRequest.Decision
+                                        break;
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,67 @@
+﻿@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests.Answers.DataShareRequestQuestionAnswers
+@using Agrimetrics.DataShare.Api.Dto.Models.Questions.QuestionParts.ResponseFormats;
+
+@model QuestionPartResponseItemFreeFormDate
+@{
+    var dayInputComponentId = Model.DayInputComponentId;
+    var monthInputComponentId = Model.MonthInputComponentId;
+    var yearInputComponentId = Model.YearInputComponentId;
+
+    var dayInputComponentName = Model.DayInputComponentName;
+    var monthInputComponentName = Model.MonthInputComponentName;
+    var yearInputComponentName = Model.YearInputComponentName;
+
+    var enteredYearPart = Model.EnteredYearPart;
+    var enteredMonthPart = Model.EnteredMonthPart;
+    var enteredDayPart = Model.EnteredDayPart;
+
+    var responseIsInvalid = Model.ResponseIsInvalid;
+}
+
+<div>
+    <div class="govuk-date-input">
+        <div class="govuk-date-input__item">
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-date-input__label" for=@dayInputComponentId>
+                    Day
+                </label>
+
+                <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(responseIsInvalid ? "govuk-input--error" : "")"
+                       id=@dayInputComponentId
+                       name=@dayInputComponentName
+                       type="text"
+                       value="@enteredDayPart"
+                       inputmode="numeric">
+            </div>
+        </div>
+
+        <div class="govuk-date-input__item">
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-date-input__label" for=@monthInputComponentId>
+                    Month
+                </label>
+
+                <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(responseIsInvalid ? "govuk-input--error" : "")"
+                       id=@monthInputComponentId
+                       name=@monthInputComponentName
+                       type="text"
+                       value="@enteredMonthPart"
+                       inputmode="numeric">
+            </div>
+        </div>
+        <div class="govuk-date-input__item">
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-date-input__label" for=@yearInputComponentId>
+                    Year
+                </label>
+
+                <input class="govuk-input govuk-date-input__input govuk-input--width-4 @(responseIsInvalid ? "govuk-input--error" : "")"
+                       id=@yearInputComponentId
+                       name=@yearInputComponentName
+                       type="text"
+                       value="@enteredYearPart"
+                       inputmode="numeric">
+            </div>
+        </div>
+    </div>
+</div>

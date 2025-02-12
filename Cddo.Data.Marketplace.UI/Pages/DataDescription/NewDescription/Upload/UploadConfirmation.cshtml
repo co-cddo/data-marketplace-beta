@@ -1,0 +1,25 @@
+﻿@page
+@using Cddo.Data.Marketplace.UI.Controllers
+@model Cddo.Data.Marketplace.UI.Pages.DataDescription.NewDescription.Upload.UploadConfirmationModel
+@{
+}
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-panel govuk-panel--confirmation">
+                <h1 class="govuk-panel__title">File accepted</h1>
+            </div>
+            <p class="govuk-body">
+                Your data descriptions have been added to the Data Marketplace’s catalogue.
+            </p>
+            <p class="govuk-body">
+                Other government organisations will now be able to find and request these data assets.
+            </p>
+            <div class="govuk-button-group">                
+                <a class="govuk-button govuk-button--secondary" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssetsByUser)">
+                    View your department’s published records
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

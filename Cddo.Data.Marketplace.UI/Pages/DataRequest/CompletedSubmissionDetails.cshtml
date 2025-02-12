@@ -1,0 +1,243 @@
+﻿@using Agrimetrics.DataShare.Api.Dto.Requests.AuditLogs
+@using Agrimetrics.DataShare.Api.Dto.Models.Supplier.DataShareRequests;
+@using Agrimetrics.DataShare.Api.Dto.Models.Questions.QuestionParts.ResponseFormats
+@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests
+@using Cddo.Data.Marketplace.Logic.Services.Interfaces
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Pages.DataShare._Partial
+
+@model CompletedSubmissionDetailsModel
+@{
+    ViewData["Title"] = "Completed Submission Details";
+
+    var submissionDetails = Model.SubmissionDetails;
+    var dataShareRequestAuditLog = Model.DataShareRequestAuditLog;
+}
+
+@functions {
+
+    public static string FormatDateTime(DateTime? date)
+    {
+        if (date == null)
+            return "N/A";
+
+        var suffix = new[] { "th", "st", "nd", "rd" };
+        int day = date.Value.Day;
+        int mod100 = day % 100;
+        string formattedDate = date.Value.ToString("dd MMMM yyyy HH:mm");
+        string daySuffix;
+        if (mod100 > 10 && mod100 < 20)
+        {
+            daySuffix = suffix[0];
+        }
+        else
+        {
+            int daySuffixIndex = (day % 10) < 4 ? day % 10 : 0;
+            daySuffix = suffix[daySuffixIndex];
+        }
+
+        return day + daySuffix + " " + formattedDate.Substring(2);
+    }
+
+    public static string FormatFreeFormDate(string? dateString)
+    {
+        if (string.IsNullOrWhiteSpace(dateString))
+            return "N/A";
+
+        var yearPart = dateString.Substring(0, 4);
+        var monthPart = dateString.Substring(4, 2);
+        var dayPart = dateString.Substring(6, 2);
+
+        return dayPart + '/' + monthPart + '/' + yearPart;
+    }
+
+    public static string PrettifyString(string input)
+    {
+        if (input == null)
+        {
+            return "";
+        }
+        return string.Join(" ", input.Split('-').Select(w => char.ToUpper(w[0]) + w.Substring(1)));
+    }
+
+    public static string PrettifySupplierResponse(string input)
+    {
+        if (input == null) { return ""; }
+
+        return input
+            .Trim()
+            .Replace("\r\n", "<br/>");
+    }
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper ">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+            @if (@submissionDetails.RequestStatus == DataShareRequestStatus.Cancelled)
+            {
+                <span class="govuk-caption-l">Request ID: @submissionDetails.DataShareRequestRequestId</span>
+                <br />
+
+                <div class="govuk-panel govuk-panel--confirmation">
+                    <h1 class="govuk-panel__title">
+                        Request was cancelled
+                    </h1>
+                </div>
+            }
+            else
+            {
+                <span class="govuk-caption-l">Request ID: @submissionDetails.DataShareRequestRequestId</span>
+
+                switch (@submissionDetails.RequestStatus)
+                {
+                    case DataShareRequestStatus.InReview:
+                        <h1 class="govuk-heading-l">
+                            Review @submissionDetails.AcquirerOrganisationName's request to access @submissionDetails.EsdaName
+                        </h1>
+                        break;
+
+                    default:
+                        <h1 class="govuk-heading-l">
+                            @submissionDetails.AcquirerOrganisationName's request to access @submissionDetails.EsdaName
+                        </h1>
+                        break;
+                }
+
+                @if (dataShareRequestAuditLog.AuditLogEntries?.Any() == true)
+                {
+                    await Html.RenderPartialAsync("~/Pages/DataShare/_Partial/_AuditLogReturnComments.cshtml", new AuditLogReturnCommentsModel
+                    {
+                        DataShareRequestAuditLog = @dataShareRequestAuditLog
+                    });
+                }
+
+                <table class="govuk-table" style="font-size: 18px;">
+                    <thead>
+                        <tr>
+                            <th class="govuk-table__header" style="visibility: hidden;">Section</th>
+                            <th class="govuk-table__header" style="visibility: hidden;">Question</th>
+                            <th class="govuk-table__header" style="visibility: hidden;">Response</th>
+                            <th class="govuk-table__header" style="visibility: hidden;">Supplementary Answer</th>
+                        </tr>
+                    </thead>
+                    <tbody class="govuk-table__body">
+                        @foreach (var submissionSection in @submissionDetails.Sections.OrderBy(x => x.SectionNumber))
+                        {
+                            @foreach (var answerGroup in @submissionSection.AnswerGroups.OrderBy(x => x.OrderWithinSubmission))
+                            {
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell">
+                                        <h2 class="govuk-heading-m">@answerGroup.MainQuestionHeader</h2>
+
+                                        @foreach (var mainEntryPart in @answerGroup.MainEntry.EntryParts.OrderBy(x => x.OrderWithinGroupEntry))
+                                        {
+                                            <h3 class="govuk-heading-s">@mainEntryPart.QuestionPartText</h3>
+
+                                            foreach (var response in mainEntryPart.Responses.OrderBy(x => x.OrderWithinAnswer))
+                                            {
+                                                switch (@mainEntryPart.ResponseInputType)
+                                                {
+                                                    case QuestionPartResponseInputType.FreeForm:
+
+                                                        SubmissionDetailsAnswerResponseItemFreeForm freeFormResponseItem = (SubmissionDetailsAnswerResponseItemFreeForm)@response.ResponseItem;
+                                                        switch (@mainEntryPart.ResponseFormatType)
+                                                        {
+                                                            case QuestionPartResponseFormatType.Text:
+                                                                <p>@freeFormResponseItem.AnswerValue</p>
+                                                                break;
+
+                                                            case QuestionPartResponseFormatType.Date:
+                                                                @FormatFreeFormDate(@freeFormResponseItem.AnswerValue)
+                                                                break;
+                                                        }
+                                                        break;
+
+                                                    case QuestionPartResponseInputType.OptionSelection:
+                                                        SubmissionDetailsAnswerResponseItemOptionSelection optionSelectionResponseItem = (SubmissionDetailsAnswerResponseItemOptionSelection)@response.ResponseItem;
+                                                        foreach (var selectedOption in optionSelectionResponseItem.SelectedOptions.OrderBy(x => x.OrderWithinSelectedOptions))
+                                                        {
+                                                            <p>
+                                                                @selectedOption.SelectionOptionText
+                                                                @if (@selectedOption.SupplementaryAnswerText != null)
+                                                                {
+                                                                    <ul>
+                                                                        <li><i>@selectedOption.SupplementaryAnswerText</i></li>
+                                                                    </ul>
+                                                                }
+                                                            </p>
+                                                        }
+                                                        break;
+                                                }
+                                            }
+                                        }
+
+                                        @foreach (var backingEntry in @answerGroup.BackingEntries)
+                                        {
+                                            <br />
+
+                                            @foreach (var backingEntryPart in @backingEntry.EntryParts.OrderBy(x => x.OrderWithinGroupEntry))
+                                            {
+                                                @if (@backingEntryPart.MultipleResponsesAllowed)
+                                                {
+                                                    <p>
+                                                        @PrettifyString(@backingEntryPart.CollectionDescriptionIfMultipleResponsesAllowed):
+                                                    </p>
+                                                    <ul>
+                                                        @foreach (var response in backingEntryPart.Responses.OrderBy(x => x.OrderWithinAnswer))
+                                                        {
+                                                            @if (backingEntryPart.ResponseInputType == QuestionPartResponseInputType.FreeForm)
+                                                            {
+                                                                SubmissionDetailsAnswerResponseItemFreeForm freeFormResponseItem = (SubmissionDetailsAnswerResponseItemFreeForm)@response.ResponseItem;
+                                                                <li>@freeFormResponseItem.AnswerValue</li>
+                                                            }
+                                                        }
+                                                    </ul>
+                                                }
+                                            }
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            
+            <form>
+                <div class="govuk-button-group govuk-!-static-margin-top-9">
+
+                    @if (submissionDetails.RequestStatus != DataShareRequestStatus.Cancelled)
+                    {
+                        <input type="hidden" name="requestId" value="@submissionDetails.DataShareRequestId" />
+
+                        @switch (@submissionDetails.RequestStatus)
+                        {
+                            case DataShareRequestStatus.Accepted:
+                            case DataShareRequestStatus.Rejected:
+                                <button class="govuk-button govuk-button--secondary" data-module="govuk-button" asp-controller="DataRequest" asp-action="ViewCompletedReceivedRequest" asp-route-requestId="@submissionDetails.DataShareRequestId">
+                                    Return to request outcome
+                                </button>
+                                break;
+
+                            case DataShareRequestStatus.Returned:
+                                <button class="govuk-button govuk-button--secondary" data-module="govuk-button" asp-controller="DataRequest" asp-action="ViewReturnedRequest" asp-route-requestId="@submissionDetails.DataShareRequestId">
+                                    Return to request outcome
+                                </button>
+                                break;
+                        }
+                    }
+
+                    <a asp-controller="DataRequest" asp-action="ReceivedRequests" class="govuk-link">View all received requests</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

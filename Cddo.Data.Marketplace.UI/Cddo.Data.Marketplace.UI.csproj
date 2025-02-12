@@ -1,0 +1,80 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<ApplicationInsightsResourceId>/subscriptions/0857455b-b221-4166-96f6-70700136cef9/resourceGroups/test-rg/providers/microsoft.insights/components/cddo-test</ApplicationInsightsResourceId>
+		<UserSecretsId>d3b1fbb0-3207-4329-91cd-67ce1ff6a37a</UserSecretsId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Content Remove="bundleconfig.json" />
+		<Content Remove="compilerconfig.json" />
+		<Content Remove="Pages\Manage\RequestAccess\OrganisationConfirmation.cshtml" />
+		<Content Remove="Pages\Support\ApiKeys.cshtml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="bundleconfig.json" />
+		<None Include="compilerconfig.json" />
+		<None Include="Pages\OrganisationAccess\OrganisationConfirmation.cshtml" />
+		<None Include="Pages\Developer\ApiCredentials.cshtml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Agm.Catalog.DotNet" Version="12.4.0.61" />
+		<PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="8.0.2" />
+		<PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.6.0" />
+		<PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
+		<PackageReference Include="BuildWebCompiler2022" Version="1.14.10" />
+		<PackageReference Include="CsvHelper" Version="32.0.3" />
+		<PackageReference Include="Enums.NET" Version="4.0.2" />
+		<PackageReference Include="Flurl.Http" Version="4.0.2" />
+		<PackageReference Include="GovUk.Frontend.AspNetCore" Version="1.5.0" />
+		<PackageReference Include="IdentityModel" Version="7.0.0" />
+		<PackageReference Include="Markdig" Version="0.39.0" />
+		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.2" />
+		<PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.2" />
+		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="8.0.5" />
+		<PackageReference Include="Microsoft.Extensions.HealthChecks.SqlServer" Version="1.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+		<PackageReference Include="Microsoft.IdentityModel.Logging" Version="7.5.0" />
+		<PackageReference Include="Microsoft.OpenApi.Readers" Version="1.6.22" />
+		<PackageReference Include="NetEscapades.AspNetCore.SecurityHeaders" Version="0.21.0" />
+		<PackageReference Include="NetEscapades.AspNetCore.SecurityHeaders.TagHelpers" Version="0.21.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Cddo.Data.Marketplace.Domain\Cddo.Data.Marketplace.Api.Dto.csproj" />
+		<ProjectReference Include="..\Cddo.Data.Marketplace.Logic\Cddo.Data.Marketplace.Logic.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="wwwroot\js\Pages\DataShareRequest\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Update="Pages\DataDescription\NewDescription\Manual\DataShareRequestNotificationsSelection.cshtml">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Update="Pages\DataShare\ReviewReadOnlyAnswers.cshtml">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	  <Content Update="wwwroot\css\dataset-results.scss">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <UpToDateCheckInput Remove="Pages\Manage\RequestAccess\OrganisationConfirmation.cshtml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <_ContentIncludedByDefault Remove="Pages\Manage\RequestAccess\OrganisationConfirmation.cshtml" />
+	</ItemGroup>
+</Project>

@@ -1,0 +1,449 @@
+﻿@page "{userId?}"
+@using Cddo.Data.Marketplace.Api.Dto.Requests.ManageUser
+@using Cddo.Data.Marketplace.UI.Configuration
+@model UsersModel
+
+@{
+    ViewData["Title"] = "Manage Users";
+    bool isOrgAdmin = false;
+    if (ViewData.ContainsKey("IsOrgAdmin"))
+    {
+        isOrgAdmin = (bool)ViewData["IsOrgAdmin"];
+    }
+}
+
+@functions {
+    public static string FormatDateTime(DateTime? date)
+    {
+        if (date == null)
+            return "N/A";
+
+        var suffix = new[] { "th", "st", "nd", "rd" };
+        int day = date.Value.Day;
+        int mod100 = day % 100;
+        string formattedDate = date.Value.ToString("dd MMMM yyyy HH:mm");
+        string daySuffix;
+        if (mod100 > 10 && mod100 < 20)
+        {
+            daySuffix = suffix[0];
+        }
+        else
+        {
+            int index = (day % 10) < 4 ? day % 10 : 0;
+            daySuffix = suffix[index];
+        }
+
+        return day + daySuffix + " " + formattedDate.Substring(2);
+    }
+
+    private readonly Dictionary<string, (string Abbreviation, string CssClass)> adminRoleDetails = new Dictionary<string, (string, string)>
+                                {
+                                {"System Administrator", ("SYS-A", "govuk-tag--light-blue")},
+                                //{"AGM Administrator", ("AGM-A", "govuk-tag--green")},
+                                {"Organisation Administrator", ("ORG-A", "govuk-tag--red")},
+                                {"Data Request Approver", ("DSR-A", "govuk-tag--pink")},
+                                {"Organisation Requests Administrator", ("REQ-A", "govuk-tag--orange")},
+                                {"Support Administrator", ("SUP-A", "govuk-tag--turquoise")},
+                                {"Audit Administrator", ("AUD-A", "govuk-tag--blue")},
+                                {"Content Administrator", ("CON-A", "govuk-tag--purple")},
+                                {"Metadata Publisher", ("ORG-P", "govuk-tag--light-blue")}
+                                // Ensure only administrative roles are included
+                                };
+
+    private string GetAdminAbbreviatedTag(string roleName)
+    {
+        return adminRoleDetails.TryGetValue(roleName, out var details) ? details.Abbreviation : null;
+    }
+
+    private string GetAdminRoleCssClass(string roleName)
+    {
+        return adminRoleDetails.TryGetValue(roleName, out var details) ? details.CssClass : "govuk-tag--default";
+    }
+
+    private readonly Dictionary<string, (string Abbreviation, string CssClass)> RoleDetails = new Dictionary<string, (string, string)>
+                                {
+                               // {"AGM Administrator", ("AGM-A", "govuk-tag--green")}, // New, implying freshly added or significant
+                                {"Organisation Administrator", ("ORG-A", "govuk-tag--red")}, // Rejected, high importance or critical
+                                {"Data Request Approver", ("DSR-A", "govuk-tag--pink")}, // Sent, active involvement
+                                {"Organisation Requests Administrator", ("REQ-A", "govuk-tag--orange")}, // Declined, important notifications
+                                {"Support Administrator", ("SUP-A", "govuk-tag--turquoise")}, // Active, directly involved in operations
+                                {"Audit Administrator", ("AUD-A", "govuk-tag--blue")}, // Pending, implying ongoing review or process
+                                {"Content Administrator", ("CON-A", "govuk-tag--purple")}, // Received, possibly handling incoming information
+                                {"System Administrator", ("SYS-A", "govuk-tag--light-blue")}, // In progress, maintaining systems
+                                {"Security Officer", ("SEC-O", "govuk-tag--yellow")}, // Highlighting security importance
+                                // Continue mapping other roles uniquely
+                                {"Metadata Publisher", ("ORG-P", "govuk-tag--light-blue")}, // In progress, active content management
+                                {"Data Explorer", ("ORG-U", "govuk-tag--yellow")}, // Highlighted for regular users
+                                {"Organisation DataSharing User", ("DSR-U", "govuk-tag--purple")}, // Received, data handling role
+                                {"Organisation Requests User", ("REQ-U", "govuk-tag--green")}, // New, for users managing requests
+                                {"Support User", ("SUP-U", "govuk-tag--red")}, // Critical support role
+                                {"Audit User", ("AUD-U", "govuk-tag--orange")}, // Declined, maybe for auditing access
+                                {"Content Editor", ("CON-E", "govuk-tag--pink")}, // Sent, actively editing content
+                                {"Content Publisher", ("CON-P", "govuk-tag--turquoise")}, // Active publishing
+                                {"Content User", ("CON-U", "govuk-tag--blue")} // Pending, awaiting publication or review
+                                };
+}
+
+<div class="govuk-width-container">
+    <a class="govuk-back-link" href="/Manage">Back</a>
+    <div class="govuk-main-wrapper">
+        <h1 class="govuk-heading-xl">
+            <span class="govuk-caption-l">Manage Users</span>
+            Manage Users
+        </h1>
+        <form method="post">
+            <div class="govuk-grid-row mb-5">
+                <div class="govuk-grid-column-two-thirds">
+                    <div class="govuk-form-group mb-2 search-input">
+                        <label class="govuk-label" for="extendedText">
+                          Search for users
+                        </label>
+                        <div class="govuk-input__wrapper">
+                            <input class="govuk-input govuk-input--width-30" id="extendedText" name="SearchTerm" aria-label="Search for users" type="search" list="searchList" autocomplete="off" value="@Model.SearchTerm">
+                            <button title="usersSearchBtn" class="search-button" aria-label="Search for users" type="submit" enterkeyhint="searchTerm">
+                                <svg class="search-button__icon" width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                                    <circle cx="12.0161" cy="11.0161" r="8.51613" stroke="currentColor" stroke-width="3"></circle>
+                                    <line x1="17.8668" y1="17.3587" x2="26.4475" y2="25.9393" stroke="currentColor" stroke-width="3"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-panel">
+                <h3 class="govuk-heading-s filter-heading">Filter by</h3>
+                <div class="filter-content">
+                    @if (isOrgAdmin == false)
+                    {
+                        <div class="govuk-form-group">
+                            <label for="organisationName" class="govuk-label">Select Organisation</label>
+                            <div class="govuk-input__wrapper">
+                                <select class="govuk-select" id="organisationName" name="@nameof(ManageUsersRequest.SelectedOrganisationId)">
+                                    <option value="">Select..</option>
+                                    @foreach (var organisation in Model.Organisations.Orgs!)
+                                    {
+                                        var selectedAttribute = Model.SelectedOrganisationId == organisation.OrganisationId ? "selected='selected'" : "";
+                                        var optionHtml = $"<option value=\"{organisation.OrganisationId}\" {selectedAttribute}>{Html.Encode(organisation.OrganisationName)}</option>";
+                                        @Html.Raw(optionHtml)
+                                    }
+                                </select>
+                                <button class="govuk-button govuk-button--secondary govuk-input__suffix">Apply</button>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-one-third">
+                            <div class="govuk-form-group">
+                                <label for="domainName" class="govuk-label">Select Domain</label>
+                                <select class="govuk-select" id="domainName" name="@nameof(ManageUsersRequest.SelectedDomainId)" @(Model.Domains.Any() ? "" : "disabled")>
+                                    <option value="">
+                                        @if (Model.SelectedOrganisationId.HasValue && Model.Domains.Any())
+                                        {
+                                            @:Select a domain
+                                        }
+                                        else if (Model.SelectedOrganisationId.HasValue)
+                                        {
+                                            @:No domains available
+                                        }
+                                        else
+                                        {
+                                            @:Select an organisation first
+                                        }
+                                    </option>
+                                    @foreach (var domain in Model.Domains)
+                                    {
+                                        var selectedAttribute = Model.SelectedDomainId == domain.DomainId ? "selected='selected'" : "";
+                                        var optionHtml = $"<option value=\"{domain.DomainId}\" {selectedAttribute}>{Html.Encode(domain.DomainName)}</option>";
+                                        @Html.Raw(optionHtml)
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="govuk-grid-column-one-third">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label" for="sortField">Sort by</label>
+                                <select class="govuk-select" id="sortField" name="@nameof(ManageUsersRequest.SortBy)">
+                                    @if (Model.SortBy == "email")
+                                    {
+                                        <option value="email" selected>Email</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="email">Email</option>
+                                    }
+                                    @if (Model.SortBy == "username")
+                                    {
+                                        <option value="username" selected>Username</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="username">Username</option>
+                                    }
+                                    @if (Model.SortBy == "lastlogin")
+                                    {
+                                        <option value="lastlogin" selected>Last Login</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="lastlogin">Last Login</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="govuk-grid-column-one-third">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label" for="sortOrder">Order by</label>
+                                <select class="govuk-select" id="sortOrder" name="@nameof(ManageUsersRequest.SortOrder)">
+                                    @if (Model.SortOrder == "asc")
+                                    {
+                                        <option value="asc" selected>Ascending</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="asc">Ascending</option>
+                                    }
+                                    @if (Model.SortOrder == "desc")
+                                    {
+                                        <option value="desc" selected>Descending</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="desc">Descending</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- Hidden Inputs -->
+                    <input type="hidden" name="@nameof(ManageUsersRequest.CurrentPage)" value="@Model.CurrentPage" />
+                    <input type="hidden" name="@nameof(ManageUsersRequest.PageSize)" value="@Model.PageSize" />
+                    <input type="hidden" name="@nameof(ManageUsersRequest.SortBy)" value="@Model.SortBy" />
+                    <input type="hidden" name="@nameof(ManageUsersRequest.SortOrder)" value="@Model.SortOrder" />
+                    <input type="hidden" name="@nameof(ManageUsersRequest.SelectedOrganisationId)" value="@Model.SelectedOrganisationId" />
+                    <input type="hidden" name="@nameof(ManageUsersRequest.SelectedDomainId)" value="@Model.SelectedDomainId" />
+                    <input type="hidden" name="@nameof(ManageUsersRequest.Visible)" value="@Model.Visible" />
+                    <div class="govuk-button-group">
+                        <button type="submit" class="govuk-button" data-module="govuk-button">
+                            Apply filter
+                        </button>
+                        <a class="govuk-link" href="/Manage/Users">Clear all</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+        @* <input type="hidden" name="SortOrder" value="@Model.SortOrder" />
+        <input type="hidden" name="SelectedOrganisationId" value="@Model.SelectedOrganisationId" />
+        <input type="hidden" name="SelectedDomainId" value="@Model.SelectedDomainId" /> *@
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <div class="d-flex justify-content-between">
+                    <h3 class="govuk-heading-s mb-0">
+                        @Model.TotalCount results
+                    </h3>
+                </div>
+                <hr />
+                @foreach (var user in Model.Users)
+                {
+                    <div class="govuk-summary-card">
+                        <div class="govuk-summary-card__title-wrapper">
+                            <h2 class="govuk-summary-card__title">
+                                <a asp-page="User" asp-route-userId="@user.UserId" class="govuk-link">@user.UserName</a>
+                            </h2>
+                            <ul class="govuk-summary-card__actions">
+                                @foreach (var role in user.Roles)
+                                {
+                                    var tag = GetAdminAbbreviatedTag(role.RoleName!);
+                                    if (tag != null)
+                                    {
+                                        <li class="govuk-summary-card__action">
+                                            <span class="govuk-tag @GetAdminRoleCssClass(role.RoleName!)">
+                                                @tag
+                                            </span>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                        <div class="govuk-summary-card__content">
+                            <dl class="govuk-summary-list">
+                                <div class="govuk-summary-list__row">
+                                    <dt class="govuk-summary-list__key">
+                                        Organisation
+                                    </dt>
+                                    <dd class="govuk-summary-list__value">
+                                        @user.OrganisationName
+                                    </dd>
+                                </div>
+                                <div class="govuk-summary-list__row">
+                                    <dt class="govuk-summary-list__key">
+                                        Email address
+                                    </dt>
+                                    <dd class="govuk-summary-list__value">
+                                        @user.Email
+                                    </dd>
+                                </div>
+                                <div class="govuk-summary-list__row">
+                                    <dt class="govuk-summary-list__key">
+                                        Role
+                                    </dt>
+                                    <dd class="govuk-summary-list__value">
+                                        <ul>
+                                            @foreach (var role in user.Roles)
+                                            {
+                                                <li>@role.RoleName</li>
+                                            }
+                                        </ul>
+                                    </dd>
+                                </div>
+                                <div class="govuk-summary-list__row">
+                                    <dt class="govuk-summary-list__key">
+                                        Last login
+                                    </dt>
+                                    <dd class="govuk-summary-list__value">
+                                        @user.LastLogin.ToGDSHelperString()
+                                    </dd>
+                                </div>
+                            </dl>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div>
+            @{
+                var baseQuery = new System.Text.StringBuilder($"pageSize={Model.PageSize}");
+                string BuildPageLink(int page) => $"?currentPage={page}&" + baseQuery.ToString();
+            }
+            @if (Model.TotalPages > 1)
+            {
+                <nav class="govuk-pagination" aria-label="Pagination">
+                    <!-- Previous Page Link -->
+                    @if (Model.CurrentPage > 1)
+                    {
+                        <form method="post" class="govuk-pagination__prev">
+                            <input type="hidden" name="CurrentPage" value="@(Model.CurrentPage - 1)" />
+                            <input type="hidden" name="PageSize" value="@Model.PageSize" />
+                            <input type="hidden" name="SearchTerm" value="@Model.SearchTerm" />
+                            <input type="hidden" name="SortBy" value="@Model.SortBy" />
+                            <input type="hidden" name="SortOrder" value="@Model.SortOrder" />
+                            <input type="hidden" name="SelectedOrganisationId" value="@Model.SelectedOrganisationId" />
+                            <input type="hidden" name="SelectedDomainId" value="@Model.SelectedDomainId" />
+                            <input type="hidden" name="Visible" value="@Model.Visible" />
+                            <button type="submit" class="govuk-link govuk-pagination__link">
+                                <span class="govuk-pagination__link-title">
+                                    Previous<span class="govuk-visually-hidden"> page</span>
+                                </span>
+                            </button>
+                        </form>
+                    }
+                    <ul class="govuk-pagination__list">
+                        <!-- Link to the First Page -->
+                        @if (Model.CurrentPage > 3)
+                        {
+                            <li class="govuk-pagination__item">
+                                <form method="post">
+                                    <input type="hidden" name="CurrentPage" value="1" />
+                                    <input type="hidden" name="PageSize" value="@Model.PageSize" />
+                                    <input type="hidden" name="SearchTerm" value="@Model.SearchTerm" />
+                                    <input type="hidden" name="SortBy" value="@Model.SortBy" />
+                                    <input type="hidden" name="SortOrder" value="@Model.SortOrder" />
+                                    <input type="hidden" name="SelectedOrganisationId" value="@Model.SelectedOrganisationId" />
+                                    <input type="hidden" name="SelectedDomainId" value="@Model.SelectedDomainId" />
+                                    <input type="hidden" name="Visible" value="@Model.Visible" />
+                                    <span class="govuk-visually-hidden">Page</span>
+
+                                    <button type="submit" class="govuk-link govuk-pagination__link">1</button>
+                                </form>
+                            </li>
+                        }
+                        @if (Model.CurrentPage > 4)
+                        {
+                            <li class="govuk-pagination__item govuk-pagination__item--ellipses">...</li>
+                        }
+                        <!-- Current Page and Up To Two Following Pages -->
+                        @for (int i = Model.CurrentPage; i <= Model.CurrentPage + 2 && i <= Model.TotalPages; i++)
+                        {
+                            <li class="govuk-pagination__item @(i == Model.CurrentPage ? "govuk-pagination__item--current" : "")">
+                                <form method="post">
+                                    <input type="hidden" name="CurrentPage" value="@i" />
+                                    <input type="hidden" name="PageSize" value="@Model.PageSize" />
+                                    <input type="hidden" name="SearchTerm" value="@Model.SearchTerm" />
+                                    <input type="hidden" name="SortBy" value="@Model.SortBy" />
+                                    <input type="hidden" name="SortOrder" value="@Model.SortOrder" />
+                                    <input type="hidden" name="SelectedOrganisationId" value="@Model.SelectedOrganisationId" />
+                                    <input type="hidden" name="SelectedDomainId" value="@Model.SelectedDomainId" />
+                                    <input type="hidden" name="Visible" value="@Model.Visible" />
+                                    <span class="govuk-visually-hidden">Page</span>
+
+                                    <button type="submit" class="govuk-link govuk-pagination__link">@i</button>
+                                </form>
+                            </li>
+                        }
+                        <!-- Link to the Last Page -->
+                        @if (Model.CurrentPage < Model.TotalPages - 3)
+                        {
+                            <li class="govuk-pagination__item govuk-pagination__item--ellipses">...</li>
+                            <li class="govuk-pagination__item">
+                                <form method="post">
+                                    <input type="hidden" name="CurrentPage" value="@Model.TotalPages" />
+                                    <input type="hidden" name="PageSize" value="@Model.PageSize" />
+                                    <input type="hidden" name="SearchTerm" value="@Model.SearchTerm" />
+                                    <input type="hidden" name="SortBy" value="@Model.SortBy" />
+                                    <input type="hidden" name="SortOrder" value="@Model.SortOrder" />
+                                    <input type="hidden" name="SelectedOrganisationId" value="@Model.SelectedOrganisationId" />
+                                    <input type="hidden" name="SelectedDomainId" value="@Model.SelectedDomainId" />
+                                    <input type="hidden" name="Visible" value="@Model.Visible" />
+                                    <span class="govuk-visually-hidden">Page</span>
+
+                                    <button type="submit" class="govuk-link govuk-pagination__link">@Model.TotalPages</button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                    <!-- Next Page Link -->
+                    @if (Model.CurrentPage < Model.TotalPages)
+                    {
+                        <form method="post" class="govuk-pagination__next">
+                            <input type="hidden" name="CurrentPage" value="@(Model.CurrentPage + 1)" />
+                            <input type="hidden" name="PageSize" value="@Model.PageSize" />
+                            <input type="hidden" name="SearchTerm" value="@Model.SearchTerm" />
+                            <input type="hidden" name="SortBy" value="@Model.SortBy" />
+                            <input type="hidden" name="SortOrder" value="@Model.SortOrder" />
+                            <input type="hidden" name="SelectedOrganisationId" value="@Model.SelectedOrganisationId" />
+                            <input type="hidden" name="SelectedDomainId" value="@Model.SelectedDomainId" />
+                            <input type="hidden" name="Visible" value="@Model.Visible" />
+                            <button type="submit" class="govuk-link govuk-pagination__link">
+                                <span class="govuk-pagination__link-title">
+                                    Next<span class="govuk-visually-hidden"> page</span>
+                                </span>
+                            </button>
+                        </form>
+                    }
+                </nav>
+            }
+        </div>
+
+
+        <style>
+            .filter-panel {
+                background-color: #f3f2f1;
+                margin-bottom: 30px;
+            }
+
+            .filter-content {
+                padding: 20px;
+            }
+
+            .filter-heading {
+                background-color: #b1b4b6;
+                padding: 10px;
+            }
+
+            .users-list .govuk-link {
+                text-decoration: none;
+            }
+        </style>

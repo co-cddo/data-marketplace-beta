@@ -1,0 +1,49 @@
+﻿@using Cddo.Data.Marketplace.UI.Pages.Shared
+@{
+    var pageTitle = ViewData["Title"]?.ToString() ?? "Main";   
+}
+
+@{
+    var analyticsCookiesAreAccepted = Context.Request.Cookies["cddo-analytics-cookies-acceptance"] == "True";
+    var siteSettingsCookiesAreAccepted = Context.Request.Cookies["cddo-sitesettings-cookies-acceptance"] == "True";
+
+    // Check if all necessary cookies are accepted
+    var allCookiesAccepted = analyticsCookiesAreAccepted && siteSettingsCookiesAreAccepted;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>@pageTitle</title>
+    @await Html.PartialAsync("_HeadPartial", new HeadPartialModel())
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    @if (!allCookiesAccepted)
+    {
+        @await Html.PartialAsync("_CookieBannerPartial.cshtml", new CookieBannerPartialModel())
+    }
+    @await Html.PartialAsync("_HeaderPartial", new HeaderPartialModel())
+    @await Html.PartialAsync("_NavbarPartial", new NavbarPartialModel())
+
+    <main role="main" id="main-content">
+        <div class="govuk-width-container govuk-phase-banner">
+            <p class="govuk-phase-banner__content">
+                <strong class="govuk-tag govuk-phase-banner__content__tag">
+                    Beta
+                </strong>
+                <span class="govuk-phase-banner__text">
+                    This is a new service – your <a class="govuk-link" href="https://docs.google.com/forms/d/e/1FAIpQLSforohZAzyIgaKnkthTDRWzpnrh10eqGmNZRSwOLZDE0DZYEQ/viewform">feedback</a> will help us to improve it.
+                </span>
+            </p>
+        </div>
+        <div class="govuk-width-container">
+            @RenderBody()
+        </div>
+    </main>
+
+    @await Html.PartialAsync("_FooterPartial", new FooterPartialModel())
+    @await Html.PartialAsync("_ScriptsPartial", new ScriptsPartialModel())
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,110 @@
+﻿@using Cddo.Data.Marketplace.Api.Dto.Responses.RequestAccess
+@using Cddo.Data.Marketplace.UI.Controllers
+
+@inject Agm.Catalog.DotNet.Core.Utilities.IEnumMemberConverter EnumMemberConverter
+
+@model OrganisationAccessResponse
+@{
+    ViewData["Title"] = "Request Access - Manage Organisation";
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper">
+    <h1 class="govuk-heading-l">
+        <span class="govuk-caption-l">Request access</span>
+        Manage organisation access
+    </h1>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+            <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Organisation name
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @Model.OrganisationName
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Organisation type
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @if (Model.OrganisationType != null)
+                        {
+                            @EnumMemberConverter.GetEnumDescription(Model.OrganisationType!)
+                        }
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Domain name
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @Model.DomainName
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Created by
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @Model.UserName
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Created
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @Model.CreatedDate
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Updated
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @Model.UpdatedDate
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Status
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        @Model.Status
+                    </dd>
+                </div>
+                @if (@Model.Status == "Rejected")
+                {
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Reason
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @Model.Reason
+                        </dd>
+                    </div>
+                }
+            </dl>
+            @if (@Model.Status == "Pending")
+            {
+                <div class="govuk-button-group">
+                    <a class="govuk-button govuk-button--secondary" asp-controller="RequestAccess" asp-action="@nameof(RequestAccessController.EditOrganisationAccess)" asp-route-OrganisationRequestID="@Model.OrganisationRequestID">
+                        Edit request
+                    </a>
+                    <a class="govuk-button govuk-button--warning" asp-controller="RequestAccess" asp-action="@nameof(RequestAccessController.RejectOrganisationAccess)" asp-route-OrganisationRequestID="@Model.OrganisationRequestID">
+                        Reject request
+                    </a>
+                    <a class="govuk-button" asp-controller="RequestAccess" asp-action="@nameof(RequestAccessController.UpdateAccessStatus)" asp-route-OrganisationRequestID="@Model.OrganisationRequestID" asp-route-status="Approved">
+                        Approve request
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

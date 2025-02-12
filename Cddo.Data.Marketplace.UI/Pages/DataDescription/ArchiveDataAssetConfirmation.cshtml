@@ -1,0 +1,26 @@
+﻿@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Model
+@model ArchiveDataAssetModel
+@{
+    ViewData["Title"] = "Confirmation";
+}
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form asp-controller="DataDescription" asp-action="@nameof(DataDescriptionController.UpdateDataAssetStatusSubmit)" asp-route-identifier="@Model.Identifier" asp-route-dataAssetStatus="@DataAssetStatus.Archived">
+                <input type="hidden" name="@nameof(DeleteDataAssetModel.Identifier)" value="@Model.Identifier" />
+                <h2 class="govuk-heading-l">Are you sure you want to archive this data description?</h2>
+                <p class="govuk-body">@Model.Title</p>
+                <div class="govuk-button-group">
+                    <button class="govuk-button" type="submit">Confirm</button>
+                    <a class="govuk-button govuk-button--secondary" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssetByUser)" asp-route-identifier="@Model.Identifier">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

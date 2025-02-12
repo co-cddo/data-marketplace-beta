@@ -1,0 +1,28 @@
+﻿@page
+@model Cddo.Data.Marketplace.UI.Pages.DataRequest.RequestDashboardModel
+@{
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper ">
+          
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl">Manage data share requests</h1>
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-half">
+            <h2 class="govuk-heading-l">Received requests</h2>
+            <p class="govuk-body-m">View the current and completed requests that your organisation has received.</p>
+            <p class="govuk-body-m"><a asp-controller="DataRequest" asp-action="ReceivedRequests" class="govuk-link">View received requests</a></p>
+        </div>
+        <div class="govuk-grid-column-one-half">
+            <h2 class="govuk-heading-l">Created requests</h2>
+            <p class="govuk-body-m">View the requests you’ve started or submitted to access data owned by other organisations.</p>
+            <p class="govuk-body-m"><a asp-controller="DataRequest" asp-action="CreatedRequests" class="govuk-link">View created requests</a></p>
+        </div>
+    </div>
+
+</div>

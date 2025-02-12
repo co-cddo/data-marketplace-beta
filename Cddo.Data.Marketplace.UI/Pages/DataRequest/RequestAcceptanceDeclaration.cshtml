@@ -1,0 +1,31 @@
+﻿@using Agrimetrics.DataShare.Api.Dto.Models.DataShareRequests
+@model RequestAcceptanceDeclarationModel
+@{
+    ViewData["Title"] = "Acceptance Declaration";
+}
+
+<div class="govuk-main-wrapper govuk-main-wrapper--l">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-l">Declaration</h1>
+                <p>By approving this request, you confirm you're satisfied that the:</p>
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>technology</li>
+                    <li>data security</li>
+                    <li>data protection</li>
+                    <li>legal</li>
+                    <li>data governance</li>
+                </ul>
+                <p>aspects have been met.</p>
+                <br>
+                <form method="post" novalidate>
+                    <input type="hidden" name="acceptanceFeedbackForAcquirer" value="@Model.FeedbackToAcquirer" />
+                    <button class="govuk-button" data-module="govuk-button" asp-controller="DataRequest" asp-action="DeclareRequestAcceptance" asp-route-requestId="@Model.DataShareRequestId">
+                        Approve the data share request
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

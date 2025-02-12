@@ -1,0 +1,13 @@
+{
+  "TemplateId": "f0d13b6a-4dea-4259-a508-41aa4f212fa8",
+  "KqlQuery": "{\u0022RequiredFields\u0022:[22,37,1,18,8,3,12,6,13],\u0022Filter\u0022:{\u0022FilterByInitiatingUserPermissions\u0022:false,\u0022FieldFilters\u0022:[{\u0022Field\u0022:12,\u0022Values\u0022:[\u0022Office for National Statistics\u0022]},{\u0022Field\u0022:37,\u0022Values\u0022:[\u0022Draft\u0022,\u0022Published\u0022,\u0022Archived\u0022,\u0022Deleted\u0022,\u0022Withdrawn\u0022]}]}}",
+  "ReportType": 2,
+  "ReportName": "Metadata - Office for National Statistics",
+  "Description": "Only Office for National Statistics Metadata records",
+  "CreatedOn": "2024-11-05T14:02:09.1432279+00:00",
+  "UserId": 18,
+  "OrganisationId": 1,
+  "SharedWithOrganisationIds": null,
+  "SharedWithUsersIds": null,
+  "IsPredefined": true
+}

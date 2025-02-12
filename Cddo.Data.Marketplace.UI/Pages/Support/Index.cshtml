@@ -1,0 +1,60 @@
+﻿@using Cddo.Data.Marketplace.UI.Controllers
+@model Cddo.Data.Marketplace.UI.Pages.Support.IndexModel
+@{
+    ViewData["Title"] = "Support";
+    Layout = "~/Pages/Shared/_SupportLayout.cshtml";
+}
+
+<div>
+    <h1 class="govuk-heading-l">Get started</h1>
+
+    <p class="govuk-body">
+        The Data Marketplace is for people who work in government organisations.
+    </p>
+
+    <p class="govuk-body">
+        It allows you to search a catalogue of data listings and find government data that may be useful to your project or policy.
+    </p>
+
+    <p class="govuk-body">The catalogue includes listings for:</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li>public data – which you can access by following the link provided</li>
+        <li>restricted data – which you can request from the organisation that owns the data</li>
+    </ul>
+
+    <p class="govuk-body">
+        This is a new service, still in private beta. It is currently only available to central government departments and some other organisations.
+    </p>
+
+    <h2 class="govuk-heading-m">Create an account</h2>
+
+    <p class="govuk-body">
+        You need an account to access the catalogue and other features in the Data Marketplace.
+    </p>
+
+    <p class="govuk-body">To set up your account, you must:</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li>be a government employee</li>
+        <li>have a government email address</li>
+    </ul>
+
+    <p class="govuk-body">Go to the <a href="/Auth/SignIn" class="govuk-link">sign in page</a>, enter your email address and continue.</p>
+
+    <p class="govuk-body">You will then go through your regular government sign-in process.</p>
+
+    <p class="govuk-body">You can also <a asp-controller="Support" asp-action="@nameof(SupportController.Roles)" class="govuk-link">request additional roles</a> for your account to approve data requests or publish metadata records.</p>
+
+    <h2 class="govuk-heading-m">Start using the Data Marketplace</h2>
+
+    <p class="govuk-body">
+        Once you have signed in, you can <a asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartCddoDataAssetsSearch)" class="govuk-link">explore the catalogue</a> and find data you’re interested in.
+    </p>
+
+    <h2 class="govuk-heading-m">Get in touch</h2>
+
+    <p class="govuk-body">
+        If you have any questions or need support, <a href="https://docs.google.com/forms/d/e/1FAIpQLSeukG0jO_XgjBt6U7Fz_FJYOhjn3xXrrZTd43Ur0tFGZFwFLA/viewform" class="govuk-link">complete a support form</a>.
+    </p>
+</div>

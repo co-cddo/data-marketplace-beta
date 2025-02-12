@@ -1,0 +1,18 @@
+﻿[
+  {
+    "outputFile": "wwwroot/css/learn.css",
+    "inputFile": "wwwroot/css/learn.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/data-description-dashboard.css",
+    "inputFile": "wwwroot/css/data-description-dashboard.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/dataset-results.css",
+    "inputFile": "wwwroot/css/dataset-results.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/dataset-detail.css",
+    "inputFile": "wwwroot/css/dataset-detail.scss"
+  }
+]
