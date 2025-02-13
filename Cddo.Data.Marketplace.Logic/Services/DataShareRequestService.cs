@@ -31,12 +31,16 @@ public class DataShareRequestService : IDataShareRequestService
     }
 
     public DataShareRequestService(
+
         ILogger<DataShareRequestService> logger,
         IConfiguration configuration,
         IHttpContextAccessor httpContextAccessor,
         IUserRoleService userRoleService)
     {
-
+        ArgumentNullException.ThrowIfNull(httpContextAccessor, nameof(httpContextAccessor));
+        ArgumentNullException.ThrowIfNull(configuration, nameof(configuration));
+        ArgumentNullException.ThrowIfNull(userRoleService, nameof(userRoleService));
+        ArgumentNullException.ThrowIfNull(logger, nameof(logger));
         _apiUrl = configuration.GetSection("Api:DataShare").Value!;
         _logger = logger;
         _httpContextAccessor = httpContextAccessor;
