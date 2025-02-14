@@ -92,7 +92,7 @@ public class DeveloperController : Controller
         {
             return View(apiLandingPageLink);
         }
-        return View(CreateApiCredential);
+        return View(CreateCredential);
     }
 
     [HttpPost]
@@ -204,16 +204,36 @@ public class DeveloperController : Controller
             return View(apiLandingPageLink);
         }
 
-        await _developerService.GetClientAuthCredentialByIdAsync(id, cancellationToken);
+        var credential = await _developerService.GetClientAuthCredentialByIdAsync(id, cancellationToken);
 
-        var updatedCredential = await _developerService.GetClientAuthCredentialByIdAsync(id, cancellationToken);
+        var request = new ClientAuthCredentialsRequest
+        {
+            AppName = appName,
+            Scopes = credential.Scopes,
+            Environment = credential.Environment,
+            Domain = credential.Domain,
+            OrganisationID = credential.OrganisationId,
+            UserId = credential.UserId,
+            Expiration = credential.Expiration,
+            ClientSecret = credential.ClientSecret,
+            ClientId = credential.ClientId,
+            Status = credential.Status
+        };
+
+
+        await _developerService.UpdateClientAuthCredentialByIdAsync(id, request, cancellationToken);
 
         var initiatingUserDetails = await DoGetInitiatingUserDetailsAsync();
         var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(initiatingUserDetails);
 
+        var updatedCredential = await _developerService.GetClientAuthCredentialByIdAsync(id, cancellationToken);
+
+
         _appInsightsLogger.LogEventMain(EventTypes.DeveloperApiEvents.UpdateName, developerApi, "CDDO", update, developerApi, updatedCredential.AppName, userEventProperties);
 
         ViewBag.IsSuccess = true;
+
+
         return View(ViewApiCredential, updatedCredential);
     }
 
@@ -247,8 +267,22 @@ public class DeveloperController : Controller
         }
 
         var scopesAsString = string.Join(",", scopes);
+        var request = new ClientAuthCredentialsRequest
+        {
+            AppName = credential.AppName,
+            Scopes = scopesAsString,
+            Environment = credential.Environment,
+            Domain = credential.Domain,
+            OrganisationID = credential.OrganisationId,
+            UserId = credential.UserId,
+            Expiration = credential.Expiration,
+            ClientId = credential.ClientId,
+            ClientSecret = credential.ClientSecret,
+            Status = credential.Status
 
-        var updatedCredential = await _developerService.GetClientAuthCredentialByIdAsync(id, cancellationToken);
+        };
+
+        await _developerService.UpdateClientAuthCredentialByIdAsync(id, request, cancellationToken);
         var initiatingUserDetails = await DoGetInitiatingUserDetailsAsync();
         var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(initiatingUserDetails);
 
@@ -268,6 +302,8 @@ public class DeveloperController : Controller
         }
 
         ViewBag.IsSuccess = true;
+        var updatedCredential = await _developerService.GetClientAuthCredentialByIdAsync(id, cancellationToken);
+
         return View(ViewApiCredential, updatedCredential);
     }
 
