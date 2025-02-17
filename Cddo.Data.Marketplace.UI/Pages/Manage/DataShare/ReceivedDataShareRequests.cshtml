@@ -128,7 +128,7 @@
                                     {
                                         <div class="govuk-grid-column-one-third">
                                             <div class="govuk-checkboxes__item">
-                                                <input class="govuk-checkboxes__input" id="status-@(status)" name="DataShareRequestStatuses" type="checkbox" value="@(status)" @(ViewBag?.DataShareRequestStatuses?.Contains(@status) ? "checked" : "")>
+                                                <input class="govuk-checkboxes__input" id="status-@(status)" name="DataShareRequestStatuses" type="checkbox" value="@(status)" @((ViewBag?.DataShareRequestStatuses?.Contains(@status) ?? false) ? "checked" : "")>
                                                 <label class="govuk-label govuk-checkboxes__label" for="status-@(status)">
                                                     @Html.Raw(GetNonBreakingStatusDescription(status))
                                                 </label>

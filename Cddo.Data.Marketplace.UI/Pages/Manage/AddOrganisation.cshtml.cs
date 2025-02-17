@@ -112,16 +112,17 @@ namespace Cddo.Data.Marketplace.UI.Pages.Manage
             return new OrganisationDetail
             {
                 OrganisationName = this.OrganisationName,
-                Domains = new List<DomainDetail>
-        {
-            new DomainDetail
-            {
-                DomainName = this.DomainName,
                 OrganisationType = (OrganisationType)parsedValue,
-                OrganisationFormat = this.OrganisationFormat,
-                AllowList = this.AllowList
-            }
-        }
+                Domains = new List<DomainDetail>
+                {
+                    new DomainDetail
+                    {
+                        DomainName = this.DomainName,
+                        OrganisationType = (OrganisationType)parsedValue,
+                        OrganisationFormat = this.OrganisationFormat,
+                        AllowList = this.AllowList
+                    }
+                }
             };
         }
 
