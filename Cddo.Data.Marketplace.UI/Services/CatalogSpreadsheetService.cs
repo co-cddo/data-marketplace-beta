@@ -26,6 +26,7 @@ namespace Cddo.Data.Marketplace.UI.Services
         private readonly ICddoFlurlExceptionBuilder _cddoFlurlExceptionBuilder;
         private readonly IValidatedDataAssetSpreadsheetItemSummaryBuilder _validatedDataAssetSpreadsheetItemSummaryBuilder;
         private readonly IDataShareRequestMailboxAddressValidation _dataShareRequestMailboxAddressValidation;
+        private readonly IConfiguration _configuration;
 
         public CatalogSpreadsheetService(
             ILogger<CatalogSpreadsheetService> logger,
@@ -36,11 +37,12 @@ namespace Cddo.Data.Marketplace.UI.Services
             IDataShareRequestMailboxAddressValidation dataShareRequestMailboxAddressValidation)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _apiUrl = configuration.GetSection("Api:Main").Value ?? throw new ArgumentNullException(nameof(configuration));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-            _cddoFlurlExceptionBuilder = cddoFlurlExceptionBuilder;
-            _validatedDataAssetSpreadsheetItemSummaryBuilder = validatedDataAssetSpreadsheetItemSummaryBuilder;
+            _cddoFlurlExceptionBuilder = cddoFlurlExceptionBuilder ?? throw new ArgumentNullException(nameof(cddoFlurlExceptionBuilder));
+            _validatedDataAssetSpreadsheetItemSummaryBuilder = validatedDataAssetSpreadsheetItemSummaryBuilder ?? throw new ArgumentNullException(nameof(validatedDataAssetSpreadsheetItemSummaryBuilder));
             _dataShareRequestMailboxAddressValidation = dataShareRequestMailboxAddressValidation ?? throw new ArgumentNullException(nameof(dataShareRequestMailboxAddressValidation));
+            _apiUrl = _configuration.GetSection("Api:Main").Value ?? throw new ArgumentNullException(nameof(_apiUrl));
         }
 
         private async Task<string?> GetTokenAsync()
@@ -83,12 +85,13 @@ namespace Cddo.Data.Marketplace.UI.Services
 
         public async Task<GetValidatedProfiledDataAssetsSpreadsheetContentResponse?> UploadSpreadsheetAsync(IFormFile uploadFile, CancellationToken cancellationToken = default)
         {
-            var token = await GetTokenAsync();
-
-            if (!string.IsNullOrEmpty(token))
+            try
             {
-                try
+                var token = await GetTokenAsync();
+
+                if (!string.IsNullOrEmpty(token))
                 {
+
                     using (var stream = new MemoryStream())
                     {
                         await uploadFile.CopyToAsync(stream, cancellationToken);
@@ -113,26 +116,28 @@ namespace Cddo.Data.Marketplace.UI.Services
                         }
                     }
                 }
-                catch (FlurlHttpException ex)
-                {
-                    var cddoFlurlException = await _cddoFlurlExceptionBuilder.BuildAsync(ex);
-                    _logger.LogError(ex, "Failed to Upload Data Descriptions from file. Flurl Response: {FlurlResponseText}", cddoFlurlException.FlurlResponseText);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "An error occurred while uploading the data description. Error: {ErrorMessage}", ex.Message);
-                }
             }
+            catch (FlurlHttpException ex)
+            {
+                var cddoFlurlException = await _cddoFlurlExceptionBuilder.BuildAsync(ex);
+                _logger.LogError(ex, "Failed to Upload Data Descriptions from file. Flurl Response: {FlurlResponseText}", cddoFlurlException.FlurlResponseText);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while uploading the data description. Error: {ErrorMessage}", ex.Message);
+            }
+
             return null;
         }
 
         public async Task<GetValidatedProfiledDataAssetsSpreadsheetContentResponse?> GetValidatedDataAssetsSpreadsheetAsync(CancellationToken cancellationToken = default)
         {
-            var token = await GetTokenAsync();
-            if (!string.IsNullOrEmpty(token))
+            try
             {
-                try
+                var token = await GetTokenAsync();
+                if (!string.IsNullOrEmpty(token))
                 {
+
                     var url = _apiUrl
                         .AppendPathSegments(BaseRoute, "get-validated-profiled-data-assets-spreadsheet-content");
 
@@ -148,31 +153,31 @@ namespace Cddo.Data.Marketplace.UI.Services
 
                     return responseObject;
                 }
-                catch (JsonSerializationException jex)
-                {
-                    _logger.LogError(jex, "JSON Serialization Exception: {Message}", jex.Message);
-                }
-                catch (FlurlHttpException ex)
-                {
-                    var responseString = await ex.GetResponseStringAsync();
-                    _logger.LogError(ex, "Flurl HTTP Exception: {ResponseString}", responseString);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, ex.Message);
-                }
-                return null;
+            }
+            catch (JsonSerializationException jex)
+            {
+                _logger.LogError(jex, "JSON Serialization Exception: {Message}", jex.Message);
+            }
+            catch (FlurlHttpException ex)
+            {
+                var responseString = await ex.GetResponseStringAsync();
+                _logger.LogError(ex, "Flurl HTTP Exception: {ResponseString}", responseString);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
             }
             return null;
         }
 
         public async Task<IValidatedDataAssetSpreadsheetItemSummary> GetValidatedDataAssetSpreadsheetItemAsync(string recordId, CancellationToken cancellationToken = default)
         {
-            var token = await GetTokenAsync();
-            if (!string.IsNullOrEmpty(token))
+            try
             {
-                try
+                var token = await GetTokenAsync();
+                if (!string.IsNullOrEmpty(token))
                 {
+
                     var url = _apiUrl
                         .AppendPathSegments(BaseRoute, "get-validated-profiled-data-assets-spreadsheet-item-content");
 
@@ -189,19 +194,19 @@ namespace Cddo.Data.Marketplace.UI.Services
 
                     return _validatedDataAssetSpreadsheetItemSummaryBuilder.BuildFromResponse(responseObject);
                 }
-                catch (JsonSerializationException jex)
-                {
-                    _logger.LogError(jex, "JSON Serialization Exception: {Message}", jex.Message);
-                }
-                catch (FlurlHttpException ex)
-                {
-                    var responseString = await ex.GetResponseStringAsync();
-                    _logger.LogError(ex, "Flurl HTTP Exception: {ResponseString}", responseString);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, ex.Message);
-                }
+            }
+            catch (JsonSerializationException jex)
+            {
+                _logger.LogError(jex, "JSON Serialization Exception: {Message}", jex.Message);
+            }
+            catch (FlurlHttpException ex)
+            {
+                var responseString = await ex.GetResponseStringAsync();
+                _logger.LogError(ex, "Flurl HTTP Exception: {ResponseString}", responseString);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
             }
             return null;
         }
@@ -293,11 +298,12 @@ namespace Cddo.Data.Marketplace.UI.Services
             string? customAddress,
             CancellationToken cancellationToken)
         {
-            var token = await GetTokenAsync();
-            if (string.IsNullOrEmpty(token)) return null;
-
             try
             {
+                var token = await GetTokenAsync();
+                if (string.IsNullOrEmpty(token)) return null;
+
+
                 var request = new PublishValidatedProfiledDataAssetsSpreadsheetContentRequest
                 {
                     DataShareRequestNotificationRecipient = new DataShareRequestNotificationRecipient
@@ -344,11 +350,12 @@ namespace Cddo.Data.Marketplace.UI.Services
 
         public async Task<string?> ClearSpreadsheetDataAssets(CancellationToken cancellationToken = default)
         {
-            var token = await GetTokenAsync();
-            if (!string.IsNullOrEmpty(token))
+            try
             {
-                try
+                var token = await GetTokenAsync();
+                if (!string.IsNullOrEmpty(token))
                 {
+
                     var url = _apiUrl
                         .AppendPathSegments(BaseRoute, "clear-validated-profiled-data-assets-spreadsheet-content");
 
@@ -360,20 +367,19 @@ namespace Cddo.Data.Marketplace.UI.Services
 
                     return response;
                 }
-                catch (FlurlHttpException ex)
-                {
-                    var responseString = await ex.GetResponseStringAsync();
-                    _logger.LogError(ex, "Flurl HTTP Exception occurred. Response: {ResponseString}", responseString);
-                }
-                catch (JsonSerializationException jex)
-                {
-                    _logger.LogError(jex, "JSON Serialization Exception occurred. Message: {Message}", jex.Message);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "An unexpected exception occurred. Error: {ErrorMessage}", ex.Message);
-                }
-                return null;
+            }
+            catch (FlurlHttpException ex)
+            {
+                var responseString = await ex.GetResponseStringAsync();
+                _logger.LogError(ex, "Flurl HTTP Exception occurred. Response: {ResponseString}", responseString);
+            }
+            catch (JsonSerializationException jex)
+            {
+                _logger.LogError(jex, "JSON Serialization Exception occurred. Message: {Message}", jex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected exception occurred. Error: {ErrorMessage}", ex.Message);
             }
             return null;
         }
@@ -381,12 +387,13 @@ namespace Cddo.Data.Marketplace.UI.Services
         public async Task<CheckForPotentialDuplicatesInValidatedSpreadsheetContentResponse?> CheckForPotentialDuplicatesInValidatedSpreadsheetContentAsync(
             CancellationToken cancellationToken = default)
         {
-            var token = await GetTokenAsync();
-
-            if (string.IsNullOrWhiteSpace(token)) return null;
-
             try
             {
+                var token = await GetTokenAsync();
+
+                if (string.IsNullOrWhiteSpace(token)) return null;
+
+
                 var url = _apiUrl
                     .AppendPathSegments(BaseRoute, "check-for-potential-duplicates-in-validated-spreadsheet-content");
 
@@ -422,12 +429,13 @@ namespace Cddo.Data.Marketplace.UI.Services
             string recordId,
             CancellationToken cancellationToken = default)
         {
-            var token = await GetTokenAsync();
-
-            if (string.IsNullOrWhiteSpace(token)) return null;
-
             try
             {
+                var token = await GetTokenAsync();
+
+                if (string.IsNullOrWhiteSpace(token)) return null;
+
+
                 var url = _apiUrl
                     .AppendPathSegments(BaseRoute, "check-for-potential-duplicates-in-validated-spreadsheet-item");
 

@@ -66,12 +66,12 @@ namespace Cddo.Data.Marketplace.UI.Services
 
                 throw new InvalidOperationException($"Error during API request. Response: {responseString}", ex);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An unexpected error occurred during the API request.");
+            //catch (Exception ex)
+            //{
+            //    _logger.LogError(ex, "An unexpected error occurred during the API request.");
 
-                throw new InvalidOperationException("An unexpected error occurred during the API request.", ex);
-            }
+            //    throw new InvalidOperationException("An unexpected error occurred during the API request.", ex);
+            //}
         }
 
         public async Task<ClientAuthCredentialsResponse?> CreateClientAuthCredentialAsync(ClientAuthCredentialsRequest request, CancellationToken cancellationToken = default)

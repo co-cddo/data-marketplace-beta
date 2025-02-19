@@ -35,7 +35,7 @@ public class CatalogDataService : ICatalogDataService
         _cddoFlurlExceptionBuilder = cddoFlurlExceptionBuilder;
     }
 
-    private async Task<string?> GetTokenAsync()
+    private string? GetToken()
     {
         var httpContext = _httpContextAccessor.HttpContext;
         if (httpContext != null && httpContext.User.Identity.IsAuthenticated)
@@ -57,7 +57,11 @@ public class CatalogDataService : ICatalogDataService
     {
         try
         {
-            var token = await GetTokenAsync();
+            var token = GetToken();
+            if (token == null)
+            {
+                return Enumerable.Empty<string>();
+            }
 
             var getCddoTopicsRequest = new GetCddoTopicsRequest
             {
@@ -97,7 +101,11 @@ public class CatalogDataService : ICatalogDataService
     {
         try
         {
-            var token = await GetTokenAsync();
+            var token = GetToken();
+            if (token == null)
+            {
+                return Enumerable.Empty<string>();
+            }
 
             var getCddoOrganisationsRequest = new GetCddoOrganisationsRequest
             {
@@ -137,8 +145,11 @@ public class CatalogDataService : ICatalogDataService
     {
         try
         {
-            var token = await GetTokenAsync();
-
+            var token = GetToken();
+            if (token == null)
+            {
+                return Enumerable.Empty<string>();
+            }
             var getSearchSuggestionsForPublishedDataAssetsRequest = new GetSearchSuggestionsForPublishedDataAssetsRequest
             {
                 SearchText = searchText
@@ -177,8 +188,11 @@ public class CatalogDataService : ICatalogDataService
     {
         try
         {
-            var token = await GetTokenAsync();
-
+            var token = GetToken();
+            if (token == null)
+            {
+                return Enumerable.Empty<string>();
+            }
             var getSearchSuggestionsForOrganisationDataAssetsRequest = new GetSearchSuggestionsForOrganisationDataAssetsRequest
             {
                 SearchText = searchText
@@ -214,12 +228,13 @@ public class CatalogDataService : ICatalogDataService
     public async Task<CheckForPotentialDuplicatesToDataAssetResponse?> CheckForPotentialDuplicatesToDataAssetAsync(
         Guid dataAssetId, CancellationToken cancellationToken = default)
     {
-        var token = await GetTokenAsync();
-
-        if (string.IsNullOrWhiteSpace(token)) return null;
-
         try
         {
+            var token = GetToken();
+
+            if (string.IsNullOrWhiteSpace(token)) return null;
+
+
             var url = _apiUrl
                 .AppendPathSegments("DataAsset/check-for-potential-duplicates-to-data-asset");
 
@@ -260,7 +275,7 @@ public class CatalogDataService : ICatalogDataService
 
         try
         {
-            var token = await GetTokenAsync();
+            var token = GetToken();
             // All responses from the Marketplace Api are serialized so that enums are returned as strings rather than
             // their integer value, so we have to read them back with the same conversion.
             var response = await _apiUrl
@@ -298,11 +313,12 @@ public class CatalogDataService : ICatalogDataService
 
         getCddoDataAssetsRequest.StartRecordIndex = (getCddoDataAssetsRequest.PageNumber - 1) * getCddoDataAssetsRequest.NumberOfRecords;
 
-        var token = await GetTokenAsync();
-        if (!string.IsNullOrEmpty(token))
+        try
         {
-            try
+            var token = GetToken();
+            if (!string.IsNullOrEmpty(token))
             {
+
                 // All responses from the Marketplace Api are serialized so that enums are returned as strings rather than
                 // their integer value, so we have to read them back with the same conversion.
                 var response = await _apiUrl
@@ -319,17 +335,17 @@ public class CatalogDataService : ICatalogDataService
 
                 return response;
             }
-            catch (FlurlHttpException ex)
-            {
-                var cddoFlurlException = await _cddoFlurlExceptionBuilder.BuildAsync(ex);
-                _logger.LogError(ex, "Failed to Get Data Descriptions By User. Flurl Response: {FlurlResponseText}", cddoFlurlException.FlurlResponseText);
-                return null;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while getting data descriptions results.");
-                return null;
-            }
+        }
+        catch (FlurlHttpException ex)
+        {
+            var cddoFlurlException = await _cddoFlurlExceptionBuilder.BuildAsync(ex);
+            _logger.LogError(ex, "Failed to Get Data Descriptions By User. Flurl Response: {FlurlResponseText}", cddoFlurlException.FlurlResponseText);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while getting data descriptions results.");
+            return null;
         }
         return null;
     }
@@ -339,7 +355,7 @@ public class CatalogDataService : ICatalogDataService
     {
         try
         {
-            var token = await GetTokenAsync();
+            var token = GetToken();
             // All responses from the Marketplace Api are serialized so that enums are returned as strings rather than
             // their integer value, so we have to read them back with the same conversion.
             var response = await _apiUrl
@@ -375,7 +391,7 @@ public class CatalogDataService : ICatalogDataService
     {
         try
         {
-            var token = await GetTokenAsync();
+            var token = GetToken();
 
             var response = await _apiUrl
                 .WithSettings(x =>
@@ -407,14 +423,15 @@ public class CatalogDataService : ICatalogDataService
     public async Task<DeleteProfiledDataAssetResponse?> DeleteDataAssetAsync(
         DeleteProfiledDataAssetRequest deleteProfiledDataAssetRequest, CancellationToken cancellationToken = default)
     {
-        var token = await GetTokenAsync();
 
-        if (!string.IsNullOrEmpty(token))
+        try
         {
-            deleteProfiledDataAssetRequest.ProfileId = _profileId;
+            var token = GetToken();
 
-            try
+            if (!string.IsNullOrEmpty(token))
             {
+                deleteProfiledDataAssetRequest.ProfileId = _profileId;
+
                 var response = await _apiUrl
                     .AppendPathSegments("DataAsset/delete-profiled-data-asset")
                     .WithOAuthBearerToken(token)
@@ -422,6 +439,7 @@ public class CatalogDataService : ICatalogDataService
                     .DeleteAsync(cancellationToken: cancellationToken)
                     .ReceiveJson<DeleteProfiledDataAssetResponse>();
                 return response;
+            }
             }
             catch (FlurlHttpException ex)
             {
@@ -440,7 +458,6 @@ public class CatalogDataService : ICatalogDataService
                 _logger.LogError(ex, "An error occurred while deleting the data set. Error: {ErrorMessage}", ex.Message);
                 return null;
             }
-        }
         return null;
     }
 }
