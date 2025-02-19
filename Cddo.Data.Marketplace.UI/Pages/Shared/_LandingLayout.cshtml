@@ -1,4 +1,7 @@
-﻿@{
+﻿@using Cddo.Data.Marketplace.UI.Configuration
+@using Microsoft.Extensions.Options
+@inject IOptions<HotjarSettings> HotjarConfig
+@{
     var pageTitle = ViewData["Title"]?.ToString() ?? "Landing";
 }
 
@@ -18,6 +21,15 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
+    @if (allCookiesAccepted)
+    {
+        <!-- Google Tag Manager (noscript) -->
+        <noscript>
+            <iframe src="https://www.googletagmanager.com/ns.html?id=@HotjarConfig.Value.GAEnvironment"
+                    height="0" width="0" style="display:none;visibility:hidden"></iframe>
+        </noscript>
+        <!-- End Google Tag Manager (noscript) -->
+    }
     @if (!allCookiesAccepted)
     {
         @await Html.PartialAsync("_CookieBannerPartial.cshtml", new CookieBannerPartialModel())
