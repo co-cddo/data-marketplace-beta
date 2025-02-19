@@ -35,8 +35,11 @@
     {
         var user = await UserRoleService.GetUserProfileAsync();
         organisationId = user.Organisation!.OrganisationId.ToString();
-        userOrganisation = organisationList.Orgs.FirstOrDefault(o => o.OrganisationId.ToString() == organisationId);
-
+        userOrganisation = new OrganisationDetail()
+                {
+                    OrganisationName = user.Organisation!.OrganisationName,
+                    OrganisationId = user.Organisation!.OrganisationId
+                };
     }
 }
 
