@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-	  <PackageReference Include="Agm.Catalog.DotNet" Version="12.4.0.61" />
+	  <PackageReference Include="Agm.Catalog.DotNet" Version="12.4.0.77" />
 	  <PackageReference Include="Azure.Identity" Version="1.12.1" />
 	  <PackageReference Include="Azure.Search.Documents" Version="11.6.0" />
 	  <PackageReference Include="Azure.Storage.Files.Shares" Version="12.20.0" />
@@ -40,6 +40,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.16" />
     <PackageReference Include="NPOI" Version="2.7.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.2" />
   </ItemGroup>
 
   <ItemGroup>
