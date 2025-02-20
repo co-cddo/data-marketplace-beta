@@ -41,6 +41,10 @@ public class DeveloperController : Controller
     [Route("api-keys")]
     public async Task<IActionResult> ApiCredentials(CancellationToken cancellationToken = default)
     {
+        if (!User.Identity!.IsAuthenticated)
+        {
+            return Challenge(); 
+        }
 
         if (!await _userRoleService.IsUserRolePublisher() && !await _userRoleService.IsUserRoleAdmin())
         {
