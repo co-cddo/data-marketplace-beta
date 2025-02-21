@@ -535,7 +535,7 @@ public class CatalogDataDescriptionController(
     {
         questionKeywordRequest.Keyword = NormalizeKeywords(questionKeywordRequest.Keyword);
 
-        if (questionKeywordRequest.Keyword != null && ModelState.IsValid)
+        if (questionKeywordRequest.Keyword != null)
         {
             var invalidKeywords = ValidateKeywords(questionKeywordRequest.Keyword);
             if (invalidKeywords.Any())
