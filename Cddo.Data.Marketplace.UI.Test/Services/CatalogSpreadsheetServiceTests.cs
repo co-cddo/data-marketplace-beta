@@ -23,6 +23,9 @@ using System.Net;
 using Newtonsoft.Json;
 using Moq;
 using Microsoft.Extensions.Primitives;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Cddo.Data.Marketplace.UI.Test.Services
 {
@@ -98,7 +101,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var testItems = ServicesTestSetUp.CreateTestItems();
             var testResponse = testItems.Fixture.Create<byte[]>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/get-data-asset-template-spreadsheet")
@@ -148,13 +151,29 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var testItems = ServicesTestSetUp.CreateTestItems();
             var request = testItems.Fixture.Create<IFormFile>();
 
+            var mockFormFile = new Mock<IFormFile>();
+
+            var fileName = "testfile.txt";
+            var contentType = "text/plain";
+            var content = "Hello, World!";
+            var fileStream = new MemoryStream();
+            var writer = new StreamWriter(fileStream);
+            writer.Write(content);
+            writer.Flush();
+            fileStream.Position = 0;  // Rewind the stream for reading
+
+            mockFormFile.Setup(x => x.OpenReadStream()).Returns(fileStream);
+            mockFormFile.Setup(x => x.FileName).Returns(fileName);
+            mockFormFile.Setup(x => x.ContentType).Returns(contentType);
+            mockFormFile.Setup(x => x.Length).Returns(fileStream.Length);
+
             using var httpTest = new HttpTest();
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             httpTest.ForCallsTo($"http://xyz/DataAsset/validate-profiled-data-assets-spreadsheet-content")
             .RespondWith("", (int)HttpStatusCode.InternalServerError);
 
             //Act
-           var result = await testItems.CatalogSpreadsheetService.UploadSpreadsheetAsync(request);
+           var result = await testItems.CatalogSpreadsheetService.UploadSpreadsheetAsync(mockFormFile.Object);
             //Assert
             result.Should().Be(null);
 
@@ -188,7 +207,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
 
             var testResponse = testItems.Fixture.Create<GetValidatedProfiledDataAssetsSpreadsheetContentResponse>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/validate-profiled-data-assets-spreadsheet-content")
@@ -251,7 +270,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var testItems = ServicesTestSetUp.CreateTestItems();
 
             using var httpTest = new HttpTest();
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             httpTest.ForCallsTo($"http://xyz/DataAsset/get-validated-profiled-data-assets-spreadsheet-content")
             .RespondWith("", (int)HttpStatusCode.InternalServerError);
 
@@ -269,7 +288,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var testItems = ServicesTestSetUp.CreateTestItems();
             var testResponse = testItems.Fixture.Create<GetValidatedProfiledDataAssetsSpreadsheetContentResponse>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/get-validated-profiled-data-assets-spreadsheet-content")
@@ -336,7 +355,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var recordId = testItems.Fixture.Create<string>();
 
             using var httpTest = new HttpTest();
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             httpTest.ForCallsTo($"http://xyz/DataAsset/get-validated-profiled-data-assets-spreadsheet-item-content")
             .RespondWith("", (int)HttpStatusCode.InternalServerError);
 
@@ -355,7 +374,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var testResponse = testItems.Fixture.Create<GetValidatedProfiledDataAssetsSpreadsheetItemContentResponse>();
             var recordId = testItems.Fixture.Create<string>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/get-validated-profiled-data-assets-spreadsheet-item-content")
@@ -474,7 +493,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
                  return false;
              });
 
-            testItems.MockDataShareRequestMailboxAddressValidation.Setup(a => a.TryValidateDataShareRequestMailboxAddress(It.IsAny<string>(), out It.Ref<string>.IsAny)).Returns(true);
+            testItems.MockDataShareRequestMailboxAddressValidation.Setup(a => a.TryValidateDataShareRequestMailboxAddress(It.IsAny<string>(), out It.Ref<string>.IsAny)).Returns(false);
 
             //Act
             var result = await testItems.CatalogSpreadsheetService.PublishSpreadsheetDataAssetsAsync(mockFormCollection.Object);
@@ -602,7 +621,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
 
             testItems.MockDataShareRequestMailboxAddressValidation.Setup(a => a.TryValidateDataShareRequestMailboxAddress(It.IsAny<string>(), out It.Ref<string>.IsAny)).Returns(true);
             using var httpTest = new HttpTest();
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             httpTest.ForCallsTo($"http://xyz/DataAsset/publish-validated-profiled-data-assets-spreadsheet-content")
             .RespondWith("", (int)HttpStatusCode.InternalServerError);
 
@@ -748,9 +767,78 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             result.DataShareRequestNotificationAddressValidationResult.Should().NotBeNull();
 
         }
-
         [Test]
         public async Task PublishSpreadsheetDataAssetsAsync_WhenPublishIsSuccessful_PublishValidatedProfiledDataAssetsSpreadsheetContentResponse()
+        {
+            var testItems = ServicesTestSetUp.CreateTestItems();
+            var testResponse = testItems.Fixture.Create<PublishValidatedProfiledDataAssetsSpreadsheetContentResponse>();
+
+            var mockFormFile = new Mock<IFormFile>();
+
+            var fileName = "testfile.txt";
+            var contentType = "text/plain";
+            var content = "Hello, World!";
+            var fileStream = new MemoryStream();
+            var writer = new StreamWriter(fileStream);
+            writer.Write(content);
+            writer.Flush();
+            fileStream.Position = 0;  // Rewind the stream for reading
+
+            mockFormFile.Setup(x => x.OpenReadStream()).Returns(fileStream);
+            mockFormFile.Setup(x => x.FileName).Returns(fileName);
+            mockFormFile.Setup(x => x.ContentType).Returns(contentType);
+            mockFormFile.Setup(x => x.Length).Returns(fileStream.Length);
+
+            var initialFormData = new Dictionary<string, StringValues>
+            {
+                { "dsr-notification-option", new StringValues("EsdaContactPointEmailAddress") },
+                { "custom-address", new StringValues("test@email.com") }
+            };
+
+
+            var mockFormCollection = new Mock<IFormCollection>();
+            mockFormCollection.Setup(x => x.Keys).Returns(initialFormData.Keys);
+            foreach (var kv in initialFormData)
+            {
+                mockFormCollection.Setup(f => f[kv.Key]).Returns(kv.Value);
+            }
+            mockFormCollection.Setup(x => x.Files).Returns(new FormFileCollection { mockFormFile.Object });
+
+            mockFormCollection.Setup(x => x.TryGetValue(It.IsAny<string>(), out It.Ref<StringValues>.IsAny))
+             .Returns((string key, out StringValues value) =>
+             {
+                 if (key == "dsr-notification-option")
+                 {
+                     value = new StringValues("EsdaContactPointEmailAddress");
+                     return true;
+                 }
+                 if (key == "custom-address")
+                 {
+                     value = new StringValues("test@email.com");
+                     return true;
+                 }
+                 value = StringValues.Empty;
+                 return false;
+             });
+
+            testItems.MockDataShareRequestMailboxAddressValidation.Setup(a => a.TryValidateDataShareRequestMailboxAddress(It.IsAny<string>(), out It.Ref<string>.IsAny)).Returns(true);
+            using var httpTest = new HttpTest();
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
+            httpTest.ForCallsTo($"http://xyz/DataAsset/publish-validated-profiled-data-assets-spreadsheet-content")
+              .RespondWithJson(testResponse);
+
+            //Act
+            var result = await testItems.CatalogSpreadsheetService.PublishSpreadsheetDataAssetsAsync(mockFormCollection.Object);
+
+            result.Response.Should().NotBeNull();
+            result.DataShareRequestNotificationAddressValidationResult.Should().NotBeNull();
+            result.Response.Success.Should().BeTrue();
+            result.DataShareRequestNotificationAddressValidationResult.RequestWasValid.Should().BeTrue();
+            result.DataShareRequestNotificationAddressValidationResult.SelectedRecipientType.Should().Be(DataShareRequestNotificationRecipientType.EsdaContactPointEmailAddress);
+        }
+
+        [Test]
+        public async Task PublishSpreadsheetDataAssetsAsync_WhenPublishIsSuccessfulForEsdaCustomDsrNotificationAddress_PublishValidatedProfiledDataAssetsSpreadsheetContentResponse()
         {
             var testItems = ServicesTestSetUp.CreateTestItems();
             var testResponse = testItems.Fixture.Create<PublishValidatedProfiledDataAssetsSpreadsheetContentResponse>();
@@ -805,7 +893,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
 
             testItems.MockDataShareRequestMailboxAddressValidation.Setup(a => a.TryValidateDataShareRequestMailboxAddress(It.IsAny<string>(), out It.Ref<string>.IsAny)).Returns(true);
             using var httpTest = new HttpTest();
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             httpTest.ForCallsTo($"http://xyz/DataAsset/publish-validated-profiled-data-assets-spreadsheet-content")
               .RespondWithJson(testResponse);
 
@@ -818,6 +906,73 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             result.DataShareRequestNotificationAddressValidationResult.EnteredCustomAddress.Should().Be("test@email.com");
             result.DataShareRequestNotificationAddressValidationResult.RequestWasValid.Should().BeTrue();
             result.DataShareRequestNotificationAddressValidationResult.SelectedRecipientType.Should().Be(DataShareRequestNotificationRecipientType.EsdaCustomDsrNotificationAddress);
+        }
+
+        [Test]
+        public async Task PublishSpreadsheetDataAssetsAsync_WhenCustomeAddressGreaterThan256_Null()
+        {
+            var testItems = ServicesTestSetUp.CreateTestItems();
+            var testResponse = testItems.Fixture.Create<PublishValidatedProfiledDataAssetsSpreadsheetContentResponse>();
+            var ridiculouslyLongString = string.Join(string.Empty, testItems.Fixture.CreateMany<string>(10)) ;
+
+            var mockFormFile = new Mock<IFormFile>();
+
+            var fileName = "testfile.txt";
+            var contentType = "text/plain";
+            var content = "Hello, World!";
+            var fileStream = new MemoryStream();
+            var writer = new StreamWriter(fileStream);
+            writer.Write(content);
+            writer.Flush();
+            fileStream.Position = 0;  // Rewind the stream for reading
+
+            mockFormFile.Setup(x => x.OpenReadStream()).Returns(fileStream);
+            mockFormFile.Setup(x => x.FileName).Returns(fileName);
+            mockFormFile.Setup(x => x.ContentType).Returns(contentType);
+            mockFormFile.Setup(x => x.Length).Returns(fileStream.Length);
+
+            var initialFormData = new Dictionary<string, StringValues>
+            {
+                { "dsr-notification-option", new StringValues("EsdaCustomDsrNotificationAddress") },
+                { "custom-address", new StringValues(ridiculouslyLongString.ToString()) }
+            };
+
+
+            var mockFormCollection = new Mock<IFormCollection>();
+            mockFormCollection.Setup(x => x.Keys).Returns(initialFormData.Keys);
+            foreach (var kv in initialFormData)
+            {
+                mockFormCollection.Setup(f => f[kv.Key]).Returns(kv.Value);
+            }
+            mockFormCollection.Setup(x => x.Files).Returns(new FormFileCollection { mockFormFile.Object });
+
+            mockFormCollection.Setup(x => x.TryGetValue(It.IsAny<string>(), out It.Ref<StringValues>.IsAny))
+             .Returns((string key, out StringValues value) =>
+             {
+                 if (key == "dsr-notification-option")
+                 {
+                     value = new StringValues("EsdaCustomDsrNotificationAddress");
+                     return true;
+                 }
+                 if (key == "custom-address")
+                 {
+                     value = new StringValues(ridiculouslyLongString.ToString());
+                     return true;
+                 }
+                 value = StringValues.Empty;
+                 return false;
+             });
+
+            testItems.MockDataShareRequestMailboxAddressValidation.Setup(a => a.TryValidateDataShareRequestMailboxAddress(It.IsAny<string>(), out It.Ref<string>.IsAny)).Returns(true);
+            using var httpTest = new HttpTest();
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
+            httpTest.ForCallsTo($"http://xyz/DataAsset/publish-validated-profiled-data-assets-spreadsheet-content")
+              .RespondWithJson(testResponse);
+
+            //Act
+            var result = await testItems.CatalogSpreadsheetService.PublishSpreadsheetDataAssetsAsync(mockFormCollection.Object);
+
+            result.Response.Should().BeNull();
         }
 
         [Test]
@@ -873,7 +1028,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var recordId = testItems.Fixture.Create<string>();
 
             using var httpTest = new HttpTest();
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             httpTest.ForCallsTo($"http://xyz/DataAsset/clear-validated-profiled-data-assets-spreadsheet-content")
             .RespondWith("", (int)HttpStatusCode.InternalServerError);
 
@@ -891,7 +1046,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var testItems = ServicesTestSetUp.CreateTestItems();
             var testResponse = testItems.Fixture.Create<string>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/clear-validated-profiled-data-assets-spreadsheet-content")
@@ -924,7 +1079,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             //Arrange
             var testItems = ServicesTestSetUp.CreateTestItems();
             var recordId = testItems.Fixture.Create<string>();
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             testItems.MockHttpContextAccessor.Setup(c => c.HttpContext).Throws(new Exception("not here lad"));
 
             //Act
@@ -939,8 +1094,26 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
         {
             //Arrange
             var testItems = ServicesTestSetUp.CreateTestItems();
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             testItems.MockHttpContextAccessor.Setup(c => c.HttpContext).Throws(new JsonSerializationException("not here lad"));
+
+            //Act
+            var result = await testItems.CatalogSpreadsheetService.CheckForPotentialDuplicatesInValidatedSpreadsheetContentAsync();
+            //Assert
+            result.Should().Be(null);
+
+        }
+
+        [Test]
+        public async Task CheckForPotentialDuplicatesInValidatedSpreadsheetContentAsync_WhenApiCallThrowsFlurlException_Null()
+        {
+            //Arrange
+            var testItems = ServicesTestSetUp.CreateTestItems();
+            var recordId = testItems.Fixture.Create<string>();
+            using var httpTest = new HttpTest();
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
+            httpTest.ForCallsTo($"http://xyz/DataAsset/check-for-potential-duplicates-in-validated-spreadsheet-content")
+            .RespondWith("", (int)HttpStatusCode.InternalServerError);
 
             //Act
             var result = await testItems.CatalogSpreadsheetService.CheckForPotentialDuplicatesInValidatedSpreadsheetContentAsync();
@@ -956,7 +1129,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var testItems = ServicesTestSetUp.CreateTestItems();
             var testResponse = testItems.Fixture.Create<CheckForPotentialDuplicatesInValidatedSpreadsheetContentResponse>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/check-for-potential-duplicates-in-validated-spreadsheet-content")
@@ -1004,8 +1177,26 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             //Arrange
             var testItems = ServicesTestSetUp.CreateTestItems();
             var recordId = testItems.Fixture.Create<string>();
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             testItems.MockHttpContextAccessor.Setup(c => c.HttpContext).Throws(new JsonSerializationException("not here lad"));
+
+            //Act
+            var result = await testItems.CatalogSpreadsheetService.CheckForPotentialDuplicatesInValidatedSpreadsheetItemAsync(recordId);
+            //Assert
+            result.Should().Be(null);
+
+        }
+
+        [Test]
+        public async Task CheckForPotentialDuplicatesInValidatedSpreadsheetItemAsync_WhenApiCallThrowsFlurlException_Null()
+        {
+            //Arrange
+            var testItems = ServicesTestSetUp.CreateTestItems();
+            var recordId = testItems.Fixture.Create<string>();
+            using var httpTest = new HttpTest();
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
+            httpTest.ForCallsTo($"http://xyz/DataAsset/check-for-potential-duplicates-in-validated-spreadsheet-item")
+            .RespondWith("", (int)HttpStatusCode.InternalServerError);
 
             //Act
             var result = await testItems.CatalogSpreadsheetService.CheckForPotentialDuplicatesInValidatedSpreadsheetItemAsync(recordId);
@@ -1022,7 +1213,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var recordId = testItems.Fixture.Create<string>();
             var testResponse = testItems.Fixture.Create<CheckForPotentialDuplicatesInValidatedSpreadsheetItemResponse>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/check-for-potential-duplicates-in-validated-spreadsheet-item")
@@ -1035,5 +1226,30 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
 
         }
         #endregion
+
+        private static string GenerateJwt(string? email, string? userName)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")); // Use a strong key
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+            new Claim(JwtRegisteredClaimNames.Sub, "test-user"),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Email, email ?? ""),
+            new Claim(JwtRegisteredClaimNames.Name, userName ?? ""),
+            new Claim("role", "admin")
+        };
+
+            var token = new JwtSecurityToken(
+                issuer: "test-issuer",
+                audience: "test-audience",
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(1),
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
 }

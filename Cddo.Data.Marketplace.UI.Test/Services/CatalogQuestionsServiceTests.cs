@@ -19,6 +19,9 @@ using System.Net;
 using Flurl.Http.Testing;
 using Org.BouncyCastle.Asn1.Cmp;
 using Agm.Catalog.DotNet.Dto.Responses.DataAssets;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Cddo.Data.Marketplace.UI.Test.Services
 {
@@ -74,7 +77,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var dataAssetType = testItems.Fixture.Create<DataAssetType>();
 
             using var httpTest = new HttpTest();
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             httpTest.ForCallsTo($"http://xyz/DataAsset/add-profiled-data-asset")
             .RespondWith("", (int)HttpStatusCode.InternalServerError);
 
@@ -110,7 +113,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var dataAssetType = testItems.Fixture.Create<DataAssetType>();
             var testResponse = testItems.Fixture.Create<AddProfiledDataAssetResponse>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/add-profiled-data-asset")
@@ -149,7 +152,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var dataAssetType = testItems.Fixture.Create<DataAssetType>();
 
             using var httpTest = new HttpTest();
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             httpTest.ForCallsTo($"http://xyz/DataAsset/patch-profiled-data-asset")
             .RespondWith("", (int)HttpStatusCode.InternalServerError);
 
@@ -186,7 +189,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var dataAssetType = testItems.Fixture.Create<DataAssetType>();
             var testResponse = testItems.Fixture.Create<PatchProfiledDataAssetResponse>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/patch-profiled-data-asset")
@@ -208,7 +211,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var dataAssetType = testItems.Fixture.Create<DataAssetType>();
             var testResponse = testItems.Fixture.Create<PatchProfiledDataAssetResponse>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/patch-profiled-data-asset")
@@ -230,7 +233,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var dataAssetType = testItems.Fixture.Create<DataAssetType>();
             var testResponse = testItems.Fixture.Create<PatchProfiledDataAssetResponse>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/patch-profiled-data-asset")
@@ -252,7 +255,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var dataAssetType = testItems.Fixture.Create<DataAssetType>();
             var testResponse = testItems.Fixture.Create<PatchProfiledDataAssetResponse>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/patch-profiled-data-asset")
@@ -274,7 +277,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var dataAssetType = testItems.Fixture.Create<DataAssetType>();
             var testResponse = testItems.Fixture.Create<PatchProfiledDataAssetResponse>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/patch-profiled-data-asset")
@@ -296,7 +299,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var dataAssetType = testItems.Fixture.Create<DataAssetType>();
             var testResponse = testItems.Fixture.Create<PatchProfiledDataAssetResponse>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/patch-profiled-data-asset")
@@ -318,7 +321,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var dataAssetType = testItems.Fixture.Create<DataAssetType>();
             var testResponse = testItems.Fixture.Create<PatchProfiledDataAssetResponse>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/patch-profiled-data-asset")
@@ -340,7 +343,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var dataAssetType = testItems.Fixture.Create<DataAssetType>();
             var testResponse = testItems.Fixture.Create<PatchProfiledDataAssetResponse>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/patch-profiled-data-asset")
@@ -362,7 +365,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var dataAssetType = testItems.Fixture.Create<DataAssetType>();
             var testResponse = testItems.Fixture.Create<PatchProfiledDataAssetResponse>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/patch-profiled-data-asset")
@@ -384,7 +387,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var dataAssetType = testItems.Fixture.Create<DataAssetType>();
             var testResponse = testItems.Fixture.Create<PatchProfiledDataAssetResponse>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/patch-profiled-data-asset")
@@ -406,7 +409,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var dataAssetType = testItems.Fixture.Create<DataAssetType>();
             var testResponse = testItems.Fixture.Create<PatchProfiledDataAssetResponse>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/patch-profiled-data-asset")
@@ -429,7 +432,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var dataAssetType = testItems.Fixture.Create<DataAssetType>();
             var testResponse = testItems.Fixture.Create<PatchProfiledDataAssetResponse>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/DataAsset/patch-profiled-data-asset")
@@ -440,6 +443,31 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             //Assert
             result.Should().BeEquivalentTo(testResponse);
 
+        }
+
+        private static string GenerateJwt(string? email, string? userName)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")); // Use a strong key
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+            new Claim(JwtRegisteredClaimNames.Sub, "test-user"),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Email, email ?? ""),
+            new Claim(JwtRegisteredClaimNames.Name, userName ?? ""),
+            new Claim("role", "admin")
+        };
+
+            var token = new JwtSecurityToken(
+                issuer: "test-issuer",
+                audience: "test-audience",
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(1),
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 

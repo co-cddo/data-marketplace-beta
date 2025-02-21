@@ -43,6 +43,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var testItems = ServicesTestSetUp.CreateTestItems();
 
             using var httpTest = new HttpTest();
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
             httpTest.RespondWith("", (int)HttpStatusCode.InternalServerError);
 
             //Act
@@ -110,6 +111,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var testItems = ServicesTestSetUp.CreateTestItems();
 
             using var httpTest = new HttpTest();
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
             httpTest.RespondWith("", (int)HttpStatusCode.InternalServerError);
 
             //Act
@@ -177,6 +179,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var testItems = ServicesTestSetUp.CreateTestItems();
 
             using var httpTest = new HttpTest();
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
             httpTest.RespondWith("", (int)HttpStatusCode.InternalServerError);
 
             //Act
@@ -244,6 +247,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var testItems = ServicesTestSetUp.CreateTestItems();
 
             using var httpTest = new HttpTest();
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
             httpTest.RespondWith("", (int)HttpStatusCode.InternalServerError);
 
             //Act
@@ -311,6 +315,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var testItems = ServicesTestSetUp.CreateTestItems();
 
             using var httpTest = new HttpTest();
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
             httpTest.RespondWith("", (int)HttpStatusCode.InternalServerError);
 
             //Act
@@ -367,7 +372,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             //Arrange
             var testItems = ServicesTestSetUp.CreateTestItems();
             var request = testItems.Fixture.Create<GetCddoDataAssetsRequest>();
-
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
             using var httpTest = new HttpTest();
             httpTest.RespondWith("", (int)HttpStatusCode.InternalServerError);
 
@@ -444,7 +449,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             //Arrange
             var testItems = ServicesTestSetUp.CreateTestItems();
             var request = testItems.Fixture.Create<GetCddoDataAssetsRequest>();
-
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
             using var httpTest = new HttpTest();
             httpTest.RespondWith("", (int)HttpStatusCode.InternalServerError);
 
@@ -506,7 +511,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             //Arrange
             var testItems = ServicesTestSetUp.CreateTestItems();
             var request = testItems.Fixture.Create<Guid>();
-
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
             using var httpTest = new HttpTest();
             httpTest.RespondWith("", (int)HttpStatusCode.InternalServerError);
 
@@ -567,7 +572,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             //Arrange
             var testItems = ServicesTestSetUp.CreateTestItems();
             var request = testItems.Fixture.Create<Guid>();
-
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
             using var httpTest = new HttpTest();
             httpTest.RespondWith("", (int)HttpStatusCode.InternalServerError);
 
@@ -639,7 +644,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             //Arrange
             var testItems = ServicesTestSetUp.CreateTestItems();
             var request = testItems.Fixture.Create<DeleteProfiledDataAssetRequest>();
-
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
             using var httpTest = new HttpTest();
             httpTest.RespondWith("", (int)HttpStatusCode.InternalServerError);
 

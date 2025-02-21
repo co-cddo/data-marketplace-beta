@@ -21,6 +21,9 @@ using Cddo.Data.Marketplace.Api.Dto.Responses.Reports;
 using Cddo.Data.Marketplace.Api.Dto.Responses.EventLogs;
 using Moq;
 using Org.BouncyCastle.Asn1.Cmp;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Cddo.Data.Marketplace.UI.Test.Services
 {
@@ -77,7 +80,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var request = testItems.Fixture.Create<QueryCatalogReportsDataRequest>();
 
             using var httpTest = new HttpTest();
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             httpTest.ForCallsTo($"http://xyz/download-catalog-reports-data")
             .RespondWith("", (int)HttpStatusCode.InternalServerError);
 
@@ -112,7 +115,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var request = testItems.Fixture.Create<QueryCatalogReportsDataRequest>();
             var testResponse = testItems.Fixture.Create<QueryCatalogReportsDataResponse>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/download-catalog-reports-data")
@@ -143,7 +146,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
                 }
             };
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/download-catalog-reports-data")
@@ -181,7 +184,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var request = testItems.Fixture.Create<QueryCatalogReportsDataRequest>();
 
             using var httpTest = new HttpTest();
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             httpTest.ForCallsTo($"http://xyz/query-catalog-reports-data")
             .RespondWith("", (int)HttpStatusCode.InternalServerError);
 
@@ -216,7 +219,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var request = testItems.Fixture.Create<QueryCatalogReportsDataRequest>();
             var testResponse = testItems.Fixture.Create<QueryCatalogReportsDataResponse>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
 
             httpTest.ForCallsTo($"http://xyz/query-catalog-reports-data")
@@ -256,8 +259,9 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var timeRange = testItems.Fixture.Create<string>();
 
             using var httpTest = new HttpTest();
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
-            httpTest.ForCallsTo($"http://xyz/User/GetEventLogs/{request}")
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
+            
+            httpTest.ForCallsTo($"http://xyz/User/GetEventLogs")
             .RespondWith("", (int)HttpStatusCode.InternalServerError);
 
             //Act
@@ -293,7 +297,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var timeRange = testItems.Fixture.Create<string>();
             var testResponse = testItems.Fixture.Create<LogsQueryDataResult>();
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
             var clean = request.Replace("\r", "").Replace("\n", "").Replace("\\", "");
             httpTest.ForCallsTo($"http://xyz/User/GetEventLogs?searchQuery={clean}&timeRange={timeRange}")
@@ -348,7 +352,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             testItems.MockUserRoleService.Setup(u => u.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
 
             using var httpTest = new HttpTest();
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             httpTest.ForCallsTo($"http://xyz/Reporting/QueryDataShareRequestCounts")
             .RespondWith("", (int)HttpStatusCode.InternalServerError);
 
@@ -386,7 +390,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
 
             testItems.MockUserRoleService.Setup(u => u.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
 
-            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, "Bearer mytestToken");
+            ServicesTestSetUp.SetupTestHttpContext(testItems.MockHttpContextAccessor, GenerateJwt("test@email.com", "tester"));
             using var httpTest = new HttpTest();
             httpTest.ForCallsTo($"http://xyz/Reporting/QueryDataShareRequestCounts")
                .RespondWithJson(testResponse);
@@ -418,6 +422,31 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
             var result = testItems.CatalogReportsService.PrettifyString(testString);
 
             result.Should().BeEquivalentTo("This is my Test String");
+        }
+
+        private static string GenerateJwt(string? email, string? userName)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")); // Use a strong key
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+            new Claim(JwtRegisteredClaimNames.Sub, "test-user"),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Email, email ?? ""),
+            new Claim(JwtRegisteredClaimNames.Name, userName ?? ""),
+            new Claim("role", "admin")
+        };
+
+            var token = new JwtSecurityToken(
+                issuer: "test-issuer",
+                audience: "test-audience",
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(1),
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }
