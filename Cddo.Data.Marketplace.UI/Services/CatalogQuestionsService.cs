@@ -167,10 +167,7 @@ public class CatalogQuestionsService(
         {
             ProfileId = _profileId,
             DataAssetType = dataAssetType,
-            Payload = JsonSerializer.Serialize(questionThemeRequest, new JsonSerializerOptions
-            {
-                Converters = { new JsonStringEnumWithEnumMemberConverter<Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.ThemeEnum>() }
-            })
+            Payload = JsonSerializer.Serialize(questionThemeRequest)
         };
         return await MakeApiPatchRequestAsync<PatchProfiledDataAssetResponse>(request);
     }
