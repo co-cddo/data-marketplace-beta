@@ -584,6 +584,7 @@ public class CatalogDataDescriptionController(
         return keywords
             .Where(k => string.IsNullOrWhiteSpace(k) ||
                         k.Length < 2 ||
+                        k.Length > 100 ||
                         !regex.IsMatch(k))
             .ToList();
     }
@@ -597,7 +598,7 @@ public class CatalogDataDescriptionController(
         {
             if (invalidKeywords.Contains(questionKeywordRequest.Keyword[i]))
             {
-                ModelState.AddModelError($"Keyword_{i}", "Keywords can only contain alphanumeric characters, spaces, hyphens, and underscores, and must be at least two characters long");
+                ModelState.AddModelError($"Keyword_{i}", "Keywords can only contain alphanumeric characters, spaces, hyphens, and underscores, and must be at least two characters, and less than 100 characters long");
             }
         }
 
