@@ -85,7 +85,7 @@ namespace Cddo.Data.Marketplace.Api.Test.Controllers
                         SecurityClassification = SecurityClassificationEnum.Official,
                         Status = ResourceStatusEnum.Published,
                         SupplierIdentifier = "supplier-12345",
-                        Theme = new List<ThemeEnum> { ThemeEnum.Education, ThemeEnum.ScienceAndTechnology }
+                        Theme = new List<string> { nameof(ThemeEnum.Education), nameof(ThemeEnum.ScienceAndTechnology) }
                     },
                     new()
                     {
@@ -104,7 +104,7 @@ namespace Cddo.Data.Marketplace.Api.Test.Controllers
                         SecurityClassification = SecurityClassificationEnum.Secret,
                         Status = ResourceStatusEnum.Draft,
                         SupplierIdentifier = "supplier-67890",
-                        Theme = new List<ThemeEnum> { ThemeEnum.HealthAndCare, ThemeEnum.TransportAndInfrastructure }
+                        Theme = new List<string> { nameof(ThemeEnum.HealthAndCare), nameof(ThemeEnum.TransportAndInfrastructure) }
                     }
                 };
 
@@ -427,7 +427,7 @@ namespace Cddo.Data.Marketplace.Api.Test.Controllers
         }
 
         [Test]
-        public async Task GivenANullDatasetIdRetrieveDataset_WhenQueryingCatalogueResouses_ThenAnErrorMessage()
+        public async Task GivenANullDatasetIdRetrieveDataset_WhenQueryingCatalogueResources_ThenAnErrorMessage()
         {
             //Arrange
             var testItems = TestsSetUp.CreateTestItems();
@@ -469,7 +469,7 @@ namespace Cddo.Data.Marketplace.Api.Test.Controllers
                 SecurityClassification = SecurityClassificationEnum.Official,
                 Status = ResourceStatusEnum.Published,
                 SupplierIdentifier = "supplier-12345-dataset",
-                Theme = new List<ThemeEnum> { ThemeEnum.BusinessEconomicsAndFinance, ThemeEnum.EnvironmentAndNature },
+                Theme = new List<string> { nameof(ThemeEnum.BusinessEconomicsAndFinance), nameof(ThemeEnum.EnvironmentAndNature) },
                 Issued = DateTime.Now,
                 Distribution = new List<Distribution>
                     {
@@ -2340,7 +2340,7 @@ namespace Cddo.Data.Marketplace.Api.Test.Controllers
                 SecurityClassification = SecurityClassificationEnum.Official,
                 Status = ResourceStatusEnum.Published,
                 SupplierIdentifier = "supplier-12345-dataset",
-                Theme = new List<ThemeEnum> { ThemeEnum.BusinessEconomicsAndFinance, ThemeEnum.EnvironmentAndNature },
+                Theme = new List<string> { nameof(ThemeEnum.BusinessEconomicsAndFinance), nameof(ThemeEnum.EnvironmentAndNature) },
                 Issued = DateTime.Now,
                 Distribution = new List<Distribution>
                     {

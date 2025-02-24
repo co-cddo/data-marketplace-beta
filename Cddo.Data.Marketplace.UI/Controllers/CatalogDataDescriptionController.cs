@@ -446,9 +446,7 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset is not null && dataAsset.CddoDataAsset.Themes.Any())
             {
-                questionThemeRequest.Theme = dataAsset.CddoDataAsset.Themes
-                    .Select(theme => EnumHelper.GetEnumValueFromString(theme))
-                    .ToList();
+                questionThemeRequest.Theme = dataAsset.CddoDataAsset.Themes.ToList();
             }
         }
 
@@ -467,7 +465,7 @@ public class CatalogDataDescriptionController(
         {
             var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
 
-            if (validationErrors.Count() > 0)
+            if (validationErrors.Count > 0)
             {
                 string themeAsString = string.Join(", ", questionThemeRequest.Theme);
 
