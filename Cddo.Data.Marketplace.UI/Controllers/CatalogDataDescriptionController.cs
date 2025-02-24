@@ -467,13 +467,13 @@ public class CatalogDataDescriptionController(
 
             if (validationErrors.Count > 0)
             {
-                string themeAsString = string.Join(", ", questionThemeRequest.Theme);
+                var themeAsString = questionThemeRequest.Theme != null ? string.Join(", ", questionThemeRequest.Theme) : string.Empty;
 
                 _insightsLogger.LogEvent(EventTypes.MetadataEvent.MetadataEdited, new Dictionary<string, string>
-        {
-            { LogValidationErrors, string.Join(", ", validationErrors) },
-            { "Theme", themeAsString }
-        });
+                    {
+                        { LogValidationErrors, string.Join(", ", validationErrors) },
+                        { "Theme", themeAsString }
+                    });
             }
         }
 
