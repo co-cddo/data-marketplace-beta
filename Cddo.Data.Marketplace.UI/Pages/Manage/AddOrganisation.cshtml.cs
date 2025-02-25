@@ -59,7 +59,7 @@ namespace Cddo.Data.Marketplace.UI.Pages.Manage
             {
                 await LoadDepartmentsAsync(selectedDepartmentId);
                 return Page();
-            }
+            }   
 
             var idToken = GetIdTokenFromCookies();
             var httpClient = _clientFactory.CreateClient();
@@ -140,7 +140,7 @@ namespace Cddo.Data.Marketplace.UI.Pages.Manage
         {
             int? orgId = await GetOrganisationIdFromResponseAsync(response);
 
-            if (orgId != 0 && selectedDepartmentId != null)
+            if (orgId != 0 && selectedDepartmentId != null && selectedDepartmentId != 0)
             {
                 var departmentResponse = await AssignDepartmentToOrganisationAsync(idToken, selectedDepartmentId.Value, orgId.Value);
 
@@ -150,7 +150,7 @@ namespace Cddo.Data.Marketplace.UI.Pages.Manage
                 }
             }
 
-            return Redirect("/manageuser");
+            return Redirect("/manageorganisation");
         }
 
         private static async Task<int?> GetOrganisationIdFromResponseAsync(HttpResponseMessage response)

@@ -154,7 +154,7 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Security-Classification")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SecurityClassificationSubmit(QuestionSecurityClassificationRequest questionSecurityClassificationRequest, string isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode)
+    public async Task<IActionResult> SecurityClassificationSubmit(QuestionSecurityClassificationRequest questionSecurityClassificationRequest, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
         if (!ModelState.IsValid && questionSecurityClassificationRequest.SecurityClassification is null)
         {
@@ -223,7 +223,7 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Title")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddTitleSubmit(QuestionTitleRequest questionTitleRequest, string isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode, SecurityClassificationEnum? securityClassification = null)
+    public async Task<IActionResult> AddTitleSubmit(QuestionTitleRequest questionTitleRequest, string? isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode, SecurityClassificationEnum? securityClassification = null)
     {
 
         if (string.IsNullOrWhiteSpace(questionTitleRequest.Title) && !ModelState.IsValid)
