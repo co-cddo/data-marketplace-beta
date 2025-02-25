@@ -20,7 +20,7 @@ public class DeveloperController : Controller
     private readonly ILogger<DeveloperController> _logger;
     private readonly IDeveloperService _developerService;
     private readonly IUserRoleService _userRoleService;
-    private readonly AppInsightsLogger _appInsightsLogger;
+    private readonly IAppInsightsLogger _appInsightsLogger;
     private readonly IUserProfilePresenter _users;
     private readonly string apiLandingPageLink = "~/Pages/APIPortal/APILandingPage.cshtml";
     private readonly string developerApi = "DeveloperAPI";
@@ -29,7 +29,7 @@ public class DeveloperController : Controller
     public const string CreateCredential = "~/Pages/Developer/CreateApiCredential.cshtml";
 
     public DeveloperController(ILogger<DeveloperController> logger,
-            IDeveloperService developerService, IUserRoleService userRoleService, AppInsightsLogger appInsightsLogger, IUserProfilePresenter users)
+            IDeveloperService developerService, IUserRoleService userRoleService, IAppInsightsLogger appInsightsLogger, IUserProfilePresenter users)
     {
         _logger = logger;
         _developerService = developerService;
@@ -124,18 +124,18 @@ public class DeveloperController : Controller
             {
                 _logger.LogError("Failed to create API credential.");
                 ModelState.AddModelError("", "An error occurred while creating the API credential. Please try again.");
-                _appInsightsLogger.LogEventMain(EventTypes.DeveloperApiEvents.Error, developerApi, "CDDO", "Create", developerApi, "Failed to create API credential.", userEventProperties);
+                _appInsightsLogger.LogEventMainBase(EventTypes.DeveloperApiEvents.Error, developerApi, "CDDO", "Create", developerApi, "Failed to create API credential.", userEventProperties);
                 return View(CreateCredential, request);
             }
 
             //Log start Api call
-            _appInsightsLogger.LogEventMain(EventTypes.DeveloperApiEvents.Create, developerApi, "CDDO", "Create", developerApi, response.AppName, userEventProperties);
+            _appInsightsLogger.LogEventMainBase(EventTypes.DeveloperApiEvents.Create, developerApi, "CDDO", "Create", developerApi, response.AppName, userEventProperties);
 
             return View("~/Pages/Developer/StoreApiCredentials.cshtml", response);
         }
         catch (Exception ex)
         {
-            _appInsightsLogger.LogEventMain(EventTypes.DeveloperApiEvents.Error, developerApi, "CDDO", "Create", developerApi, ex.Message, userEventProperties);
+            _appInsightsLogger.LogEventMainBase(EventTypes.DeveloperApiEvents.Error, developerApi, "CDDO", "Create", developerApi, ex.Message, userEventProperties);
             _logger.LogError(ex, "An unexpected error occurred while creating API credential.");
             ModelState.AddModelError("", "An unexpected error occurred. Please try again.");
 
@@ -179,7 +179,7 @@ public class DeveloperController : Controller
 
         if (result)
         {
-            _appInsightsLogger.LogEventMain(EventTypes.DeveloperApiEvents.Revoked, developerApi, "CDDO", "Revoke", developerApi, result.ToString(), userEventProperties);
+            _appInsightsLogger.LogEventMainBase(EventTypes.DeveloperApiEvents.Revoked, developerApi, "CDDO", "Revoke", developerApi, result.ToString(), userEventProperties);
         }
         return RedirectToAction(nameof(DeveloperController.ApiCredentials));
     }
@@ -229,7 +229,7 @@ public class DeveloperController : Controller
         var updatedCredential = await _developerService.GetClientAuthCredentialByIdAsync(id, cancellationToken);
 
 
-        _appInsightsLogger.LogEventMain(EventTypes.DeveloperApiEvents.UpdateName, developerApi, "CDDO", update, developerApi, updatedCredential.AppName, userEventProperties);
+        _appInsightsLogger.LogEventMainBase(EventTypes.DeveloperApiEvents.UpdateName, developerApi, "CDDO", update, developerApi, updatedCredential.AppName, userEventProperties);
 
         ViewBag.IsSuccess = true;
 
@@ -286,7 +286,7 @@ public class DeveloperController : Controller
         var initiatingUserDetails = await DoGetInitiatingUserDetailsAsync();
         var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(initiatingUserDetails);
 
-        _appInsightsLogger.LogEventMain(EventTypes.DeveloperApiEvents.UpdateScope, developerApi, "CDDO", update, developerApi, scopesAsString, userEventProperties
+        _appInsightsLogger.LogEventMainBase(EventTypes.DeveloperApiEvents.UpdateScope, developerApi, "CDDO", update, developerApi, scopesAsString, userEventProperties
         );
 
         if (!ModelState.IsValid)
@@ -296,7 +296,7 @@ public class DeveloperController : Controller
                 .Select(e => e.ErrorMessage)
                 .ToList();
 
-            _appInsightsLogger.LogEventMain(EventTypes.DeveloperApiEvents.UpdateScope, developerApi, "CDDO", update, developerApi, scopesAsString, new Dictionary<string, string>
+            _appInsightsLogger.LogEventMainBase(EventTypes.DeveloperApiEvents.UpdateScope, developerApi, "CDDO", update, developerApi, scopesAsString, new Dictionary<string, string>
                 {{ "ValidationErrors", string.Join(", ", validationErrors) },{ "id", id }}
             );
         }
@@ -404,7 +404,7 @@ public class DeveloperController : Controller
 
             var updatedCredential = await _developerService.GetClientAuthCredentialByIdAsync(id, cancellationToken);
 
-            _appInsightsLogger.LogEventMain(EventTypes.DeveloperApiEvents.UpdateExpiry, developerApi, "CDDO", update, developerApi, request.Expiration.ToString(), userEventProperties);
+            _appInsightsLogger.LogEventMainBase(EventTypes.DeveloperApiEvents.UpdateExpiry, developerApi, "CDDO", update, developerApi, request.Expiration.ToString(), userEventProperties);
 
             ViewBag.IsSuccess = true;
 
@@ -414,7 +414,7 @@ public class DeveloperController : Controller
         {
             ModelState.AddModelError("expiryDate", "Invalid date. Please ensure the day, month, and year form a valid date.");
             var credential = await _developerService.GetClientAuthCredentialByIdAsync(id, cancellationToken);
-            _appInsightsLogger.LogEventMain(EventTypes.DeveloperApiEvents.Error, developerApi, "CDDO", update, developerApi, credential.AppName, userEventProperties);
+            _appInsightsLogger.LogEventMainBase(EventTypes.DeveloperApiEvents.Error, developerApi, "CDDO", update, developerApi, credential.AppName, userEventProperties);
             return View("~/Pages/Developer/EditCredentialExpiry.cshtml", credential);
         }
     }
