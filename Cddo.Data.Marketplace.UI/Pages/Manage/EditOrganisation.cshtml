@@ -56,8 +56,7 @@
 
                     <div class="govuk-form-group">
                         <label class="govuk-label" for="organisationType">Organisation Type</label>
-                        <select class="govuk-select" id="organisationType" name="OrganisationType" required>
-                            <option value="">Select..</option>
+                        <select class="govuk-select" id="organisationType" name="OrganisationType" required>                            
                             @foreach (var item in organisationTypes)
                             {
                                 <option value="@item.Value" selected="@item.Selected">@item.Text</option>
