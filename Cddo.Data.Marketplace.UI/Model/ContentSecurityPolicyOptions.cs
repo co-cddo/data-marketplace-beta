@@ -2,13 +2,12 @@
 {
     public class ContentSecurityPolicyOptions
     {
-        public string[] DefaultSrc { get; set; }
-        public string[] ScriptSrc { get; set; }
-        public string[] ConnectSrc { get; set; }
-        public string[] ImgSrc { get; set; }
-        public string[] StyleSrc { get; set; }
-        public string[] FontSrc { get; set; }
-        public string[] ManifestSrc { get; set; }
+        public string[] DefaultSrc { get; set; } = Array.Empty<string>();
+        public string[] ScriptSrc { get; set; } = Array.Empty<string>();
+        public string[] ConnectSrc { get; set; } = Array.Empty<string>();
+        public string[] ImgSrc { get; set; } = Array.Empty<string>();
+        public string[] StyleSrc { get; set; } = Array.Empty<string>();
+        public string[] FontSrc { get; set; } = Array.Empty<string>();
+        public string[] ManifestSrc { get; set; } = Array.Empty<string>();
     }
-
 }
