@@ -21,7 +21,7 @@ namespace Cddo.Data.Marketplace.UI.Pages.Manage
         [BindProperty]
         public string DomainName { get; set; }
         [BindProperty]
-        public string? OrganisationType { get; set; }
+        public string OrganisationType { get; set; }
         [BindProperty]
         public int? DepartmentId { get; set; }
         [BindProperty]
