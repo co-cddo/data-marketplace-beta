@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.HttpOverrides;
 using Cddo.Data.Marketplace.UI.Controllers;
 using static Cddo.Data.Marketplace.Audit.EventTypes;
+using Cddo.Data.Marketplace.UI.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -351,17 +352,83 @@ else
     });
 }
 
+// Assuming 'Configuration' is your IConfiguration instance.
+var cspOptions = builder.Configuration.GetSection("ContentSecurityPolicy")
+                              .Get<ContentSecurityPolicyOptions>();
+
 var policyCollection = new HeaderPolicyCollection()
     .AddContentSecurityPolicy(builder =>
     {
-        builder.AddDefaultSrc().Self().From("https://sso.service.security.gov.uk");
-        builder.AddScriptSrc().Self().From("https://static.hotjar.com").From("https://script.hotjar.com").From("https://www.googletagmanager.com").UnsafeInline().From("https://sso.service.security.gov.uk");
-        builder.AddConnectSrc().Self().From("https://*.hotjar.com").From("wss://*.hotjar.com").From("https://metrics.hotjar.io").From("https://content.hotjar.io").From("https://surveystats.hotjar.io").From("https://ask.hotjar.io").From("https://*.google-analytics.com").From("https://sso.service.security.gov.uk");
-        builder.AddImgSrc().Self().Data().From("https://sso.service.security.gov.uk");
-        builder.AddStyleSrc().Self().UnsafeInline().From("https://sso.service.security.gov.uk");
-        builder.AddFontSrc().Self().From("https://script.hotjar.com").From("https://sso.service.security.gov.uk");
-        builder.AddManifestSrc().Self().From("https://sso.service.security.gov.uk");
+        var defaultSrc = builder.AddDefaultSrc();
+        foreach (var src in cspOptions.DefaultSrc)
+        {
+            if (src.Equals("self", StringComparison.OrdinalIgnoreCase))
+                defaultSrc.Self();
+            else
+                defaultSrc.From(src);
+        }
+
+        var scriptSrc = builder.AddScriptSrc();
+        foreach (var src in cspOptions.ScriptSrc)
+        {
+            if (src.Equals("self", StringComparison.OrdinalIgnoreCase))
+                scriptSrc.Self();
+            else if (src.Equals("unsafe-inline", StringComparison.OrdinalIgnoreCase))
+                scriptSrc.UnsafeInline();
+            else
+                scriptSrc.From(src);
+        }
+
+        var connectSrc = builder.AddConnectSrc();
+        foreach (var src in cspOptions.ConnectSrc)
+        {
+            if (src.Equals("self", StringComparison.OrdinalIgnoreCase))
+                connectSrc.Self();
+            else
+                connectSrc.From(src);
+        }
+
+        var imgSrc = builder.AddImgSrc();
+        foreach (var src in cspOptions.ImgSrc)
+        {
+            if (src.Equals("self", StringComparison.OrdinalIgnoreCase))
+                imgSrc.Self();
+            else if (src.Equals("data", StringComparison.OrdinalIgnoreCase))
+                imgSrc.Data();
+            else
+                imgSrc.From(src);
+        }
+
+        var styleSrc = builder.AddStyleSrc();
+        foreach (var src in cspOptions.StyleSrc)
+        {
+            if (src.Equals("self", StringComparison.OrdinalIgnoreCase))
+                styleSrc.Self();
+            else if (src.Equals("unsafe-inline", StringComparison.OrdinalIgnoreCase))
+                styleSrc.UnsafeInline();
+            else
+                styleSrc.From(src);
+        }
+
+        var fontSrc = builder.AddFontSrc();
+        foreach (var src in cspOptions.FontSrc)
+        {
+            if (src.Equals("self", StringComparison.OrdinalIgnoreCase))
+                fontSrc.Self();
+            else
+                fontSrc.From(src);
+        }
+
+        var manifestSrc = builder.AddManifestSrc();
+        foreach (var src in cspOptions.ManifestSrc)
+        {
+            if (src.Equals("self", StringComparison.OrdinalIgnoreCase))
+                manifestSrc.Self();
+            else
+                manifestSrc.From(src);
+        }
     });
+
 
 app.UseSecurityHeaders(policyCollection);
 app.UseResponseCompression();
