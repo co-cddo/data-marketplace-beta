@@ -3,6 +3,7 @@ using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums;
 using Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1;
 using Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums;
 using Agm.Catalog.DotNet.Dto.Responses.DataAssets;
+using Agm.Catalog.DotNet.Dto.Responses.DataAssets.Models;
 using AutoFixture;
 using Cddo.Data.Marketplace.Api.Dto.Models;
 using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions;
@@ -1070,6 +1071,869 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             // Assert
             Assert.That(result, Is.TypeOf<RedirectToPageResult>());
         }
+        [Test]
+        public async Task AddKeywords_InvalidModelState_LogsValidationErrors()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var request = new QuestionKeywordRequest { Keyword = new List<string>() };
+            _controller.ModelState.AddModelError("Keyword", "Keyword is required");
 
+            // Act
+            var result = await _controller.AddKeywords(request, null, "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+
+        [Test]
+        public async Task AddKeywords_ValidRequest_CallsServiceAndRedirects()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var request = new QuestionKeywordRequest { Keyword = new List<string> { "data" } };
+            _mockCatalogDataService.Setup(s => s.GetDataAssetAsync(It.IsAny<Guid>(), default))
+                .ReturnsAsync(new GetCddoDataAssetResponse() { CddoDataAsset = new CddoDataAsset() { SecurityClassification = "TopSecret" } });
+
+            // Act
+            var result = await _controller.AddKeywords(request, Guid.NewGuid().ToString(), "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+
+        [Test]
+        public async Task AddKeywordsSubmit_ValidRequest_CallsServiceAndRedirects()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var request = new QuestionKeywordRequest { Keyword = new List<string> { "valid" } };
+            var response = new PatchProfiledDataAssetResponse { DataAssetId = Guid.NewGuid() };
+
+            _mockCatalogQuestionsService.Setup(s => s.UpdateKeywordsAsync(It.IsAny<QuestionKeywordRequest>(), DataAssetType.DataSet))
+                .ReturnsAsync(response);
+
+            // Act
+            var result = await _controller.AddKeywordsSubmit(request, "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<RedirectToActionResult>());
+        }
+        [Test]
+        public async Task AddKeywordsSubmit_InvalidKeywords_ReturnsView()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var request = new QuestionKeywordRequest { Keyword = new List<string> { "1" } };
+            var response = new PatchProfiledDataAssetResponse { DataAssetId = Guid.NewGuid() };
+
+            _mockCatalogQuestionsService.Setup(s => s.UpdateKeywordsAsync(It.IsAny<QuestionKeywordRequest>(), DataAssetType.DataSet))
+                .ReturnsAsync(response);
+
+            // Act
+            var result = await _controller.AddKeywordsSubmit(request, "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+        [Test]
+        public async Task AddKeywordsSubmit_CatalogReturnsNull_ReturnsView()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var request = new QuestionKeywordRequest { Keyword = new List<string> { "111" } };
+
+            _mockCatalogQuestionsService.Setup(s => s.UpdateKeywordsAsync(It.IsAny<QuestionKeywordRequest>(), DataAssetType.DataSet))
+                .ReturnsAsync((PatchProfiledDataAssetResponse)null);
+
+            // Act
+            var result = await _controller.AddKeywordsSubmit(request, "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+        [Test]
+        public async Task AddKeywordsSubmit_KeywordsNull_ReturnsRedirect()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var request = new QuestionKeywordRequest { Keyword = new List<string> {  } };
+            var response = new PatchProfiledDataAssetResponse { DataAssetId = Guid.NewGuid() };
+
+            _mockCatalogQuestionsService.Setup(s => s.UpdateKeywordsAsync(It.IsAny<QuestionKeywordRequest>(), DataAssetType.DataSet))
+                .ReturnsAsync(response);
+
+            // Act
+            var result = await _controller.AddKeywordsSubmit(request, "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<RedirectToActionResult>());
+        }
+
+        [Test]
+        public async Task AddKeywordsSubmit_UnauthorizedAccessException_ReturnsAccessDenied()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var request = new QuestionKeywordRequest { Keyword = new List<string> { "valid" } };
+            _mockCatalogQuestionsService.Setup(s => s.UpdateKeywordsAsync(It.IsAny<QuestionKeywordRequest>(), DataAssetType.DataSet))
+                .ThrowsAsync(new UnauthorizedAccessException());
+
+            // Act
+            var result = await _controller.AddKeywordsSubmit(request, "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<RedirectToPageResult>());
+        }
+        [Test]
+        public async Task AddContactPoint_InvalidModelState_LogsValidationErrors()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var request = new QuestionContactPointRequest();
+            _controller.ModelState.AddModelError("ContactPoint", "Invalid contact point");
+
+            // Act
+            var result = await _controller.AddContactPoint(request, new Guid().ToString(), "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+
+        [Test]
+        public async Task AddContactPoint_ValidRequest_CallsServiceAndReturnsView()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var request = new QuestionContactPointRequest { ContactPoint = new List<Contact> { new Contact { Name = "John Doe", Email = "john.doe@example.com", Role = ContactRoleEnum.Owner } } };
+            var dataAsset =  new GetCddoDataAssetResponse() 
+            { 
+                CddoDataAsset = new CddoDataAsset() 
+                {
+                    SecurityClassification = "TopSecret",
+                    DataAssetContacts = _fixture.Create<List<CddoDataAssetContact>>()
+                } 
+            }; 
+
+            _mockCatalogDataService.Setup(s => s.GetDataAssetAsync(It.IsAny<Guid>(), default)).ReturnsAsync(dataAsset);
+
+            // Act
+            var result = await _controller.AddContactPoint(request, new Guid().ToString(), "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+        [Test]
+        public async Task AddContactPointSubmit_InvalidModelState_ReturnsView()
+        {
+            // Arrange
+            var contact = new Contact { Name = "", Email = "" };
+            _controller.ModelState.AddModelError("Contact", "Invalid contact details");
+
+            // Act
+            var result = await _controller.AddContactPointSubmit(contact, "identifier", "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+
+        [Test]
+        public async Task AddContactPointSubmit_ValidRequest_CallsUpdateAndRedirects()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var contact = new Contact { Name = "John Doe", Email = "john.doe@example.com", Role = ContactRoleEnum.Contact };
+            var response = new PatchProfiledDataAssetResponse { DataAssetId = Guid.NewGuid() };
+
+            var mockDataAsset = new GetCddoDataAssetResponse() 
+            { 
+                CddoDataAsset = new CddoDataAsset() 
+                { 
+                    SecurityClassification = "TopSecret",
+                    DataAssetContacts =  new List<CddoDataAssetContact>() { new CddoDataAssetContact() { Email = "test", Name = "test", Role = DataAssetContactRoleType.Owner } }
+                } 
+            };
+
+            _mockCatalogDataService.Setup(s => s.GetDataAssetAsync(It.IsAny<Guid>(), default))
+                .ReturnsAsync(mockDataAsset);
+
+
+            _mockCatalogQuestionsService.Setup(s => s.UpdateContactPointAsync(It.IsAny<QuestionContactPointRequest>(), DataAssetType.DataSet))
+                .ReturnsAsync(response);
+
+            // Act
+            var result = await _controller.AddContactPointSubmit(contact, new Guid().ToString(), "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<RedirectToActionResult>());
+        }
+        [Test]
+        public async Task AddContactPointSubmit_ValidRequest_CallsUpdateAndThrowsException()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var contact = new Contact { Name = "John Doe", Email = "john.doe@example.com", Role = ContactRoleEnum.Contact };
+            var response = new PatchProfiledDataAssetResponse { DataAssetId = Guid.NewGuid() };
+
+            var mockDataAsset = new GetCddoDataAssetResponse() 
+            { 
+                CddoDataAsset = new CddoDataAsset() 
+                { 
+                    SecurityClassification = "TopSecret",
+                    DataAssetContacts =  new List<CddoDataAssetContact>() { new CddoDataAssetContact() { Email = "test", Name = "test", Role = DataAssetContactRoleType.Owner } }
+                } 
+            };
+
+            _mockCatalogDataService.Setup(s => s.GetDataAssetAsync(It.IsAny<Guid>(), default))
+                .ReturnsAsync(mockDataAsset);
+
+
+            _mockCatalogQuestionsService.Setup(s => s.UpdateContactPointAsync(It.IsAny<QuestionContactPointRequest>(), DataAssetType.DataSet))
+                .ThrowsAsync(new UnauthorizedAccessException());
+
+            // Act
+            var result = await _controller.AddContactPointSubmit(contact, new Guid().ToString(), "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+
+        [Test]
+        public async Task AddDataOwner_InvalidModelState_LogsAndReturnsView()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var request = new QuestionContactPointRequest();
+            _controller.ModelState.AddModelError("Contact", "Invalid contact details");
+
+            // Act
+            var result = await _controller.AddDataOwner(request, new Guid().ToString(), "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+
+        [Test]
+        public async Task AddDataOwner_ValidRequest_ReturnsSecureActionResult()
+        {
+            // Arrange
+            var request = new QuestionContactPointRequest { Identifier = "identifier" };
+            var dataAsset = new GetCddoDataAssetResponse()
+            {
+                CddoDataAsset = new CddoDataAsset()
+                {
+                    SecurityClassification = "TopSecret",
+                    DataAssetContacts = new List<CddoDataAssetContact>() { new CddoDataAssetContact() { Email = "test", Name = "test", Role = DataAssetContactRoleType.Owner } }
+                }
+            };
+            _mockCatalogDataService.Setup(s => s.GetDataAssetAsync(It.IsAny<Guid>(), default)).ReturnsAsync(dataAsset);
+
+            // Act
+            var result = await _controller.AddDataOwner(request, new Guid().ToString(), "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+        [Test]
+        public async Task AddDataOwnerSubmit_InvalidModelState_ReturnsView()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var contact = new Contact { Name = "", Email = "" };
+            _controller.ModelState.AddModelError("Contact", "Invalid contact details");
+            _mockLogger.Setup(x => x.LogEvent(It.IsAny<MetadataEvent>(), It.IsAny<Dictionary<string, string>>(), null));
+
+            _mockCatalogDataService.Setup(s => s.GetDataAssetAsync(It.IsAny<Guid>(), default)).ReturnsAsync((GetCddoDataAssetResponse)null);
+
+
+            // Act
+            var result = await _controller.AddDataOwnerSubmit(contact, new Guid().ToString(), "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+
+        [Test]
+        public async Task AddDataOwnerSubmit_ValidRequest_UpdatesContactPointAndRedirects()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var contact = new Contact { Name = "John Doe", Email = "john.doe@example.com", Role = ContactRoleEnum.Owner };
+            var response = new PatchProfiledDataAssetResponse() { DataAssetId = Guid.NewGuid() };
+
+            var dataAsset = new GetCddoDataAssetResponse()
+            {
+                CddoDataAsset = new CddoDataAsset()
+                {
+                    SecurityClassification = "TopSecret",
+                    DataAssetContacts = new List<CddoDataAssetContact>() { new CddoDataAssetContact() { Email = "test", Name = "test", Role = DataAssetContactRoleType.Contact } }
+                }
+            };
+            _mockCatalogDataService.Setup(s => s.GetDataAssetAsync(It.IsAny<Guid>(), default)).ReturnsAsync(dataAsset);
+
+            _mockCatalogQuestionsService.Setup(s => s.UpdateContactPointAsync(It.IsAny<QuestionContactPointRequest>(), DataAssetType.DataSet)).ReturnsAsync(response);
+
+            // Act
+            var result = await _controller.AddDataOwnerSubmit(contact, new Guid().ToString(), "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<RedirectToActionResult>());
+        }
+        [Test]
+        public async Task AddDataOwnerSubmit_ValidRequest_UpdatesContactReturnsNull()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var contact = new Contact { Name = "John Doe", Email = "john.doe@example.com", Role = ContactRoleEnum.Owner };
+            var response = new PatchProfiledDataAssetResponse() { DataAssetId = Guid.NewGuid() };
+
+            var dataAsset = new GetCddoDataAssetResponse()
+            {
+                CddoDataAsset = new CddoDataAsset()
+                {
+                    SecurityClassification = "TopSecret",
+                    DataAssetContacts = new List<CddoDataAssetContact>() { new CddoDataAssetContact() { Email = "test", Name = "test", Role = DataAssetContactRoleType.Contact } }
+                }
+            };
+            _mockCatalogDataService.Setup(s => s.GetDataAssetAsync(It.IsAny<Guid>(), default)).ReturnsAsync(dataAsset);
+
+            _mockCatalogQuestionsService.Setup(s => s.UpdateContactPointAsync(It.IsAny<QuestionContactPointRequest>(), DataAssetType.DataSet)).ReturnsAsync((PatchProfiledDataAssetResponse)null);
+
+            // Act
+            var result = await _controller.AddDataOwnerSubmit(contact, new Guid().ToString(), "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+
+        [Test]
+        public async Task AddPublishedDate_InvalidModelState_LogsAndReturnsView()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var questionIssuedRequest = new QuestionIssuedRequest();
+            _controller.ModelState.AddModelError("IssuedDate", "Invalid date");
+
+            // Act
+            var result = await _controller.AddPublishedDate(questionIssuedRequest, "", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+
+        [Test]
+        public async Task AddPublishedDate_ValidIdentifier_FetchesDataAndReturnsView()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var identifier = Guid.NewGuid().ToString();
+            var questionIssuedRequest = new QuestionIssuedRequest { Identifier = identifier };
+            var dataAsset = new GetCddoDataAssetResponse() 
+            { 
+                CddoDataAsset = new CddoDataAsset() 
+                { 
+                    SecurityClassification = "TopSecret" ,
+                    Issued = DateTime.UtcNow
+                } 
+            };
+
+            _mockCatalogDataService.Setup(s => s.GetDataAssetAsync(It.IsAny<Guid>(), default)).ReturnsAsync(dataAsset);
+
+            // Act
+            var result = await _controller.AddPublishedDate(questionIssuedRequest, identifier, "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+        [Test]
+        public async Task AddPublishedDateSubmit_ValidDate_CallsServiceAndRedirects()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var identifier = Guid.NewGuid().ToString();
+            var questionIssuedRequest = new QuestionIssuedRequest
+            {
+                metadataIssuedDay = 1,
+                metadataIssuedMonth = 1,
+                metadataIssuedYear = 2024,
+                Identifier = identifier
+            };
+
+            var response = new PatchProfiledDataAssetResponse { DataAssetId = Guid.NewGuid() };
+            _mockCatalogQuestionsService.Setup(s => s.UpdateIssuedAsync(It.IsAny<QuestionIssuedRequest>(), It.IsAny<DataAssetType>()))
+                .ReturnsAsync(response);
+
+            // Act
+            var result = await _controller.AddPublishedDateSubmit(questionIssuedRequest, "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<RedirectToActionResult>());
+        }
+        [Test]
+        public async Task AddPublishedDateSubmit_InvalidDate_CallsServiceAndRedirects()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var identifier = Guid.NewGuid().ToString();
+            var questionIssuedRequest = new QuestionIssuedRequest
+            {
+                metadataIssuedDay = 0,
+                metadataIssuedMonth = 0,
+                metadataIssuedYear = 0,
+                Identifier = identifier
+            };
+
+            var response = new PatchProfiledDataAssetResponse { DataAssetId = Guid.NewGuid() };
+            _mockCatalogQuestionsService.Setup(s => s.UpdateIssuedAsync(It.IsAny<QuestionIssuedRequest>(), It.IsAny<DataAssetType>()))
+                .ReturnsAsync(response);
+
+            // Act
+            var result = await _controller.AddPublishedDateSubmit(questionIssuedRequest, "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+        [Test]
+        public async Task AddPublishedDateSubmit_InvalidDate_AndModelError_CallsServiceAndRedirects()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            _controller.ModelState.AddModelError("IssuedDate", "Invalid date");
+
+            var identifier = Guid.NewGuid().ToString();
+            var questionIssuedRequest = new QuestionIssuedRequest
+            {
+                metadataIssuedDay = 0,
+                metadataIssuedMonth = 0,
+                metadataIssuedYear = 0,
+                Identifier = identifier
+            };
+
+            var response = new PatchProfiledDataAssetResponse { DataAssetId = Guid.NewGuid() };
+            _mockCatalogQuestionsService.Setup(s => s.UpdateIssuedAsync(It.IsAny<QuestionIssuedRequest>(), It.IsAny<DataAssetType>()))
+                .ReturnsAsync(response);
+
+            // Act
+            var result = await _controller.AddPublishedDateSubmit(questionIssuedRequest, "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<RedirectToActionResult>());
+        }
+        [Test]
+        public async Task AddPublishedDateSubmit_DateInFuture_ReturnsView()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var identifier = Guid.NewGuid().ToString();
+            var questionIssuedRequest = new QuestionIssuedRequest
+            {
+                metadataIssuedDay = 1,
+                metadataIssuedMonth = 1,
+                metadataIssuedYear = 2026,
+                Identifier = identifier
+            };
+
+            _mockCatalogQuestionsService.Setup(s => s.UpdateIssuedAsync(It.IsAny<QuestionIssuedRequest>(), It.IsAny<DataAssetType>()))
+                .ThrowsAsync(new UnauthorizedAccessException());
+
+            // Act
+            var result = await _controller.AddPublishedDateSubmit(questionIssuedRequest, "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+        [Test]
+        public async Task AddPublishedDateSubmit_ValidDate_CallsServiceAndThrowsException()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var identifier = Guid.NewGuid().ToString();
+            var questionIssuedRequest = new QuestionIssuedRequest
+            {
+                metadataIssuedDay = 1,
+                metadataIssuedMonth = 1,
+                metadataIssuedYear = 2024,
+                Identifier = identifier
+            };
+
+            _mockCatalogQuestionsService.Setup(s => s.UpdateIssuedAsync(It.IsAny<QuestionIssuedRequest>(), It.IsAny<DataAssetType>()))
+                .ThrowsAsync(new UnauthorizedAccessException());
+
+            // Act
+            var result = await _controller.AddPublishedDateSubmit(questionIssuedRequest, "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<RedirectToPageResult>());
+        }
+
+        [Test]
+        public async Task AddFrequency_InvalidModelState_LogsAndReturnsView()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            var identifier = Guid.NewGuid().ToString();
+
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var questionUpdateFrequencyRequest = new QuestionUpdateFrequencyRequest();
+            _controller.ModelState.AddModelError("UpdateFrequency", "Invalid frequency");
+
+            // Act
+            var result = await _controller.AddFrequency(questionUpdateFrequencyRequest, identifier, "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+
+        [Test]
+        public async Task AddFrequency_ValidIdentifier_FetchesDataAndReturnsView()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var identifier = Guid.NewGuid().ToString();
+            var questionUpdateFrequencyRequest = new QuestionUpdateFrequencyRequest { Identifier = identifier };
+            var dataAsset = new GetCddoDataAssetResponse() { CddoDataAsset = new CddoDataAsset() { SecurityClassification = "TopSecret", UpdateFrequencyString = "Monthly" } };
+
+            _mockCatalogDataService.Setup(s => s.GetDataAssetAsync(It.IsAny<Guid>(), default)).ReturnsAsync(dataAsset);
+
+            // Act
+            var result = await _controller.AddFrequency(questionUpdateFrequencyRequest, identifier, "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+        [Test]
+        public async Task AddFrequencySubmit_InvalidModelState_LogsAndReturnsView()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var questionUpdateFrequencyRequest = new QuestionUpdateFrequencyRequest { UpdateFrequency = "Invalid" };
+            _controller.ModelState.AddModelError("UpdateFrequency", "Invalid frequency");
+            _mockLogger.Setup(x => x.LogEvent(It.IsAny<MetadataEvent>(), It.IsAny<Dictionary<string, string>>(), null));
+
+            _mockCatalogQuestionsService.Setup(s => s.UpdateUpdateFrequencyAsync(It.IsAny<QuestionUpdateFrequencyRequest>(), It.IsAny<DataAssetType>()))
+            .ReturnsAsync((PatchProfiledDataAssetResponse)null);
+            // Act
+            var result = await _controller.AddFrequencySubmit(questionUpdateFrequencyRequest, "", "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+
+        [Test]
+        public async Task AddFrequencySubmit_ValidFrequency_CallsServiceAndRedirects()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var identifier = Guid.NewGuid().ToString();
+            var questionUpdateFrequencyRequest = new QuestionUpdateFrequencyRequest { UpdateFrequency = "Weekly", Identifier = identifier };
+            var response = new PatchProfiledDataAssetResponse { DataAssetId = Guid.NewGuid() };
+
+            _mockCatalogQuestionsService.Setup(s => s.UpdateUpdateFrequencyAsync(It.IsAny<QuestionUpdateFrequencyRequest>(), It.IsAny<DataAssetType>()))
+                .ReturnsAsync(response);
+
+            // Act
+            var result = await _controller.AddFrequencySubmit(questionUpdateFrequencyRequest, "", "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<RedirectToActionResult>());
+        }
+        [Test]
+        public async Task AddFrequencySubmit_ValidFrequency_CallsServiceAndThrowsException()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var identifier = Guid.NewGuid().ToString();
+            var questionUpdateFrequencyRequest = new QuestionUpdateFrequencyRequest { UpdateFrequency = "Other", Identifier = identifier };
+            var response = new PatchProfiledDataAssetResponse { DataAssetId = Guid.NewGuid() };
+
+            _mockCatalogQuestionsService.Setup(s => s.UpdateUpdateFrequencyAsync(It.IsAny<QuestionUpdateFrequencyRequest>(), It.IsAny<DataAssetType>()))
+                .ThrowsAsync(new UnauthorizedAccessException());
+
+            // Act
+            var result = await _controller.AddFrequencySubmit(questionUpdateFrequencyRequest, "", "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<RedirectToPageResult>());
+        }
+        [Test]
+        public async Task AddSupplyFormat_InvalidModelState_LogsErrorAndReturnsView()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var request = new QuestionDistributionRequest();
+            _controller.ModelState.AddModelError("Distribution", "Invalid distribution");
+
+            // Act
+            var result = await _controller.AddSupplyFormat(request, "", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+
+        [Test]
+        public async Task AddSupplyFormat_ValidIdentifier_FetchesDataAndReturnsView()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var identifier = Guid.NewGuid().ToString();
+            var request = new QuestionDistributionRequest { Identifier = identifier };
+            var dataAsset = new GetCddoDataAssetResponse() { CddoDataAsset = new CddoDataAsset() { SecurityClassification = "TopSecret", DataAssetDistribution = new CddoDataAssetDistribution() { MediaType ="application/json"  } } };
+   
+            _mockCatalogDataService.Setup(s => s.GetDataAssetAsync(It.IsAny<Guid>(), default)).ReturnsAsync(dataAsset);
+
+            // Act
+            var result = await _controller.AddSupplyFormat(request, identifier, "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+        [Test]
+        public async Task AddSupplyFormatSubmit_InvalidModelState_LogsErrorAndReturnsView()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var request = new QuestionDistributionRequest();
+            _controller.ModelState.AddModelError("Distribution", "Invalid distribution");
+
+            // Act
+            var result = await _controller.AddSupplyFormatSubmit(request, "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+
+        [Test]
+        public async Task AddSupplyFormatSubmit_ValidRequest_CallsServiceAndRedirects()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var request = new QuestionDistributionRequest { Identifier = Guid.NewGuid().ToString() };
+            var response = new PatchProfiledDataAssetResponse { DataAssetId = Guid.NewGuid() };
+
+            _mockCatalogQuestionsService.Setup(s => s.UpdateDistributionAsync(request, DataAssetType.DataSet)).ReturnsAsync(response);
+
+            // Act
+            var result = await _controller.AddSupplyFormatSubmit(request, "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<RedirectToActionResult>());
+        }
+
+        [Test]
+        public async Task AddSupplyFormatSubmit_UnauthorizedAccessException_RedirectsToAccessDeniedPage()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var request = new QuestionDistributionRequest { Identifier = Guid.NewGuid().ToString() };
+
+            _mockCatalogQuestionsService.Setup(s => s.UpdateDistributionAsync(request, DataAssetType.DataSet)).ThrowsAsync(new UnauthorizedAccessException());
+
+            // Act
+            var result = await _controller.AddSupplyFormatSubmit(request, "false", "false", "false", "false");
+
+            // Assert
+            Assert.That(result, Is.TypeOf<RedirectToPageResult>());
+        }
+        [Test]
+        public async Task TaskList_InvalidModelState_LogsErrorAndReturnsView()
+        {
+            // Arrange 
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            _controller.ModelState.AddModelError("Identifier", "Invalid identifier");
+
+            // Act and Assert
+            Assert.That(() => _controller.TaskList(null, false), Throws.Exception.TypeOf<ArgumentNullException>());
+            _mockLogger.Verify(logger => logger.LogEvent(EventTypes.MetadataEvent.MetadataAccessDenied, It.IsAny<Dictionary<string, string>>(), null), Times.Once);
+        }
+
+        [Test]
+        public async Task TaskList_ValidRequest_ReturnsViewWithData()
+        {
+            // Arrange
+            SetAuthenticatedUser(true);
+            ClearInvocations();
+            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
+                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
+            var identifier = Guid.NewGuid().ToString();
+            var dataAssetResponse = new  GetCddoDataAssetResponse() { CddoDataAsset = new CddoDataAsset() { SecurityClassification = "TopSecret" } };
+            var duplicateResponse = new CheckForPotentialDuplicatesToDataAssetResponse() 
+            { 
+                PotentialDuplicatesToDataAsset = _fixture.Create<List<PotentialDuplicateDataAssetInformation>>() 
+            };
+
+            _mockCatalogDataService.Setup(s => s.GetDataAssetAsync(It.IsAny<Guid>(), default)).ReturnsAsync(dataAssetResponse);
+            _mockCatalogDataService.Setup(s => s.CheckForPotentialDuplicatesToDataAssetAsync(It.IsAny<Guid>(), default)).ReturnsAsync(duplicateResponse);
+
+            // Act
+            var result = await _controller.TaskList(identifier, false);
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
+        [Test]
+        public async Task CheckAnswers_InvalidModelState_LogsErrorAndReturnsView()
+        {
+            // Arrange
+            _controller.ModelState.AddModelError("Identifier", "Invalid identifier");
+
+            // Act and Assert
+            Assert.That(() =>  _controller.CheckAnswers(null), Throws.Exception.TypeOf<ArgumentNullException>());
+            _mockLogger.Verify(logger => logger.LogEvent(EventTypes.MetadataEvent.MetadataAccessDenied, It.IsAny<Dictionary<string, string>>(), null), Times.Once);
+        }
+
+        [Test]
+        public async Task CheckAnswers_ValidRequest_ReturnsViewWithData()
+        {
+            // Arrange
+            var identifier = Guid.NewGuid().ToString();
+            var dataAssetResponse = new GetCddoDataAssetResponse() { CddoDataAsset = new CddoDataAsset() { SecurityClassification = "TopSecret" } }; ;
+            var validationErrorsResponse = new GetCddoDataAssetValidationErrorsResponse { PropertyValidationErrors = new List<DataAssetValidationPropertyResult>() };
+            var duplicateResponse = new CheckForPotentialDuplicatesToDataAssetResponse()
+            {
+                PotentialDuplicatesToDataAsset = _fixture.Create<List<PotentialDuplicateDataAssetInformation>>()
+            };
+
+            _mockCatalogDataService.Setup(s => s.GetDataAssetAsync(It.IsAny<Guid>(), default)).ReturnsAsync(dataAssetResponse);
+            _mockCatalogDataService.Setup(s => s.GetDataAssetValidationErrorsAsync(It.IsAny<Guid>(), default)).ReturnsAsync(validationErrorsResponse);
+            _mockCatalogDataService.Setup(s => s.CheckForPotentialDuplicatesToDataAssetAsync(It.IsAny<Guid>(), default)).ReturnsAsync(duplicateResponse);
+
+            // Act
+            var result = await _controller.CheckAnswers(identifier);
+
+            // Assert
+            Assert.That(result, Is.TypeOf<ViewResult>());
+        }
     }
 }
