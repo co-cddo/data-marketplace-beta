@@ -15,7 +15,6 @@
                 Selected = Model?.OrganisationType != null &&
                                                            Enum.TryParse(typeof(OrganisationType), Model.OrganisationType, true, out var parsedValue) &&
                                                            (OrganisationType)parsedValue == e
-
             });
 
     int? selectedDepartment = null; 
@@ -61,8 +60,7 @@
                             {
                                 <option value="@item.Value" selected="@item.Selected">@item.Text</option>
                             }                           
-                        </select>
-                       
+                        </select>                      
                     </div>
 
                     <div class="govuk-form-group">

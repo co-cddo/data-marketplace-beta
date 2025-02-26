@@ -15,7 +15,7 @@
     <script src="~/js/Pages/DataShareRequest/data-share-request-question.min.js" asp-add-nonce="true"></script>
 }
 
-<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+<a class="govuk-back-link" asp-controller="DataRequest" asp-action="RequestTasks" asp-route-requestId="@dataShareRequestId">Back</a>
 <div class="govuk-main-wrapper ">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
