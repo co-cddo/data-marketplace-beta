@@ -46,9 +46,12 @@
                         <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                             @foreach (var theme in Enum.GetValues(typeof(ThemeEnum)).Cast<ThemeEnum>())
                             {
-                                var isChecked = Model.Theme != null && Model.Theme.Contains(theme);
+                                var themeMemberValue = EnumMemberConverter.GetEnumMemberValue(@theme);
+
+                                var isChecked = Model.Theme != null && Model.Theme.Contains(themeMemberValue);
+
                                 <div class="govuk-checkboxes__item">
-                                    <input class="govuk-checkboxes__input" id="@theme" name="@nameof(QuestionThemeRequest.Theme)" type="checkbox" value="@theme"
+                                    <input class="govuk-checkboxes__input" id="@theme" name="@nameof(QuestionThemeRequest.Theme)" type="checkbox" value="@themeMemberValue"
                                     @(isChecked ? "checked" : "")>
                                     <label class="govuk-label govuk-checkboxes__label" for="@theme">
                                         @EnumMemberConverter.GetEnumDescription(@theme)

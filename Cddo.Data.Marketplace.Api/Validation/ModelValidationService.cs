@@ -304,7 +304,7 @@ namespace Cddo.Data.Marketplace.Api.Validation
                         SecurityClassification = SecurityClassificationEnum.Official,
                         Status = ResourceStatusEnum.Published,
                         SupplierIdentifier = "supplier-12345",
-                        Theme = new List<ThemeEnum> { ThemeEnum.Education, ThemeEnum.ScienceAndTechnology }
+                        Theme = new List<string> { nameof(ThemeEnum.Education), nameof(ThemeEnum.ScienceAndTechnology) }
                     },
                     new()
                     {
@@ -323,7 +323,7 @@ namespace Cddo.Data.Marketplace.Api.Validation
                         SecurityClassification = SecurityClassificationEnum.Secret,
                         Status = ResourceStatusEnum.Draft,
                         SupplierIdentifier = "supplier-67890",
-                        Theme = new List<ThemeEnum> { ThemeEnum.HealthAndCare, ThemeEnum.TransportAndInfrastructure }
+                        Theme = new List<string> { nameof(ThemeEnum.HealthAndCare), nameof(ThemeEnum.TransportAndInfrastructure) }
                     }
                 };
 
@@ -350,7 +350,7 @@ namespace Cddo.Data.Marketplace.Api.Validation
                 SecurityClassification = SecurityClassificationEnum.Official,
                 Status = ResourceStatusEnum.Published,
                 SupplierIdentifier = "supplier-12345-dataset",
-                Theme = new List<ThemeEnum> { ThemeEnum.BusinessEconomicsAndFinance, ThemeEnum.EnvironmentAndNature },
+                Theme = new List<string> { nameof(ThemeEnum.BusinessEconomicsAndFinance), nameof(ThemeEnum.EnvironmentAndNature) },
                 Issued = DateTime.Now,
                 Distribution = new List<Distribution>
                     {
@@ -381,7 +381,7 @@ namespace Cddo.Data.Marketplace.Api.Validation
                 Publisher = patchModel.Publisher ?? "Mocked Publisher",
                 SecurityClassification = SecurityClassificationEnum.Official,
                 Type = ResourceEnum.DataSet,
-                Theme = new List<ThemeEnum> { ThemeEnum.BusinessEconomicsAndFinance, ThemeEnum.EnvironmentAndNature },
+                Theme = new List<string> { nameof(ThemeEnum.BusinessEconomicsAndFinance), nameof(ThemeEnum.EnvironmentAndNature) },
                 Issued = DateTime.Now,
                 ContactPoint = new List<Contact>
                     {
@@ -420,7 +420,7 @@ namespace Cddo.Data.Marketplace.Api.Validation
                 Status = ResourceStatusEnum.Published,
                 Modified = DateTime.Now,
                 Type = ResourceEnum.DataService,
-                Theme = new List<ThemeEnum> { ThemeEnum.AgricultureFisheriesAndForestry, ThemeEnum.BusinessEconomicsAndFinance },
+                Theme = new List<string> { nameof(ThemeEnum.AgricultureFisheriesAndForestry), nameof(ThemeEnum.BusinessEconomicsAndFinance) },
                 SecurityClassification = SecurityClassificationEnum.Official,
                 EndpointDescription = "Endpoint Description",
                 EndpointUrl = "https://testingurl.com",
@@ -449,7 +449,7 @@ namespace Cddo.Data.Marketplace.Api.Validation
                 Status = ResourceStatusEnum.Published,
                 Modified = DateTime.UtcNow,
                 Type = ResourceEnum.DataService,
-                Theme = new List<ThemeEnum> { ThemeEnum.AgricultureFisheriesAndForestry, ThemeEnum.BusinessEconomicsAndFinance },
+                Theme = new List<string> { nameof(ThemeEnum.AgricultureFisheriesAndForestry), nameof(ThemeEnum.BusinessEconomicsAndFinance) },
                 SecurityClassification = SecurityClassificationEnum.Official,
                 EndpointDescription = "Endpoint Description",
                 EndpointUrl = "https://testingurl.com",

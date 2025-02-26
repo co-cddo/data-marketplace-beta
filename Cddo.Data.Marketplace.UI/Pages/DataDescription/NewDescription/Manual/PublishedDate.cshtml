@@ -1,9 +1,9 @@
 ﻿@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
 @using Cddo.Data.Marketplace.UI.Controllers
-@model QuestionIssuedRequest
+@model QuestionIssuedRequestModel
 @{
     ViewData["Title"] = "Date Issued";
-    var errorMessage = ViewData.ModelState[nameof(Model.metadataIssuedDate)]?.Errors?.FirstOrDefault()?.ErrorMessage;
+    var errorMessage = ViewData.ModelState["metadataIssuedDate"]?.Errors?.FirstOrDefault()?.ErrorMessage;
     bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
     bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
     bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
@@ -35,7 +35,7 @@
                 @Html.AntiForgeryToken()
                 @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
 
-                <div class="govuk-form-group @(ViewData.ModelState[nameof(Model.metadataIssuedDate)]?.Errors.Any() == true ? "govuk-form-group--error" : "")">
+                <div class="govuk-form-group @(ViewData.ModelState["metadataIssuedDate"]?.Errors.Any() == true ? "govuk-form-group--error" : "")">
                     <fieldset class="govuk-fieldset" role="group" aria-describedby="passport-issued-hint">
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                             <h1 class="govuk-fieldset__heading">
@@ -45,7 +45,7 @@
                         <div id="passport-issued-hint" class="govuk-hint">
                             Provide the date when you first issued the data set or published it in your data catalogue. For example, 17 03 2024.
                         </div>
-                        @if (ViewData.ModelState[nameof(Model.metadataIssuedDate)]?.Errors.Any() == true)
+                        @if (ViewData.ModelState["metadataIssuedDate"]?.Errors.Any() == true)
                         {
                             <p id="metadataTitle-error" class="govuk-error-message">
                                 <span class="govuk-visually-hidden">Error:</span> @errorMessage
@@ -58,7 +58,7 @@
                                         Day
                                     </label>
                                     <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState[nameof(Model.metadataIssuedDay)]?.Errors.Any() == true ? "govuk-input--error" : "")"
-                                           id="metadataIssuedDay" name="@nameof(QuestionIssuedRequest.metadataIssuedDay)" type="number" inputmode="numeric" value="@(Model?.metadataIssuedDay != 0 ? Model?.metadataIssuedDay.ToString() : "")">
+                                           id="metadataIssuedDay" name="@nameof(QuestionIssuedRequest.metadataIssuedDay)"value="@(!string.IsNullOrEmpty(Model?.metadataIssuedDay) ? Model?.metadataIssuedDay.ToString() : "")">
                                 </div>
                             </div>
                             <div class="govuk-date-input__item">
@@ -67,7 +67,7 @@
                                         Month
                                     </label>
                                     <input class="govuk-input govuk-date-input__input govuk-input--width-2 @(ViewData.ModelState[nameof(Model.metadataIssuedMonth)]?.Errors.Any() == true ? "govuk-input--error" : "")"
-                                           id="metadataIssuedMonth" name="@nameof(QuestionIssuedRequest.metadataIssuedMonth)" type="number" inputmode="numeric" value="@(Model?.metadataIssuedMonth != 0 ? Model?.metadataIssuedMonth.ToString() : "")">
+                                           id="metadataIssuedMonth" name="@nameof(QuestionIssuedRequest.metadataIssuedMonth)" value="@(!string.IsNullOrEmpty(Model?.metadataIssuedMonth) ? Model?.metadataIssuedMonth.ToString() : "")">
                                 </div>
                             </div>
                             <div class="govuk-date-input__item">
@@ -76,7 +76,7 @@
                                         Year
                                     </label>
                                     <input class="govuk-input govuk-date-input__input govuk-input--width-4 @(ViewData.ModelState[nameof(Model.metadataIssuedYear)]?.Errors.Any() == true ? "govuk-input--error" : "")"
-                                           id="metadataIssuedYear" name="@nameof(QuestionIssuedRequest.metadataIssuedYear)" type="number" inputmode="numeric" value="@(Model?.metadataIssuedYear != 0 ? Model?.metadataIssuedYear.ToString() : "")">
+                                           id="metadataIssuedYear" name="@nameof(QuestionIssuedRequest.metadataIssuedYear)" value="@(!string.IsNullOrEmpty(Model?.metadataIssuedYear) ? Model?.metadataIssuedYear.ToString() : "")">
                                 </div>
                             </div>
                         </div>

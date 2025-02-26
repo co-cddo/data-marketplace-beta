@@ -15,6 +15,7 @@ using Agm.Catalog.DotNet.Dto.Responses.DataAssets;
 using Cddo.Data.Marketplace.Audit;
 using Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums;
 using System.Text.RegularExpressions;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Cddo.Data.Marketplace.UI.Controllers;
 
@@ -154,7 +155,7 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Security-Classification")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SecurityClassificationSubmit(QuestionSecurityClassificationRequest questionSecurityClassificationRequest, string isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode)
+    public async Task<IActionResult> SecurityClassificationSubmit(QuestionSecurityClassificationRequest questionSecurityClassificationRequest, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
         if (!ModelState.IsValid && questionSecurityClassificationRequest.SecurityClassification is null)
         {
@@ -223,7 +224,7 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Title")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddTitleSubmit(QuestionTitleRequest questionTitleRequest, string isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode, SecurityClassificationEnum? securityClassification = null)
+    public async Task<IActionResult> AddTitleSubmit(QuestionTitleRequest questionTitleRequest, string? isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode, SecurityClassificationEnum? securityClassification = null)
     {
 
         if (string.IsNullOrWhiteSpace(questionTitleRequest.Title) && !ModelState.IsValid)
@@ -446,9 +447,7 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset is not null && dataAsset.CddoDataAsset.Themes.Any())
             {
-                questionThemeRequest.Theme = dataAsset.CddoDataAsset.Themes
-                    .Select(theme => EnumHelper.GetEnumValueFromString(theme))
-                    .ToList();
+                questionThemeRequest.Theme = dataAsset.CddoDataAsset.Themes.ToList();
             }
         }
 
@@ -467,15 +466,15 @@ public class CatalogDataDescriptionController(
         {
             var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
 
-            if (validationErrors.Count() > 0)
+            if (validationErrors.Count > 0)
             {
-                string themeAsString = string.Join(", ", questionThemeRequest.Theme);
+                var themeAsString = questionThemeRequest.Theme != null ? string.Join(", ", questionThemeRequest.Theme) : string.Empty;
 
                 _insightsLogger.LogEvent(EventTypes.MetadataEvent.MetadataEdited, new Dictionary<string, string>
-        {
-            { LogValidationErrors, string.Join(", ", validationErrors) },
-            { "Theme", themeAsString }
-        });
+                    {
+                        { LogValidationErrors, string.Join(", ", validationErrors) },
+                        { "Theme", themeAsString }
+                    });
             }
         }
 
@@ -535,7 +534,7 @@ public class CatalogDataDescriptionController(
     {
         questionKeywordRequest.Keyword = NormalizeKeywords(questionKeywordRequest.Keyword);
 
-        if (questionKeywordRequest.Keyword != null && ModelState.IsValid)
+        if (questionKeywordRequest.Keyword != null)
         {
             var invalidKeywords = ValidateKeywords(questionKeywordRequest.Keyword);
             if (invalidKeywords.Any())
@@ -584,6 +583,7 @@ public class CatalogDataDescriptionController(
         return keywords
             .Where(k => string.IsNullOrWhiteSpace(k) ||
                         k.Length < 2 ||
+                        k.Length > 100 ||
                         !regex.IsMatch(k))
             .ToList();
     }
@@ -597,7 +597,7 @@ public class CatalogDataDescriptionController(
         {
             if (invalidKeywords.Contains(questionKeywordRequest.Keyword[i]))
             {
-                ModelState.AddModelError($"Keyword_{i}", "Keywords can only contain alphanumeric characters, spaces, hyphens, and underscores, and must be at least two characters long");
+                ModelState.AddModelError($"Keyword_{i}", "Keywords can only contain alphanumeric characters, spaces, hyphens, and underscores, and must be at least two characters, and less than 100 characters long");
             }
         }
 
@@ -662,7 +662,7 @@ public class CatalogDataDescriptionController(
 
         var questionContactPointRequest = CreateQuestionContactPointRequest(contact, identifier);
 
-        if (questionContactPointRequest.ContactPoint.Any())
+        if (questionContactPointRequest.ContactPoint != null && questionContactPointRequest.ContactPoint.Any())
         {
             var response = await UpdateContactPointAsync(questionContactPointRequest);
 
@@ -853,7 +853,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("Add-Published-Date")]
-    public async Task<IActionResult> AddPublishedDate(QuestionIssuedRequest questionIssuedRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> AddPublishedDate(QuestionIssuedRequestModel questionIssuedRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -870,10 +870,9 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset!.CddoDataAsset.Issued.HasValue)
             {
-                questionIssuedRequest.metadataIssuedDate = dataAsset.CddoDataAsset.Issued.Value;
-                questionIssuedRequest.metadataIssuedDay = dataAsset.CddoDataAsset.Issued.Value.Day;
-                questionIssuedRequest.metadataIssuedMonth = dataAsset.CddoDataAsset.Issued.Value.Month;
-                questionIssuedRequest.metadataIssuedYear = dataAsset.CddoDataAsset.Issued.Value.Year;
+                questionIssuedRequest.metadataIssuedDay = dataAsset.CddoDataAsset.Issued.Value.Day.ToString();
+                questionIssuedRequest.metadataIssuedMonth = dataAsset.CddoDataAsset.Issued.Value.Month.ToString();
+                questionIssuedRequest.metadataIssuedYear = dataAsset.CddoDataAsset.Issued.Value.Year.ToString();
             }
         }
 
@@ -886,17 +885,25 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Published-Date")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddPublishedDateSubmit(QuestionIssuedRequest questionIssuedRequest, string isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode)
+    public async Task<IActionResult> AddPublishedDateSubmit(QuestionIssuedRequestModel questionIssuedRequestModel, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
-        if (IsDateEmpty(questionIssuedRequest) && !ModelState.IsValid)
+        if (IsDateEmpty(questionIssuedRequestModel) && !ModelState.IsValid)
         {
-            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, questionIssuedRequest.Identifier, nameof(AddFrequency), isEditMode)
-                   ?? RedirectToAction(nameof(AddFrequency), new { questionIssuedRequest.Identifier });
+            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, questionIssuedRequestModel.Identifier, nameof(AddFrequency), isEditMode)
+                   ?? RedirectToAction(nameof(AddFrequency), new { questionIssuedRequestModel.Identifier });
         }
 
-        var dateString = $"{questionIssuedRequest.metadataIssuedMonth}/{questionIssuedRequest.metadataIssuedDay}/{questionIssuedRequest.metadataIssuedYear}";
+        var dateString = $"{questionIssuedRequestModel.metadataIssuedMonth}/{questionIssuedRequestModel.metadataIssuedDay}/{questionIssuedRequestModel.metadataIssuedYear}";
         if (DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
         {
+            QuestionIssuedRequest questionIssuedRequest = new()
+            {
+                metadataIssuedDay = int.Parse(questionIssuedRequestModel.metadataIssuedDay),
+                metadataIssuedMonth = int.Parse(questionIssuedRequestModel.metadataIssuedMonth),
+                metadataIssuedYear = int.Parse(questionIssuedRequestModel.metadataIssuedYear),
+                Identifier = questionIssuedRequestModel.Identifier
+            };
+
             questionIssuedRequest.metadataIssuedDate = date;
 
             if (date.Date > DateTime.Now.Date)
@@ -904,7 +911,7 @@ public class CatalogDataDescriptionController(
                 ModelState.Clear();
                 ModelState.AddModelError(nameof(questionIssuedRequest.metadataIssuedDate), "The date cannot be in the future");
                 ViewBag.isEditMode = isEditMode;
-                return ViewOrRedirect(PublishedDateViewPath, questionIssuedRequest);
+                return ViewOrRedirect(PublishedDateViewPath, questionIssuedRequestModel);
             }
 
             PatchProfiledDataAssetResponse? response;
@@ -927,37 +934,35 @@ public class CatalogDataDescriptionController(
             }
         }
 
-        AddModelErrorsForInvalidDate(questionIssuedRequest);
+        AddModelErrorsForInvalidDate(questionIssuedRequestModel);
         ViewBag.isEditMode = isEditMode;
-        return ViewOrRedirect(PublishedDateViewPath, questionIssuedRequest);
+        return ViewOrRedirect(PublishedDateViewPath, questionIssuedRequestModel);
     }
 
-    private static bool IsDateEmpty(QuestionIssuedRequest questionIssuedRequest)
+    private static bool IsDateEmpty(QuestionIssuedRequestModel questionIssuedRequest)
     {
-        return questionIssuedRequest is { metadataIssuedDay: 0, metadataIssuedMonth: 0, metadataIssuedYear: 0 };
+        if (questionIssuedRequest.metadataIssuedDay.IsNullOrEmpty() || questionIssuedRequest.metadataIssuedMonth.IsNullOrEmpty() || questionIssuedRequest.metadataIssuedYear.IsNullOrEmpty()) return false;
+        return true;
     }
 
-    private void AddModelErrorsForInvalidDate(QuestionIssuedRequest questionIssuedRequest)
+    private void AddModelErrorsForInvalidDate(QuestionIssuedRequestModel questionIssuedRequest)
     {
         ModelState.Clear();
 
-        if (questionIssuedRequest.metadataIssuedDay == 0 || questionIssuedRequest.metadataIssuedMonth == 0
-            || questionIssuedRequest.metadataIssuedYear == 0 || questionIssuedRequest.metadataIssuedDate.Date == DateTime.MinValue)
-        {
-            ModelState.AddModelError(nameof(questionIssuedRequest.metadataIssuedDate), "Provide a valid date");
-        }
+        ModelState.AddModelError("metadataIssuedDate", "Provide a valid date");
+        
 
-        if (questionIssuedRequest.metadataIssuedDay == 0)
+        if (!questionIssuedRequest.metadataIssuedDay.IsNullOrEmpty() && !int.TryParse(questionIssuedRequest.metadataIssuedDay, out int dayResult))
         {
             ModelState.AddModelError(nameof(questionIssuedRequest.metadataIssuedDay), "Day is invalid");
         }
 
-        if (questionIssuedRequest.metadataIssuedMonth == 0)
+        if (!questionIssuedRequest.metadataIssuedMonth.IsNullOrEmpty() && !int.TryParse(questionIssuedRequest.metadataIssuedMonth, out int monthResult ))
         {
             ModelState.AddModelError(nameof(questionIssuedRequest.metadataIssuedMonth), "Month is invalid");
         }
 
-        if (questionIssuedRequest.metadataIssuedYear == 0)
+        if (!questionIssuedRequest.metadataIssuedYear.IsNullOrEmpty() && !int.TryParse(questionIssuedRequest.metadataIssuedYear, out int yearResult))
         {
             ModelState.AddModelError(nameof(questionIssuedRequest.metadataIssuedYear), "Year is invalid");
         }

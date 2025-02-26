@@ -48,13 +48,15 @@
                     <input hidden value="@Model.Organisation.OrganisationId" name="OrganisationId" />
                     <div class="govuk-form-group">
                         <label class="govuk-label" for="organisationName">Organisation Name</label>
-                        <input class="govuk-input" id="organisationName" name="OrganisationName" type="text" required value="@Model.Organisation.OrganisationName">
+                        <!-- Disabled text input (greyed out and not editable) -->
+                        <input class="govuk-input" id="organisationName" type="text" value="@Model.Organisation.OrganisationName" disabled />
+                        <!-- Hidden field to submit the organisation name value -->
+                        <input type="hidden" name="OrganisationName" value="@Model.Organisation.OrganisationName" />
                     </div>
 
                     <div class="govuk-form-group">
                         <label class="govuk-label" for="organisationType">Organisation Type</label>
-                        <select class="govuk-select" id="organisationType" name="OrganisationType" required>
-                            <option value="">Select..</option>
+                        <select class="govuk-select" id="organisationType" name="OrganisationType" required>                            
                             @foreach (var item in organisationTypes)
                             {
                                 <option value="@item.Value" selected="@item.Selected">@item.Text</option>
