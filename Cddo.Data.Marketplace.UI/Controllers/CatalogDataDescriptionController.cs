@@ -16,6 +16,7 @@ using Cddo.Data.Marketplace.Audit;
 using Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums;
 using System.Text.RegularExpressions;
 using Microsoft.IdentityModel.Tokens;
+using Agm.Catalog.DotNet.Core.Validation.EmailAddress;
 
 namespace Cddo.Data.Marketplace.UI.Controllers;
 
@@ -40,6 +41,7 @@ public class CatalogDataDescriptionController(
     private const string KeywordsViewPath = "~/Pages/DataDescription/NewDescription/Manual/Keywords.cshtml";
     private const string DataOwnerViewPath = "~/Pages/DataDescription/NewDescription/Manual/DataOwner.cshtml";
     private const string PublishedDateViewPath = "~/Pages/DataDescription/NewDescription/Manual/PublishedDate.cshtml";
+    private const string ContactPointViewPath = "~/Pages/DataDescription/NewDescription/Manual/ContactPoint.cshtml";
 
     // Centralised roles definition
     private static readonly List<string> RequiredRoles =
@@ -654,10 +656,24 @@ public class CatalogDataDescriptionController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddContactPointSubmit(Contact contact, string? identifier, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
+        CddoEmailAddressValidation emailValidator = new();
+        QuestionContactPointRequest questionContactPoint = new() { Identifier = identifier, ContactPoint = new List<Contact> { contact } };
+
+        if (!string.IsNullOrEmpty(contact.Email) && !Regex.IsMatch(contact.Email, emailValidator.CddoEmailAddressRegex.ToString()))
+        {
+            ModelState.AddModelError(nameof(contact.Email), "Email is invalid");     
+        }
+        if (string.IsNullOrEmpty(contact.Name) && !string.IsNullOrEmpty(contact.Email))
+        {
+            ModelState.AddModelError(nameof(contact.Name), "Please enter a name to continue");
+        }
+
         if (!ModelState.IsValid)
         {
+            ViewBag.isEditMode = isEditMode;
+
             insightsLogger.LogWarning("Model state is invalid for AddContactPointSubmit.");
-            return View();
+            return ViewOrRedirect(ContactPointViewPath, questionContactPoint);
         }
 
         var questionContactPointRequest = CreateQuestionContactPointRequest(contact, identifier);
