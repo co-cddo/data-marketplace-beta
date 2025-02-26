@@ -8,12 +8,14 @@ using Cddo.Data.Marketplace.Logic.Services.Users;
 using Cddo.Data.Marketplace.Logic.Services.Users.Model;
 using Cddo.Data.Marketplace.UI.Controllers;
 using Cddo.Data.Marketplace.UI.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -79,10 +81,37 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             };
         }
 
+        private void SetAuthenticatedUser(bool isAuthenticated)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, "TestUser")
+            };
+
+            ClaimsIdentity identity;
+
+            if (isAuthenticated)
+            {
+                identity = new ClaimsIdentity(claims, "TestAuthenticationType");
+            }
+            else
+            {
+                identity = new ClaimsIdentity();
+            }
+
+            var user = new ClaimsPrincipal(identity);
+
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext() { User = user }
+            };
+        }
+
         [Test]
         public async Task ApiCredentials_UserIsNotAuthorized_ReturnsLandingPageView()
         {
             // Arrange
+            SetAuthenticatedUser(true);
             _mockUserRoleService.Setup(x => x.IsUserRolePublisher()).ReturnsAsync(false);
             _mockUserRoleService.Setup(x => x.IsUserRoleAdmin()).ReturnsAsync(false);
 
@@ -99,6 +128,8 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
         public async Task ApiCredentials_UserIsAuthorized_ReturnsCredentialsViewWithData()
         {
             // Arrange
+            SetAuthenticatedUser(true);
+
             var credentials = _fixture.Create<List<ClientAuthCredentialsResponse>>();
             _mockUserRoleService.Setup(x => x.IsUserRolePublisher()).ReturnsAsync(true);
             _mockDeveloperService.Setup(x => x.GetClientAuthCredentialsAsync(It.IsAny<CancellationToken>()))
@@ -118,6 +149,8 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
         public async Task ApiCredentials_ExceptionThrown_ReturnsCredentialsViewWithNullModel()
         {
             // Arrange
+            SetAuthenticatedUser(true);
+
             _mockUserRoleService.Setup(x => x.IsUserRolePublisher()).ReturnsAsync(true);
             _mockDeveloperService.Setup(x => x.GetClientAuthCredentialsAsync(It.IsAny<CancellationToken>()))
                                   .ThrowsAsync(new Exception("Test Exception"));
