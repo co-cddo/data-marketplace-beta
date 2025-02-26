@@ -966,34 +966,6 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             Assert.That(request.Theme, Is.Not.Null);
             Assert.That(request.Theme.Count, Is.EqualTo(1));
         }
-        [Test]
-        public async Task AddThemes_ValidIdentifier_ThemeFetch_Returns_Exception()
-        {
-            // Arrange
-            SetAuthenticatedUser(true);
-            ClearInvocations();
-            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
-            _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
-                                                       It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
-            var identifier = new Guid().ToString();
-            var request = new QuestionThemeRequest();
-            var dataAsset = new GetCddoDataAssetResponse()
-            {
-                CddoDataAsset = new CddoDataAsset()
-                {
-                    SecurityClassification = "TopSecret",
-                    Themes = new List<string>()
-                    {
-                        "Test"
-                    }
-                }
-            };
-            _mockCatalogDataService.Setup(s => s.GetDataAssetAsync(It.IsAny<Guid>(), default))
-                .ReturnsAsync(dataAsset);
-
-            // Act and Assert
-            Assert.That(() => _controller.AddThemes(request, identifier, "false", "false", "false"), Throws.Exception.TypeOf<ArgumentException>());
-        }
 
         [Test]
         public async Task AddThemes_InvalidModelState_LogsValidationErrors()
@@ -1022,7 +994,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
             _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
                                                        It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
-            var request = new QuestionThemeRequest { Theme = new List<ThemeEnum>() { ThemeEnum.TransportAndInfrastructure } };
+            var request = new QuestionThemeRequest { Theme = new List<string>() { "TransportAndInfrastructure" } };
             _controller.ModelState.AddModelError("Theme", "Theme is required");
 
             // Act
@@ -1041,7 +1013,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
             _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
                                                        It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
-            var request = new QuestionThemeRequest { Theme = new List<ThemeEnum> { ThemeEnum.AgricultureFisheriesAndForestry } };
+            var request = new QuestionThemeRequest { Theme = new List<string> { "AgricultureFisheriesAndForestry" } };
             _mockCatalogQuestionsService.Setup(s => s.UpdateThemesAsync(It.IsAny<QuestionThemeRequest>(), DataAssetType.DataSet))
                 .ReturnsAsync(new PatchProfiledDataAssetResponse { DataAssetId = Guid.NewGuid() });
 
@@ -1061,7 +1033,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
             _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
                                                        It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
-            var request = new QuestionThemeRequest { Theme = new List<ThemeEnum> { ThemeEnum.AgricultureFisheriesAndForestry } };
+            var request = new QuestionThemeRequest { Theme = new List<string> { "AgricultureFisheriesAndForestry" } };
             _mockCatalogQuestionsService.Setup(s => s.UpdateThemesAsync(It.IsAny<QuestionThemeRequest>(), DataAssetType.DataSet))
                 .ThrowsAsync(new UnauthorizedAccessException());
 
@@ -1475,7 +1447,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
             _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
                                                        It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
-            var questionIssuedRequest = new QuestionIssuedRequest();
+            var questionIssuedRequest = new QuestionIssuedRequestModel();
             _controller.ModelState.AddModelError("IssuedDate", "Invalid date");
 
             // Act
@@ -1495,7 +1467,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
                                                        It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
             var identifier = Guid.NewGuid().ToString();
-            var questionIssuedRequest = new QuestionIssuedRequest { Identifier = identifier };
+            var questionIssuedRequest = new QuestionIssuedRequestModel() { Identifier = identifier };
             var dataAsset = new GetCddoDataAssetResponse() 
             { 
                 CddoDataAsset = new CddoDataAsset() 
@@ -1523,11 +1495,11 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
                                                        It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
             var identifier = Guid.NewGuid().ToString();
-            var questionIssuedRequest = new QuestionIssuedRequest
+            var questionIssuedRequest = new QuestionIssuedRequestModel()
             {
-                metadataIssuedDay = 1,
-                metadataIssuedMonth = 1,
-                metadataIssuedYear = 2024,
+                metadataIssuedDay = "1",
+                metadataIssuedMonth = "1",
+                metadataIssuedYear = "2024",
                 Identifier = identifier
             };
 
@@ -1551,11 +1523,11 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
                                                        It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
             var identifier = Guid.NewGuid().ToString();
-            var questionIssuedRequest = new QuestionIssuedRequest
+            var questionIssuedRequest = new QuestionIssuedRequestModel()
             {
-                metadataIssuedDay = 0,
-                metadataIssuedMonth = 0,
-                metadataIssuedYear = 0,
+                metadataIssuedDay = "0",
+                metadataIssuedMonth = "0",
+                metadataIssuedYear = "0",
                 Identifier = identifier
             };
 
@@ -1581,11 +1553,11 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             _controller.ModelState.AddModelError("IssuedDate", "Invalid date");
 
             var identifier = Guid.NewGuid().ToString();
-            var questionIssuedRequest = new QuestionIssuedRequest
+            var questionIssuedRequest = new QuestionIssuedRequestModel()
             {
-                metadataIssuedDay = 0,
-                metadataIssuedMonth = 0,
-                metadataIssuedYear = 0,
+                metadataIssuedDay = "0",
+                metadataIssuedMonth = "0",
+                metadataIssuedYear = "0",
                 Identifier = identifier
             };
 
@@ -1609,11 +1581,11 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
                                                        It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
             var identifier = Guid.NewGuid().ToString();
-            var questionIssuedRequest = new QuestionIssuedRequest
+            var questionIssuedRequest = new QuestionIssuedRequestModel()
             {
-                metadataIssuedDay = 1,
-                metadataIssuedMonth = 1,
-                metadataIssuedYear = 2026,
+                metadataIssuedDay = "1",
+                metadataIssuedMonth = "1",
+                metadataIssuedYear = "2026",
                 Identifier = identifier
             };
 
@@ -1636,11 +1608,11 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
                                                        It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
             var identifier = Guid.NewGuid().ToString();
-            var questionIssuedRequest = new QuestionIssuedRequest
+            var questionIssuedRequest = new QuestionIssuedRequestModel
             {
-                metadataIssuedDay = 1,
-                metadataIssuedMonth = 1,
-                metadataIssuedYear = 2024,
+                metadataIssuedDay = "1",
+                metadataIssuedMonth = "1",
+                metadataIssuedYear = "2024",
                 Identifier = identifier
             };
 
