@@ -1011,10 +1011,10 @@ public class CatalogDataDescriptionController(
             if (validationErrors.Count() > 0)
             {
                 _insightsLogger.LogEvent(EventTypes.MetadataEvent.MetadataEdited, new Dictionary<string, string>
-        {
-            { LogValidationErrors, string.Join(", ", validationErrors) },
-            { "Frequency", questionUpdateFrequencyRequest.UpdateFrequency }
-        });
+                {
+                    { LogValidationErrors, string.Join(", ", validationErrors) },
+                    { "Frequency", questionUpdateFrequencyRequest.UpdateFrequency }
+                });
             }
         }
 
@@ -1117,10 +1117,10 @@ public class CatalogDataDescriptionController(
                                                     .Select(e => e.ErrorMessage)
                                                     .ToList();
             _insightsLogger.LogEvent(EventTypes.MetadataEvent.MetadataAccessDenied, new Dictionary<string, string>
-        {
-            { "ValidationErrors", string.Join(", ", validationErrors) },
-            { "Identifier", identifier ?? "null" }
-        });
+            {
+                { "ValidationErrors", string.Join(", ", validationErrors) },
+                { "Identifier", identifier ?? "null" }
+            });
         }
 
         ArgumentNullException.ThrowIfNull(identifier);
@@ -1151,10 +1151,10 @@ public class CatalogDataDescriptionController(
                                                     .Select(e => e.ErrorMessage)
                                                     .ToList();
             _insightsLogger.LogEvent(EventTypes.MetadataEvent.MetadataAccessDenied, new Dictionary<string, string>
-        {
-            { "ValidationErrors", string.Join(", ", validationErrors) },
-            { "Identifier", identifier ?? "null" }
-        });
+            {
+                { "ValidationErrors", string.Join(", ", validationErrors) },
+                { "Identifier", identifier ?? "null" }
+            });
         }
 
         ArgumentNullException.ThrowIfNull(identifier);

@@ -14,13 +14,13 @@ public class CatalogSpreadsheetController : Controller
     private readonly ICatalogSpreadsheetService _catalogSpreadsheetService;
     private readonly IUserRoleService _userRoleService;
     private readonly IUserProfilePresenter _userProfilePresenter;
-    private readonly AppInsightsLogger _appInsightlogger;
+    private readonly IAppInsightsLogger _appInsightlogger;
     private const string UploadSpreadsheetPath = "~/Pages/DataDescription/NewDescription/Upload/UploadSpreadsheet.cshtml";
     public CatalogSpreadsheetController(
         ICatalogSpreadsheetService catalogSpreadsheetService,
         IUserRoleService userRoleService,
         IUserProfilePresenter userProfilePresenter,
-        AppInsightsLogger appInsightlogger)
+        IAppInsightsLogger appInsightlogger)
     {
         _catalogSpreadsheetService = catalogSpreadsheetService;
         _userRoleService = userRoleService;
@@ -36,7 +36,7 @@ public class CatalogSpreadsheetController : Controller
             var content = await _catalogSpreadsheetService.DownloadSpreadsheetTemplateAsync();
             var userresponse = await _userRoleService.GetUserProfileAsync();
             var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userresponse);
-            _appInsightlogger.LogAdminEvent(EventTypes.AdminAuditEvent.AdminDownloadTemplate, "UploadFile", "CDDO", "AddFile", "AssertUpload", "", userEventProperties);
+            _appInsightlogger.LogAdminEventBase(EventTypes.AdminAuditEvent.AdminDownloadTemplate, "UploadFile", "CDDO", "AddFile", "AssertUpload", "", userEventProperties);
             return File(content, "application/octet-stream", "Template For Data Descriptions.xlsx");
         }
         return null;
@@ -69,7 +69,7 @@ public class CatalogSpreadsheetController : Controller
             var result = await _catalogSpreadsheetService.UploadSpreadsheetAsync(fileUpload);
             var userresponse = await _userRoleService.GetUserProfileAsync();
             var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userresponse);
-            _appInsightlogger.LogAdminEvent(EventTypes.AdminAuditEvent.AdminUploadCsv, "UploadSpreadsheet", "CDDO", "AddFile", "AssertUpload", "", userEventProperties);
+            _appInsightlogger.LogAdminEventBase(EventTypes.AdminAuditEvent.AdminUploadCsv, "UploadSpreadsheet", "CDDO", "AddFile", "AssertUpload", "", userEventProperties);
             if (result != null)
             {
                 return RedirectToAction(nameof(GetValidatedDataAssetsSpreadsheet));
