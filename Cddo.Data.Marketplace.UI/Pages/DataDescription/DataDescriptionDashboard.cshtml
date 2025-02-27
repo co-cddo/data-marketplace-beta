@@ -14,21 +14,20 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds govuk-!-margin-bottom-6">
             <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">
-                Data descriptions published by the @ViewBag.OrganisationName
+                Listings published by @ViewBag.OrganisationName
             </h1>
             <p class="govuk-body">
-                Manage your organisation’s data descriptions (also known as metadata records).
-                Every metadata record must have a description of the data set to help other users find it.
+                Manage the listings of your organisation’s data. Make sure your listings are accurate and up to date to help other users find them.
             </p>
             <p class="govuk-body">
-                You can search for and edit any description that your organisation has already published.
+                You can add a new listing, or search for and edit any listing that your organisation has already published.
             </p>
 
             <a asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddNewDataDescription)" class="govuk-button" data-module="govuk-button">
-                Add new data description
+                Add new listing
             </a>
             <p class="govuk-body">
-                <a asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssetsByUser)" class="govuk-link">Find your data descriptions</a>
+                <a asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssetsByUser)" class="govuk-link">Find your listings</a>
             </p>
         </div>
     </div>
