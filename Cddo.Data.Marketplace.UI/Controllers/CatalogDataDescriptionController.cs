@@ -161,7 +161,7 @@ public class CatalogDataDescriptionController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SecurityClassificationSubmit(QuestionSecurityClassificationRequest questionSecurityClassificationRequest, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
-        if (!ModelState.IsValid && questionSecurityClassificationRequest.SecurityClassification is null)
+        if (questionSecurityClassificationRequest.SecurityClassification is null)
         {
             ModelState.Clear();
             ModelState.AddModelError("SecurityClassification", "Confirm that the security classification is data set");
