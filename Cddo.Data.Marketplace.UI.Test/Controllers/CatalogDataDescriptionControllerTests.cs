@@ -1,4 +1,5 @@
-﻿using Agm.Catalog.DotNet.Dto.Models.DataAssets;
+﻿using Agm.Catalog.DotNet.Core.Validation.EmailAddress;
+using Agm.Catalog.DotNet.Dto.Models.DataAssets;
 using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums;
 using Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1;
 using Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums;
@@ -32,6 +33,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
         private Mock<ICatalogQuestionsService> _mockCatalogQuestionsService;
         private Mock<IUserRoleService> _mockUserRoleService;
         private Mock<IAppInsightsLogger> _mockLogger;
+        private Mock<ICddoEmailAddressValidation> _mockEmailValidator;
         private IFixture _fixture;
 #pragma warning disable NUnit1032 // An IDisposable field/property should be Disposed in a TearDown method
         private CatalogDataDescriptionController _controller;
@@ -45,12 +47,14 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             _mockCatalogQuestionsService = new Mock<ICatalogQuestionsService>();
             _mockUserRoleService = new Mock<IUserRoleService>();
             _mockLogger = new Mock<IAppInsightsLogger>();
+            _mockEmailValidator = new Mock<ICddoEmailAddressValidation>();
 
             _controller = new CatalogDataDescriptionController(
                 _mockCatalogDataService.Object,
                 _mockCatalogQuestionsService.Object,
                 _mockUserRoleService.Object,
-                _mockLogger.Object);
+                _mockLogger.Object,
+                _mockEmailValidator.Object);
         }
         private void SetAuthenticatedUser(bool isAuthenticated)
         {
@@ -1273,6 +1277,8 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             _mockCatalogQuestionsService.Setup(s => s.UpdateContactPointAsync(It.IsAny<QuestionContactPointRequest>(), DataAssetType.DataSet))
                 .ReturnsAsync(response);
 
+            _mockEmailValidator.Setup(x => x.CddoEmailAddressRegex).Returns(new System.Text.RegularExpressions.Regex(".*"));
+
             // Act
             var result = await _controller.AddContactPointSubmit(contact, new Guid().ToString(), "false", "false", "false", "false");
 
@@ -1306,6 +1312,9 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
 
             _mockCatalogQuestionsService.Setup(s => s.UpdateContactPointAsync(It.IsAny<QuestionContactPointRequest>(), DataAssetType.DataSet))
                 .ThrowsAsync(new UnauthorizedAccessException());
+
+            _mockEmailValidator.Setup(x => x.CddoEmailAddressRegex).Returns(new System.Text.RegularExpressions.Regex(".*"));
+
 
             // Act
             var result = await _controller.AddContactPointSubmit(contact, new Guid().ToString(), "false", "false", "false", "false");

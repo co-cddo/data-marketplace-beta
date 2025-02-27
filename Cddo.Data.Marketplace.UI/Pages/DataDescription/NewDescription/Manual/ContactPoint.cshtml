@@ -5,6 +5,9 @@
 @model QuestionContactPointRequest
 @{
     ViewData["Title"] = "Contact Point";
+    var errorMessage = ViewData.ModelState[nameof(Contact.Email)]?.Errors?.FirstOrDefault()?.ErrorMessage;
+    var errorMessageName = ViewData.ModelState[nameof(Contact.Name)]?.Errors?.FirstOrDefault()?.ErrorMessage;
+
     bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
     bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
     bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
@@ -41,17 +44,31 @@
             </div>
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddContactPointSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
                 <input type="hidden" name="identifier" value="@Model.Identifier" />
+                @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
+
                 <div class="govuk-form-group">
                     <label class="govuk-label govuk-label--m" for="metadataContact">
                         Name
                     </label>
-                    <input class="govuk-input" id="metadataContact" name="@nameof(Contact.Name)" type="text" value="@dataAssetContactPoint?.Name">
+                    @if (ViewData.ModelState[nameof(Contact.Name)]?.Errors.Any() == true)
+                    {
+                        <p id="metadataTitle-error" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> @errorMessageName
+                        </p>
+                    }
+                    <input class="govuk-input  @(ViewData.ModelState[nameof(Contact.Name)]?.Errors.Any() == true ? "govuk-input--error" : "")" id="metadataContact" name="@nameof(Contact.Name)" type="text" value="@dataAssetContactPoint?.Name">
                 </div>
-                <div class="govuk-form-group">
+                <div class="govuk-form-group">                    
                     <label class="govuk-label govuk-label--m" for="metadataContactEmail">
                         Email address
                     </label>
-                    <input class="govuk-input" id="metadataContactEmail" name="@nameof(Contact.Email)" type="text" value="@dataAssetContactPoint?.Email">
+                    @if (ViewData.ModelState[nameof(Contact.Email)]?.Errors.Any() == true)
+                    {
+                        <p id="metadataTitle-error" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> @errorMessage
+                        </p>
+                    }
+                    <input class="govuk-input @(ViewData.ModelState[nameof(Contact.Email)]?.Errors.Any() == true ? "govuk-input--error" : "")" id="metadataContactEmail" name="@nameof(Contact.Email)" type="text" value="@dataAssetContactPoint?.Email">
                 </div>
                 <input hidden name="@nameof(Contact.Role)" value="@ContactRoleEnum.Contact" />
                 <div class="govuk-button-group">
