@@ -74,7 +74,7 @@
     <a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
     <div class="govuk-main-wrapper">
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
-            Find data description
+            Find a listing
         </h1>
         <form asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssetsByUser)" method="get">
             <div class="govuk-grid-row mb-5">
@@ -98,40 +98,6 @@
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-one-third">
                     <div class="accordion accordion-flush accordion-filter" id="accordionFlushFilter">
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="flush-topics">
-                                <button class="accordion-button collapsed govuk-link" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTopics" aria-controls="flush-collapseTopics">
-                                    Topics
-                                </button>
-                            </h2>
-                            <div id="flush-collapseTopics" class="accordion-collapse collapse" aria-labelledby="flush-topics" data-bs-parent="#accordionFlushFilter">
-                                <div class="accordion-body">
-                                    <div class="govuk-form-group">
-                                        <fieldset class="govuk-fieldset">
-                                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m visually-hidden">
-                                                <h1 class="govuk-fieldset__heading">
-                                                    Topics
-                                                </h1>
-                                            </legend>
-                                            <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
-                                                @if (topics.Any())
-                                                {
-                                                    @foreach (var topic in topics.OrderBy(x => x))
-                                                    {
-                                                        <div class="govuk-checkboxes__item">
-                                                            <input class="govuk-checkboxes__input" id="@topic" name="@nameof(GetCddoDataAssetsRequest.Themes)" type="checkbox" value="@topic" @(ViewBag?.Themes?.Contains(@topic) ? "checked" : "")>
-                                                            <label class="govuk-label govuk-checkboxes__label" for="@topic">
-                                                                @topic
-                                                            </label>
-                                                        </div>
-                                                    }
-                                                }
-                                            </div>
-                                        </fieldset>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="flush-asset">
                                 <button class="accordion-button collapsed govuk-link " type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseAsset" aria-controls="flush-collapseAsset">
