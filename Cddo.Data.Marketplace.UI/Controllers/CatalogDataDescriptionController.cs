@@ -16,6 +16,7 @@ using Cddo.Data.Marketplace.Audit;
 using Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums;
 using System.Text.RegularExpressions;
 using Microsoft.IdentityModel.Tokens;
+using Agm.Catalog.DotNet.Core.Validation.EmailAddress;
 
 namespace Cddo.Data.Marketplace.UI.Controllers;
 
@@ -25,13 +26,15 @@ public class CatalogDataDescriptionController(
     ICatalogDataService catalogDataService,
     ICatalogQuestionsService catalogQuestionsService,
     IUserRoleService userRoleService,
-    AppInsightsLogger insightsLogger)
+    AppInsightsLogger insightsLogger,
+    ICddoEmailAddressValidation emailValidator)
     : Controller
 {
     private readonly ICatalogDataService _catalogDataService = catalogDataService ?? throw new ArgumentNullException(nameof(catalogDataService));
     private readonly ICatalogQuestionsService _catalogQuestionsService = catalogQuestionsService ?? throw new ArgumentNullException(nameof(catalogQuestionsService));
     private readonly IUserRoleService _userRoleService = userRoleService ?? throw new ArgumentNullException(nameof(userRoleService));
     private readonly AppInsightsLogger _insightsLogger = insightsLogger ?? throw new ArgumentNullException(nameof(insightsLogger));
+    private readonly ICddoEmailAddressValidation _emailValidator = emailValidator;
 
     private static readonly string AccessDeniedPage = "/Error/403";
     private const string LogValidationErrors = "validationErrors";
@@ -40,6 +43,7 @@ public class CatalogDataDescriptionController(
     private const string KeywordsViewPath = "~/Pages/DataDescription/NewDescription/Manual/Keywords.cshtml";
     private const string DataOwnerViewPath = "~/Pages/DataDescription/NewDescription/Manual/DataOwner.cshtml";
     private const string PublishedDateViewPath = "~/Pages/DataDescription/NewDescription/Manual/PublishedDate.cshtml";
+    private const string ContactPointViewPath = "~/Pages/DataDescription/NewDescription/Manual/ContactPoint.cshtml";
 
     // Centralised roles definition
     private static readonly List<string> RequiredRoles =
@@ -654,10 +658,23 @@ public class CatalogDataDescriptionController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddContactPointSubmit(Contact contact, string? identifier, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
+        QuestionContactPointRequest questionContactPoint = new() { Identifier = identifier, ContactPoint = new List<Contact> { contact } };
+
+        if (!string.IsNullOrEmpty(contact.Email) && !Regex.IsMatch(contact.Email, _emailValidator.CddoEmailAddressRegex.ToString()))
+        {
+            ModelState.AddModelError(nameof(contact.Email), "Email is invalid");     
+        }
+        if (string.IsNullOrEmpty(contact.Name) && !string.IsNullOrEmpty(contact.Email))
+        {
+            ModelState.AddModelError(nameof(contact.Name), "Please enter a name to continue");
+        }
+
         if (!ModelState.IsValid)
         {
+            ViewBag.isEditMode = isEditMode;
+
             insightsLogger.LogWarning("Model state is invalid for AddContactPointSubmit.");
-            return View();
+            return ViewOrRedirect(ContactPointViewPath, questionContactPoint);
         }
 
         var questionContactPointRequest = CreateQuestionContactPointRequest(contact, identifier);
