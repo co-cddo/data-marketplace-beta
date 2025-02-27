@@ -26,13 +26,15 @@ public class CatalogDataDescriptionController(
     ICatalogDataService catalogDataService,
     ICatalogQuestionsService catalogQuestionsService,
     IUserRoleService userRoleService,
-    AppInsightsLogger insightsLogger)
+    AppInsightsLogger insightsLogger,
+    ICddoEmailAddressValidation emailValidator)
     : Controller
 {
     private readonly ICatalogDataService _catalogDataService = catalogDataService ?? throw new ArgumentNullException(nameof(catalogDataService));
     private readonly ICatalogQuestionsService _catalogQuestionsService = catalogQuestionsService ?? throw new ArgumentNullException(nameof(catalogQuestionsService));
     private readonly IUserRoleService _userRoleService = userRoleService ?? throw new ArgumentNullException(nameof(userRoleService));
     private readonly AppInsightsLogger _insightsLogger = insightsLogger ?? throw new ArgumentNullException(nameof(insightsLogger));
+    private readonly ICddoEmailAddressValidation _emailValidator = emailValidator;
 
     private static readonly string AccessDeniedPage = "/Error/403";
     private const string LogValidationErrors = "validationErrors";
@@ -656,10 +658,9 @@ public class CatalogDataDescriptionController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddContactPointSubmit(Contact contact, string? identifier, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
-        CddoEmailAddressValidation emailValidator = new();
         QuestionContactPointRequest questionContactPoint = new() { Identifier = identifier, ContactPoint = new List<Contact> { contact } };
 
-        if (!string.IsNullOrEmpty(contact.Email) && !Regex.IsMatch(contact.Email, emailValidator.CddoEmailAddressRegex.ToString()))
+        if (!string.IsNullOrEmpty(contact.Email) && !Regex.IsMatch(contact.Email, _emailValidator.CddoEmailAddressRegex.ToString()))
         {
             ModelState.AddModelError(nameof(contact.Email), "Email is invalid");     
         }
