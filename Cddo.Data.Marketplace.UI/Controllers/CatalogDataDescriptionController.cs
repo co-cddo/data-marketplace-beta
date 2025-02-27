@@ -34,7 +34,7 @@ public class CatalogDataDescriptionController(
     private readonly ICatalogQuestionsService _catalogQuestionsService = catalogQuestionsService ?? throw new ArgumentNullException(nameof(catalogQuestionsService));
     private readonly IUserRoleService _userRoleService = userRoleService ?? throw new ArgumentNullException(nameof(userRoleService));
     private readonly IAppInsightsLogger _insightsLogger = insightsLogger ?? throw new ArgumentNullException(nameof(insightsLogger));
-    private readonly ICddoEmailAddressValidation _emailValidator = emailValidator;
+    private readonly ICddoEmailAddressValidation _emailValidator = emailValidator ?? throw new ArgumentNullException(nameof(emailValidator));
 
     private static readonly string AccessDeniedPage = "/Error/403";
     private const string LogValidationErrors = "validationErrors";
