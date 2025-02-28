@@ -660,7 +660,7 @@ public class CatalogDataDescriptionController(
     {
         QuestionContactPointRequest questionContactPoint = new() { Identifier = identifier, ContactPoint = new List<Contact> { contact } };
 
-        if (!string.IsNullOrEmpty(contact.Email) && !Regex.IsMatch(contact.Email, _emailValidator.CddoEmailAddressRegex.ToString()))
+        if (!string.IsNullOrEmpty(contact.Email) &&  !_emailValidator.IsEmailAddressValid(contact.Email))
         {
             ModelState.AddModelError(nameof(contact.Email), "Email is invalid");     
         }
