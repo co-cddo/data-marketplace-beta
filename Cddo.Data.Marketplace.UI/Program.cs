@@ -357,9 +357,9 @@ var cspOptions = builder.Configuration.GetSection("ContentSecurityPolicy")
                               .Get<ContentSecurityPolicyOptions>();
 
 var policyCollection = new HeaderPolicyCollection()
-    .AddContentSecurityPolicy(builder =>
+    .AddContentSecurityPolicy(innerBuilder =>
     {
-        var defaultSrc = builder.AddDefaultSrc();
+        var defaultSrc = innerBuilder.AddDefaultSrc();
         foreach (var src in cspOptions.DefaultSrc)
         {
             if (src.Equals("self", StringComparison.OrdinalIgnoreCase))
@@ -368,7 +368,7 @@ var policyCollection = new HeaderPolicyCollection()
                 defaultSrc.From(src);
         }
 
-        var scriptSrc = builder.AddScriptSrc();
+        var scriptSrc = innerBuilder.AddScriptSrc();
         foreach (var src in cspOptions.ScriptSrc)
         {
             if (src.Equals("self", StringComparison.OrdinalIgnoreCase))
@@ -379,7 +379,7 @@ var policyCollection = new HeaderPolicyCollection()
                 scriptSrc.From(src);
         }
 
-        var connectSrc = builder.AddConnectSrc();
+        var connectSrc = innerBuilder.AddConnectSrc();
         foreach (var src in cspOptions.ConnectSrc)
         {
             if (src.Equals("self", StringComparison.OrdinalIgnoreCase))
@@ -388,7 +388,7 @@ var policyCollection = new HeaderPolicyCollection()
                 connectSrc.From(src);
         }
 
-        var imgSrc = builder.AddImgSrc();
+        var imgSrc = innerBuilder.AddImgSrc();
         foreach (var src in cspOptions.ImgSrc)
         {
             if (src.Equals("self", StringComparison.OrdinalIgnoreCase))
@@ -399,7 +399,7 @@ var policyCollection = new HeaderPolicyCollection()
                 imgSrc.From(src);
         }
 
-        var styleSrc = builder.AddStyleSrc();
+        var styleSrc = innerBuilder.AddStyleSrc();
         foreach (var src in cspOptions.StyleSrc)
         {
             if (src.Equals("self", StringComparison.OrdinalIgnoreCase))
@@ -410,7 +410,7 @@ var policyCollection = new HeaderPolicyCollection()
                 styleSrc.From(src);
         }
 
-        var fontSrc = builder.AddFontSrc();
+        var fontSrc = innerBuilder.AddFontSrc();
         foreach (var src in cspOptions.FontSrc)
         {
             if (src.Equals("self", StringComparison.OrdinalIgnoreCase))
@@ -419,7 +419,7 @@ var policyCollection = new HeaderPolicyCollection()
                 fontSrc.From(src);
         }
 
-        var manifestSrc = builder.AddManifestSrc();
+        var manifestSrc = innerBuilder.AddManifestSrc();
         foreach (var src in cspOptions.ManifestSrc)
         {
             if (src.Equals("self", StringComparison.OrdinalIgnoreCase))
