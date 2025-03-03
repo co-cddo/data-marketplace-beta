@@ -3,4 +3,5 @@
 public class CatalogDataRequestBase
 {
     public string? Identifier { get; set; }
+    public string? Title { get; set; }
 }

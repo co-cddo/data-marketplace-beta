@@ -270,6 +270,7 @@ public class CatalogDataDescriptionController(
             if (dataAsset is not null)
             {
                 questionDescriptionRequest.Description = dataAsset.CddoDataAsset.Description!;
+                questionDescriptionRequest.Title = dataAsset.CddoDataAsset.Title;
             }
         }
 
@@ -331,6 +332,7 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset is not null)
             {
+                questionSupplierIdentifierRequest.Title = dataAsset.CddoDataAsset.Title;
                 questionSupplierIdentifierRequest.SupplierIdentifier = dataAsset.CddoDataAsset.InternalIdentifier!;
             }
         }
@@ -416,8 +418,9 @@ public class CatalogDataDescriptionController(
         {
             questionThemeRequest.Identifier = identifier;
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+            questionThemeRequest.Title = dataAsset.CddoDataAsset.Title;
             if (dataAsset is not null && dataAsset.CddoDataAsset.Themes.Any())
-            {
+            {               
                 questionThemeRequest.Theme = dataAsset.CddoDataAsset.Themes.ToList();
             }
         }
@@ -488,6 +491,7 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset is not null)
             {
+                questionKeywordRequest.Title = dataAsset.CddoDataAsset.Title;
                 questionKeywordRequest.Keyword = dataAsset.CddoDataAsset.Keywords;
             }
         }
@@ -601,6 +605,7 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset?.CddoDataAsset is not null)
             {
+                questionContactPointRequest.Title = dataAsset.CddoDataAsset.Title;
                 questionContactPointRequest.ContactPoint ??= [];
                 foreach (var contact in dataAsset.CddoDataAsset.DataAssetContacts)
                 {
@@ -743,6 +748,7 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset?.CddoDataAsset is not null)
             {
+                questionContactPointRequest.Title = dataAsset.CddoDataAsset.Title;
                 questionContactPointRequest.ContactPoint ??= [];
                 foreach (var contact in dataAsset.CddoDataAsset.DataAssetContacts)
                 {
@@ -969,6 +975,7 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset is not null)
             {
+                questionUpdateFrequencyRequest.Title = dataAsset.CddoDataAsset.Title;
                 questionUpdateFrequencyRequest.UpdateFrequency = dataAsset.CddoDataAsset.UpdateFrequencyString;
             }
         }
@@ -1041,6 +1048,7 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset is not null)
             {
+                questionKeywordRequest.Title = dataAsset.CddoDataAsset.Title;
                 questionKeywordRequest.Distribution =
                 [
                     new Distribution

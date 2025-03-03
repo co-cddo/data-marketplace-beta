@@ -31,10 +31,12 @@
         <div class="govuk-grid-column-two-thirds">
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddThemesSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
                 <input type="hidden" name="@nameof(QuestionThemeRequest.Identifier)" value="@Model.Identifier" />
-
                 <div class="govuk-form-group">
                     <fieldset class="govuk-fieldset" aria-describedby="metadataThemes-hint">
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                            <div class="govuk-caption-l">
+                                @Model.Title
+                            </div>
                             <h1 class="govuk-fieldset__heading">
                                 What themes are associated with the data set?
                             </h1>
