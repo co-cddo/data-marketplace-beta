@@ -17,6 +17,7 @@ using Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums;
 using System.Text.RegularExpressions;
 using Microsoft.IdentityModel.Tokens;
 using Agm.Catalog.DotNet.Core.Validation.EmailAddress;
+using Cddo.Data.Marketplace.Api.Dto.Responses.Catalog;
 
 namespace Cddo.Data.Marketplace.UI.Controllers;
 
@@ -1000,6 +1001,7 @@ public class CatalogDataDescriptionController(
         {
             questionUpdateFrequencyRequest.Identifier = identifier;
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+
             if (dataAsset is not null)
             {
                 questionUpdateFrequencyRequest.UpdateFrequency = dataAsset.CddoDataAsset.UpdateFrequencyString;
@@ -1055,6 +1057,72 @@ public class CatalogDataDescriptionController(
         }
 
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/UpdateFrequency.cshtml", questionUpdateFrequencyRequest);
+    }
+
+    [Route("access-rights")]
+    public async Task<IActionResult> AccessRights(QuestionAccessRightsRequest accessRightsRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    {
+
+        if (!string.IsNullOrEmpty(identifier))
+        {
+            accessRightsRequest.Identifier = identifier;
+            var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+
+            if (dataAsset is not null)
+            {
+                accessRightsRequest.AccessRights = dataAsset.CddoDataAsset.AccessRights;
+            }
+        }
+
+        ViewBag.isCheckList = isCheckList;
+        ViewBag.isCheckAnswers = isCheckAnswers;
+        ViewBag.isEditMode = isEditMode;
+        return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/AccessRights.cshtml", accessRightsRequest);
+    }
+
+    [HttpPost("access-rights")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AccessRights(QuestionAccessRightsRequest accessRightsRequest, bool? accessRightsSelection, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    {
+        if (accessRightsSelection != null)
+        {
+            accessRightsRequest.AccessRights = accessRightsSelection.Value ? "OPEN" : "RESTRICTED";
+        }
+
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+
+            if (validationErrors.Count() > 0)
+            {
+                _insightsLogger.LogEvent(EventTypes.MetadataEvent.MetadataEdited, new Dictionary<string, string>
+                {
+                    { LogValidationErrors, string.Join(", ", validationErrors) },
+                    { "AccessRights", accessRightsRequest.AccessRights }
+                });
+            }
+        }
+
+        PatchProfiledDataAssetResponse? response;
+
+        try
+        {
+            response = await _catalogQuestionsService.UpdateAccessRightsAsync(accessRightsRequest, DataAssetType.DataSet);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return RedirectToPage(AccessDeniedPage);
+        }
+
+        if (response is not null)
+        {
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddFrequency, "Access-Rights", $"Updated the access rights of data set {response.DataAssetId}");
+
+            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(Licence), isEditMode)
+                   ?? RedirectToAction(nameof(Licence), new { identifier = response.DataAssetId.ToString() });
+        }
+
+        return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/AccessRights.cshtml", accessRightsRequest);
     }
 
     [Route("Add-Supply-Format")]
@@ -1195,6 +1263,75 @@ public class CatalogDataDescriptionController(
         };
 
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/CheckAnswers.cshtml", model);
+    }
+
+    [Route("licence")]
+    public async Task<IActionResult> Licence(QuestionLicenceRequest licenceRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    {
+        if (!string.IsNullOrEmpty(identifier))
+        {
+            licenceRequest.Identifier = identifier;
+            var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+
+            if (dataAsset is not null)
+            {
+                licenceRequest.Licence = new Licence() {Text = dataAsset.CddoDataAsset.LicenseTitle, Url = dataAsset.CddoDataAsset.EndpointUrl };
+            }
+        }
+
+        ViewBag.isCheckList = isCheckList;
+        ViewBag.isCheckAnswers = isCheckAnswers;
+        ViewBag.isEditMode = isEditMode;
+        return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/Licence.cshtml", licenceRequest);
+
+    }
+
+    [HttpPost("licence")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Licence(QuestionLicenceRequest questionLicenceRequest, string? accessRightsSelection, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    {
+        //if (accessRightsSelection != null)
+        //{
+        //    questionLicenceRequest.Licence = accessRightsSelection.Value ? "OPEN" : "RESTRICTED";
+        //}
+
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+
+            if (validationErrors.Count() > 0)
+            {
+                _insightsLogger.LogEvent(EventTypes.MetadataEvent.MetadataEdited, new Dictionary<string, string>
+                {
+                    { LogValidationErrors, string.Join(", ", validationErrors) },
+                    { "Licence", questionLicenceRequest.Licence.Text }
+                });
+            }
+        }
+
+        PatchProfiledDataAssetResponse? response = new PatchProfiledDataAssetResponse();
+
+        try
+        {
+            //response = await _catalogQuestionsService.UpdateLicenceAsync(questionLicenceRequest, DataAssetType.DataSet);
+            //TODO: Stub the licence update
+            response.DataAssetId = new Guid(questionLicenceRequest.Identifier);
+
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return RedirectToPage(AccessDeniedPage);
+        }
+
+        if (response is not null)
+        {
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddFrequency, "licence", $"Updated the licence of data set {response.DataAssetId}");
+
+            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddSupplyFormat), isEditMode)
+                   ?? RedirectToAction(nameof(AddSupplyFormat), new { identifier = response.DataAssetId.ToString() });
+        }
+
+        return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/AccessRights.cshtml", questionLicenceRequest);
     }
     private static bool ParseBoolean(string input)
     {

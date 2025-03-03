@@ -253,6 +253,17 @@ public class CatalogQuestionsService(
         return await MakeApiPatchRequestAsync<PatchProfiledDataAssetResponse>(request);
     }
 
+    public async Task<PatchProfiledDataAssetResponse?> UpdateAccessRightsAsync(QuestionAccessRightsRequest questionAccessRightsRequest, DataAssetType dataAssetType)
+    {
+        var request = new PatchProfiledDataAssetRequest
+        {
+            ProfileId = _profileId,
+            DataAssetType = dataAssetType,
+            Payload = JsonSerializer.Serialize(questionAccessRightsRequest)
+        };
+        return await MakeApiPatchRequestAsync<PatchProfiledDataAssetResponse>(request);
+    }
+
     public async Task<PatchProfiledDataAssetResponse?> UpdateDataShareRequestNotificationsSelectionAsync(
         DataShareRequestNotificationsRequest dataShareRequestNotificationsRequest,
         DataAssetType dataAssetType)
