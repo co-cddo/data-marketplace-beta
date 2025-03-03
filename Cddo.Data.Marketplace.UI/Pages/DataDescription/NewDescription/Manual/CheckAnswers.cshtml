@@ -121,7 +121,7 @@
                             @cddoDataAsset.Title
                         </div>
                     </div>
-                    <p class="govuk-body"><a class="govuk-link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartCddoDataAssetsSearch)">View listing on the Data Marketplace</a></p>
+                    <p class="govuk-body"><a class="govuk-link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAsset)" asp-route-dataAssetId="@cddoDataAsset.Id">View listing on the Data Marketplace</a></p>
                     <p class="govuk-body"><a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.TaskList)" asp-route-identifier="@cddoDataAsset.Id">Change your listing</a></p>
                     <p class="govuk-body"><a class="govuk-link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssetsByUser)">View all your listings</a></p>
                 </div>
