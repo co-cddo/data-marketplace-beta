@@ -32,6 +32,9 @@
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddInternalIdentifierSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
                 <input type="hidden" name="@nameof(QuestionSupplierIdentifierRequest.Identifier)" value="@Model.Identifier" />
                 <div class="govuk-form-group">
+                    <div class="govuk-caption-l">
+                        @Model.Title
+                    </div>
                     <h1 class="govuk-label-wrapper">
                         <label class="govuk-label govuk-label--l" for="supplierIdentifier">
                             What internal identifier do you have for the data set?
