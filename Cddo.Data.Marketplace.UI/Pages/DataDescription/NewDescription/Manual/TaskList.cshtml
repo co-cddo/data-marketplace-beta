@@ -29,13 +29,13 @@
             case 1: return formattedSimilarityDescriptions.First();
 
             default:
-            {
-                var finalFormattedSimilarityDescription = formattedSimilarityDescriptions.Last();
+                {
+                    var finalFormattedSimilarityDescription = formattedSimilarityDescriptions.Last();
 
-                var otherFormattedSimilarityDescriptions = formattedSimilarityDescriptions.Take(formattedSimilarityDescriptions.Count - 1).ToList();
+                    var otherFormattedSimilarityDescriptions = formattedSimilarityDescriptions.Take(formattedSimilarityDescriptions.Count - 1).ToList();
 
-                return $"{string.Join(", ", otherFormattedSimilarityDescriptions)} and {finalFormattedSimilarityDescription}";
-            }
+                    return $"{string.Join(", ", otherFormattedSimilarityDescriptions)} and {finalFormattedSimilarityDescription}";
+                }
         }
     }
 }
@@ -45,20 +45,6 @@
 <div class="govuk-main-wrapper">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <span class="govuk-caption-xl">
-                @if (ViewBag.isEditMode)
-                {
-                    <span>Edit data description</span>
-                }
-                else
-                {
-                    <span>
-                        Create new data description
-                    </span>
-                }
-            </span>
-            
-            <br/>
 
             @* Potential Duplicates Section *@
             @if (potentialDuplicatesToDataAsset.Any())
@@ -102,15 +88,17 @@
                 </div>
             }
 
-            <h1 class="govuk-heading-xl">Data set questions</h1>
+            <h1 class="govuk-heading-xl">
+                @dataAsset.Title @(dataAsset.DataAssetStatus == DataAssetStatus.Draft ? "(draft)" : "")
+            </h1>
 
             @* General Section *@
             <h3 class="govuk-heading-m">General</h3>
             <ul class="govuk-task-list">
-                @foreach (var item in new[] {                
-                new { Title = "Title", Action = nameof(CatalogDataDescriptionController.AddTitle), Completed = !string.IsNullOrEmpty(dataAsset.Title) },
-                new { Title = "Description", Action = nameof(CatalogDataDescriptionController.AddDescription), Completed = !string.IsNullOrEmpty(dataAsset.Description) },
-                new { Title = "Internal identifier", Action = nameof(CatalogDataDescriptionController.AddInternalIdentifier), Completed = !string.IsNullOrEmpty(dataAsset.InternalIdentifier) }
+                @foreach (var item in new[] {
+                new { Title = "Title", Action = nameof(CatalogDataDescriptionController.AddTitle), Done = !string.IsNullOrEmpty(dataAsset.Title) },
+                new { Title = "Description", Action = nameof(CatalogDataDescriptionController.AddDescription), Done = !string.IsNullOrEmpty(dataAsset.Description) },
+                new { Title = "Internal identifier", Action = nameof(CatalogDataDescriptionController.AddInternalIdentifier), Done = !string.IsNullOrEmpty(dataAsset.InternalIdentifier) }
                 })
                 {
                     <li class="govuk-task-list__item govuk-task-list__item--with-link">
@@ -124,13 +112,13 @@
                             </a>
                         </div>
                         <div class="govuk-task-list__status">
-                            @if (item.Completed)
+                            @if (item.Done)
                             {
-                                <span>Completed</span>
+                                <span>Done</span>
                             }
                             else
                             {
-                                <strong class="govuk-tag govuk-tag--blue">Incomplete</strong>
+                                <strong class="govuk-tag govuk-tag--blue">To do</strong>
                             }
                         </div>
                     </li>
@@ -142,8 +130,8 @@
             <ul class="govuk-task-list">
                 @foreach (var item in new[] {
 
-                new { Title = "Themes", Action = nameof(CatalogDataDescriptionController.AddThemes), Completed = dataAsset.Themes.Any() },
-                new { Title = "Keywords", Action = nameof(CatalogDataDescriptionController.AddKeywords), Completed = dataAsset.Keywords.Any() }
+                new { Title = "Themes", Action = nameof(CatalogDataDescriptionController.AddThemes), Done = dataAsset.Themes.Any() },
+                new { Title = "Keywords", Action = nameof(CatalogDataDescriptionController.AddKeywords), Done = dataAsset.Keywords.Any() }
                 })
                 {
                     <li class="govuk-task-list__item govuk-task-list__item--with-link">
@@ -157,13 +145,13 @@
                             </a>
                         </div>
                         <div class="govuk-task-list__status">
-                            @if (item.Completed)
+                            @if (item.Done)
                             {
-                                <span>Completed</span>
+                                <span>Done</span>
                             }
                             else
                             {
-                                <strong class="govuk-tag govuk-tag--blue">Incomplete</strong>
+                                <strong class="govuk-tag govuk-tag--blue">To do</strong>
                             }
                         </div>
                     </li>
@@ -174,8 +162,8 @@
             <h3 class="govuk-heading-m">Contact and owner</h3>
             <ul class="govuk-task-list">
                 @foreach (var item in new[] {
-                new { Title = "Point of contact", Action = nameof(CatalogDataDescriptionController.AddContactPoint), Completed = dataAsset.DataAssetContacts.Any(x=>x.Role==DataAssetContactRoleType.Contact) },
-                new { Title = "Data owner", Action = nameof(CatalogDataDescriptionController.AddDataOwner), Completed = dataAsset.DataAssetContacts.Any() }
+                new { Title = "Point of contact", Action = nameof(CatalogDataDescriptionController.AddContactPoint), Done = dataAsset.DataAssetContacts.Any(x=>x.Role==DataAssetContactRoleType.Contact) },
+                new { Title = "Data owner", Action = nameof(CatalogDataDescriptionController.AddDataOwner), Done = dataAsset.DataAssetContacts.Any() }
                 })
                 {
                     <li class="govuk-task-list__item govuk-task-list__item--with-link">
@@ -189,13 +177,13 @@
                             </a>
                         </div>
                         <div class="govuk-task-list__status">
-                            @if (item.Completed)
+                            @if (item.Done)
                             {
-                                <span>Completed</span>
+                                <span>Done</span>
                             }
                             else
                             {
-                                <strong class="govuk-tag govuk-tag--blue">Incomplete</strong>
+                                <strong class="govuk-tag govuk-tag--blue">To do</strong>
                             }
                         </div>
                     </li>
@@ -206,9 +194,9 @@
             <h3 class="govuk-heading-m">Additional information</h3>
             <ul class="govuk-task-list">
                 @foreach (var item in new[] {
-                new { Title = "Date first made available", Action = nameof(CatalogDataDescriptionController.AddPublishedDate), Completed = dataAsset.Issued != null },
-                new { Title = "Frequency of update", Action = nameof(CatalogDataDescriptionController.AddFrequency), Completed = !string.IsNullOrEmpty(dataAsset.UpdateFrequencyString) },
-                new { Title = "Supply format", Action = nameof(CatalogDataDescriptionController.AddSupplyFormat), Completed = dataAsset.DataAssetDistribution?.MediaType is not null }
+                new { Title = "Date first made available", Action = nameof(CatalogDataDescriptionController.AddPublishedDate), Done = dataAsset.Issued != null },
+                new { Title = "Frequency of update", Action = nameof(CatalogDataDescriptionController.AddFrequency), Done = !string.IsNullOrEmpty(dataAsset.UpdateFrequencyString) },
+                new { Title = "Supply format", Action = nameof(CatalogDataDescriptionController.AddSupplyFormat), Done = dataAsset.DataAssetDistribution?.MediaType is not null }
                 })
                 {
                     <li class="govuk-task-list__item govuk-task-list__item--with-link">
@@ -222,19 +210,19 @@
                             </a>
                         </div>
                         <div class="govuk-task-list__status">
-                            @if (item.Completed)
+                            @if (item.Done)
                             {
-                                <span>Completed</span>
+                                <span>Done</span>
                             }
                             else
                             {
-                                <strong class="govuk-tag govuk-tag--blue">Incomplete</strong>
+                                <strong class="govuk-tag govuk-tag--blue">To do</strong>
                             }
                         </div>
                     </li>
                 }
             </ul>
-            
+
             @* Buttons Section *@
             <div class="govuk-button-group">
                 <a class="govuk-button"
@@ -250,12 +238,18 @@
                     Cancel
                 </a>
             </div>
+            <p class="govuk-body">
+                <a class="govuk-link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.DeleteCddoDataAssetConfirmation)"
+                   asp-route-identifier="@dataAsset.Id" asp-route-title="@dataAsset.Title">
+                    Delete draft
+                </a>
+            </p>
         </div>
     </div>
 </div>
-<style scoped="">
+<style scoped>
     .govuk-tag {
-        text-transform: capitalize;
+        text-transform: none !important;
         font-weight: 400;
         font-size: 1.1875rem;
     }

@@ -40,12 +40,11 @@
                 <div class="govuk-form-group @(hasTitleError ? "govuk-form-group--error" : "")">
                     <h1 class="govuk-label-wrapper">
                         <label class="govuk-label govuk-label--l" for="Title">
-                            What is the title of the data set?
+                            Listing title
                         </label>
                     </h1>
                     <div id="Title-hint" class="govuk-hint">
-                        Provide the full name. Do not use acronyms or technical jargon.
-                        Your title should help other users understand if this is the data they’re looking for. For example, ‘Student Absence Data 2020-23’ is a helpful title because it specifies the date range the data applies to.
+                        Your title should be unique – consider adding a version number or date range.
                     </div>
                     @if (hasTitleError)
                     {
