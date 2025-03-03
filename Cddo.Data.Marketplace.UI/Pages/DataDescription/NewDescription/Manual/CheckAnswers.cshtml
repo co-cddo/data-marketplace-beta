@@ -194,44 +194,7 @@
                     </div>
                 }
 
-                <dl class="govuk-summary-list govuk-!-margin-bottom-9">
-                    @if (cddoDataAsset.DataAssetStatus != null)
-                    {
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                                Status
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                <strong class="govuk-tag govuk-tag--blue">@cddoDataAsset.DataAssetStatus</strong>
-                            </dd>
-                            <dd class="govuk-summary-list__actions">
-                            </dd>
-                        </div>
-                    }
-
-                    @* Security Classification *@
-                    <div id="@nameof(CataloguedResource.SecurityClassification)" class="govuk-summary-list__row @(GetErrorMessages(nameof(CataloguedResource.SecurityClassification)).Any() ? "govuk-form-group--error" : "")">
-                        <dt class="govuk-summary-list__key">
-                            Security classification
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            @foreach (var errorMessage in GetErrorMessages(nameof(CataloguedResource.SecurityClassification)))
-                            {
-                                <p class="govuk-error-message">@errorMessage</p>
-                            }
-                            <ul class="govuk-list">
-                                @cddoDataAsset.SecurityClassification
-                            </ul>
-                        </dd>
-                        <dd class="govuk-summary-list__actions">
-                            <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.SecurityClassification)" asp-route-identifier="@cddoDataAsset.Id"
-                               asp-route-isCheckAnswers="true">
-                                Change
-                                <span class="govuk-visually-hidden"> Security Classification</span>
-                            </a>
-                        </dd>
-                    </div>
-
+                <dl class="govuk-summary-list govuk-!-margin-bottom-9">                                        
                     @* Title *@
                     <div id="@nameof(CataloguedResource.Title)" class="govuk-summary-list__row @(GetErrorMessages(nameof(CataloguedResource.Title)).Any() ? "govuk-form-group--error" : "")">
                         <dt class="govuk-summary-list__key">

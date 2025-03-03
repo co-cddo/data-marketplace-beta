@@ -97,14 +97,14 @@ public class CatalogDataDescriptionController(
         if (method is not null)
             return method switch
             {
-                NewDataDescriptionMethod.Manual => RedirectToAction(nameof(DataDescriptionType)),
+                NewDataDescriptionMethod.Manual => RedirectToAction(nameof(SecurityClassification)),
                 NewDataDescriptionMethod.API => RedirectToAction(nameof(DataDescriptionApiStart)),
                 NewDataDescriptionMethod.Spreadsheet => RedirectToAction(
                     nameof(CatalogSpreadsheetController.AddNewUploadSpreadsheet), "CatalogSpreadsheet"),
                 _ => ViewOrRedirect("~/Pages/DataDescription/AddNewDataDescription.cshtml")
             };
         ModelState.AddModelError("dataDescriptionMethod", "Select how you want to add your data description");
-        return ViewOrRedirect("~/Pages/DataDescription/AddNewDataDescription.cshtml");
+        return ViewOrRedirect("~/Pages/DataDescription/Manual/SecurityClassification.cshtml");
 
     }
 
@@ -112,66 +112,34 @@ public class CatalogDataDescriptionController(
     public Task<IActionResult> DataDescriptionApiStart() =>
         SecureActionAsync("~/Pages/DataDescription/NewDescription/Api/Start.cshtml");
 
-    [Route("Add-Data-Description-Type")]
-    public Task<IActionResult> DataDescriptionType() =>
-        SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/DataDescriptionType.cshtml");
-
-    [HttpPost("Add-Data-Description-Type")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DataDescriptionTypeSubmit(bool confirmDataDescription)
-    {
-        if (!ModelState.IsValid)
-        {
-            return RedirectToPage("/Error/400");
-        }
-        if (!await UserHasRequiredRoleAsync()) return RedirectToPage("/Index");
-
-        if (confirmDataDescription)
-            return RedirectToAction(nameof(SecurityClassification));
-
-        ModelState.AddModelError("confirmDataDescription", "Confirm that you're describing a data set");
-        return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/DataDescriptionType.cshtml");
-    }
-
     [Route("Add-Security-Classification")]
-    public async Task<IActionResult> SecurityClassification(QuestionSecurityClassificationRequest questionSecurityClassificationRequest, string? identifier, bool isCheckList, bool isCheckAnswers, bool isEditMode)
+    public async Task<IActionResult> SecurityClassification(QuestionSecurityClassificationRequest questionSecurityClassificationRequest)
     {
         if (!ModelState.IsValid)
         {
             return RedirectToPage("/Error/400");
         }
-
-        if (!string.IsNullOrEmpty(identifier))
-        {
-            questionSecurityClassificationRequest.Identifier = identifier;
-            var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
-            if (dataAsset is not null && Enum.TryParse<SecurityClassificationEnum>(dataAsset.CddoDataAsset.SecurityClassification!, out var securityClassification))
-            {
-                questionSecurityClassificationRequest.SecurityClassification = securityClassification;
-            }
-        }
-
-        ViewBag.isCheckList = isCheckList;
-        ViewBag.isCheckAnswers = isCheckAnswers;
-        ViewBag.isEditMode = isEditMode;
         return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/SecurityClassification.cshtml", questionSecurityClassificationRequest);
     }
 
     [HttpPost("Add-Security-Classification")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SecurityClassificationSubmit(QuestionSecurityClassificationRequest questionSecurityClassificationRequest, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    public async Task<IActionResult> SecurityClassificationSubmit(QuestionSecurityClassificationRequest questionSecurityClassificationRequest)
     {
         if (questionSecurityClassificationRequest.SecurityClassification is null)
         {
             ModelState.Clear();
-            ModelState.AddModelError("SecurityClassification", "Confirm that the security classification is data set");
-            ViewBag.isEditMode = isEditMode;
+            ModelState.AddModelError("SecurityClassification", "Select how you want to add security classification");
             return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/SecurityClassification.cshtml", questionSecurityClassificationRequest);
         }
 
-        if (string.IsNullOrEmpty(questionSecurityClassificationRequest.Identifier))
+        if (string.IsNullOrEmpty(questionSecurityClassificationRequest.Identifier) && questionSecurityClassificationRequest.SecurityClassification == SecurityClassificationEnum.Official)
         {
             return RedirectToAction(nameof(AddTitle), new { securityClassification = questionSecurityClassificationRequest.SecurityClassification });
+        }
+        else if (questionSecurityClassificationRequest.SecurityClassification == SecurityClassificationEnum.Secret)
+        {
+            return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/SecurityClassificationMessage.cshtml");
         }
 
         PatchProfiledDataAssetResponse? response;
@@ -187,8 +155,7 @@ public class CatalogDataDescriptionController(
 
         if (response is not null)
         {
-            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddTitle), isEditMode)
-                   ?? RedirectToAction(nameof(AddTitle), new { identifier = response.DataAssetId.ToString() });
+            return RedirectToAction(nameof(AddTitle), new { identifier = response.DataAssetId.ToString() });
         }
 
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/SecurityClassification.cshtml", questionSecurityClassificationRequest);
@@ -660,9 +627,9 @@ public class CatalogDataDescriptionController(
     {
         QuestionContactPointRequest questionContactPoint = new() { Identifier = identifier, ContactPoint = new List<Contact> { contact } };
 
-        if (!string.IsNullOrEmpty(contact.Email) &&  !_emailValidator.IsEmailAddressValid(contact.Email))
+        if (!string.IsNullOrEmpty(contact.Email) && !_emailValidator.IsEmailAddressValid(contact.Email))
         {
-            ModelState.AddModelError(nameof(contact.Email), "Email is invalid");     
+            ModelState.AddModelError(nameof(contact.Email), "Email is invalid");
         }
         if (string.IsNullOrEmpty(contact.Name) && !string.IsNullOrEmpty(contact.Email))
         {
@@ -967,14 +934,14 @@ public class CatalogDataDescriptionController(
         ModelState.Clear();
 
         ModelState.AddModelError("metadataIssuedDate", "Provide a valid date");
-        
+
 
         if (!questionIssuedRequest.metadataIssuedDay.IsNullOrEmpty() && !int.TryParse(questionIssuedRequest.metadataIssuedDay, out int dayResult))
         {
             ModelState.AddModelError(nameof(questionIssuedRequest.metadataIssuedDay), "Day is invalid");
         }
 
-        if (!questionIssuedRequest.metadataIssuedMonth.IsNullOrEmpty() && !int.TryParse(questionIssuedRequest.metadataIssuedMonth, out int monthResult ))
+        if (!questionIssuedRequest.metadataIssuedMonth.IsNullOrEmpty() && !int.TryParse(questionIssuedRequest.metadataIssuedMonth, out int monthResult))
         {
             ModelState.AddModelError(nameof(questionIssuedRequest.metadataIssuedMonth), "Month is invalid");
         }

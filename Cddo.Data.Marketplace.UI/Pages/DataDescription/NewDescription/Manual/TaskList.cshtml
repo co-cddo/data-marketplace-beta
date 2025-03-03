@@ -107,8 +107,7 @@
             @* General Section *@
             <h3 class="govuk-heading-m">General</h3>
             <ul class="govuk-task-list">
-                @foreach (var item in new[] {
-                new { Title = "Security classification", Action = nameof(CatalogDataDescriptionController.SecurityClassification), Completed = !string.IsNullOrEmpty(dataAsset.SecurityClassification) },
+                @foreach (var item in new[] {                
                 new { Title = "Title", Action = nameof(CatalogDataDescriptionController.AddTitle), Completed = !string.IsNullOrEmpty(dataAsset.Title) },
                 new { Title = "Description", Action = nameof(CatalogDataDescriptionController.AddDescription), Completed = !string.IsNullOrEmpty(dataAsset.Description) },
                 new { Title = "Internal identifier", Action = nameof(CatalogDataDescriptionController.AddInternalIdentifier), Completed = !string.IsNullOrEmpty(dataAsset.InternalIdentifier) }
