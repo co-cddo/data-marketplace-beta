@@ -17,9 +17,9 @@
                     Data Marketplace
                 </h1>
                 <p class="govuk-body-l">
-                    A place for people who work in government organisations, agencies and public bodies to share data.
+                    A place for people who work in government organisations to find, request and share government data.
                 </p>
-                <h2 class="govuk-heading-m govuk-!-margin-bottom-3" id="landing-banner-heading">Find data assets from government organisations</h2>
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-3" id="landing-banner-heading"> Find data from government organisations</h2>
 
                 <form method="get" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartCddoDataAssetsSearch)">
                     <div class="govuk-!-width-two-thirds govuk-!-margin-bottom-4">
@@ -113,29 +113,29 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-half govuk-!-margin-bottom-6">
             <h2 class="govuk-heading-m">Data requests</h2>
-            <p class="govuk-body">Manage the requests you’ve created or received from other government organisations.</p>
+            <p class="govuk-body">Manage your data requests with other government organisations.</p>
 
             <ul class="govuk-list">
                 <li>
-                    <p class="govuk-body"><a asp-controller="DataRequest" asp-action="@nameof(DataRequestController.RequestDashboard)" class="govuk-link  govuk-!-font-weight-bold">Data request dashboard</a></p>
+                    <p class="govuk-body"><a asp-controller="DataRequest" asp-action="@nameof(DataRequestController.RequestDashboard)" class="govuk-link  govuk-!-font-weight-bold">View data requests</a></p>
                 </li>
             </ul>
         </div>
 
         <div class="govuk-grid-column-one-half govuk-!-margin-bottom-6">
-            <h2 class="govuk-heading-m">Data descriptions</h2>
+            <h2 class="govuk-heading-m">List your data</h2>
             <p class="govuk-body">View or add a description of your organisation’s data assets.</p>
             <ul class="govuk-list">
                 <li>
                     <p govuk-body>
-                        <a asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.DataDescriptionDashboard)" class="govuk-link govuk-!-font-weight-bold">Data descriptions dashboard</a>
+                        <a asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.DataDescriptionDashboard)" class="govuk-link govuk-!-font-weight-bold">Manage your listings</a>
                     </p>
                 </li>
-                <li>
+             @*    <li>
                     <p govuk-body>
                         <a asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddNewDataDescription)" class="govuk-link  govuk-!-font-weight-bold">Add data description</a>
                     </p>
-                </li>
+                </li> *@
             </ul>
         </div>        
     </div>
