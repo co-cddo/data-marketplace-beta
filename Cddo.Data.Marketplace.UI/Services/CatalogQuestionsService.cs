@@ -312,4 +312,9 @@ public class CatalogQuestionsService(
         };
         return await MakeApiPatchRequestAsync<PatchProfiledDataAssetResponse>(request);
     }
+
+    public Task<PatchProfiledDataAssetResponse?> UpdateLicenceAsync(QuestionLicenceRequest questionLicenceRequest, DataAssetType dataSet)
+    {
+        throw new NotImplementedException();
+    }
 }

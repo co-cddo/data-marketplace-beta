@@ -1,0 +1,88 @@
+﻿@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
+@using Cddo.Data.Marketplace.Api.Dto.Responses.Catalog
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Model.Enum
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions.QuestionLicenceRequest
+@{
+
+    bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
+    bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
+    bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
+    string saveButtonName;
+    if (isCheckList)
+    {
+        saveButtonName = "isCheckList";
+    }
+    else if (isCheckAnswers)
+    {
+        saveButtonName = "isCheckAnswers";
+    }
+    else
+    {
+        saveButtonName = "isCheckList";
+    }
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.Licence)" asp-route-isEditMode="@isEditMode.ToString().ToLower()" method="post">
+                <input type="hidden" name="@nameof(QuestionLicenceRequest.Identifier)" value="@Model.Identifier" />
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                            <h1 class="govuk-fieldset__heading">
+                                What is the licence for this data?
+                            </h1>
+                        </legend>
+                        <div class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="licence" name="licence" type="radio" value="Open Government Licence">
+                                <label class="govuk-label govuk-radios__label" for="licence">
+                                    Open Government Licence
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="licence-2" name="licence" type="radio" value="Not known">
+                                <label class="govuk-label govuk-radios__label" for="licence-2">
+                                    Not known
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="licence-3" name="licence" type="radio" value="Other" aria-controls="conditional-licence-3" aria-expanded="true">
+                                <label class="govuk-label govuk-radios__label" for="licence-3">
+                                    Other
+                                </label>
+                            </div>
+                            <div class="govuk-radios__conditional" id="conditional-licence-3">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label" for="metadataLicenceOther">
+                                        Licence name
+                                    </label>
+                                    <input class="govuk-input" id="metadataLicenceOther" type="text" asp-for="@Model.Licence.Text">
+                                </div>
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label" for="metadataLicenceOther">
+                                        Licence URL
+                                    </label>
+                                    <input class="govuk-input" id="metadataLicenceOther"  type="text" asp-for="@Model.Licence.Url" >
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="govuk-button-group">
+                    <button type="submit" name="showNextQuestion" value="true" class="govuk-button" data-module="govuk-button">
+                        Continue
+                    </button>
+                    <button type="submit" name="@saveButtonName" value="true" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        Save and return
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

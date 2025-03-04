@@ -1288,7 +1288,7 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("licence")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Licence(QuestionLicenceRequest questionLicenceRequest, string? accessRightsSelection, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    public async Task<IActionResult> Licence(QuestionLicenceRequest questionLicenceRequest,string? licence, string? accessRightsSelection, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
         //if (accessRightsSelection != null)
         //{
