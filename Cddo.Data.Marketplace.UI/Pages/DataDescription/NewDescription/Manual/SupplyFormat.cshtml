@@ -39,13 +39,33 @@
                     <fieldset class="govuk-fieldset" aria-describedby="mediaType-hint">
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                             <h1 class="govuk-fieldset__heading">
-                                How is the data set made available? (optional)
+                                How can users access the data?
                             </h1>
                         </legend>
                         <div id="mediaType-hint" class="govuk-hint">
-                            Select one option.
+                            You’ll be able to add more access methods if needed.
                         </div>
                         <div class="govuk-radios" data-module="govuk-radios">
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="filedownload" name="MediaType" type="radio" value="File download" @(selectedMediaType?.FirstOrDefault()?.Equals("File Download", StringComparison.OrdinalIgnoreCase) == true ? "checked" : "")>
+                                <label class="govuk-label govuk-radios__label" for="filedownload">
+                                        File download
+                                    </label>
+                                </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="api" name="MediaType" type="radio" value="API" @(selectedMediaType?.FirstOrDefault()?.Equals("API", StringComparison.OrdinalIgnoreCase) == true ? "checked" : "")>
+                                <label class="govuk-label govuk-radios__label" for="api">
+                                    API
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="webPage" name="MediaType" type="radio" value="Webpage" @(selectedMediaType?.FirstOrDefault()?.Equals("Webpage", StringComparison.OrdinalIgnoreCase) == true ? "checked" : "")>
+                                <label class="govuk-label govuk-radios__label" for="webPage">
+                                    Webpage
+                                </label>
+                            </div>
+                        </div>
+                        @* <div class="govuk-radios" data-module="govuk-radios">
                             @foreach (var mediaType in Enum.GetValues(typeof(MediaType)).Cast<MediaType>())
                             {
                                 <div class="govuk-radios__item">
@@ -62,7 +82,7 @@
                                     </label>
                                 </div>
                             }
-                        </div>
+                        </div> *@
                     </fieldset>
                 </div>
                 <div class="govuk-button-group">

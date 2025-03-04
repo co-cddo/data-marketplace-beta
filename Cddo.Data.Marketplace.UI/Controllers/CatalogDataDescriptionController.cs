@@ -1161,8 +1161,12 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Supply-Format")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddSupplyFormatSubmit(QuestionDistributionRequest questionDistributionRequest, string isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode)
+    public async Task<IActionResult> AddSupplyFormatSubmit(QuestionDistributionRequest questionDistributionRequest, string? mediaType, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
+        if(mediaType != null)
+        {
+            questionDistributionRequest.Distribution = new List<Distribution>() { new Distribution() { MediaType = new List<string>() { mediaType } } };
+        }
         if (!ModelState.IsValid)
         {
             var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
@@ -1331,7 +1335,7 @@ public class CatalogDataDescriptionController(
                    ?? RedirectToAction(nameof(AddSupplyFormat), new { identifier = response.DataAssetId.ToString() });
         }
 
-        return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/AccessRights.cshtml", questionLicenceRequest);
+        return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/Licence.cshtml", questionLicenceRequest);
     }
     private static bool ParseBoolean(string input)
     {
