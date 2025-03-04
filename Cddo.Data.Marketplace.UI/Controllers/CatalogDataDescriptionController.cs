@@ -1190,8 +1190,8 @@ public class CatalogDataDescriptionController(
         {
             await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", $"Updated the update supply format of data set {response.DataAssetId}");
 
-            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(CheckAnswers), isEditMode)
-                   ?? RedirectToAction(nameof(CheckAnswers), new { identifier = response.DataAssetId.ToString() });
+            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddDistributionLinks), isEditMode)
+                   ?? RedirectToAction(nameof(AddDistributionLinks), new { identifier = response.DataAssetId.ToString() });
         }
 
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/SupplyFormat.cshtml", questionDistributionRequest);
@@ -1336,6 +1336,81 @@ public class CatalogDataDescriptionController(
         }
 
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/Licence.cshtml", questionLicenceRequest);
+    }
+
+    [Route("distribution-links")]
+    public async Task<IActionResult> AddDistributionLinks(QuestionDistributionRequest questionKeywordRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
+    {
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+
+            string summary = $"Validation failed for Add-Supply-Format. Errors: {string.Join(", ", validationErrors)}";
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", summary);
+        }
+
+        if (!string.IsNullOrEmpty(identifier))
+        {
+            questionKeywordRequest.Identifier = identifier;
+            var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+            if (dataAsset is not null)
+            {
+                questionKeywordRequest.Distribution =
+                [
+                    new Distribution
+                    {
+                        MediaType = [dataAsset.CddoDataAsset.DataAssetDistribution?.MediaType!],
+                        DownloadUrl = dataAsset.CddoDataAsset.DataAssetDistribution?.DownloadUrl,
+                        Title = dataAsset.CddoDataAsset.DataAssetDistribution?.Title,
+                        Format = dataAsset.CddoDataAsset.DataAssetDistribution?.Format
+
+                    }
+                ];
+            }
+        }
+
+        ViewBag.isCheckList = isCheckList;
+        ViewBag.isCheckAnswers = isCheckAnswers;
+        ViewBag.isEditMode = isEditMode;
+        return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/DistributionLink.cshtml", questionKeywordRequest);
+    }
+
+    [HttpPost("distribution-links")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddDistributionLinks(QuestionDistributionRequest questionDistributionRequest, string? mediaType, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    {
+        if (mediaType != null)
+        {
+            questionDistributionRequest.Distribution.FirstOrDefault().MediaType = new List<string>() { mediaType };
+        }
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+
+            string summary = $"Validation failed for Add-Distribution-Link. Errors: {string.Join(", ", validationErrors)}";
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Distribution-Link", summary);
+        }
+
+        PatchProfiledDataAssetResponse? response;
+
+        try
+        {
+            response = await _catalogQuestionsService.UpdateDistributionAsync(questionDistributionRequest, DataAssetType.DataSet);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return RedirectToPage(AccessDeniedPage);
+        }
+
+        if (response is not null)
+        {
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", $"Updated the update supply format of data set {response.DataAssetId}");
+
+            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddDistributionLinks), isEditMode)
+                   ?? RedirectToAction(nameof(AddDistributionLinks), new { identifier = response.DataAssetId.ToString() });
+        }
+
+        return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/SupplyFormat.cshtml", questionDistributionRequest);
     }
     private static bool ParseBoolean(string input)
     {
