@@ -1427,6 +1427,52 @@ public class CatalogDataDescriptionController(
 
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/AccessLinks.cshtml", questionDistributionRequest);
     }
+    [Route("distribution-links-restricted")]
+    public async Task<IActionResult> AddDistributionLinksRestricted(QuestionDistributionRequest questionKeywordRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
+    {
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+
+            string summary = $"Validation failed for Add-Supply-Format. Errors: {string.Join(", ", validationErrors)}";
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", summary);
+        }
+
+        if (!string.IsNullOrEmpty(identifier))
+        {
+            questionKeywordRequest.Identifier = identifier;
+            var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+            if (dataAsset is not null)
+            {
+                questionKeywordRequest.Distribution =
+                [
+                    new Distribution
+                    {
+                        MediaType = [dataAsset.CddoDataAsset.DataAssetDistribution?.MediaType!],
+                        DownloadUrl = dataAsset.CddoDataAsset.DataAssetDistribution?.DownloadUrl,
+                        Title = dataAsset.CddoDataAsset.DataAssetDistribution?.Title,
+                        Format = dataAsset.CddoDataAsset.DataAssetDistribution?.Format,
+                        AccessUrl = dataAsset.CddoDataAsset.DataAssetDistribution?.AccessUrl
+
+                    }
+                ];
+            }
+        }
+
+        ViewBag.isCheckList = isCheckList;
+        ViewBag.isCheckAnswers = isCheckAnswers;
+        ViewBag.isEditMode = isEditMode;
+        return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/DistributionLink.cshtml", questionKeywordRequest);
+    }
+
+    [HttpPost("distribution-links-restricted")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddDistributionLinksRestricted(QuestionDistributionRequest questionDistributionRequest, string? mediaType, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    {
+
+        return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, questionDistributionRequest.Identifier, nameof(CheckAnswers), isEditMode)
+       ?? RedirectToAction(nameof(CheckAnswers), new { identifier = questionDistributionRequest.Identifier });
+    }
     [Route("accesslinks")]
     public async Task<IActionResult> AddAccessLinksSubmit(QuestionDistributionRequest questionFormatsRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
