@@ -1,6 +1,7 @@
 ﻿@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums
 @using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
 @using Cddo.Data.Marketplace.UI.Controllers
+@using Newtonsoft.Json
 
 @model QuestionDistributionRequest
 
@@ -34,6 +35,7 @@
         <div class="govuk-grid-column-two-thirds">
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddSupplyFormatSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
                 <input type="hidden" name="@nameof(QuestionDistributionRequest.Identifier)" value="@Model?.Identifier" />
+                <input type="hidden" name="@nameof(QuestionDistributionRequest.Distribution)" value="@JsonConvert.SerializeObject(Model?.Distribution)" />
 
                 <div class="govuk-form-group">
                     <fieldset class="govuk-fieldset" aria-describedby="mediaType-hint">
