@@ -16,10 +16,10 @@
             @if (User.Identity!.IsAuthenticated)
             {
                 <div class="govuk-grid-column-three-quarters">
-                    <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">
+                    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
                         Data Marketplace
                     </h1>
-                    <p class="govuk-body-l">
+                    <p class="govuk-body-l govuk-!-margin-bottom-4">
                         A place for people who work in government organisations to find, request and share government data.
                     </p>
                     <h2 class="govuk-heading-m govuk-!-margin-bottom-3" id="landing-banner-heading">Find data from government organisations</h2>
@@ -111,14 +111,14 @@
             else
             {
                 <div class="govuk-grid-column-two-thirds">
-                    <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">
-                        A place for people who work in government organisations to find, request and share data
+                    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
+                        A place for people who work in government organisations to find, request and share&nbsp;data
                     </h1>
-                    <p class="govuk-body-l">
+                    <p class="govuk-body-l govuk-!-margin-bottom-4">
                         The Data Marketplace is currently in private beta.
                     </p>
-                    <p class="govuk-body-l">
-                        <a asp-controller="Support" asp-action="@nameof(SupportController.GetStarted)">Find out if you can use it</a> or if you have access, <a href="@Url.Page("/Auth/SignIn")">sign in</a>.
+                    <p class="govuk-body-l govuk-!-margin-bottom-4">
+                        <a class="govuk-link" asp-controller="Support" asp-action="@nameof(SupportController.GetStarted)">Find out if you can use it</a> or if you have access, <a class="govuk-link" href="@Url.Page("/Auth/SignIn")">sign in</a>.
                     </p>
                 </div>
                 <div class="govuk-grid-column-one-third">
