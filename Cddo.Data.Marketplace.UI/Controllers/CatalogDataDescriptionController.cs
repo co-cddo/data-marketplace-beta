@@ -19,6 +19,8 @@ using Microsoft.IdentityModel.Tokens;
 using Agm.Catalog.DotNet.Core.Validation.EmailAddress;
 using Cddo.Data.Marketplace.Api.Dto.Responses.Catalog;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using System.Linq;
 
 namespace Cddo.Data.Marketplace.UI.Controllers;
 
@@ -1061,7 +1063,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("access-rights")]
-    public async Task<IActionResult> AccessRights(QuestionAccessRightsRequest accessRightsRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> AccessRights(QuestionAccessRightsRequest accessRightsRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
 
         if (!string.IsNullOrEmpty(identifier))
@@ -1118,9 +1120,14 @@ public class CatalogDataDescriptionController(
         if (response is not null)
         {
             await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddFrequency, "Access-Rights", $"Updated the access rights of data set {response.DataAssetId}");
-
-            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(Licence), isEditMode)
+            if(accessRightsSelection.Value)
+            {
+                return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(Licence), isEditMode)
                    ?? RedirectToAction(nameof(Licence), new { identifier = response.DataAssetId.ToString() });
+            }
+
+            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddRestrictedSupplyFormatSubmit), isEditMode)
+                   ?? RedirectToAction(nameof(AddRestrictedSupplyFormatSubmit), new { identifier = response.DataAssetId.ToString() });
         }
 
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/AccessRights.cshtml", accessRightsRequest);
@@ -1209,6 +1216,108 @@ public class CatalogDataDescriptionController(
         }
 
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/SupplyFormat.cshtml", questionDistributionRequest);
+    }
+
+    [HttpPost("access-method-restricted")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddRestrictedSupplyFormatSubmit(QuestionDistributionRequest questionDistributionRequest, List<string>? supplyFormat, string? distribution, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    {
+
+        if (distribution != null)
+        {
+            var distributionList = JsonConvert.DeserializeObject<List<Distribution>>(distribution);
+            questionDistributionRequest.Distribution = distributionList;
+        }
+        if (supplyFormat != null && questionDistributionRequest.Distribution == null)
+        {
+            questionDistributionRequest.Distribution = new List<Distribution>();
+            foreach (var mediaType in supplyFormat)
+            {
+                questionDistributionRequest.Distribution.Add(new Distribution() { MediaType = new List<string>() { mediaType } });
+            }
+
+        }
+        else if(supplyFormat != null)
+        {
+           
+            var currentMediaTypes = questionDistributionRequest?.Distribution?.Select(x => x?.MediaType?.FirstOrDefault()).ToList();
+
+            var unCommonElements = currentMediaTypes?.Where(item => !supplyFormat.Contains(item)).ToList();
+            foreach (var item in unCommonElements)
+            {
+                questionDistributionRequest?.Distribution?.Add(new Distribution() { MediaType = new List<string>() { item } });
+            }
+           
+        }
+        //else if (mediaType != null)
+        //{
+        //    questionDistributionRequest.Distribution.FirstOrDefault().MediaType = new List<string>() { mediaType };
+        //}
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+
+            string summary = $"Validation failed for Add-Supply-Format. Errors: {string.Join(", ", validationErrors)}";
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", summary);
+        }
+
+        PatchProfiledDataAssetResponse? response;
+
+        try
+        {
+            response = await _catalogQuestionsService.UpdateDistributionAsync(questionDistributionRequest, DataAssetType.DataSet);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return RedirectToPage(AccessDeniedPage);
+        }
+
+        if (response is not null)
+        {
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", $"Updated the update supply format of data set {response.DataAssetId}");
+
+            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddFormatsSubmit), isEditMode)
+                   ?? RedirectToAction(nameof(AddFormatsSubmit), new { identifier = response.DataAssetId.ToString() });
+        }
+
+        return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/SupplyFormat.cshtml", questionDistributionRequest);
+    }
+
+    [Route("access-method-restricted")]
+    public async Task<IActionResult> AddRestrictedSupplyFormatSubmit(QuestionDistributionRequest questionKeywordRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
+    {
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+
+            string summary = $"Validation failed for Add-Supply-Format. Errors: {string.Join(", ", validationErrors)}";
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", summary);
+        }
+
+        if (!string.IsNullOrEmpty(identifier))
+        {
+            questionKeywordRequest.Identifier = identifier;
+            var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+            if (dataAsset is not null)
+            {
+                questionKeywordRequest.Distribution =
+                [
+                    new Distribution
+                    {
+                        MediaType = [dataAsset.CddoDataAsset.DataAssetDistribution?.MediaType!],
+                        DownloadUrl = dataAsset.CddoDataAsset.DataAssetDistribution?.DownloadUrl,
+                        Title = dataAsset.CddoDataAsset.DataAssetDistribution?.Title,
+                        Format = dataAsset.CddoDataAsset.DataAssetDistribution?.Format
+
+                    }
+                ];
+            }
+        }
+
+        ViewBag.isCheckList = isCheckList;
+        ViewBag.isCheckAnswers = isCheckAnswers;
+        ViewBag.isEditMode = isEditMode;
+        return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/AccessRightsRestricted.cshtml", questionKeywordRequest);
     }
 
     [Route("Task-List")]
@@ -1596,7 +1705,7 @@ public class CatalogDataDescriptionController(
                    ?? RedirectToAction(nameof(CheckAnswers), new { identifier = response.DataAssetId.ToString() });
         }
 
-        return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/SupplyFormat.cshtml", questionFormatsRequest);
+        return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/Formats.cshtml", questionFormatsRequest);
     }
     private static bool ParseBoolean(string input)
     {
