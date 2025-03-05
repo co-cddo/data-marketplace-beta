@@ -1,0 +1,159 @@
+﻿@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums
+@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
+@using Cddo.Data.Marketplace.UI.Controllers
+
+@model QuestionDistributionRequest
+
+@{
+    ViewData["Title"] = "Supply Format";
+    var selectedMediaType = Model?.Distribution?.FirstOrDefault()?.MediaType;
+    bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
+    bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
+    bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
+
+    var fileDownloads = Model.Distribution.Where(d => d.MediaType.FirstOrDefault() == "File Download").ToList();
+    var apis = Model.Distribution.Where(d => d.MediaType.FirstOrDefault() == "API").ToList();
+    var webpages = Model.Distribution.Where(d => d.MediaType.FirstOrDefault() == "text/html").ToList();
+
+    string saveButtonName;
+
+    if (isCheckList)
+    {
+        saveButtonName = "isCheckList";
+    }
+    else if (isCheckAnswers)
+    {
+        saveButtonName = "isCheckAnswers";
+    }
+    else
+    {
+        saveButtonName = "isCheckList";
+    }
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddAccessLinksSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                <input type="hidden" name="@nameof(QuestionDistributionRequest.Identifier)" value="@Model?.Identifier" />
+                <h1 class="govuk-heading-l">
+                    Access links
+                </h1>
+
+                <p>
+                    These links open in a new tab.
+                </p>
+
+                @switch (selectedMediaType.FirstOrDefault())
+                {
+                    case "File download":
+                        <table class="govuk-table">
+                            <thead class="govuk-table__head">
+                                <tr class="govuk-table__row">
+                                    <th scope="col" class="govuk-table__header govuk-!-width-one-half">Downloads</th>
+                                    <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
+                                    <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="govuk-table__body">
+
+                                @foreach (var distribution in Model.Distribution.Select((value, index) => new { value, index }))
+                                {
+                                    <tr class="govuk-table__row">
+                                        <th scope="row" class="govuk-table__header govuk-!-font-weight-regular">
+                                        <a href="@distribution.value.DownloadUrl">
+                                                @distribution.value.DownloadUrl
+                                            </a>
+                                        </th>
+                                        <td class="govuk-table__cell">
+                                            @distribution.value.Format
+                                        </td>
+                                        <td class="govuk-table__cell">
+                                            <a href="#">Change</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        break;
+
+                    case "API":
+                        <table class="govuk-table">
+                            <thead class="govuk-table__head">
+                                <tr class="govuk-table__row">
+                                    <th scope="col" class="govuk-table__header govuk-!-width-three-quarters">
+                                        API
+                                    </th>
+                                    <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="govuk-table__body">
+                                @foreach (var distribution in Model.Distribution.Select((value, index) => new { value, index }))
+                                {
+                                    <tr class="govuk-table__row">
+                                        <th scope="row" class="govuk-table__header govuk-!-font-weight-regular">
+                                            <a href="@distribution.value.AccessUrl">
+                                                @distribution.value.AccessUrl
+                                            </a>
+                                        </th>
+                                        <td class="govuk-table__cell">
+                                            <a href="#">Change</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        break;
+
+                    case "text/html":
+                        <table class="govuk-table">
+                            <thead class="govuk-table__head">
+                                <tr class="govuk-table__row">
+                                    <th scope="col" class="govuk-table__header govuk-!-width-three-quarters">
+                                        Webpages
+                                    </th>
+                                    <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="govuk-table__body">
+                            @foreach (var distribution in Model.Distribution.Select((value, index) => new { value, index }))
+                            {
+                                <tr class="govuk-table__row">
+                                    <th scope="row" class="govuk-table__header govuk-!-font-weight-regular">
+                                        <a href="@distribution.value.DownloadUrl">
+                                            @distribution.value.DownloadUrl
+                                        </a>
+                                    </th>
+                                    <td class="govuk-table__cell">
+                                        <a href="#">Change</a>
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                        break;
+                    
+
+                }
+                <div class="govuk-form-group">
+                    <a href="#" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button" data-govuk-button-init="">
+                        Add another access method
+                    </a>
+                </div>
+
+                <div class="govuk-button-group">
+                    <button type="submit" class="govuk-button" data-module="govuk-button" data-govuk-button-init="">
+                        Continue
+                    </button>
+                    <button type="submit" name="@saveButtonName" value="true" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        Save and return
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

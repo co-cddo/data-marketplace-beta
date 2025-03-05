@@ -1530,15 +1530,59 @@ public class CatalogDataDescriptionController(
         {
             await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", $"Updated the update supply format of data set {response.DataAssetId}");
 
-            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddFormatsSubmit), isEditMode)
-                   ?? RedirectToAction(nameof(AddFormatsSubmit), new { identifier = response.DataAssetId.ToString() });
+            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddAccessLinksSubmit), isEditMode)
+                   ?? RedirectToAction(nameof(AddAccessLinksSubmit), new { identifier = response.DataAssetId.ToString() });
         }
 
-        return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/SupplyFormat.cshtml", questionDistributionRequest);
+        return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/AccessLinks.cshtml", questionDistributionRequest);
     }
+    [Route("accesslinks")]
+    public async Task<IActionResult> AddAccessLinksSubmit(QuestionDistributionRequest questionFormatsRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
+    {
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
 
+            string summary = $"Validation failed for Add-Supply-Format. Errors: {string.Join(", ", validationErrors)}";
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", summary);
+        }
+
+        if (!string.IsNullOrEmpty(identifier))
+        {
+            questionFormatsRequest.Identifier = identifier;
+            var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+            if (dataAsset is not null)
+            {
+                questionFormatsRequest.Distribution =
+                [
+                    new Distribution
+                    {
+                        MediaType = [dataAsset.CddoDataAsset.DataAssetDistribution?.MediaType!],
+                        DownloadUrl = dataAsset.CddoDataAsset.DataAssetDistribution?.DownloadUrl,
+                        Title = dataAsset.CddoDataAsset.DataAssetDistribution?.Title,
+                        Format = dataAsset.CddoDataAsset.DataAssetDistribution?.Format,
+                        AccessUrl = dataAsset.CddoDataAsset.DataAssetDistribution?.AccessUrl
+                    }
+                ];
+            }
+        }
+
+        ViewBag.isCheckList = isCheckList;
+        ViewBag.isCheckAnswers = isCheckAnswers;
+        ViewBag.isEditMode = isEditMode;
+        return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/AccessLinks.cshtml", questionFormatsRequest);
+
+    }
+    [HttpPost("accesslinks")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddAccessLinksSubmit(QuestionDistributionRequest questionFormatsRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    {
+        return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, questionFormatsRequest.Identifier, nameof(CheckAnswers), isEditMode)
+               ?? RedirectToAction(nameof(CheckAnswers), new { identifier = questionFormatsRequest.Identifier });
+
+    }
     [Route("formats")]
-    public async Task<IActionResult> AddFormatsSubmit(QuestionDistributionRequest questionFormatsRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
+    public async Task<IActionResult> AddFormatsSubmit(QuestionDistributionRequest questionFormatsRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? showNextQuestion,  string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
