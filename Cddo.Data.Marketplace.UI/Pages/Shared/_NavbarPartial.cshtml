@@ -14,14 +14,14 @@
                     Home
                 </a>
             </li>
-
-            <li class="app-navigation__list-item ">
-                <a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartCddoDataAssetsSearch)">
-                    Find data
-                </a>
-            </li>
             @if (User.Identity!.IsAuthenticated)
             {
+                <li class="app-navigation__list-item ">
+                    <a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartCddoDataAssetsSearch)">
+                        Find data
+                    </a>
+                </li>
+
                 <li class="app-navigation__list-item ">
                     <a href="@Url.Page("/ApiPortal/APILandingPage")" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link">
                         API
@@ -35,7 +35,7 @@
                 </a>
             </li>
 
-            
+
         </ul>
 
         <ul class="app-navigation__list app-width-container float-end">
