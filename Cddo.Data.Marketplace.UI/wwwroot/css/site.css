@@ -47,7 +47,7 @@ code {
 }
 
     .app-navigation__list .app-navigation__list-item {
-        padding: 10px;
+        padding: 20px 10px;
     }
 
 @media (min-width: 844px) {
@@ -58,7 +58,6 @@ code {
 
 .app-navigation__list .app-navigation__list-item a {
     font-size: 1.1875rem;
-    font-weight: 600;
 }
 
 /*landing navigation style*/
@@ -194,6 +193,10 @@ button.govuk-link {
 .search-input .search-button__icon {
     height: 20px;
     width: 30px;
+}
+
+.govuk-header {
+    border-bottom: 10px solid #1d70b8!important;
 }
 
 .govuk-header__link {
