@@ -1242,7 +1242,7 @@ public class CatalogDataDescriptionController(
            
             var currentMediaTypes = questionDistributionRequest?.Distribution?.Select(x => x?.MediaType?.FirstOrDefault()).ToList();
 
-            var unCommonElements = currentMediaTypes?.Where(item => !supplyFormat.Contains(item)).ToList();
+            var unCommonElements = supplyFormat?.Where(item => !currentMediaTypes.Contains(item)).ToList();
             foreach (var item in unCommonElements)
             {
                 questionDistributionRequest?.Distribution?.Add(new Distribution() { MediaType = new List<string>() { item } });
@@ -1655,8 +1655,8 @@ public class CatalogDataDescriptionController(
         {
             await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", $"Updated the update supply format of data set {response.DataAssetId}");
 
-            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(CheckAnswers), isEditMode)
-                   ?? RedirectToAction(nameof(CheckAnswers), new { identifier = response.DataAssetId.ToString() });
+            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddDistributionLinks), isEditMode)
+                   ?? RedirectToAction(nameof(AddDistributionLinks), new { identifier = response.DataAssetId.ToString() });
         }
 
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/Formats.cshtml", questionFormatsRequest);
