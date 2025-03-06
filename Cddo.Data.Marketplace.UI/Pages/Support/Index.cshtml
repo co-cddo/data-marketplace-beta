@@ -28,7 +28,7 @@
     </p>
 
     <p class="govuk-body">
-        <a href="https://alphagov.github.io/data-marketplace-info/domains/" class="govuk-link">Check which organisations have joined</a> already. If you’re from a different organisation and you want to use the Data Marketplace, you can <a href="https://datamarketplace.gov.uk/organisationaccess/organisation-access-request" class="govuk-link">request access</a>.
+        <a href="https://alphagov.github.io/data-marketplace-info/domains/" class="govuk-link">Check which organisations have joined</a> already. If you’re from a different organisation and you want to use the Data Marketplace, you can <a asp-controller="OrganisationAccess" asp-action="@nameof(OrganisationAccessController.RequestOrganisationAccess)" class="govuk-link">request access</a>.
     </p>
 
     <h2 class="govuk-heading-m">Create an account</h2>
