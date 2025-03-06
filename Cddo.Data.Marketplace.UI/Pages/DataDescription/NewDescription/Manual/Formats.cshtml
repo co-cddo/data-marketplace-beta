@@ -23,6 +23,10 @@
         saveButtonName = "isCheckList";
     }
 }
+@section Scripts
+{
+    <script src="~/js/Pages/NewDataDescription/Formats.js" asp-add-nonce="true"></script>
+}
 
 <a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
 
@@ -36,7 +40,7 @@
                 <input type="hidden" name="@nameof(QuestionDistributionRequest.Identifier)" value="@Model.Identifier" />
 
                 <div class="govuk-form-group">
-                    <fieldset class="govuk-fieldset" aria-describedby="question-hint" id="keyword-addition">
+                    <fieldset class="govuk-fieldset" aria-describedby="question-hint" id="format-addition">
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                             <h1 class="govuk-fieldset__heading">
                                 What formats is the data available in? (optional)
@@ -52,12 +56,6 @@
                             @foreach (var distribution in Model.Distribution.Where(t => t.MediaType?.FirstOrDefault() == "File download"))
                             {
                                 <div class="govuk-form-group @(ViewData.ModelState[$"Formats_{distribution.Format}"]?.Errors.Any() == true ? "govuk-form-group--error" : "")">
-                                    @* @if (ViewData.ModelState[$"Formats_{i}"]?.Errors.Any() == true)
-                                    {
-                                        <p class="govuk-error-message">
-                                            <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState[$"Format_{i}"].Errors[0].ErrorMessage
-                                        </p>
-                                    } *@
                                     <label class="govuk-label govuk-visually-hidden" for="Format_@distribution.Format">Format</label>
                                     <div class="govuk-input__wrapper">
                                         @{
@@ -66,8 +64,8 @@
                                         @if (formats != null)
                                         {
                                             for (int index = 0; index < formats.Length; index++)
-                                                                {
-                                                <input class="govuk-input" type="text" name="formats" aria-describedby="link-title-hint" value="@formats[index]">
+                                            {
+                                                <input class="govuk-input govuk-input--width-10" type="text" name="formats" aria-describedby="link-title-hint" value="@formats[index]">
                                                 if (index > 1)
                                                 {
                                                     <button type="button" class="remove-input govuk-button govuk-button--secondary mb-0">Remove</button>
@@ -85,6 +83,7 @@
                                 <input class="govuk-input" id="Format_0" name="Format" type="text">
                             </div>
                         }
+
                     </fieldset>
                 </div>
                 <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-4" id="add-another-format" type="button">Add another format</button><br />
