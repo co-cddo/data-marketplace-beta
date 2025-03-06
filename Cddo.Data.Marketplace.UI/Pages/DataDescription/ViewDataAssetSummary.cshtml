@@ -65,7 +65,13 @@
                             <tr class="govuk-table__row">
                                 <th scope="row" class="govuk-table__header">Media type</th>
                                 <td class="govuk-table__cell">
-                                    @Model.DataAssetDistribution?.MediaType
+                                    @if (Model.DataAssetDistribution != null)
+                                    {
+                                        foreach (var distribution in Model.DataAssetDistribution)
+                                        {
+                                            @distribution?.MediaType
+                                        }
+                                    }
                                 </td>
                             </tr>
                         </tbody>

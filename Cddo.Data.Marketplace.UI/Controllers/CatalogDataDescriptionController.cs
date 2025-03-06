@@ -1150,17 +1150,17 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset is not null)
             {
-                questionKeywordRequest.Distribution =
-                [
-                    new Distribution
+                foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
+                {
+                    questionKeywordRequest.Distribution?.Add(new Distribution
                     {
-                        MediaType = [dataAsset.CddoDataAsset.DataAssetDistribution?.MediaType!],
-                        DownloadUrl = dataAsset.CddoDataAsset.DataAssetDistribution?.DownloadUrl,
-                        Title = dataAsset.CddoDataAsset.DataAssetDistribution?.Title,
-                        Format = dataAsset.CddoDataAsset.DataAssetDistribution?.Format
+                        MediaType = [distribution?.MediaType!],
+                        DownloadUrl = distribution?.DownloadUrl,
+                        Title = distribution?.Title,
+                        Format = distribution?.Format
 
-                    }
-                ];
+                    });
+                }
             }
         }
 
@@ -1300,17 +1300,18 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset is not null)
             {
-                questionKeywordRequest.Distribution =
-                [
-                    new Distribution
-                    {
-                        MediaType = [dataAsset.CddoDataAsset.DataAssetDistribution?.MediaType!],
-                        DownloadUrl = dataAsset.CddoDataAsset.DataAssetDistribution?.DownloadUrl,
-                        Title = dataAsset.CddoDataAsset.DataAssetDistribution?.Title,
-                        Format = dataAsset.CddoDataAsset.DataAssetDistribution?.Format
 
-                    }
-                ];
+                 foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
+                {
+                    questionKeywordRequest.Distribution.Add(new Distribution
+                    {
+                        MediaType = [distribution?.MediaType!],
+                        DownloadUrl = distribution?.DownloadUrl,
+                        Title = distribution?.Title,
+                        Format = distribution?.Format
+
+                    });
+                }
             }
         }
 
@@ -1478,18 +1479,18 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset is not null)
             {
-                questionKeywordRequest.Distribution =
-                [
-                    new Distribution
+                foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
+                {
+                    questionKeywordRequest.Distribution?.Add(new Distribution
                     {
-                        MediaType = [dataAsset.CddoDataAsset.DataAssetDistribution?.MediaType!],
-                        DownloadUrl = dataAsset.CddoDataAsset.DataAssetDistribution?.DownloadUrl,
-                        Title = dataAsset.CddoDataAsset.DataAssetDistribution?.Title,
-                        Format = dataAsset.CddoDataAsset.DataAssetDistribution?.Format,
-                        AccessUrl = dataAsset.CddoDataAsset.DataAssetDistribution?.AccessUrl
+                        MediaType = [distribution?.MediaType!],
+                        DownloadUrl = distribution?.DownloadUrl,
+                        Title = distribution?.Title,
+                        Format = distribution?.Format,
+                        AccessUrl = distribution?.AccessUrl,
 
-                    }
-                ];
+                    });
+                }
             }
         }
 
@@ -1553,25 +1554,25 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset is not null)
             {
-                questionKeywordRequest.Distribution =
-                [
-                    new Distribution
+                foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
+                {
+                    questionKeywordRequest.Distribution?.Add(new Distribution
                     {
-                        MediaType = [dataAsset.CddoDataAsset.DataAssetDistribution?.MediaType!],
-                        DownloadUrl = dataAsset.CddoDataAsset.DataAssetDistribution?.DownloadUrl,
-                        Title = dataAsset.CddoDataAsset.DataAssetDistribution?.Title,
-                        Format = dataAsset.CddoDataAsset.DataAssetDistribution?.Format,
-                        AccessUrl = dataAsset.CddoDataAsset.DataAssetDistribution?.AccessUrl
+                        MediaType = [distribution?.MediaType!],
+                        DownloadUrl = distribution?.DownloadUrl,
+                        Title = distribution?.Title,
+                        Format = distribution?.Format,
+                        AccessUrl = distribution?.AccessUrl,
 
-                    }
-                ];
+                    });
+                }
             }
         }
 
         ViewBag.isCheckList = isCheckList;
         ViewBag.isCheckAnswers = isCheckAnswers;
         ViewBag.isEditMode = isEditMode;
-        return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/DistributionLink.cshtml", questionKeywordRequest);
+        return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/DistributionApiRestricted.cshtml", questionKeywordRequest);
     }
 
     [HttpPost("distribution-links-restricted")]
@@ -1599,17 +1600,18 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset is not null)
             {
-                questionFormatsRequest.Distribution =
-                [
-                    new Distribution
+                foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
+                {
+                    questionFormatsRequest.Distribution?.Add(new Distribution
                     {
-                        MediaType = [dataAsset.CddoDataAsset.DataAssetDistribution?.MediaType!],
-                        DownloadUrl = dataAsset.CddoDataAsset.DataAssetDistribution?.DownloadUrl,
-                        Title = dataAsset.CddoDataAsset.DataAssetDistribution?.Title,
-                        Format = dataAsset.CddoDataAsset.DataAssetDistribution?.Format,
-                        AccessUrl = dataAsset.CddoDataAsset.DataAssetDistribution?.AccessUrl
-                    }
-                ];
+                        MediaType = [distribution?.MediaType!],
+                        DownloadUrl = distribution?.DownloadUrl,
+                        Title = distribution?.Title,
+                        Format = distribution?.Format,
+                        AccessUrl = distribution?.AccessUrl,
+
+                    });
+                }
             }
         }
 
@@ -1644,17 +1646,18 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset is not null)
             {
-                questionFormatsRequest.Distribution =
-                [
-                    new Distribution
+                foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
+                {
+                    questionFormatsRequest.Distribution?.Add(new Distribution
                     {
-                        MediaType = [dataAsset.CddoDataAsset.DataAssetDistribution?.MediaType!],
-                        DownloadUrl = dataAsset.CddoDataAsset.DataAssetDistribution?.DownloadUrl,
-                        Title = dataAsset.CddoDataAsset.DataAssetDistribution?.Title,
-                        Format = dataAsset.CddoDataAsset.DataAssetDistribution?.Format,
-                        AccessUrl = dataAsset.CddoDataAsset.DataAssetDistribution?.AccessUrl
-                    }
-                ];
+                        MediaType = [distribution?.MediaType!],
+                        DownloadUrl = distribution?.DownloadUrl,
+                        Title = distribution?.Title,
+                        Format = distribution?.Format,
+                        AccessUrl = distribution?.AccessUrl,
+
+                    });
+                }
             }
         }
 
@@ -1667,15 +1670,18 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("formats")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddFormatsSubmit(QuestionDistributionRequest questionFormatsRequest, string? mediaType, List<string>? formats, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    public async Task<IActionResult> AddFormatsSubmit(QuestionDistributionRequest questionFormatsRequest, string? distribution, List<string>? formats, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
-        if (mediaType != null)
+
+        if (distribution != null)
         {
-            questionFormatsRequest.Distribution.FirstOrDefault().MediaType = new List<string>() { mediaType };
+            var distributionList = JsonConvert.DeserializeObject<List<Distribution>>(distribution);
+            questionFormatsRequest.Distribution = distributionList;
         }
+
         if(formats != null && formats.Any()) 
         {
-            questionFormatsRequest.Distribution.FirstOrDefault().Format = String.Join(",", formats);
+            questionFormatsRequest.Distribution.Where(f=>f.MediaType.FirstOrDefault() == "File download").FirstOrDefault().Format = String.Join(",", formats);
         }
 
         if (!ModelState.IsValid)
@@ -1701,8 +1707,8 @@ public class CatalogDataDescriptionController(
         {
             await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", $"Updated the update supply format of data set {response.DataAssetId}");
 
-            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddDistributionLinks), isEditMode)
-                   ?? RedirectToAction(nameof(AddDistributionLinks), new { identifier = response.DataAssetId.ToString() });
+            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddDistributionLinksRestricted), isEditMode)
+                   ?? RedirectToAction(nameof(AddDistributionLinksRestricted), new { identifier = response.DataAssetId.ToString() });
         }
 
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/Formats.cshtml", questionFormatsRequest);

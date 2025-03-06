@@ -481,12 +481,16 @@
                             {
                                 <p class="govuk-error-message">@errorMessage</p>
                             }
-                            <ul class="govuk-list">
-                                @if (!string.IsNullOrEmpty(cddoDataAsset.DataAssetDistribution?.MediaType))
-                                {
-                                    @cddoDataAsset.DataAssetDistribution.MediaType
-                                }
-                            </ul>
+                            @foreach (var distribution in cddoDataAsset.DataAssetDistribution)
+                            {
+                                <ul class="govuk-list">
+                                    @if (!string.IsNullOrEmpty(distribution?.MediaType))
+                                    {
+                                        @distribution.MediaType
+                                    }
+                                </ul>
+                            }
+                            
                         </dd>
                         <dd class="govuk-summary-list__actions">
                             <a class="govuk-link" asp-controller="CatalogDataDescription" asp-route-identifier="@cddoDataAsset.Id"

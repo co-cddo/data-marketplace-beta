@@ -1,5 +1,6 @@
 ﻿@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
 @using Cddo.Data.Marketplace.UI.Controllers
+@using Newtonsoft.Json
 @model QuestionDistributionRequest
 @{
 
@@ -47,23 +48,32 @@
 
                         @if (Model.Distribution != null)
                         {
-                            @foreach (var distribution in Model.Distribution.Select((value, index) => new { value, index }))
+                            <input type="hidden" name="@nameof(QuestionDistributionRequest.Distribution)" value="@JsonConvert.SerializeObject(Model?.Distribution)" />
+                            @foreach (var distribution in Model.Distribution.Where(t => t.MediaType?.FirstOrDefault() == "File download"))
                             {
-                                <input type="hidden" name="mediaType" value="@Model.Distribution[distribution.index].MediaType.FirstOrDefault()" />
-                                <input type="hidden" asp-for="@Model.Distribution[distribution.index].DownloadUrl" />
-                                <input type="hidden" asp-for="@Model.Distribution[distribution.index].Title" />
-                                <input type="hidden" asp-for="@Model.Distribution[distribution.index].AccessUrl" />
-                                <div class="govuk-form-group @(ViewData.ModelState[$"Formats_{distribution.index}"]?.Errors.Any() == true ? "govuk-form-group--error" : "")">
+                                <div class="govuk-form-group @(ViewData.ModelState[$"Formats_{distribution.Format}"]?.Errors.Any() == true ? "govuk-form-group--error" : "")">
                                     @* @if (ViewData.ModelState[$"Formats_{i}"]?.Errors.Any() == true)
                                     {
                                         <p class="govuk-error-message">
                                             <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState[$"Format_{i}"].Errors[0].ErrorMessage
                                         </p>
                                     } *@
-                                    <label class="govuk-label govuk-visually-hidden" for="Format_@distribution.index">Format</label>
+                                    <label class="govuk-label govuk-visually-hidden" for="Format_@distribution.Format">Format</label>
                                     <div class="govuk-input__wrapper">
-                                        <input class="govuk-input" type="text" name="formats" aria-describedby="link-title-hint" value="@Model.Distribution[distribution.index].Format.Split(",")[@distribution.index]">
-                                        <button type="button" class="remove-input govuk-button govuk-button--secondary mb-0">Remove</button>
+                                        @{
+                                            var formats = distribution?.Format?.Split(",");
+                                        }
+                                        @if (formats != null)
+                                        {
+                                            for (int index = 0; index < formats.Length; index++)
+                                                                {
+                                                <input class="govuk-input" type="text" name="formats" aria-describedby="link-title-hint" value="@formats[index]">
+                                                if (index > 1)
+                                                {
+                                                    <button type="button" class="remove-input govuk-button govuk-button--secondary mb-0">Remove</button>
+                                                }
+                                            }
+                                        }
                                     </div>
                                 </div>
                             }

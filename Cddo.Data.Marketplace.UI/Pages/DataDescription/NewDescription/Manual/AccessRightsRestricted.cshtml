@@ -3,7 +3,7 @@
 @using Newtonsoft.Json
 @model QuestionDistributionRequest
 @{
-    var selectedMediaType = Model?.Distribution?.FirstOrDefault()?.MediaType;
+    var selectedMediaType = Model?.Distribution?.Select(x => x?.MediaType?.FirstOrDefault()).ToList();
     bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
     bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
     bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
@@ -56,7 +56,7 @@
                                        name="supplyFormat"
                                        type="checkbox"
                                        value="File download"
-                                       @(selectedMediaType?.FirstOrDefault() == "File download" ? "checked" : "")
+                                       @(selectedMediaType.Contains("File download") ? "checked" : "")
                                        aria-describedby="confirm-data-error">
                                 <label class="govuk-label govuk-checkboxes__label" for="fileDownLoad">
                                     File download
@@ -68,7 +68,7 @@
                                        name="supplyFormat"
                                        type="checkbox"
                                        value="API"
-                                       @(selectedMediaType?.FirstOrDefault() == "API" ? "checked" : "")
+                                @(selectedMediaType.Contains("API") ? "checked" : "")
                                        aria-describedby="confirm-data-error">
                                 <label class="govuk-label govuk-checkboxes__label" for="api">
                                     API
@@ -81,7 +81,7 @@
                                        name="supplyFormat"
                                        type="checkbox"
                                        value="text/html"
-                                       @(selectedMediaType?.FirstOrDefault() == "text/html" ? "checked" : "")
+                                @(selectedMediaType.Contains("text/html") ? "checked" : "")
                                        aria-describedby="confirm-data-error">
                                 <label class="govuk-label govuk-checkboxes__label" for="webpage">
                                     Webpage

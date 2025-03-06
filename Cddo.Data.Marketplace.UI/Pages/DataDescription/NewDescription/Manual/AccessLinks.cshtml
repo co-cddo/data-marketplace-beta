@@ -11,7 +11,7 @@
     bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
     bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
 
-    var fileDownloads = Model.Distribution.Where(d => d.MediaType.FirstOrDefault() == "File Download").ToList();
+    var fileDownloads = Model.Distribution.Where(d => d.MediaType.FirstOrDefault() == "File download").ToList();
     var apis = Model.Distribution.Where(d => d.MediaType.FirstOrDefault() == "API").ToList();
     var webpages = Model.Distribution.Where(d => d.MediaType.FirstOrDefault() == "text/html").ToList();
 

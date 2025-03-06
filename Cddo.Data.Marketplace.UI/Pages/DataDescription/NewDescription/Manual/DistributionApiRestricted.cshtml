@@ -34,10 +34,10 @@
         <div class="govuk-grid-column-two-thirds">
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinksRestricted)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
                 <input type="hidden" name="@nameof(QuestionDistributionRequest.Identifier)" value="@Model?.Identifier" />  
-                @foreach (var distribution in Model.Distribution.Select((value, index) => new { value, index}))
+                @foreach (var distribution in Model.Distribution.Where(t => t.MediaType?.FirstOrDefault() == "API"))
                 {
-                    
-                    <input type="hidden" name="mediaType" value="@Model.Distribution[distribution.index].MediaType.FirstOrDefault()" />
+
+                    <input type="hidden" name="mediaType" value="@distribution?.MediaType?.FirstOrDefault()" />
 
                     <h1 class="govuk-heading-l">
                         API Details (Optional)
@@ -49,13 +49,13 @@
                         <div id="link-title-hint" class="govuk-hint">
                             If there is only one API, the title can be the same as your listing.
                         </div>
-                        <input class="govuk-input" id="title" type="text" aria-describedby="link-title-hint" asp-for="@Model.Distribution[distribution.index].Title">
+                        <input class="govuk-input" id="title" type="text" aria-describedby="link-title-hint" asp-for="@distribution.Title">
                     </div>
                     <div class="govuk-form-group">
                         <label class="govuk-label govuk-label--s" for="url">
                             Documentation URL
                         </label>
-                        <input class="govuk-input" id="url" type="text" asp-for="@Model.Distribution[distribution.index].AccessUrl">
+                        <input class="govuk-input" id="url" type="text" asp-for="@distribution.AccessUrl">
                     </div>
 
                     

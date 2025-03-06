@@ -209,7 +209,7 @@
                 @foreach (var item in new[] {
                 new { Title = "Date first made available", Action = nameof(CatalogDataDescriptionController.AddPublishedDate), Completed = dataAsset.Issued != null },
                 new { Title = "Frequency of update", Action = nameof(CatalogDataDescriptionController.AddFrequency), Completed = !string.IsNullOrEmpty(dataAsset.UpdateFrequencyString) },
-                new { Title = "Supply format", Action = nameof(CatalogDataDescriptionController.AddSupplyFormat), Completed = dataAsset.DataAssetDistribution?.MediaType is not null },
+               // new { Title = "Supply format", Action = nameof(CatalogDataDescriptionController.AddSupplyFormat), Completed = dataAsset.DataAssetDistribution?.MediaType is not null },
                 new { Title = "Public or restricted data", Action = nameof(CatalogDataDescriptionController.AccessRights), Completed = dataAsset.AccessRights is not null }
 
                           })
