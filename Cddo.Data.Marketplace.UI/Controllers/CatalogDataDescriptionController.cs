@@ -21,6 +21,7 @@ using Cddo.Data.Marketplace.Api.Dto.Responses.Catalog;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using System.Linq;
+using System.Data;
 
 namespace Cddo.Data.Marketplace.UI.Controllers;
 
@@ -307,12 +308,14 @@ public class CatalogDataDescriptionController(
             if (dataAsset is not null)
             {
                 questionDescriptionRequest.Description = dataAsset.CddoDataAsset.Description!;
+                ViewBag.DataAssetTitle = dataAsset.CddoDataAsset.Title;
             }
         }
 
         ViewBag.isCheckList = isCheckList;
         ViewBag.isCheckAnswers = isCheckAnswers;
         ViewBag.isEditMode = isEditMode;
+        
         return await SecureActionAsync(DescriptionViewPath, questionDescriptionRequest);
     }
 
@@ -1091,6 +1094,10 @@ public class CatalogDataDescriptionController(
         {
             accessRightsRequest.AccessRights = accessRightsSelection.Value ? "OPEN" : "RESTRICTED";
         }
+       
+        var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(accessRightsRequest.Identifier));
+
+        
 
         if (!ModelState.IsValid)
         {
@@ -1110,6 +1117,15 @@ public class CatalogDataDescriptionController(
 
         try
         {
+            if (dataAsset?.CddoDataAsset.AccessRights != accessRightsRequest.AccessRights)
+            {
+                var questionDistributionRequest = new QuestionDistributionRequest()
+                {
+                    Identifier = accessRightsRequest.Identifier,
+                    Distribution = new List<Distribution>()
+                };
+                var responseUpdate = await _catalogQuestionsService.UpdateDistributionAsync(questionDistributionRequest, DataAssetType.DataSet);
+            }
             response = await _catalogQuestionsService.UpdateAccessRightsAsync(accessRightsRequest, DataAssetType.DataSet);
         }
         catch (UnauthorizedAccessException)
@@ -1120,10 +1136,13 @@ public class CatalogDataDescriptionController(
         if (response is not null)
         {
             await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddFrequency, "Access-Rights", $"Updated the access rights of data set {response.DataAssetId}");
-            if(accessRightsSelection.Value)
+            if(accessRightsSelection != null && accessRightsSelection.Value)
             {
                 return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(Licence), isEditMode)
                    ?? RedirectToAction(nameof(Licence), new { identifier = response.DataAssetId.ToString() });
+            }else if(showNextQuestion != null && ParseBoolean(showNextQuestion))
+            {
+                return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/AccessRights.cshtml", accessRightsRequest);
             }
 
             return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddRestrictedSupplyFormatSubmit), isEditMode)
@@ -1157,7 +1176,8 @@ public class CatalogDataDescriptionController(
                         MediaType = [distribution?.MediaType!],
                         DownloadUrl = distribution?.DownloadUrl,
                         Title = distribution?.Title,
-                        Format = distribution?.Format
+                        Format = distribution?.Format,
+                        AccessUrl = distribution?.AccessUrl,
 
                     });
                 }
@@ -1180,13 +1200,13 @@ public class CatalogDataDescriptionController(
             var distributionList = JsonConvert.DeserializeObject<List<Distribution>>(distribution);
             questionDistributionRequest.Distribution = distributionList;
         }
-        if (mediaType != null && questionDistributionRequest.Distribution == null)
+        if (mediaType != null && !questionDistributionRequest.Distribution.Any())
         {
             questionDistributionRequest.Distribution = new List<Distribution>() { new Distribution() { MediaType = new List<string>() { mediaType } } };
         }
         else if(mediaType != null)
         {
-            questionDistributionRequest.Distribution.FirstOrDefault().MediaType = new List<string>() { mediaType };
+            questionDistributionRequest.Distribution.Add(new Distribution() { MediaType = new List<string>() { mediaType } });
         }
         if (!ModelState.IsValid)
         {
@@ -1228,7 +1248,7 @@ public class CatalogDataDescriptionController(
             var distributionList = JsonConvert.DeserializeObject<List<Distribution>>(distribution);
             questionDistributionRequest.Distribution = distributionList;
         }
-        if (supplyFormat != null && questionDistributionRequest.Distribution == null)
+        if (supplyFormat != null && !questionDistributionRequest.Distribution.Any())
         {
             questionDistributionRequest.Distribution = new List<Distribution>();
             foreach (var mediaType in supplyFormat)
@@ -1308,7 +1328,8 @@ public class CatalogDataDescriptionController(
                         MediaType = [distribution?.MediaType!],
                         DownloadUrl = distribution?.DownloadUrl,
                         Title = distribution?.Title,
-                        Format = distribution?.Format
+                        Format = distribution?.Format,
+                        AccessUrl = distribution?.AccessUrl,
 
                     });
                 }
@@ -1577,11 +1598,61 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("distribution-links-restricted")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddDistributionLinksRestricted(QuestionDistributionRequest questionDistributionRequest, string? mediaType, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    public async Task<IActionResult> AddDistributionLinksRestricted(QuestionDistributionRequest questionDistributionRequest, string? title, string? accessUrl, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
+       if(questionDistributionRequest.Identifier == null)
+        {
+            return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/DistributionApiRestricted.cshtml", questionDistributionRequest);
+        }
 
-        return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, questionDistributionRequest.Identifier, nameof(CheckAnswers), isEditMode)
-       ?? RedirectToAction(nameof(CheckAnswers), new { identifier = questionDistributionRequest.Identifier });
+        var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(questionDistributionRequest.Identifier));
+        if (dataAsset != null)
+        {
+            foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
+            {
+                questionDistributionRequest.Distribution?.Add(new Distribution
+                {
+                    MediaType = [distribution?.MediaType!],
+                    DownloadUrl = distribution?.DownloadUrl,
+                    Title = distribution?.Title,
+                    Format = distribution?.Format,
+                    AccessUrl = distribution?.AccessUrl,
+
+                });
+            }
+
+            var updateDistribution = questionDistributionRequest?.Distribution?.Where(t => t.MediaType.FirstOrDefault() == "API").FirstOrDefault();
+
+            if (updateDistribution != null && questionDistributionRequest?.Distribution != null)
+            {
+                var index = questionDistributionRequest?.Distribution?.IndexOf(updateDistribution);
+                if (index != null && index >= 0)
+                {
+                    updateDistribution.Title = title;
+                    updateDistribution.AccessUrl = accessUrl;
+                    questionDistributionRequest.Distribution[(int)index] = updateDistribution;
+                }
+            }
+
+            PatchProfiledDataAssetResponse? response;
+            try
+            {
+                response = await _catalogQuestionsService.UpdateDistributionAsync(questionDistributionRequest, DataAssetType.DataSet);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return RedirectToPage(AccessDeniedPage);
+            }
+
+            if (response is not null)
+            {
+                await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", $"Updated the update supply format of data set {response.DataAssetId}");
+
+                return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, questionDistributionRequest.Identifier, nameof(CheckAnswers), isEditMode)
+            ?? RedirectToAction(nameof(CheckAnswers), new { identifier = questionDistributionRequest.Identifier });
+            }
+        }
+        return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/DistributionApiRestricted.cshtml", questionDistributionRequest);
     }
     [Route("accesslinks")]
     public async Task<IActionResult> AddAccessLinksSubmit(QuestionDistributionRequest questionFormatsRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)

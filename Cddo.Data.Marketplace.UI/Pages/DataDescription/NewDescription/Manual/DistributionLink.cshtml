@@ -36,10 +36,11 @@
                 <input type="hidden" name="@nameof(QuestionDistributionRequest.Identifier)" value="@Model?.Identifier" />  
                 @foreach (var distribution in Model.Distribution.Select((value, index) => new { value, index}))
                 {
-                    switch (Model.Distribution[distribution.index].MediaType.FirstOrDefault())
+                    var mediaType = Model.Distribution[distribution.index].MediaType.FirstOrDefault();
+                    switch (mediaType)
                     {
                         case "File download":
-                            <input type="hidden" name="mediaType" value="@Model.Distribution[distribution.index].MediaType.FirstOrDefault()" />
+                            <input type="hidden" name="Distribution[@distribution.index].MediaType" value="@mediaType" />
 
                             <h1 class="govuk-heading-l">
                                 Add a download link
@@ -68,7 +69,7 @@
                         break;
 
                         case "API":
-                            <input type="hidden" name="mediaType" value="@Model.Distribution[distribution.index].MediaType.FirstOrDefault()" />
+                            <input type="hidden" name="Distribution[@distribution.index].MediaType" value="@mediaType" />
 
                             <h1 class="govuk-heading-l">
                                 API Details
@@ -91,8 +92,7 @@
                         break;
 
                         case "Webpage":
-                            <input type="hidden" name="mediaType" value="text/html" />
-
+                            <input type="hidden" name="Distribution[@distribution.index].MediaType" value="@mediaType" />
                             <h1 class="govuk-heading-l">
                                 Add a webpage link
                             </h1>

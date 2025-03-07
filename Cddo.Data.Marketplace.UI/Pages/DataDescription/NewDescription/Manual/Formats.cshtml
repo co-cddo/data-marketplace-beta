@@ -57,7 +57,7 @@
                             {
                                 <div class="govuk-form-group @(ViewData.ModelState[$"Formats_{distribution.Format}"]?.Errors.Any() == true ? "govuk-form-group--error" : "")">
                                     <label class="govuk-label govuk-visually-hidden" for="Format_@distribution.Format">Format</label>
-                                    <div class="govuk-input__wrapper">
+                                   
                                         @{
                                             var formats = distribution?.Format?.Split(",");
                                         }
@@ -65,14 +65,23 @@
                                         {
                                             for (int index = 0; index < formats.Length; index++)
                                             {
+                                                <div class="govuk-form-group">
+                                                <div class="govuk-input__wrapper">
                                                 <input class="govuk-input govuk-input--width-10" type="text" name="formats" aria-describedby="link-title-hint" value="@formats[index]">
-                                                if (index > 1)
+                                                </div>
+                                                @if (index >= 1)
                                                 {
                                                     <button type="button" class="remove-input govuk-button govuk-button--secondary mb-0">Remove</button>
                                                 }
+                                            </div>
                                             }
-                                        }
-                                    </div>
+                                        }else
+                                    {
+                                        <div class="govuk-form-group">
+                                            <label class="govuk-label govuk-visually-hidden" for="Format_0">Format</label>
+                                            <input class="govuk-input" id="Format_0" name="formats" type="text">
+                                        </div>
+                                    }
                                 </div>
                             }
                         }
@@ -80,7 +89,7 @@
                         {
                             <div class="govuk-form-group">
                                 <label class="govuk-label govuk-visually-hidden" for="Format_0">Format</label>
-                                <input class="govuk-input" id="Format_0" name="Format" type="text">
+                                <input class="govuk-input" id="Format_0" name="formats" type="text">
                             </div>
                         }
 

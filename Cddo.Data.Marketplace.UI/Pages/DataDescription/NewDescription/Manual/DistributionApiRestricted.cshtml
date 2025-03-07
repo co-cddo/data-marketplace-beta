@@ -49,13 +49,13 @@
                         <div id="link-title-hint" class="govuk-hint">
                             If there is only one API, the title can be the same as your listing.
                         </div>
-                        <input class="govuk-input" id="title" type="text" aria-describedby="link-title-hint" asp-for="@distribution.Title">
+                        <input class="govuk-input" id="title" type="text" aria-describedby="link-title-hint" name="title" value="@distribution?.Title">
                     </div>
                     <div class="govuk-form-group">
                         <label class="govuk-label govuk-label--s" for="url">
                             Documentation URL
                         </label>
-                        <input class="govuk-input" id="url" type="text" asp-for="@distribution.AccessUrl">
+                        <input class="govuk-input" id="url" type="text" name="accessUrl" value="@distribution?.AccessUrl">
                     </div>
 
                     

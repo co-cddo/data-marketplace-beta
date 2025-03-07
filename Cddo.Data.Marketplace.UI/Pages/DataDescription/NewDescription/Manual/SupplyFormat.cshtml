@@ -49,19 +49,19 @@
                         </div>
                         <div class="govuk-radios" data-module="govuk-radios">
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="filedownload" name="MediaType" type="radio" value="File download" @(selectedMediaType?.FirstOrDefault()?.Equals("File Download", StringComparison.OrdinalIgnoreCase) == true ? "checked" : "")>
+                                    <input class="govuk-radios__input" id="filedownload" name="MediaType" type="radio" value="File download" >
                                 <label class="govuk-label govuk-radios__label" for="filedownload">
                                         File download
                                     </label>
                                 </div>
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="api" name="MediaType" type="radio" value="API" @(selectedMediaType?.FirstOrDefault()?.Equals("API", StringComparison.OrdinalIgnoreCase) == true ? "checked" : "")>
+                                <input class="govuk-radios__input" id="api" name="MediaType" type="radio" value="API">
                                 <label class="govuk-label govuk-radios__label" for="api">
                                     API
                                 </label>
                             </div>
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="webPage" name="MediaType" type="radio" value="Webpage" @(selectedMediaType?.FirstOrDefault()?.Equals("Webpage", StringComparison.OrdinalIgnoreCase) == true ? "checked" : "")>
+                                <input class="govuk-radios__input" id="webPage" name="MediaType" type="radio" value="Webpage">
                                 <label class="govuk-label govuk-radios__label" for="webPage">
                                     Webpage
                                 </label>

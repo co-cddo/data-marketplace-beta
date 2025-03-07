@@ -17,9 +17,9 @@
         newInput.innerHTML = `
             <label class="govuk-label govuk-visually-hidden" for="format-${inputCount}">formats</label>
             <div class="govuk-input__wrapper">
-                <input class="govuk-input govuk-input--width-10" id="format-${inputCount}" name="formats" type="text" value="@formats[index]">
-                <button type="button" class="remove-input govuk-button govuk-button--secondary mb-0">Remove</button>  
+                <input class="govuk-input govuk-input--width-10" id="format-${inputCount}" name="formats" type="text">
             </div>
+            <button type="button" class="remove-input govuk-button govuk-button--secondary mb-0">Remove</button>
         `;
         formContainer.appendChild(newInput);
     });
