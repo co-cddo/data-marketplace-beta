@@ -71,7 +71,7 @@
                                             @distribution.value.Format
                                         </td>
                                         <td class="govuk-table__cell">
-                                            <a href="#">Change</a>
+                                            <a asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@Model?.Identifier">Change</a>
                                         </td>
                                     </tr>
                                 }
@@ -100,7 +100,7 @@
                                             </a>
                                         </th>
                                         <td class="govuk-table__cell">
-                                            <a href="#">Change</a>
+                                            <a asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@Model?.Identifier">Change</a>
                                         </td>
                                     </tr>
                                 }
@@ -129,7 +129,7 @@
                                         </a>
                                     </th>
                                     <td class="govuk-table__cell">
-                                        <a href="#">Change</a>
+                                        <a asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@Model?.Identifier">Change</a>
                                     </td>
                                 </tr>
                             }
