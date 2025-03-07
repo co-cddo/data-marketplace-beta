@@ -140,9 +140,10 @@
 
                 }
                 <div class="govuk-form-group">
-                    <a href="#" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button" data-govuk-button-init="">
+                    <a asp-action="@nameof(CatalogDataDescriptionController.AddSupplyFormat)" asp-route-identifier="@Model?.Identifier" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button" data-govuk-button-init="">
                         Add another access method
                     </a>
+
                 </div>
 
                 <div class="govuk-button-group">
