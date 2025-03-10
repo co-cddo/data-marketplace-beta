@@ -11,10 +11,6 @@
     bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
     bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
 
-    var fileDownloads = Model.Distribution.Where(d => d.MediaType.FirstOrDefault() == "File download").ToList();
-    var apis = Model.Distribution.Where(d => d.MediaType.FirstOrDefault() == "API").ToList();
-    var webpages = Model.Distribution.Where(d => d.MediaType.FirstOrDefault() == "Webpage").ToList();
-
     string saveButtonName;
 
     if (isCheckList)
@@ -38,110 +34,9 @@
         <div class="govuk-grid-column-two-thirds">
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddAccessLinksSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
                 <input type="hidden" name="@nameof(QuestionDistributionRequest.Identifier)" value="@Model?.Identifier" />
-                <h1 class="govuk-heading-l">
-                    Access links
-                </h1>
 
-                <p>
-                    These links open in a new tab.
-                </p>
-                @if (fileDownloads.Any())
-                {
-                   
-                        <table class="govuk-table">
-                            <thead class="govuk-table__head">
-                                <tr class="govuk-table__row">
-                                    <th scope="col" class="govuk-table__header govuk-!-width-one-half">Downloads</th>
-                                    <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
-                                    <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
-                                </tr>
-                            </thead>
-                            <tbody class="govuk-table__body">
-
-                            @foreach (var distribution in fileDownloads)
-                                {
-                                    <tr class="govuk-table__row">
-                                        <th scope="row" class="govuk-table__header govuk-!-font-weight-regular">
-                                        <a href="@distribution.DownloadUrl">
-                                                @distribution.DownloadUrl
-                                            </a>
-                                        </th>
-                                        <td class="govuk-table__cell">
-                                            @distribution.Format
-                                        </td>
-                                        <td class="govuk-table__cell">
-                                            <a asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@Model?.Identifier">Change</a>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                        }
-                @if (apis.Any())
-                {
-                        <table class="govuk-table">
-                            <thead class="govuk-table__head">
-                                <tr class="govuk-table__row">
-                                    <th scope="col" class="govuk-table__header govuk-!-width-three-quarters">
-                                        API
-                                    </th>
-                                    <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="govuk-table__body">
-                            @foreach (var distribution in apis)
-                                {
-                                    <tr class="govuk-table__row">
-                                        <th scope="row" class="govuk-table__header govuk-!-font-weight-regular">
-                                            <a href="@distribution.AccessUrl">
-                                                @distribution.AccessUrl
-                                            </a>
-                                        </th>
-                                        <td class="govuk-table__cell">
-                                            <a asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@Model?.Identifier">Change</a>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                      }
-                @if (webpages.Any())
-                {
-                        <table class="govuk-table">
-                            <thead class="govuk-table__head">
-                                <tr class="govuk-table__row">
-                                    <th scope="col" class="govuk-table__header govuk-!-width-three-quarters">
-                                        Webpages
-                                    </th>
-                                    <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="govuk-table__body">
-                            @foreach (var distribution in webpages)
-                            {
-                                <tr class="govuk-table__row">
-                                    <th scope="row" class="govuk-table__header govuk-!-font-weight-regular">
-                                        <a href="@distribution.DownloadUrl">
-                                            @distribution.DownloadUrl
-                                        </a>
-                                    </th>
-                                    <td class="govuk-table__cell">
-                                        <a asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@Model?.Identifier">Change</a>
-                                    </td>
-                                </tr>
-                            }
-                            </tbody>
-                        </table>
-                     
-                }
-                <div class="govuk-form-group">
-                    <a asp-action="@nameof(CatalogDataDescriptionController.AddSupplyFormat)" asp-route-identifier="@Model?.Identifier" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button" data-govuk-button-init="">
-                        Add another access method
-                    </a>
-
-                </div>
+              
+                @await Html.PartialAsync("_AccessLinksPartial", Model)
 
                 <div class="govuk-button-group">
                     <button type="submit" class="govuk-button" data-module="govuk-button" data-govuk-button-init="">
