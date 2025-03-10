@@ -1429,7 +1429,7 @@ public class CatalogDataDescriptionController(
 
             if (dataAsset is not null)
             {
-                licenceRequest.Licence = new Licence() {Text = dataAsset.CddoDataAsset.LicenseTitle, Url = dataAsset.CddoDataAsset.EndpointUrl };
+                licenceRequest.License = new License() {Title = dataAsset.CddoDataAsset?.License?.Title, LicenseUrl = dataAsset.CddoDataAsset?.License?.LicenseUrl };
             }
         }
 
@@ -1442,12 +1442,21 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("licence")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Licence(QuestionLicenceRequest questionLicenceRequest,string? licence, string? accessRightsSelection, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    public async Task<IActionResult> Licence(QuestionLicenceRequest questionLicenceRequest, string? license, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
         //if (accessRightsSelection != null)
         //{
         //    questionLicenceRequest.Licence = accessRightsSelection.Value ? "OPEN" : "RESTRICTED";
         //}
+        if(!string.IsNullOrEmpty(license) && license != "Other")
+        {
+            questionLicenceRequest.License.Title = license;
+
+        }
+        if(license == "Open Government Licence")
+        {
+            questionLicenceRequest.License.LicenseUrl = "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/";
+        }
 
         if (!ModelState.IsValid)
         {
@@ -1458,7 +1467,7 @@ public class CatalogDataDescriptionController(
                 _insightsLogger.LogEvent(EventTypes.MetadataEvent.MetadataEdited, new Dictionary<string, string>
                 {
                     { LogValidationErrors, string.Join(", ", validationErrors) },
-                    { "Licence", questionLicenceRequest.Licence.Text }
+                    { "Licence", questionLicenceRequest.License.Title }
                 });
             }
         }
@@ -1467,8 +1476,9 @@ public class CatalogDataDescriptionController(
 
         try
         {
-            //response = await _catalogQuestionsService.UpdateLicenceAsync(questionLicenceRequest, DataAssetType.DataSet);
+            response = await _catalogQuestionsService.UpdateLicenceAsync(questionLicenceRequest, DataAssetType.DataSet);
             //TODO: Stub the licence update
+
             response.DataAssetId = new Guid(questionLicenceRequest.Identifier);
 
         }

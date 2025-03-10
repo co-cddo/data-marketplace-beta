@@ -22,6 +22,11 @@
     {
         saveButtonName = "isCheckList";
     }
+
+    bool openGovChecked = Model?.License?.Title == "Open Government Licence";
+    bool notKnownChecked = Model?.License?.Title == "Not Known";
+    bool otherChecked = !string.IsNullOrEmpty(Model?.License?.Title) && !openGovChecked && !notKnownChecked;
+
 }
 
 <a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
@@ -39,19 +44,20 @@
                         </legend>
                         <div class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="licence" name="licence" type="radio" value="Open Government Licence">
-                                <label class="govuk-label govuk-radios__label" for="licence">
+                                <input class="govuk-radios__input" id="openGovLicenseTitle" name="license" type="radio" value="Open Government Licence" @(openGovChecked ? "checked" : "")>
+
+                                <label class="govuk-label govuk-radios__label" for="openGovLicenseTitle">
                                     Open Government Licence
                                 </label>
                             </div>
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="licence-2" name="licence" type="radio" value="Not known">
+                                <input class="govuk-radios__input" id="licence-2" name="license" type="radio" value="Not known" @(notKnownChecked ? "checked" : "")>
                                 <label class="govuk-label govuk-radios__label" for="licence-2">
                                     Not known
                                 </label>
                             </div>
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="licence-3" name="licence" type="radio" value="Other" aria-controls="conditional-licence-3" aria-expanded="true">
+                                <input class="govuk-radios__input" id="licence-3" name="license" type="radio" value="Other" aria-controls="conditional-licence-3" aria-expanded="true" @(otherChecked ? "checked" : "")>
                                 <label class="govuk-label govuk-radios__label" for="licence-3">
                                     Other
                                 </label>
@@ -61,13 +67,13 @@
                                     <label class="govuk-label" for="metadataLicenceOther">
                                         Licence name
                                     </label>
-                                    <input class="govuk-input" id="metadataLicenceOther" type="text" asp-for="@Model.Licence.Text">
+                                    <input class="govuk-input" id="metadataLicenceOther" type="text" name="License.Title" value="@(otherChecked ? Model.License?.Title : "")">
                                 </div>
                                 <div class="govuk-form-group">
                                     <label class="govuk-label" for="metadataLicenceOther">
                                         Licence URL
                                     </label>
-                                    <input class="govuk-input" id="metadataLicenceOther"  type="text" asp-for="@Model.Licence.Url" >
+                                    <input class="govuk-input" id="metadataLicenceOther" name="License.LicenseUrl" type="text" value="@(otherChecked ? Model.License?.LicenseUrl : "")">
                                 </div>
                             </div>
                         </div>

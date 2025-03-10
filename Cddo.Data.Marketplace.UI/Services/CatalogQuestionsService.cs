@@ -313,8 +313,14 @@ public class CatalogQuestionsService(
         return await MakeApiPatchRequestAsync<PatchProfiledDataAssetResponse>(request);
     }
 
-    public Task<PatchProfiledDataAssetResponse?> UpdateLicenceAsync(QuestionLicenceRequest questionLicenceRequest, DataAssetType dataSet)
+    public async Task<PatchProfiledDataAssetResponse?> UpdateLicenceAsync(QuestionLicenceRequest questionLicenceRequest, DataAssetType dataSet)
     {
-        throw new NotImplementedException();
+        var request = new PatchProfiledDataAssetRequest
+        {
+            ProfileId = _profileId,
+            DataAssetType = dataSet,
+            Payload = JsonSerializer.Serialize(questionLicenceRequest)
+        };
+        return await MakeApiPatchRequestAsync<PatchProfiledDataAssetResponse>(request);
     }
 }
