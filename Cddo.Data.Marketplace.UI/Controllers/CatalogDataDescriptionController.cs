@@ -1140,7 +1140,7 @@ public class CatalogDataDescriptionController(
             {
                 return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(Licence), isEditMode)
                    ?? RedirectToAction(nameof(Licence), new { identifier = response.DataAssetId.ToString() });
-            }else if(showNextQuestion != null && ParseBoolean(showNextQuestion))
+            }else if(showNextQuestion != null && ParseBoolean(showNextQuestion) && accessRightsSelection == null)
             {
                 return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/AccessRights.cshtml", accessRightsRequest);
             }
@@ -1266,6 +1266,11 @@ public class CatalogDataDescriptionController(
             foreach (var item in unCommonElements)
             {
                 questionDistributionRequest?.Distribution?.Add(new Distribution() { MediaType = new List<string>() { item } });
+            }
+
+            if(supplyFormat?.Count() != questionDistributionRequest?.Distribution?.Count())
+            {
+                questionDistributionRequest?.Distribution?.RemoveAll(item => !supplyFormat.Contains(item?.MediaType?.FirstOrDefault()));
             }
            
         }
@@ -1593,7 +1598,12 @@ public class CatalogDataDescriptionController(
         ViewBag.isCheckList = isCheckList;
         ViewBag.isCheckAnswers = isCheckAnswers;
         ViewBag.isEditMode = isEditMode;
-        return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/DistributionApiRestricted.cshtml", questionKeywordRequest);
+        if(questionKeywordRequest.Distribution.Where(t => t.MediaType?.FirstOrDefault() == "API").Any())
+        {
+            return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/DistributionApiRestricted.cshtml", questionKeywordRequest);
+        }
+
+        return RedirectToAction(nameof(CheckAnswers), new { identifier = identifier });
     }
 
     [HttpPost("distribution-links-restricted")]
