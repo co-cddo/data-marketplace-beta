@@ -39,7 +39,7 @@ public class SupportController : Controller
         return View("~/Pages/Support/DataShareArrangement.cshtml");
     }
 
-    [Route("data-share-request-questions")]
+    [Route("data-request-questions")]
     public async Task<IActionResult> DataShareQuestions()
     {
         List<TagLinks> tags = await SetEndpointLinks();
