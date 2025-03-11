@@ -1,17 +1,15 @@
 ﻿@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums
+@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1
 @using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
 @using Cddo.Data.Marketplace.UI.Controllers
 
-@model QuestionDistributionRequest
+@model List<Distribution>
 
 @{
-
-
-    var fileDownloads = Model.Distribution.Where(d => d.MediaType.FirstOrDefault() == "File download").ToList();
-    var apis = Model.Distribution.Where(d => d.MediaType.FirstOrDefault() == "API").ToList();
-    var webpages = Model.Distribution.Where(d => d.MediaType.FirstOrDefault() == "Webpage").ToList();
-
-
+    var identifier = ViewData["identifier"] as string;
+    var fileDownloads = Model.Where(d => d.MediaType.FirstOrDefault() == "File download").ToList();
+    var apis = Model.Where(d => d.MediaType.FirstOrDefault() == "API").ToList();
+    var webpages = Model.Where(d => d.MediaType.FirstOrDefault() == "Webpage").ToList();
 }
 <h1 class="govuk-heading-l">
     Access links
@@ -46,7 +44,7 @@
                         @distribution.Format
                     </td>
                     <td class="govuk-table__cell">
-                        <a asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@Model?.Identifier">Change</a>
+                        <a asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@identifier" asp-route-mediaType="@distribution.MediaType.FirstOrDefault()" asp-route-distributionId="@distribution.Id" asp-route-isEditMode="true">Change</a>
                     </td>
                 </tr>
             }
@@ -75,7 +73,7 @@
                         </a>
                     </th>
                     <td class="govuk-table__cell">
-                        <a asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@Model?.Identifier">Change</a>
+                        <a asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@identifier" asp-route-mediaType="@distribution.MediaType.FirstOrDefault()" asp-route-distributionId="@distribution.Id" asp-route-isEditMode="true">Change</a>
                     </td>
                 </tr>
             }
@@ -104,7 +102,7 @@
                         </a>
                     </th>
                     <td class="govuk-table__cell">
-                        <a asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@Model?.Identifier">Change</a>
+                        <a asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@identifier" asp-route-mediaType="@distribution.MediaType.FirstOrDefault()" asp-route-distributionId="@distribution.Id" asp-route-isEditMode="true">Change</a>
                     </td>
                 </tr>
             }
@@ -113,7 +111,7 @@
 
 }
 <div class="govuk-form-group">
-    <a asp-action="@nameof(CatalogDataDescriptionController.AddSupplyFormat)" asp-route-identifier="@Model?.Identifier" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button" data-govuk-button-init="">
+    <a asp-action="@nameof(CatalogDataDescriptionController.AddSupplyFormat)" asp-route-identifier="@identifier" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button" data-govuk-button-init="">
         Add another access method
     </a>
 

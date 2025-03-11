@@ -1178,7 +1178,7 @@ public class CatalogDataDescriptionController(
                         Title = distribution?.Title,
                         Format = distribution?.Format,
                         AccessUrl = distribution?.AccessUrl,
-
+                        Id = distribution?.Id
                     });
                 }
             }
@@ -1200,14 +1200,12 @@ public class CatalogDataDescriptionController(
             var distributionList = JsonConvert.DeserializeObject<List<Distribution>>(distribution);
             questionDistributionRequest.Distribution = distributionList;
         }
+        var distributionId = SetDistributionId(questionDistributionRequest.Distribution);
         if (mediaType != null && !questionDistributionRequest.Distribution.Any())
         {
-            questionDistributionRequest.Distribution = new List<Distribution>() { new Distribution() { MediaType = new List<string>() { mediaType } } };
+            questionDistributionRequest.Distribution = new List<Distribution>() { new Distribution() {Id = distributionId, MediaType = new List<string>() { mediaType } } };
         }
-        else if(mediaType != null)
-        {
-            questionDistributionRequest.Distribution.Add(new Distribution() { MediaType = new List<string>() { mediaType } });
-        }
+       
         if (!ModelState.IsValid)
         {
             var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
@@ -1225,6 +1223,10 @@ public class CatalogDataDescriptionController(
         catch (UnauthorizedAccessException)
         {
             return RedirectToPage(AccessDeniedPage);
+        }
+        if (mediaType != null)
+        {
+            return RedirectToAction(nameof(AddDistributionLinks), new { identifier = response.DataAssetId.ToString(), mediaType = mediaType, distributionId });
         }
 
         if (response is not null)
@@ -1253,7 +1255,7 @@ public class CatalogDataDescriptionController(
             questionDistributionRequest.Distribution = new List<Distribution>();
             foreach (var mediaType in supplyFormat)
             {
-                questionDistributionRequest.Distribution.Add(new Distribution() { MediaType = new List<string>() { mediaType } });
+                questionDistributionRequest.Distribution.Add(new Distribution() {Id = SetDistributionId(questionDistributionRequest.Distribution), MediaType = new List<string>() { mediaType } });
             }
 
         }
@@ -1265,7 +1267,7 @@ public class CatalogDataDescriptionController(
             var unCommonElements = supplyFormat?.Where(item => !currentMediaTypes.Contains(item)).ToList();
             foreach (var item in unCommonElements)
             {
-                questionDistributionRequest?.Distribution?.Add(new Distribution() { MediaType = new List<string>() { item } });
+                questionDistributionRequest?.Distribution?.Add(new Distribution() { Id= SetDistributionId(questionDistributionRequest?.Distribution), MediaType = new List<string>() { item } });
             }
 
             if(supplyFormat?.Count() != questionDistributionRequest?.Distribution?.Count())
@@ -1308,6 +1310,13 @@ public class CatalogDataDescriptionController(
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/SupplyFormat.cshtml", questionDistributionRequest);
     }
 
+    private int? SetDistributionId(List<Distribution>? distribution)
+    {
+        if(distribution == null || !distribution.Any()) {return 1;}
+
+        return distribution.Count() + 1;
+    }
+
     [Route("access-method-restricted")]
     public async Task<IActionResult> AddRestrictedSupplyFormatSubmit(QuestionDistributionRequest questionKeywordRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
@@ -1335,6 +1344,7 @@ public class CatalogDataDescriptionController(
                         Title = distribution?.Title,
                         Format = distribution?.Format,
                         AccessUrl = distribution?.AccessUrl,
+                        Id = distribution?.Id,
 
                     });
                 }
@@ -1499,7 +1509,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("distribution-links")]
-    public async Task<IActionResult> AddDistributionLinks(QuestionDistributionRequest questionKeywordRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
+    public async Task<IActionResult> AddDistributionLinks(QuestionDistributionRequest questionKeywordRequest, string? identifier, string? mediaType, int? distributionId, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -1524,6 +1534,7 @@ public class CatalogDataDescriptionController(
                         Title = distribution?.Title,
                         Format = distribution?.Format,
                         AccessUrl = distribution?.AccessUrl,
+                        Id = distribution?.Id,
 
                     });
                 }
@@ -1533,23 +1544,65 @@ public class CatalogDataDescriptionController(
         ViewBag.isCheckList = isCheckList;
         ViewBag.isCheckAnswers = isCheckAnswers;
         ViewBag.isEditMode = isEditMode;
+        ViewBag.distributions = questionKeywordRequest.Distribution;
+        if (mediaType != null)
+        {
+            if(questionKeywordRequest?.Distribution?.FirstOrDefault(x => x.Id == distributionId) == null)
+            {
+                questionKeywordRequest.Distribution = new List<Distribution>() { new Distribution() { Id = distributionId, MediaType = new List<string>() { mediaType } } };
+            }
+            else
+            {
+                questionKeywordRequest.Distribution = [questionKeywordRequest?.Distribution?.FirstOrDefault(x => x.Id == distributionId)];
+            }
+        }
         return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/DistributionLink.cshtml", questionKeywordRequest);
     }
 
     [HttpPost("distribution-links")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddDistributionLinks(QuestionDistributionRequest questionDistributionRequest, string? mediaType, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    public async Task<IActionResult> AddDistributionLinks(QuestionDistributionRequest questionDistributionRequest, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
-        if (mediaType != null)
-        {
-            questionDistributionRequest.Distribution.FirstOrDefault().MediaType = new List<string>() { mediaType };
-        }
+       
         if (!ModelState.IsValid)
         {
             var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
 
             string summary = $"Validation failed for Add-Distribution-Link. Errors: {string.Join(", ", validationErrors)}";
             await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Distribution-Link", summary);
+        }
+        var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(questionDistributionRequest.Identifier));
+        bool result;
+        bool.TryParse(isEditMode, out result);
+        if (questionDistributionRequest.Distribution != null && !result)
+        {
+            foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution)
+            {
+                questionDistributionRequest.Distribution.Add(new Distribution()
+                {
+                    MediaType = new List<string>() { distribution.MediaType },
+                    AccessUrl = distribution.AccessUrl,
+                    DownloadUrl = distribution.DownloadUrl,
+                    Format = distribution.Format,
+                    Title = distribution.Title,
+                    Id = distribution.Id
+                });
+            }
+        }
+        else if(dataAsset?.CddoDataAsset?.DataAssetDistribution != null)
+        {
+            foreach (var distribution in dataAsset?.CddoDataAsset?.DataAssetDistribution.Where(x=>x.Id != questionDistributionRequest?.Distribution?.FirstOrDefault().Id))
+            {
+                questionDistributionRequest?.Distribution?.Add(new Distribution()
+                {
+                    MediaType = new List<string>() { distribution.MediaType },
+                    AccessUrl = distribution.AccessUrl,
+                    DownloadUrl = distribution.DownloadUrl,
+                    Format = distribution.Format,
+                    Title = distribution.Title,
+                    Id = distribution.Id
+                });
+            }
         }
 
         PatchProfiledDataAssetResponse? response;
@@ -1599,6 +1652,7 @@ public class CatalogDataDescriptionController(
                         Title = distribution?.Title,
                         Format = distribution?.Format,
                         AccessUrl = distribution?.AccessUrl,
+                        Id = distribution?.Id,
 
                     });
                 }
@@ -1637,6 +1691,7 @@ public class CatalogDataDescriptionController(
                     Title = distribution?.Title,
                     Format = distribution?.Format,
                     AccessUrl = distribution?.AccessUrl,
+                    Id = SetDistributionId(questionDistributionRequest.Distribution)
 
                 });
             }
@@ -1700,7 +1755,7 @@ public class CatalogDataDescriptionController(
                         Title = distribution?.Title,
                         Format = distribution?.Format,
                         AccessUrl = distribution?.AccessUrl,
-
+                        Id = distribution?.Id
                     });
                 }
             }
@@ -1746,6 +1801,7 @@ public class CatalogDataDescriptionController(
                         Title = distribution?.Title,
                         Format = distribution?.Format,
                         AccessUrl = distribution?.AccessUrl,
+                        Id = distribution?.Id
 
                     });
                 }
