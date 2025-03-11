@@ -29,8 +29,8 @@ public class SupportController : Controller
         return View("~/Pages/Support/Roles.cshtml");
     }
 
-    [Route("set-up-data-share-arrangement")]
-    public async Task<IActionResult> SetUpDataShareArrangement()
+    [Route("requesting-restricted-data")]
+    public async Task<IActionResult> RequestingRestrictedData()
     {
         List<TagLinks> tags = await SetEndpointLinks();
 
