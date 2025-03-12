@@ -242,10 +242,10 @@
                             </dd>
                         </div>
 
-                        @* Internal Identifier *@
+                        @* Reference *@
                         <div id="@nameof(CataloguedResource.Identifier)" class="govuk-summary-list__row @(GetErrorMessages(nameof(CataloguedResource.Identifier)).Any() ? "govuk-form-group--error" : "")">
                             <dt class="govuk-summary-list__key">
-                                Internal identifier
+                                Reference
                             </dt>
                             <dd class="govuk-summary-list__value">
                                 @foreach (var errorMessage in GetErrorMessages(nameof(CataloguedResource.Identifier)))
@@ -258,7 +258,7 @@
                                 <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddInternalIdentifier)" asp-route-identifier="@cddoDataAsset.Id"
                                    asp-route-isCheckAnswers="true">
                                     Change
-                                    <span class="govuk-visually-hidden">Internal Identifier</span>
+                                    <span class="govuk-visually-hidden">Reference</span>
                                 </a>
                             </dd>
                         </div>
