@@ -9,7 +9,7 @@
     var identifier = ViewData["identifier"] as string;
     var fileDownloads = Model.Where(d => d.MediaType.FirstOrDefault() == "File download").ToList();
     var apis = Model.Where(d => d.MediaType.FirstOrDefault() == "API").ToList();
-    var webpages = Model.Where(d => d.MediaType.FirstOrDefault() == "Webpage").ToList();
+    var webpages = Model.Where(d => d.MediaType.FirstOrDefault() == "text/html").ToList();
 }
 <h1 class="govuk-heading-l">
     Access links
