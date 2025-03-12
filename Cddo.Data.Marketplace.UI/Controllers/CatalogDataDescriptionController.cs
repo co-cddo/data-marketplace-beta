@@ -271,6 +271,7 @@ public class CatalogDataDescriptionController(
                 var response = await _catalogQuestionsService.UpdateTitleAsync(questionTitleRequest, DataAssetType.DataSet);
 
                 dataAssetId = response?.DataAssetId;
+
             }
             catch (UnauthorizedAccessException)
             {
@@ -1073,13 +1074,14 @@ public class CatalogDataDescriptionController(
         {
             accessRightsRequest.Identifier = identifier;
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
-
+            ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
             if (dataAsset is not null)
             {
                 accessRightsRequest.AccessRights = dataAsset.CddoDataAsset.AccessRights;
+                ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
+
             }
         }
-
         ViewBag.isCheckList = isCheckList;
         ViewBag.isCheckAnswers = isCheckAnswers;
         ViewBag.isEditMode = isEditMode;
@@ -1169,6 +1171,7 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset is not null)
             {
+                ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
                 foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
                 {
                     questionKeywordRequest.Distribution?.Add(new Distribution
@@ -1330,8 +1333,9 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset is not null)
             {
+                ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
 
-                 foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
+                foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
                 {
                     questionKeywordRequest.Distribution.Add(new Distribution
                     {
@@ -1435,6 +1439,7 @@ public class CatalogDataDescriptionController(
 
             if (dataAsset is not null)
             {
+                ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
                 licenceRequest.License = new License() {Title = dataAsset.CddoDataAsset?.License?.Title, LicenseUrl = dataAsset.CddoDataAsset?.License?.LicenseUrl };
             }
         }
@@ -1639,6 +1644,7 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset is not null)
             {
+                ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
                 foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
                 {
                     questionKeywordRequest.Distribution?.Add(new Distribution
@@ -1740,6 +1746,7 @@ public class CatalogDataDescriptionController(
         {
             questionFormatsRequest.Identifier = identifier;
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+            ViewBag.DataDescriptionTitle = dataAsset?.CddoDataAsset.Title;
             if (dataAsset is not null)
             {
                 foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
@@ -1788,6 +1795,7 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset is not null)
             {
+                ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
                 foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
                 {
                     questionFormatsRequest.Distribution?.Add(new Distribution

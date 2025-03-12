@@ -35,6 +35,9 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                <span class="govuk-caption-l">
+                    @ViewBag.DatadescriptionTitle
+                </span>
                 <input type="hidden" name="@nameof(QuestionDistributionRequest.Identifier)" value="@Model?.Identifier" />  
                 @foreach (var distribution in Model.Distribution.Select((value, index) => new { value, index}))
                 {
