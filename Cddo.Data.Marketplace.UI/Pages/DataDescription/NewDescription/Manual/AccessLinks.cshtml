@@ -35,7 +35,7 @@
         <div class="govuk-grid-column-two-thirds">
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddAccessLinksSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
                 <span class="govuk-caption-l">
-                    @ViewBag.DatadescriptionTitle
+                    @ViewBag.DataDescriptionTitle
                 </span>
                 <input type="hidden" name="@nameof(QuestionDistributionRequest.Identifier)" value="@Model?.Identifier" />
 
