@@ -42,8 +42,10 @@
                 Contact details
             </h1>
             <div id="contact-hint" class="govuk-hint">
-                Provide details of the team or individual that will respond to queries or requests for this listing.<br />
-                These details will be visible to users on the Data Marketplace.
+                <p class="govuk-hint">
+                    Provide details of the team or individual that will respond to queries or requests for this listing.
+                </p>
+                <p class="govuk-hint">These details will be visible to users on the Data Marketplace.</p>
             </div>
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddContactPointSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
                 <input type="hidden" name="identifier" value="@Model.Identifier" />
@@ -61,7 +63,7 @@
                     }
                     <input class="govuk-input  @(ViewData.ModelState[nameof(Contact.Name)]?.Errors.Any() == true ? "govuk-input--error" : "")" id="metadataContact" name="@nameof(Contact.Name)" type="text" value="@dataAssetContactPoint?.Name">
                 </div>
-                <div class="govuk-form-group">                    
+                <div class="govuk-form-group">
                     <label class="govuk-label govuk-label--m" for="metadataContactEmail">
                         Email address
                     </label>

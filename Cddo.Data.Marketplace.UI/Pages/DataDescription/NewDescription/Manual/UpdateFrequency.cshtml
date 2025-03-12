@@ -2,6 +2,7 @@
 @using Cddo.Data.Marketplace.UI.Controllers
 @using Cddo.Data.Marketplace.UI.Model.Enum
 @using GovUk.Frontend.AspNetCore.TagHelpers
+@inject Agm.Catalog.DotNet.Core.Utilities.IEnumMemberConverter EnumMemberConverter
 
 @model QuestionUpdateFrequencyRequest
 @{
@@ -56,7 +57,7 @@
                                     @(Model.UpdateFrequency == updateFrequency.ToString() ? "checked" : "")
                                     @(!string.IsNullOrEmpty(Model.UpdateFrequency) && isOtherSelected && updateFrequency.ToString() == "Other" ? "checked" : "")>
                                     <label class="govuk-label govuk-radios__label" for="@updateFrequency">
-                                        @updateFrequency
+                                        @EnumMemberConverter.GetEnumDescription(@updateFrequency)
                                     </label>
                                 </div>
 

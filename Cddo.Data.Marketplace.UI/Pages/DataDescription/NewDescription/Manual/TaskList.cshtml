@@ -163,7 +163,7 @@
             <ul class="govuk-task-list">
                 @foreach (var item in new[] {
                 new { Title = "Point of contact", Action = nameof(CatalogDataDescriptionController.AddContactPoint), Done = dataAsset.DataAssetContacts.Any(x=>x.Role==DataAssetContactRoleType.Contact) },
-                new { Title = "Data owner", Action = nameof(CatalogDataDescriptionController.AddDataOwner), Done = dataAsset.DataAssetContacts.Any() }
+                new { Title = "Data owner", Action = nameof(CatalogDataDescriptionController.AddDataOwner), Done = dataAsset.DataAssetContacts.Any(x=>x.Role==DataAssetContactRoleType.Owner) }
                 })
                 {
                     <li class="govuk-task-list__item govuk-task-list__item--with-link">
@@ -196,10 +196,10 @@
                 @foreach (var item in new[] {
                 new { Title = "Date first made available", Action = nameof(CatalogDataDescriptionController.AddPublishedDate), Done = dataAsset.Issued != null },
                 new { Title = "Frequency of update", Action = nameof(CatalogDataDescriptionController.AddFrequency), Done = !string.IsNullOrEmpty(dataAsset.UpdateFrequencyString) },
-               // new { Title = "Supply format", Action = nameof(CatalogDataDescriptionController.AddSupplyFormat), Completed = dataAsset.DataAssetDistribution?.MediaType is not null },
+                // new { Title = "Supply format", Action = nameof(CatalogDataDescriptionController.AddSupplyFormat), Completed = dataAsset.DataAssetDistribution?.MediaType is not null },
                 new { Title = "Public or restricted data", Action = nameof(CatalogDataDescriptionController.AccessRights), Done = dataAsset.AccessRights is not null }
 
-                          })
+                })
                 {
                     <li class="govuk-task-list__item govuk-task-list__item--with-link">
                         <div class="govuk-task-list__name-and-hint">
