@@ -1273,9 +1273,21 @@ public class CatalogDataDescriptionController(
         if (response is not null)
         {
             await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", $"Updated the update supply format of data set {response.DataAssetId}");
+            bool showNext;
+            bool.TryParse(showNextQuestion, out showNext);
+            if (questionDistributionRequest.Distribution.Where(t => t.MediaType?.FirstOrDefault() == "File download").Any() && showNext)
+            {
+                return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddFormatsSubmit), isEditMode)
+                ?? RedirectToAction(nameof(AddFormatsSubmit), new { identifier = response.DataAssetId.ToString() });
+            }
 
-            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddFormatsSubmit), isEditMode)
-                   ?? RedirectToAction(nameof(AddFormatsSubmit), new { identifier = response.DataAssetId.ToString() });
+            if (questionDistributionRequest.Distribution.Where(t => t.MediaType?.FirstOrDefault() == "API").Any() && showNext)
+            {
+                return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/DistributionApiRestricted.cshtml", questionDistributionRequest);
+            }
+
+            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(CheckAnswers), isEditMode)
+                   ?? RedirectToAction(nameof(CheckAnswers), new { identifier = response.DataAssetId.ToString() });
         }
 
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/SupplyFormat.cshtml", questionDistributionRequest);
@@ -1831,8 +1843,18 @@ public class CatalogDataDescriptionController(
         {
             await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", $"Updated the update supply format of data set {response.DataAssetId}");
 
-            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddDistributionLinksRestricted), isEditMode)
-                   ?? RedirectToAction(nameof(AddDistributionLinksRestricted), new { identifier = response.DataAssetId.ToString() });
+            bool showNext;
+            bool.TryParse(showNextQuestion, out showNext);
+            if (questionFormatsRequest.Distribution.Where(t => t.MediaType?.FirstOrDefault() == "API").Any() && showNext)
+            {
+
+                return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddDistributionLinksRestricted), isEditMode)
+                       ?? RedirectToAction(nameof(AddDistributionLinksRestricted), new { identifier = response.DataAssetId.ToString() });
+            }
+
+            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(CheckAnswers), isEditMode)
+                   ?? RedirectToAction(nameof(CheckAnswers), new { identifier = response.DataAssetId.ToString() });
+
         }
 
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/Formats.cshtml", questionFormatsRequest);
