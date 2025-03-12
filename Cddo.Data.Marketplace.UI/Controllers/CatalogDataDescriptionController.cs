@@ -1526,6 +1526,7 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset is not null)
             {
+                ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
                 foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
                 {
                     questionKeywordRequest.Distribution?.Add(new Distribution
