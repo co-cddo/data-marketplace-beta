@@ -26,9 +26,6 @@
     {
         saveButtonName = "isCheckList";
     }
-
-
-    var isOfficial = Model?.SecurityClassification == SecurityClassificationEnum.Official;
 }
 
 <a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
@@ -48,34 +45,31 @@
                     <fieldset class="govuk-fieldset" aria-describedby="SecurityClassification-hint">
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                             <h1 class="govuk-fieldset__heading">
-                                Confirm the security classification of the data set
+                                Is the security classification of the data OFFICIAL?
                             </h1>
                         </legend>
                         <div id="SecurityClassification-hint" class="govuk-hint">
-                            You can only add descriptions of data that has an OFFICIAL classification, rather than SECRET or TOP SECRET.
-                            <a class="govuk-link" target="_blank" href="https://www.gov.uk/government/publications/government-security-classifications/government-security-classifications-policy-html#definitions-for-official-secret-and-top-secret">
-                                Find out more about these definitions (opens in new tab)
-                            </a>.
+                            This includes OFFICIAL-SENSITIVE.
                         </div>
                         @if (hasError.GetValueOrDefault())
                         {
                             <p id="metadataTitle-error" class="govuk-error-message">
                                 <span class="govuk-visually-hidden">Error:</span> @ViewData.ModelState[nameof(Model.SecurityClassification)]?.Errors.FirstOrDefault()?.ErrorMessage
                             </p>
-                        }
-                        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                            <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input"
-                                       id="SecurityClassification"
-                                       name="@nameof(QuestionSecurityClassificationRequest.SecurityClassification)"
-                                       type="checkbox"
-                                       value="OFFICIAL"
-                                       aria-describedby="confirm-data-error"
-                                @(isOfficial ? "checked" : "")>
-                                <label class="govuk-label govuk-checkboxes__label" for="SecurityClassification">
-                                    The security classification of this data set is OFFICIAL
+                        }                        
+                        <div class="govuk-radios" data-module="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="OFFICIAL" name="@nameof(QuestionSecurityClassificationRequest.SecurityClassification)" type="radio" value="@SecurityClassificationEnum.Official">
+                                <label class="govuk-label govuk-radios__label" for="OFFICIAL">
+                                    Yes
                                 </label>
                             </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="NONOFFICIAL" name="@nameof(QuestionSecurityClassificationRequest.SecurityClassification)" type="radio" value="@SecurityClassificationEnum.Secret">
+                                <label class="govuk-label govuk-radios__label" for="NONOFFICIAL">
+                                    No
+                                </label>
+                            </div>                           
                         </div>
                     </fieldset>
                 </div>

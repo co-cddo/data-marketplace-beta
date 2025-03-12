@@ -1,50 +1,64 @@
 ﻿@using Cddo.Data.Marketplace.UI.Controllers
 @model Cddo.Data.Marketplace.UI.Pages.Support.DataShareArrangementModel
 @{
-    ViewData["Title"] = "Support - Setup Datashare Arrangement";
+    ViewData["Title"] = "Support - Requesting restricted data";
     Layout = "~/Pages/Shared/_SupportLayout.cshtml";
 }
 
 <div>
-    <h1 class="govuk-heading-l">
-        Set up a data share arrangement
-    </h1>
+    <h1 class="govuk-heading-l">Requesting restricted data</h1>
+    <p class="govuk-body">If you want restricted data from the Data Marketplace catalogue, you need to request it from the organisation that owns the data – the data supplier.</p>
+    <p class="govuk-body">While public data is available to access immediately, you can only access restricted data once you have a data share agreement with the data supplier. Typically this is because the data contains personal or commercially sensitive information.</p>
 
     <h2 class="govuk-heading-m">1. Find the data you need</h2>
+    <p class="govuk-body"><a class="govuk-link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartCddoDataAssetsSearch)">Search the catalogue</a> for data that can support your project or policy.</p>
+    <p class="govuk-body">When you find a listing that’s of interest, if it says ‘Access on request’ this means it’s restricted data and you’ll need to request it.</p>
 
-    <p class="govuk-body">
-        The Data Marketplace is a place for people who work in government to find and request data from other government organisations.<br />
-        <br />
-        Start by <a class="govuk-link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartCddoDataAssetsSearch)">searching the data catalogue</a> to find data assets that you’re interested in. Data assets include data sets and data services.
-    </p>
+    <h2 class="govuk-heading-m">2. Submit a data request</h2>
+    <p class="govuk-body">Select ‘Start a data request’ on the page for the listing.</p>
+    <p class="govuk-body">Read the next page, then select ‘Start now’.</p>
+    <p class="govuk-body">You’ll then need to answer <a class="govuk-link" asp-controller="Support" asp-action="@nameof(SupportController.DataShareQuestions)">some questions</a> to ensure your request meets data protection and data sharing requirements.</p>
+    <p class="govuk-body">Some questions may require support from people with skills in:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>legal</li>
+        <li>data protection</li>
+        <li>data security</li>
+    </ul>
+    <p class="govuk-body"> You do not need to answer all the questions in one go. You can save your answers and return to edit them as often as you need before submitting your request.</p>       
 
-    <h2 class="govuk-heading-m">2. Submit a data share request</h2>
+    <h2 class="govuk-heading-m">3. Wait for a decision</h2>
+    <p class="govuk-body">When you’ve submitted your request, the data supplier will review it. It can take time for them to make a decision, and they might ask you for more information.</p>
+    <p class="govuk-body">They might reject your request if:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>you do not have the legal power to request the data</li>
+        <li>you do not provide enough information</li>
+        <li>your answers have not been reviewed by legal, data protection and data security specialists in your organisation</li>
+    </ul>
+    <p class="govuk-body">If the data supplier approves your request, continue with the steps below.</p>
 
-    <p class="govuk-body">
-        When you’ve found a data asset you would like to request, select the link on that screen to begin the data share request process.<br />
-        <br />
-        This involves answering a <a class="govuk-link" asp-controller="Support" asp-action="@nameof(SupportController.DataShareQuestions)">list of questions</a> to ensure your request meets data protection and data sharing standards.<br />
-        <br />
-        Your answers will be reviewed by the organisation that owns the data – the data supplier. It can take time for them to make a decision, and they may ask you for more information.
-    </p>
+    <h2 class="govuk-heading-m">4. Complete a memorandum of understanding (MOU)</h2>
+    <p class="govuk-body">An MOU is a statement of intent between 2 or more parties.</p>
+    <p class="govuk-body">You and the data supplier must agree an MOU that covers the details of your data sharing agreement. Speak with your data protection and legal teams for help with this.</p>
+    <p class="govuk-body">Many organisations have their own MOU templates.</p>
+    <h3 class="govuk-heading-s">If the data you’re requesting contains personal data</h3>
+    <p class="govuk-body">The data supplier may ask for a <a class="govuk-link" href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/accountability-and-governance/data-protection-impact-assessments-dpias/what-is-a-dpia/">Data Protection Impact Assessment (DPIA)</a>.</p>
+    <p class="govuk-body">Make sure you speak with your data protection team early on in the process to help complete this.</p>
 
-    <h2 class="govuk-heading-m">3. Complete a DPIA and MOU</h2>
+    <h2 class="govuk-heading-m">5. Access the data</h2>
+    <p class="govuk-body">Once your MOU is in place, the data supplier will speak with you about how you can access their data.</p>
+    <p class="govuk-body">Data sharing itself happens outside the Data Marketplace because each organisation manages data transfers differently.</p>
+    <p class="govuk-body">The data supplier might provide access to the data in one or more of the following ways:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>a webpage link</li>
+        <li>a file download link – for example, as a zip folder or in a format like CSV or PDF</li>
+        <li>an application programming interface (API) – software that a developer in your organisation can set up</li>
+    </ul>
+    <p class="govuk-body">You may need help from your data security team to access and store the data.</p>
 
-    <p class="govuk-body">
-        If the data asset you’re requesting contains personal data, the data supplier may ask for a <a class="govuk-link" rel="noopener" target="_blank" href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/accountability-and-governance/data-protection-impact-assessments-dpias/what-is-a-dpia/">Data Protection Impact Assessment (DPIA) (opens in new tab)</a>. Make sure you speak with a data protection specialist in your organisation as early in the process as possible to help you complete this.<br />
-        <br />
-        If your request is approved, you’ll need to agree a memorandum of understanding (MOU) with the data supplier.<br />
-        <br />
-        An MOU is a statement of intent between 2 or more organisations. Your MOU will cover the details of your data sharing agreement. Many organisations and departments have their own MOU templates.
-    </p>
+    <h3 class="govuk-heading-s">Data minimisation</h3>
+    <p class="govuk-body">The data supplier might choose to give you some of the data, rather than the whole data set.</p>
+    <p class="govuk-body">If only some data from a large data set is relevant to your request, the supplier will only share the data you need – to comply with data protection requirements.</p>
 
-    <h2 class="govuk-heading-m">4. Gain access to the data</h2>
-
-    <p class="govuk-body">
-        Once your MOU and, if required, DPIA are in place, the data supplier will speak with you about how you can access their data.<br />
-        <br />
-        This will vary depending on the available formats of the data and how it can be delivered.<br />
-        <br />
-        Data sharing itself happens outside the Data Marketplace because each organisation manages data transfers differently.
-    </p>
+    <h3 class="govuk-heading-s">Querying the data you receive</h3>
+    <p class="govuk-body">If the data you receive is not what you expected, speak with the data supplier.</p>
 </div>

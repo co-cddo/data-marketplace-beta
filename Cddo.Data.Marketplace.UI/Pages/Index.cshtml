@@ -10,125 +10,148 @@
 <div class="govuk-masterhead">
     <div class="govuk-width-container">
         @await Html.PartialAsync("_PhasePartial", new PhasePartialModel())
-       
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-three-quarters">
-                <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">
-                    Data Marketplace
-                </h1>
-                <p class="govuk-body-l">
-                    A place for people who work in government organisations to find, request and share government data.
-                </p>
-                <h2 class="govuk-heading-m govuk-!-margin-bottom-3" id="landing-banner-heading"> Find data from government organisations</h2>
 
-                <form method="get" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartCddoDataAssetsSearch)">
-                    <div class="govuk-!-width-two-thirds govuk-!-margin-bottom-4">
-                        <div class="govuk-form-group">
-                            <div class="govuk-input__wrapper" style="position: relative;">
-                                <input class="govuk-input govuk-input--width-30" id="catalogDataSearchInput" name="SearchText" type="text" autocomplete="off" aria-label="Search the Data Catalogue" style="width: 100%;">
-                                <button title="searchBtn" class="search-button" aria-label="Search for data sets" type="submit" enterkeyhint="search">
-                                    <svg class="search-button__icon" width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-                                        <circle cx="12.0161" cy="11.0161" r="8.51613" stroke="currentColor" stroke-width="3"></circle>
-                                        <line x1="17.8668" y1="17.3587" x2="26.4475" y2="25.9393" stroke="currentColor" stroke-width="3"></line>
-                                    </svg>
-                                </button>
-                                <ul id="catalogDataSearchList" class="suggestions"></ul>
+        <div class="govuk-grid-row">
+
+            @if (User.Identity!.IsAuthenticated)
+            {
+                <div class="govuk-grid-column-three-quarters">
+                    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
+                        Data Marketplace
+                    </h1>
+                    <p class="govuk-body-l govuk-!-margin-bottom-4">
+                        A place for people who work in government organisations to find, request and share government data.
+                    </p>
+                    <h2 class="govuk-heading-m govuk-!-margin-bottom-3" id="landing-banner-heading">Find data from government organisations</h2>
+
+                    <form method="get" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartCddoDataAssetsSearch)">
+                        <div class="govuk-!-width-two-thirds govuk-!-margin-bottom-4">
+                            <div class="govuk-form-group">
+                                <div class="govuk-input__wrapper" style="position: relative;">
+                                    <input class="govuk-input govuk-input--width-30" id="catalogDataSearchInput" name="SearchText" type="text" autocomplete="off" aria-label="Search the Data Catalogue" style="width: 100%;">
+                                    <button title="searchBtn" class="search-button" aria-label="Search for data sets" type="submit" enterkeyhint="search">
+                                        <svg class="search-button__icon" width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                                            <circle cx="12.0161" cy="11.0161" r="8.51613" stroke="currentColor" stroke-width="3"></circle>
+                                            <line x1="17.8668" y1="17.3587" x2="26.4475" y2="25.9393" stroke="currentColor" stroke-width="3"></line>
+                                        </svg>
+                                    </button>
+                                    <ul id="catalogDataSearchList" class="suggestions"></ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </form>
-
+                    </form>
+                </div>
                 @section Scripts {
-                    <script asp-add-nonce="true">
-                        document.addEventListener("DOMContentLoaded", function () {
-                            const searchInput = document.getElementById('catalogDataSearchInput');
-                            const searchList = document.getElementById('catalogDataSearchList');
+                <script asp-add-nonce="true">
+                    document.addEventListener("DOMContentLoaded", function () {
+                    const searchInput = document.getElementById('catalogDataSearchInput');
+                    const searchList = document.getElementById('catalogDataSearchList');
 
-                            // Set isAuthenticated based on server-side check (still needed to prevent calls if not logged in)
-                            const isAuthenticated = @Json.Serialize(isAuthenticated);
+                    // Set isAuthenticated based on server-side check (still needed to prevent calls if not logged in)
+                    const isAuthenticated = @Json.Serialize(isAuthenticated);
 
-                            searchInput.addEventListener('input', function (e) {
-                                const searchTerm = e.target.value.trim().toLowerCase();
-                                if (searchTerm.length === 0) {
-                                    searchList.innerHTML = ''; // Clear the list if input is empty
-                                    return;
-                                }
+                    searchInput.addEventListener('input', function (e) {
+                    const searchTerm = e.target.value.trim().toLowerCase();
+                    if (searchTerm.length === 0) {
+                    searchList.innerHTML = ''; // Clear the list if input is empty
+                    return;
+                    }
 
-                                if (!isAuthenticated) {
-                                    console.log('User is not logged in');
-                                    searchList.innerHTML = ''; // Clear the list if user is not logged in
-                                    return;
-                                }
+                    if (!isAuthenticated) {
+                    console.log('User is not logged in');
+                    searchList.innerHTML = ''; // Clear the list if user is not logged in
+                    return;
+                    }
 
-                                // Fetch autocomplete suggestions from the server, automatically sending CO-Datamarketplace token via cookies
-                                fetch(`/catalogData/GetSearchSuggestionsForPublishedDataAssets?searchText=${encodeURIComponent(searchTerm)}`, {
-                                    credentials: 'include' // This ensures that the CO-Datamarketplace cookie is sent with the request
-                                })
-                                    .then(response => {
-                                        // Handle redirect response, e.g., if session expired
-                                        if (response.redirected) {
-                                            window.location.href = response.url; // Redirect user to login if necessary
-                                            return;
-                                        }
-                                        if (!response.ok) {
-                                            throw new Error('Network response was not ok');
-                                        }
-                                        return response.json(); // Parse the JSON data from the response
-                                    })
-                                    .then(data => {
-                                        // Log data for debugging
-                                        console.log('Fetched data:', data);
+                    // Fetch autocomplete suggestions from the server, automatically sending CO-Datamarketplace token via cookies
+                    fetch(`/catalogData/GetSearchSuggestionsForPublishedDataAssets?searchText=${encodeURIComponent(searchTerm)}`, {
+                    credentials: 'include' // This ensures that the CO-Datamarketplace cookie is sent with the request
+                    })
+                    .then(response => {
+                    // Handle redirect response, e.g., if session expired
+                    if (response.redirected) {
+                    window.location.href = response.url; // Redirect user to login if necessary
+                    return;
+                    }
+                    if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                    }
+                    return response.json(); // Parse the JSON data from the response
+                    })
+                    .then(data => {
+                    // Log data for debugging
+                    console.log('Fetched data:', data);
 
-                                        if (data.length === 0) {
-                                            searchList.innerHTML = ''; // Clear the list if no results
-                                            return;
-                                        }
+                    if (data.length === 0) {
+                    searchList.innerHTML = ''; // Clear the list if no results
+                    return;
+                    }
 
-                                        // Populate the suggestion list with items from the data
-                                        const optionsHTML = data.map(item => `<li>${item}</li>`).join('');
-                                        searchList.innerHTML = optionsHTML;
-                                    })
-                                    .catch(error => {
-                                        console.error('Error fetching data:', error);
-                                        searchList.innerHTML = ''; // Clear the list on error
-                                    });
-                            });
+                    // Populate the suggestion list with items from the data
+                    const optionsHTML = data.map(item => `<li>${item}</li>`).join('');
+                    searchList.innerHTML = optionsHTML;
+                    })
+                    .catch(error => {
+                    console.error('Error fetching data:', error);
+                    searchList.innerHTML = ''; // Clear the list on error
+                    });
+                    });
 
-                            // Optional: Add click event listener for suggestion items
-                            searchList.addEventListener('click', function (e) {
-                                if (e.target.tagName === 'LI') {
-                                    searchInput.value = e.target.textContent; // Set the clicked suggestion as input value
-                                    searchList.innerHTML = ''; // Clear the suggestion list
-                                }
-                            });
-                        });
-                    </script>
-                }
-            </div>
+                    // Optional: Add click event listener for suggestion items
+                    searchList.addEventListener('click', function (e) {
+                    if (e.target.tagName === 'LI') {
+                    searchInput.value = e.target.textContent; // Set the clicked suggestion as input value
+                    searchList.innerHTML = ''; // Clear the suggestion list
+                    }
+                    });
+                    });
+                </script>
+            }
+            }
+            else
+            {
+                <div class="govuk-grid-column-two-thirds">
+                    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
+                        A place for people who work in government organisations to find, request and share&nbsp;data
+                    </h1>
+                    <p class="govuk-body-l govuk-!-margin-bottom-4">
+                        The Data Marketplace is currently in private beta.
+                    </p>
+                    <p class="govuk-body-l govuk-!-margin-bottom-4">
+                        <a class="govuk-link" asp-controller="Support" asp-action="@nameof(SupportController.GetStarted)">Find out if you can use it</a> or if you have access, <a class="govuk-link" href="@Url.Page("/Auth/SignIn")">sign in</a>.
+                    </p>
+                </div>
+                <div class="govuk-grid-column-one-third">
+                    <img style="max-width: 100%;" class="govuk-!-margin-top-6" src="~/assets/images/data-marketplace-home-image.png" alt="Illustration of a laptop with a search screen. Around the laptop are abstract images of data graphs and charts, and a map of the UK.">
+                </div>
+            }
+
         </div>
     </div>
 </div>
 
 <div class="govuk-width-container govuk-main-wrapper">
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-half govuk-!-margin-bottom-6">
-            <h2 class="govuk-heading-m">Data requests</h2>
-            <p class="govuk-body">Manage your data requests with other government organisations.</p>
+        @if (User.Identity!.IsAuthenticated)
+        {
+            <div class="govuk-grid-column-one-half govuk-!-margin-bottom-6">
+                <h2 class="govuk-heading-m">Data requests</h2>
+                <p class="govuk-body">Manage your data requests with other government organisations.</p>
 
-            <ul class="govuk-list">
-                <li>
-                    <p class="govuk-body"><a asp-controller="DataRequest" asp-action="@nameof(DataRequestController.RequestDashboard)" class="govuk-link  govuk-!-font-weight-bold">View data requests</a></p>
-                </li>
-            </ul>
-        </div>
-
+                <ul class="govuk-list">
+                    <li>
+                        <p class="govuk-body"><a asp-controller="DataRequest" asp-action="@nameof(DataRequestController.RequestDashboard)" class="govuk-link  govuk-!-font-weight-bold">View data requests</a></p>
+                    </li>
+                </ul>
+            </div>
+        }
         <div class="govuk-grid-column-one-half govuk-!-margin-bottom-6">
             <h2 class="govuk-heading-m">List your data</h2>
             <p class="govuk-body">View or add listings of your organisation’s data.</p>
             <ul class="govuk-list">
                 <li>
                     <p govuk-body>
-                        <a asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.DataDescriptionDashboard)" class="govuk-link govuk-!-font-weight-bold">Manage your listings</a>
+                        <a asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.DataDescriptionDashboard)" class="govuk-link govuk-!-font-weight-bold">List your data</a>
                     </p>
                 </li>
              @*    <li>

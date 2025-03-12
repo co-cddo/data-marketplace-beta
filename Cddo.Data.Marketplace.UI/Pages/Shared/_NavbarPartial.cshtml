@@ -9,19 +9,19 @@
     <h2 class="govuk-visually-hidden" id="app-navigation-heading">Menu</h2>
     <div class="govuk-width-container">
         <ul class="app-navigation__list landing-navigation__list app-width-container float-start">
-            <li class="app-navigation__list-item">
+            <li class="app-navigation__list-item pl-0">
                 <a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link" href="/">
                     Home
                 </a>
             </li>
-
-            <li class="app-navigation__list-item ">
-                <a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartCddoDataAssetsSearch)">
-                    Find data
-                </a>
-            </li>
             @if (User.Identity!.IsAuthenticated)
             {
+                <li class="app-navigation__list-item ">
+                    <a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartCddoDataAssetsSearch)">
+                        Find data
+                    </a>
+                </li>
+
                 <li class="app-navigation__list-item ">
                     <a href="@Url.Page("/ApiPortal/APILandingPage")" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link">
                         API
@@ -35,7 +35,7 @@
                 </a>
             </li>
 
-            
+
         </ul>
 
         <ul class="app-navigation__list app-width-container float-end">
@@ -90,14 +90,14 @@
                 }
 
                 // Sign out link is always visible
-                <li class="app-navigation__list-item">
+                <li class="app-navigation__list-item pr-0">
                     <a href="@Url.Page("/Auth/SignOut", "SignOut")" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link">Sign out</a>
                 </li>
             }
             else
             {
                 // If user is not authenticated, show sign-in link
-                <li class="app-navigation__list-item">
+                <li class="app-navigation__list-item pr-0">
                     <a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link" href="@Url.Page("/Auth/SignIn")">Sign in</a>
                 </li>
             }

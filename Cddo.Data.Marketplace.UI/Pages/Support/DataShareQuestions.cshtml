@@ -1,7 +1,7 @@
 ﻿@using Cddo.Data.Marketplace.UI.Controllers
 @model Cddo.Data.Marketplace.UI.Pages.Support.DataShareQuestionsModel
 @{
-    ViewData["Title"] = "Support - Datashare Questions";
+    ViewData["Title"] = "Support - Data request questions";
     Layout = "~/Pages/Shared/_SupportLayout.cshtml";
 }
 <div>
@@ -10,66 +10,63 @@
     </h1>
 
     <p class="govuk-body">
-        If you want to <a class="govuk-link" asp-controller="Support" asp-action="@nameof(SupportController.SetUpDataShareArrangement)">set up a data share arrangement in government</a> you must submit a data share request.<br />
-        <br />
-        In this process, you’ll need to answer the questions below to ensure your request meets data sharing standards.<br />
-        <br />
+        If you want to <a class="govuk-link" asp-controller="Support" asp-action="@nameof(SupportController.RequestingRestrictedData)">request restricted data</a> you must submit a data request.
+    </p>
+    <p class="govuk-body">
+        This involves answering the questions below to ensure your request meets data protection and data sharing requirements.
+    </p>
+    <p class="govuk-body">
         Some questions may require support from people with skills in:
     </p>
-
     <ul class="govuk-list govuk-list--bullet">
         <li>legal</li>
         <li>data protection</li>
-        <li>data security and technology</li>
-        <li>data governance</li>
+        <li>data security</li>
     </ul>
-
     <p class="govuk-body">
-        The questions may differ slightly depending on the nature of your request – for example, whether you’re requesting personal data or special category data.<br />
-        <br />
+        The questions may differ slightly depending on the nature of your request – for example, if you’re requesting personal data and special category data.
+    </p>
+    <p class="govuk-body">
         During the process there are suggestions for how to answer each question.
     </p>
 
-    <h2 class="govuk-heading-l">The questions you will be asked</h2>
-    <h3 class="govuk-heading-m">Purpose of the data share</h3>
+    <h2 class="govuk-heading-l">The questions you need to answer</h2>
 
+    <h3 class="govuk-heading-m">1. About your project</h3>
     <ul class="govuk-list govuk-list--bullet">
         <li>What type of data do you need?</li>
         <li>Who are the data subjects?</li>
         <li>What are the aims of your project?</li>
         <li>How will the data you want help achieve this?</li>
         <li>What data from this data set do you need?</li>
-        <li>What public benefits will your project provide?</li>
+        <li>How will your project benefit the public?</li>
         <li>Will other organisations need access to this data?</li>
         <li>How will it impact your project if you don't get this data?</li>
-        <li>By when do you need this data?</li>
+        <li>When do you need the data?</li>
     </ul>
 
-    <h3 class="govuk-heading-m">Legal power</h3>
-
+    <h3 class="govuk-heading-m">2. Legal</h3>
     <ul class="govuk-list govuk-list--bullet">
         <li>Are you requesting this data under a legal power?</li>
     </ul>
 
-    <h3 class="govuk-heading-m">Data protection</h3>
-
+    <h3 class="govuk-heading-m">3. Data protection</h3>
     <ul class="govuk-list govuk-list--bullet">
-        <li>What is your lawful basis for requesting personal data under UK GDPR? <a class="govuk-link" rel="noopener" target="_blank" href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/lawful-basis/a-guide-to-lawful-basis/">Find out more about processing personal data (opens in new tab)</a></li>
-        <li>What is your lawful basis for requesting special category data under UK GDPR? <a class="govuk-link" rel="noopener" target="_blank" href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/lawful-basis/a-guide-to-lawful-basis/lawful-basis-for-processing/special-category-data/">Find out more about special category data (opens in new tab)</a></li>
+        <li>What is your lawful basis for requesting personal data under UK GDPR?  <a class="govuk-link" href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/lawful-basis/a-guide-to-lawful-basis/">Find out more about processing personal data</a></li>
+        <li>What is your lawful basis for requesting special category data under UK GDPR? <a class="govuk-link" href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/lawful-basis/a-guide-to-lawful-basis/lawful-basis-for-processing/special-category-data/">Find out more about special category data</a></li>
         <li>What is the substantial public interest for requesting special category data under UK GDPR?</li>
         <li>Will any of this data leave the UK? For example, if any processing will happen outside the UK</li>
         <li>What will be the role of your organisation under UK GDPR? For example, data controller (joint or independent) or data processor</li>
     </ul>
 
-    <h3 class="govuk-heading-m">Data governance, security and technology</h3>
-
+    <h3 class="govuk-heading-m">4. Data security</h3>
     <ul class="govuk-list govuk-list--bullet">
         <li>How will you ensure that this data is deleted when your project finishes?</li>
     </ul>
-
     <p class="govuk-body">
-        You will need to confirm that you’ve had your answers checked by people with the appropriate legal, data protection and data security knowledge and expertise.<br />
-        <br />
+        You'll need to confirm that you’ve had your answers checked by people with the appropriate legal, data protection and data security knowledge and expertise.
+    </p>
+    <p class="govuk-body">
         This will minimise delays and make it more likely that your request is approved.
     </p>
 </div>

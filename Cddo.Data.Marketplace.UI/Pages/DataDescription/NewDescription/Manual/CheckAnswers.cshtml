@@ -115,361 +115,329 @@
                 <div class="govuk-grid-column-two-thirds">
                     <div class="govuk-panel govuk-panel--confirmation">
                         <h1 class="govuk-panel__title">
-                            Publishing complete
+                            Listing published
                         </h1>
+                        <div class="govuk-panel__body">
+                            @cddoDataAsset.Title
+                        </div>
                     </div>
-                    <p class="govuk-body">Your data set has been added to the Data Marketplace.</p>
-                    <p class="govuk-body">Other organisations now will be able to find it.</p>
+                    <p class="govuk-body"><a class="govuk-link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAsset)" asp-route-dataAssetId="@cddoDataAsset.Id">View listing on the Data Marketplace</a></p>
+                    <p class="govuk-body"><a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.TaskList)" asp-route-identifier="@cddoDataAsset.Id">Change your listing</a></p>
+                    <p class="govuk-body"><a class="govuk-link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssetsByUser)">View all your listings</a></p>
                 </div>
             </div>
         }
+        else
+        {
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-two-thirds">
+                    <h2 class="govuk-heading-xl">Check your answers</h2>
 
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-two-thirds">
-                <h2 class="govuk-heading-xl">Check your answers</h2>
-
-                @Html.AntiForgeryToken()
-                @if (propertyValidationErrors.Any())
-                {
-                    <div class="govuk-error-summary validation-summary-errors" data-module="govuk-error-summary">
-                        <div role="alert">
-                            <h2 class="govuk-error-summary__title">
-                                There is a problem
-                            </h2>
-                            <div class="govuk-error-summary__body">
-                                <ul class="govuk-list govuk-error-summary__list">
-                                    @foreach (var propertyValidationError in propertyValidationErrors)
-                                    {
-                                        foreach (var error in propertyValidationError.Errors)
-                                        {
-                                            <li>
-                                                <a href="#@propertyValidationError.PropertyName">@PrettifyValidationPropertyName(propertyValidationError.PropertyName): @FormatPropertyError(error)</a>
-                                            </li>
-                                        }
-                                    }
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                }
-
-                @* Potential Duplicates Section *@
-                @if (potentialDuplicatesToDataAsset.Any())
-                {
-                    <div class="govuk-grid-row">
-                        <section class="govuk-notification-banner" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
-                            <div class="govuk-notification-banner__header">
-                                <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
-                                    <div class="govuk-warning-text govuk-!-static-margin-bottom-1">
-                                        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-                                        <strong class="govuk-warning-text__text">
-                                            <span class="govuk-warning-text__assistive">Warning</span>
-                                            This record might be a duplicate.
-                                        </strong>
-                                    </div>
-                                </h2>
-                            </div>
-                            <div class="govuk-notification-banner__content">
-                                <p class="govuk-body">
-                                    The details you’ve provided seem to match with the following data description(s) in the Data Marketplace’s catalogue:
-                                </p>
-
-                                <ul class="govuk-list govuk-list--bullet">
-                                    @foreach (var potentialDuplicateToDataAsset in potentialDuplicatesToDataAsset)
-                                    {
-                                        <li>
-                                            <a class="govuk-link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssetByUser)" asp-route-identifier="@potentialDuplicateToDataAsset.DataAssetId">
-                                                @potentialDuplicateToDataAsset.Title
-                                            </a>
-                                            (based on your @PrettifyDuplicateSimilarityDescriptions(potentialDuplicateToDataAsset.SimilarityDescriptions))
-                                        </li>
-                                    }
-                                </ul>
-
-                                <p class="govuk-body">
-                                    You can choose to either update that data description by following the link above, or continue with creating a new data description.
-                                </p>
-                            </div>
-                        </section>
-                    </div>
-                }
-
-                <dl class="govuk-summary-list govuk-!-margin-bottom-9">
-                    @if (cddoDataAsset.DataAssetStatus != null)
+                    @Html.AntiForgeryToken()
+                    @if (propertyValidationErrors.Any())
                     {
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                                Status
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                <strong class="govuk-tag govuk-tag--blue">@cddoDataAsset.DataAssetStatus</strong>
-                            </dd>
-                            <dd class="govuk-summary-list__actions">
-                            </dd>
+                        <div class="govuk-error-summary validation-summary-errors" data-module="govuk-error-summary">
+                            <div role="alert">
+                                <h2 class="govuk-error-summary__title">
+                                    There is a problem
+                                </h2>
+                                <div class="govuk-error-summary__body">
+                                    <ul class="govuk-list govuk-error-summary__list">
+                                        @foreach (var propertyValidationError in propertyValidationErrors)
+                                        {
+                                            foreach (var error in propertyValidationError.Errors)
+                                            {
+                                                <li>
+                                                    <a href="#@propertyValidationError.PropertyName">@PrettifyValidationPropertyName(propertyValidationError.PropertyName): @FormatPropertyError(error)</a>
+                                                </li>
+                                            }
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     }
 
-                    @* Security Classification *@
-                    <div id="@nameof(CataloguedResource.SecurityClassification)" class="govuk-summary-list__row @(GetErrorMessages(nameof(CataloguedResource.SecurityClassification)).Any() ? "govuk-form-group--error" : "")">
-                        <dt class="govuk-summary-list__key">
-                            Security classification
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            @foreach (var errorMessage in GetErrorMessages(nameof(CataloguedResource.SecurityClassification)))
-                            {
-                                <p class="govuk-error-message">@errorMessage</p>
-                            }
-                            <ul class="govuk-list">
-                                @cddoDataAsset.SecurityClassification
-                            </ul>
-                        </dd>
-                        <dd class="govuk-summary-list__actions">
-                            <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.SecurityClassification)" asp-route-identifier="@cddoDataAsset.Id"
-                               asp-route-isCheckAnswers="true">
-                                Change
-                                <span class="govuk-visually-hidden"> Security Classification</span>
-                            </a>
-                        </dd>
-                    </div>
+                    @* Potential Duplicates Section *@
+                    @if (potentialDuplicatesToDataAsset.Any())
+                    {
+                        <div class="govuk-grid-row">
+                            <section class="govuk-notification-banner" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                                <div class="govuk-notification-banner__header">
+                                    <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                                        <div class="govuk-warning-text govuk-!-static-margin-bottom-1">
+                                            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                            <strong class="govuk-warning-text__text">
+                                                <span class="govuk-warning-text__assistive">Warning</span>
+                                                This record might be a duplicate.
+                                            </strong>
+                                        </div>
+                                    </h2>
+                                </div>
+                                <div class="govuk-notification-banner__content">
+                                    <p class="govuk-body">
+                                        The details you’ve provided seem to match with the following data description(s) in the Data Marketplace’s catalogue:
+                                    </p>
 
-                    @* Title *@
-                    <div id="@nameof(CataloguedResource.Title)" class="govuk-summary-list__row @(GetErrorMessages(nameof(CataloguedResource.Title)).Any() ? "govuk-form-group--error" : "")">
-                        <dt class="govuk-summary-list__key">
-                            Title
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            @foreach (var errorMessage in GetErrorMessages(nameof(CataloguedResource.Title)))
-                            {
-                                <p class="govuk-error-message">@errorMessage</p>
-                            }
-                            @cddoDataAsset.Title
-                        </dd>
-                        <dd class="govuk-summary-list__actions">
-                            <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddTitle)" asp-route-identifier="@cddoDataAsset.Id"
-                               asp-route-isCheckAnswers="true">
-                                Change
-                                <span class="govuk-visually-hidden"> title</span>
-                            </a>
-                        </dd>
-                    </div>
+                                    <ul class="govuk-list govuk-list--bullet">
+                                        @foreach (var potentialDuplicateToDataAsset in potentialDuplicatesToDataAsset)
+                                        {
+                                            <li>
+                                                <a class="govuk-link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssetByUser)" asp-route-identifier="@potentialDuplicateToDataAsset.DataAssetId">
+                                                    @potentialDuplicateToDataAsset.Title
+                                                </a>
+                                                (based on your @PrettifyDuplicateSimilarityDescriptions(potentialDuplicateToDataAsset.SimilarityDescriptions))
+                                            </li>
+                                        }
+                                    </ul>
 
-                    @* Description *@
-                    <div id="@nameof(CataloguedResource.Description)" class="govuk-summary-list__row @(GetErrorMessages(nameof(CataloguedResource.Description)).Any() ? "govuk-form-group--error" : "")" id="@nameof(CataloguedResource.Description)">
-                        <dt class="govuk-summary-list__key">
-                            Description
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            @foreach (var errorMessage in GetErrorMessages(nameof(CataloguedResource.Description)))
-                            {
-                                <p class="govuk-error-message">@errorMessage</p>
-                            }
-                            @cddoDataAsset.Description
-                        </dd>
-                        <dd class="govuk-summary-list__actions">
-                            <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddDescription)" asp-route-identifier="@cddoDataAsset.Id"
-                               asp-route-isCheckAnswers="true">
-                                Change
-                                <span class="govuk-visually-hidden"> description</span>
-                            </a>
-                        </dd>
-                    </div>
+                                    <p class="govuk-body">
+                                        You can choose to either update that data description by following the link above, or continue with creating a new data description.
+                                    </p>
+                                </div>
+                            </section>
+                        </div>
+                    }
 
-                    @* Internal Identifier *@
-                    <div id="@nameof(CataloguedResource.Identifier)" class="govuk-summary-list__row @(GetErrorMessages(nameof(CataloguedResource.Identifier)).Any() ? "govuk-form-group--error" : "")">
-                        <dt class="govuk-summary-list__key">
-                            Internal identifier
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            @foreach (var errorMessage in GetErrorMessages(nameof(CataloguedResource.Identifier)))
-                            {
-                                <p class="govuk-error-message">@errorMessage</p>
-                            }
-                            @cddoDataAsset.InternalIdentifier
-                        </dd>
-                        <dd class="govuk-summary-list__actions">
-                            <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddInternalIdentifier)" asp-route-identifier="@cddoDataAsset.Id"
-                               asp-route-isCheckAnswers="true">
-                                Change
-                                <span class="govuk-visually-hidden">Internal Identifier</span>
-                            </a>
-                        </dd>
-                    </div>
-
-                    @* Themes *@
-                    <div id="@nameof(CataloguedResource.Theme)" class="govuk-summary-list__row @(GetErrorMessages(nameof(CataloguedResource.Theme)).Any() ? "govuk-form-group--error" : "")">
-                        <dt class="govuk-summary-list__key">
-                            Themes
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            @foreach (var errorMessage in GetErrorMessages(nameof(CataloguedResource.Theme)))
-                            {
-                                <p class="govuk-error-message">@errorMessage</p>
-                            }
-                            <ul class="govuk-list">
-                                @if (cddoDataAsset.Themes.Any())
+                    <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+                        @* Title *@
+                        <div id="@nameof(CataloguedResource.Title)" class="govuk-summary-list__row @(GetErrorMessages(nameof(CataloguedResource.Title)).Any() ? "govuk-form-group--error" : "")">
+                            <dt class="govuk-summary-list__key">
+                                Title
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @foreach (var errorMessage in GetErrorMessages(nameof(CataloguedResource.Title)))
                                 {
-                                    @foreach (var theme in cddoDataAsset.Themes)
+                                    <p class="govuk-error-message">@errorMessage</p>
+                                }
+                                @cddoDataAsset.Title
+                            </dd>
+                            <dd class="govuk-summary-list__actions">
+                                <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddTitle)" asp-route-identifier="@cddoDataAsset.Id"
+                                   asp-route-isCheckAnswers="true">
+                                    Change
+                                    <span class="govuk-visually-hidden"> title</span>
+                                </a>
+                            </dd>
+                        </div>
+
+                        @* Description *@
+                        <div id="@nameof(CataloguedResource.Description)" class="govuk-summary-list__row @(GetErrorMessages(nameof(CataloguedResource.Description)).Any() ? "govuk-form-group--error" : "")" id="@nameof(CataloguedResource.Description)">
+                            <dt class="govuk-summary-list__key">
+                                Description
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @foreach (var errorMessage in GetErrorMessages(nameof(CataloguedResource.Description)))
+                                {
+                                    <p class="govuk-error-message">@errorMessage</p>
+                                }
+                                @cddoDataAsset.Description
+                            </dd>
+                            <dd class="govuk-summary-list__actions">
+                                <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddDescription)" asp-route-identifier="@cddoDataAsset.Id"
+                                   asp-route-isCheckAnswers="true">
+                                    Change
+                                    <span class="govuk-visually-hidden"> description</span>
+                                </a>
+                            </dd>
+                        </div>
+
+                        @* Internal Identifier *@
+                        <div id="@nameof(CataloguedResource.Identifier)" class="govuk-summary-list__row @(GetErrorMessages(nameof(CataloguedResource.Identifier)).Any() ? "govuk-form-group--error" : "")">
+                            <dt class="govuk-summary-list__key">
+                                Internal identifier
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @foreach (var errorMessage in GetErrorMessages(nameof(CataloguedResource.Identifier)))
+                                {
+                                    <p class="govuk-error-message">@errorMessage</p>
+                                }
+                                @cddoDataAsset.InternalIdentifier
+                            </dd>
+                            <dd class="govuk-summary-list__actions">
+                                <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddInternalIdentifier)" asp-route-identifier="@cddoDataAsset.Id"
+                                   asp-route-isCheckAnswers="true">
+                                    Change
+                                    <span class="govuk-visually-hidden">Internal Identifier</span>
+                                </a>
+                            </dd>
+                        </div>
+
+                        @* Themes *@
+                        <div id="@nameof(CataloguedResource.Theme)" class="govuk-summary-list__row @(GetErrorMessages(nameof(CataloguedResource.Theme)).Any() ? "govuk-form-group--error" : "")">
+                            <dt class="govuk-summary-list__key">
+                                Themes
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @foreach (var errorMessage in GetErrorMessages(nameof(CataloguedResource.Theme)))
+                                {
+                                    <p class="govuk-error-message">@errorMessage</p>
+                                }
+                                <ul class="govuk-list">
+                                    @if (cddoDataAsset.Themes.Any())
                                     {
-                                        <li>@theme</li>
+                                        @foreach (var theme in cddoDataAsset.Themes)
+                                        {
+                                            <li>@theme</li>
+                                        }
+                                    }
+                                </ul>
+                            </dd>
+                            <dd class="govuk-summary-list__actions">
+                                <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddThemes)" asp-route-identifier="@cddoDataAsset.Id"
+                                   asp-route-isCheckAnswers="true">
+                                    Change
+                                    <span class="govuk-visually-hidden">Themes</span>
+                                </a>
+                            </dd>
+                        </div>
+
+                        @* Keywords *@
+                        <div id="@nameof(CataloguedResource.Keyword)" class="govuk-summary-list__row @(GetErrorMessages(nameof(CataloguedResource.Keyword)).Any() ? "govuk-form-group--error" : "")">
+                            <dt class="govuk-summary-list__key">
+                                Keywords
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @foreach (var errorMessage in GetErrorMessages(nameof(CataloguedResource.Keyword)))
+                                {
+                                    <p class="govuk-error-message">@errorMessage</p>
+                                }
+                                <ul class="govuk-list">
+                                    @if (cddoDataAsset.Keywords.Any())
+                                    {
+                                        @foreach (var keyword in @cddoDataAsset.Keywords)
+                                        {
+                                            <li>@keyword</li>
+                                        }
+                                    }
+                                </ul>
+                            </dd>
+                            <dd class="govuk-summary-list__actions">
+                                <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddKeywords)" asp-route-identifier="@cddoDataAsset.Id"
+                                   asp-route-isCheckAnswers="true">
+                                    Change
+                                    <span class="govuk-visually-hidden">Keywords</span>
+                                </a>
+                            </dd>
+                        </div>
+
+                        @* Point of Contact *@
+                        <div id="ContactPoint.Contact" class="govuk-summary-list__row @(GetErrorMessages($"{nameof(CataloguedResource.ContactPoint)}.Contact").Any()  ? "govuk-form-group--error" : "")">
+                            <dt class="govuk-summary-list__key">
+                                Point of contact
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @foreach (var errorMessage in GetErrorMessages($"{nameof(CataloguedResource.ContactPoint)}.Contact"))
+                                {
+                                    <p class="govuk-error-message">@errorMessage</p>
+                                }
+
+                                @if (cddoDataAsset.DataAssetContacts is not null)
+                                {
+                                    var contactPoint = cddoDataAsset.DataAssetContacts.FirstOrDefault(x => x.Role == DataAssetContactRoleType.Contact);
+
+                                    if (contactPoint is not null)
+                                    {
+                                        <span id="@($"{nameof(CataloguedResource.ContactPoint)}.{nameof(Contact.Name)}")">
+                                            @contactPoint.Name
+                                        </span>
+                                        <br />
+                                        <span id="@($"{nameof(CataloguedResource.ContactPoint)}.{nameof(Contact.Email)}")">
+                                            @contactPoint.Email
+                                        </span>
                                     }
                                 }
-                            </ul>
-                        </dd>
-                        <dd class="govuk-summary-list__actions">
-                            <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddThemes)" asp-route-identifier="@cddoDataAsset.Id"
-                               asp-route-isCheckAnswers="true">
-                                Change
-                                <span class="govuk-visually-hidden">Themes</span>
-                            </a>
-                        </dd>
-                    </div>
+                            </dd>
+                            <dd class="govuk-summary-list__actions">
+                                <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddContactPoint)" asp-route-identifier="@cddoDataAsset.Id"
+                                   asp-route-isCheckAnswers="true" asp-route-dataAssetType="@cddoDataAsset.DataAssetType">
+                                    Change
+                                    <span class="govuk-visually-hidden">Point of Contact</span>
+                                </a>
+                            </dd>
+                        </div>
 
-                    @* Keywords *@
-                    <div id="@nameof(CataloguedResource.Keyword)" class="govuk-summary-list__row @(GetErrorMessages(nameof(CataloguedResource.Keyword)).Any() ? "govuk-form-group--error" : "")">
-                        <dt class="govuk-summary-list__key">
-                            Keywords
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            @foreach (var errorMessage in GetErrorMessages(nameof(CataloguedResource.Keyword)))
-                            {
-                                <p class="govuk-error-message">@errorMessage</p>
-                            }
-                            <ul class="govuk-list">
-                                @if (cddoDataAsset.Keywords.Any())
+                        @* Data Owner *@
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Data owner
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @if (cddoDataAsset.DataAssetContacts is not null)
                                 {
-                                    @foreach (var keyword in @cddoDataAsset.Keywords)
+                                    var ownerContact = cddoDataAsset.DataAssetContacts.FirstOrDefault(x => x.Role == DataAssetContactRoleType.Owner);
+
+                                    if (ownerContact is not null)
                                     {
-                                        <li>@keyword</li>
+                                        <span id="@($"{nameof(CataloguedResource.ContactPoint)}.{nameof(Contact.Name)}")">
+                                            @ownerContact.Name
+                                        </span>
+                                        <br />
+                                        <span id="@($"{nameof(CataloguedResource.ContactPoint)}.{nameof(Contact.Email)}")">
+                                            @ownerContact.Email
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>The owner is the point of contact</span>
                                     }
                                 }
-                            </ul>
-                        </dd>
-                        <dd class="govuk-summary-list__actions">
-                            <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddKeywords)" asp-route-identifier="@cddoDataAsset.Id"
-                               asp-route-isCheckAnswers="true">
-                                Change
-                                <span class="govuk-visually-hidden">Keywords</span>
-                            </a>
-                        </dd>
-                    </div>
+                            </dd>
+                            <dd class="govuk-summary-list__actions">
+                                <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddDataOwner)" asp-route-identifier="@cddoDataAsset.Id"
+                                   asp-route-isCheckAnswers="true">
+                                    Change
+                                    <span class="govuk-visually-hidden">Point of Contact</span>
+                                </a>
+                            </dd>
+                        </div>
 
-                    @* Point of Contact *@
-                    <div id="ContactPoint.Contact" class="govuk-summary-list__row @(GetErrorMessages($"{nameof(CataloguedResource.ContactPoint)}.Contact").Any()  ? "govuk-form-group--error" : "")">
-                        <dt class="govuk-summary-list__key">
-                            Point of contact
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            @foreach (var errorMessage in GetErrorMessages($"{nameof(CataloguedResource.ContactPoint)}.Contact"))
-                            {
-                                <p class="govuk-error-message">@errorMessage</p>
-                            }
-
-                            @if (cddoDataAsset.DataAssetContacts is not null)
-                            {
-                                var contactPoint = cddoDataAsset.DataAssetContacts.FirstOrDefault(x => x.Role == DataAssetContactRoleType.Contact);
-
-                                if (contactPoint is not null)
+                        @* Date first made available *@
+                        <div id="@nameof(DataSet.Issued)" class="govuk-summary-list__row @(GetErrorMessages(nameof(DataSet.Issued)).Any() ? "govuk-form-group--error" : "")">
+                            <dt class="govuk-summary-list__key">
+                                Date first made available
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @foreach (var errorMessage in GetErrorMessages(nameof(DataSet.Issued)))
                                 {
-                                    <span id="@($"{nameof(CataloguedResource.ContactPoint)}.{nameof(Contact.Name)}")">
-                                        @contactPoint.Name
-                                    </span>
-                                    <br />
-                                    <span id="@($"{nameof(CataloguedResource.ContactPoint)}.{nameof(Contact.Email)}")">
-                                        @contactPoint.Email
-                                    </span>
+                                    <p class="govuk-error-message">@errorMessage</p>
                                 }
-                            }
-                        </dd>
-                        <dd class="govuk-summary-list__actions">
-                            <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddContactPoint)" asp-route-identifier="@cddoDataAsset.Id"
-                               asp-route-isCheckAnswers="true" asp-route-dataAssetType="@cddoDataAsset.DataAssetType">
-                                Change
-                                <span class="govuk-visually-hidden">Point of Contact</span>
-                            </a>
-                        </dd>
-                    </div>
+                                @cddoDataAsset.Issued?.ToString("dd/MM/yyyy")
+                            </dd>
+                            <dd class="govuk-summary-list__actions">
+                                <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddPublishedDate)" asp-route-identifier="@cddoDataAsset.Id"
+                                   asp-route-isCheckAnswers="true">
+                                    Change
+                                    <span class="govuk-visually-hidden">Date Issued</span>
+                                </a>
+                            </dd>
+                        </div>
 
-                    @* Data Owner *@
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            Data owner
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            @if (cddoDataAsset.DataAssetContacts is not null)
-                            {
-                                var ownerContact = cddoDataAsset.DataAssetContacts.FirstOrDefault(x => x.Role == DataAssetContactRoleType.Owner);
-
-                                if (ownerContact is not null)
+                        @* Frequency of update *@
+                        <div id="@nameof(DataSet.UpdateFrequency)" class="govuk-summary-list__row @(GetErrorMessages(nameof(DataSet.UpdateFrequency)).Any() ? "govuk-form-group--error" : "")">
+                            <dt class="govuk-summary-list__key">
+                                Frequency of update
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @foreach (var errorMessage in GetErrorMessages(nameof(DataSet.UpdateFrequency)))
                                 {
-                                    <span id="@($"{nameof(CataloguedResource.ContactPoint)}.{nameof(Contact.Name)}")">
-                                        @ownerContact.Name
-                                    </span>
-                                    <br />
-                                    <span id="@($"{nameof(CataloguedResource.ContactPoint)}.{nameof(Contact.Email)}")">
-                                        @ownerContact.Email
-                                    </span>
+                                    <p class="govuk-error-message">@errorMessage</p>
                                 }
-                                else
-                                {
-                                    <span>The owner is the point of contact</span>
-                                }
-                            }
-                        </dd>
-                        <dd class="govuk-summary-list__actions">
-                            <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddDataOwner)" asp-route-identifier="@cddoDataAsset.Id"
-                               asp-route-isCheckAnswers="true">
-                                Change
-                                <span class="govuk-visually-hidden">Point of Contact</span>
-                            </a>
-                        </dd>
-                    </div>
-
-                    @* Date first made available *@
-                    <div id="@nameof(DataSet.Issued)" class="govuk-summary-list__row @(GetErrorMessages(nameof(DataSet.Issued)).Any() ? "govuk-form-group--error" : "")">
-                        <dt class="govuk-summary-list__key">
-                            Date first made available
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            @foreach (var errorMessage in GetErrorMessages(nameof(DataSet.Issued)))
-                            {
-                                <p class="govuk-error-message">@errorMessage</p>
-                            }
-                            @cddoDataAsset.Issued?.ToString("dd/MM/yyyy")
-                        </dd>
-                        <dd class="govuk-summary-list__actions">
-                            <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddPublishedDate)" asp-route-identifier="@cddoDataAsset.Id"
-                               asp-route-isCheckAnswers="true">
-                                Change
-                                <span class="govuk-visually-hidden">Date Issued</span>
-                            </a>
-                        </dd>
-                    </div>
-
-                    @* Frequency of update *@
-                    <div id="@nameof(DataSet.UpdateFrequency)" class="govuk-summary-list__row @(GetErrorMessages(nameof(DataSet.UpdateFrequency)).Any() ? "govuk-form-group--error" : "")">
-                        <dt class="govuk-summary-list__key">
-                            Frequency of update
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            @foreach (var errorMessage in GetErrorMessages(nameof(DataSet.UpdateFrequency)))
-                            {
-                                <p class="govuk-error-message">@errorMessage</p>
-                            }
-                            <ul class="govuk-list">
-                                @if (cddoDataAsset.UpdateFrequencyString != null)
-                                {
-                                    @cddoDataAsset.UpdateFrequencyString
-                                }
-                            </ul>
-                        </dd>
-                        <dd class="govuk-summary-list__actions">
-                            <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddFrequency)" asp-route-identifier="@cddoDataAsset.Id"
-                               asp-route-isCheckAnswers="true">
-                                Change
-                                <span class="govuk-visually-hidden">Update frequency</span>
-                            </a>
-                        </dd>
-                    </div>
+                                <ul class="govuk-list">
+                                    @if (cddoDataAsset.UpdateFrequencyString != null)
+                                    {
+                                        @cddoDataAsset.UpdateFrequencyString
+                                    }
+                                </ul>
+                            </dd>
+                            <dd class="govuk-summary-list__actions">
+                                <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddFrequency)" asp-route-identifier="@cddoDataAsset.Id"
+                                   asp-route-isCheckAnswers="true">
+                                    Change
+                                    <span class="govuk-visually-hidden">Update frequency</span>
+                                </a>
+                            </dd>
+                        </div>
 
                     @* Supply Format *@
                     <div id="@($"{nameof(DataSet.Distribution)}")" class="govuk-summary-list__row">
@@ -501,49 +469,50 @@
                         </dd>
                     </div>
 
-                    @* Date Modified *@
-                    <div id="@nameof(CataloguedResource.Modified)" class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">
-                            Last modified
-                        </dt>
-                        <dd class="govuk-summary-list__value">
-                            @cddoDataAsset.Modified.ToGDSHelperString()
-                        </dd>
-                        <dd class="govuk-summary-list__actions">
-                        </dd>
-                    </div>
-                </dl>
+                        @* Date Modified *@
+                        <div id="@nameof(CataloguedResource.Modified)" class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Last modified
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                @cddoDataAsset.Modified.ToGDSHelperString()
+                            </dd>
+                            <dd class="govuk-summary-list__actions">
+                            </dd>
+                        </div>
+                    </dl>
 
-                <div class="govuk-button-group">
-                    @if (canPublish)
-                    {
-                        <form asp-controller="DataDescription" asp-action="@nameof(DataDescriptionController.DataShareRequestNotificationsSelection)"
-                              asp-route-identifier="@cddoDataAsset.Id">
-                            <button class="govuk-button" data-module="govuk-button">
-                                Publish data description
-                            </button>
-                        </form>
-                    }
-                    else if (canUnPublish)
-                    {
-                        <form asp-controller="DataDescription" asp-action="@nameof(DataDescriptionController.UpdateDataAssetStatusSubmit)"
-                              asp-route-identifier="@cddoDataAsset.Id" asp-route-dataAssetStatus="@DataAssetStatus.Draft" asp-route-dataAssetType="@cddoDataAsset.DataAssetType">
-                            <button class="govuk-button" data-module="govuk-button">
-                                Unpublish data description
-                            </button>
-                        </form>
-                        <a class="govuk-button govuk-button--secondary" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAsset)" asp-route-dataAssetId="@cddoDataAsset.Id">View the published data description</a>
-                    }
-                         
-                    <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.TaskList)" asp-route-identifier="@cddoDataAsset.Id">
-                        View the list of questions
-                    </a>
-                    <a class="govuk-link" class="govuk-link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssetsByUser)">
-                        View your department’s published records
-                    </a>
+                    <div class="govuk-button-group">
+                        @if (canPublish)
+                        {
+                            <form asp-controller="DataDescription" asp-action="@nameof(DataDescriptionController.DataShareRequestNotificationsSelection)"
+                                  asp-route-identifier="@cddoDataAsset.Id">
+                                <button class="govuk-button" data-module="govuk-button">
+                                    Publish data description
+                                </button>
+                            </form>
+                        }
+                        else if (canUnPublish)
+                        {
+                            <form asp-controller="DataDescription" asp-action="@nameof(DataDescriptionController.UpdateDataAssetStatusSubmit)"
+                                  asp-route-identifier="@cddoDataAsset.Id" asp-route-dataAssetStatus="@DataAssetStatus.Draft" asp-route-dataAssetType="@cddoDataAsset.DataAssetType">
+                                <button class="govuk-button" data-module="govuk-button">
+                                    Unpublish data description
+                                </button>
+                            </form>
+                            <a class="govuk-button govuk-button--secondary" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAsset)" asp-route-dataAssetId="@cddoDataAsset.Id">View the published data description</a>
+                        }
+
+                        <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.TaskList)" asp-route-identifier="@cddoDataAsset.Id">
+                            View the list of questions
+                        </a>
+                        <a class="govuk-link" class="govuk-link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssetsByUser)">
+                            View your department’s published records
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
+        }
     </div>
 }
 <style scoped>

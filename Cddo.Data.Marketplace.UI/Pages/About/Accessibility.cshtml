@@ -1,4 +1,4 @@
-﻿@model Cddo.Data.Marketplace.UI.Pages.About.AccessibilityModel
+﻿c@model Cddo.Data.Marketplace.UI.Pages.About.AccessibilityModel
 @{
     ViewData["Title"] = "Accessibility";
 }
@@ -9,42 +9,64 @@
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-xl">Accessibility statement</h1>
-            <p class="govuk-body">This website is designed to be used by as many people as possible. The text should be clear and simple to understand. You should be able to:</p>
+            <h1 class="govuk-heading-xl">Accessibility statement  for the Data Marketplace</h1>
+            <p class="govuk-body">The Data Marketplace is committed to making its website accessible, in accordance with the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018.</p>
+            <p class="govuk-body">This accessibility statement applies to the Data Marketplace website at: <a class="govuk-link" href="https://datamarketplace.gov.uk">https://datamarketplace.gov.uk</a>.</p>
+            <p class="govuk-body">This page explains how accessible this website is, the improvements we’ve made and how to report accessibility problems.</p>
+            <p class="govuk-body">There is a separate <a class="govuk-link" rel="noopener" target="_blank" href="https://www.gov.uk/help/accessibility-statement">accessibility statement for the main GOV.UK website (opens in new tab)</a>.</p>
+            
+            <h1 class="govuk-heading-l">Using this service</h1>
+            <p class="govuk-body">This service is run by the Department for Science, Innovation and Technology (DSIT). We want as many people as possible to be able to use this service.</p>
+            <p class="govuk-body">You should be able to:</p>
             <ul class="govuk-list govuk-list--bullet">
-                <li>zoom in up to 300% without problems</li>
-                <li>navigate most of the website using just a keyboard</li>
-                <li>navigate most of the website using speech recognition software</li>
-                <li>use most of the website using a screen reader (including the most recent versions of JAWS, NVDA and VoiceOver)</li>
+                <li>zoom in up to 200% without the text spilling off the screen</li>
+                <li>navigate the website using just a keyboard</li>
+                <li>navigate the website using speech recognition software</li>
+                <li>use the website with a screen reader – including JAWS, NVDA and VoiceOver</li>
             </ul>
-            <p class="govuk-body">We've also made the website text as simple as possible to understand.</p>
-            <p class="govuk-body"><a class="govuk-link" rel="noopener" target="_blank" href="https://mcmw.abilitynet.org.uk/">AbilityNet (opens in new tab)</a> has advice on making your device easier to use if you have a disability.</p>
+            <p class="govuk-body">We’ve also made the text in the service as simple as possible to understand.</p>
+            <p class="govuk-body">The service is currently in private beta and subject to ongoing user research and testing, including accessibility audits.</p>
+            
+            <h1 class="govuk-heading-l">Compliance status</h1>
+            <p class="govuk-body">The service fully complies with WCAG 2.1 AA standards and incorporates improvements recommended for WCAG 2.2.</p>
 
-            <h1 class="govuk-heading-l">How accessible is this website?</h1>
-            <p class="govuk-body">This website is currently a Private Beta Service and as part of the on-going user research it is currently subject to an accessibility audit. Its design is based on our user research that has included research into individuals with specific needs.</p>
-            <p class="govuk-body">Accessibility has been considered during the build, and the page will be updated following the conclusion of the audit.</p>
-
-            <h1 class="govuk-heading-l">GOV.UK services</h1>
-            <p class="govuk-body">Each service has its own accessibility page, with details of how accessible the service is, how to report problems and how to request information in an alternative format. You can access these pages from the footer inside the service.</p>
-
-            <h1 class="govuk-heading-l">Feedback and contact information</h1>
-            <p class="govuk-body">In your message, include:</p>
+            <h1 class="govuk-heading-l">Improvements we’ve made</h1>
+            <p class="govuk-body">In summer 2024 the Digital Accessibility Centre (DAC) conducted an accessibility audit of the Data Marketplace. </p>
+            <p class="govuk-body">This identified several issues which we’ve now resolved, including:</p>
             <ul class="govuk-list govuk-list--bullet">
-                <li>the web address (URL) of the content</li>
-                <li>your email address and name</li>
-                <li>the format you need, for example: plain text, braille, BSL, large print or audio CD</li>
+                <li>form controls – all form controls now have meaningful names and logical structures for screen readers</li>
+                <li>skip links – ’skip to main content’ links allow keyboard-only users to bypass repetitive elements</li>
+                <li>screen reader feedback – buttons, links and pagination controls now have clear, descriptive labels</li>
+                <li>text resizing and reflow – the website supports resizing up to 200% without loss of functionality, meeting reflow requirements</li>
+                <li>heading structure – logical hierarchies across pages improve screen reader navigation</li>
+                <li>fieldset grouping – related form controls are grouped with proper fieldset and legend tags</li>
+                <li>pagination labels – pagination controls are labelled descriptively for better usability</li>
+                <li>visible input labels – all input fields now have clear, visible labels</li>
+                <li>distinct links – duplicate links now have unique identifiers for screen readers, for example on the Manage Organisations page</li>
             </ul>
-
+            
             <h1 class="govuk-heading-l">Reporting accessibility problems with this website</h1>
-            <p class="govuk-body">If you find any problems that are not listed on this page or you think we're not meeting the accessibility requirements, <a class="govuk-link" href="https://docs.google.com/forms/d/e/1FAIpQLSeukG0jO_XgjBt6U7Fz_FJYOhjn3xXrrZTd43Ur0tFGZFwFLA/viewform">contact us</a>.</p>
-
+            <p class="govuk-body">If you find any problems that are not listed on this page or you think we’re not meeting the accessibility requirements, email us at: <a class="govuk-link" href="mailto:datamarketplace@digital.cabinet-office.gov.uk">datamarketplace@digital.cabinet-office.gov.uk</a>.</p>
+            <p class="govuk-body">It will help if you include:</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>your name</li>
+                <li>the URL of the page you want to tell us about (if relevant)</li>
+            </ul>
+            
             <h1 class="govuk-heading-l">Enforcement procedure</h1>
-            <p class="govuk-body">The Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the 'accessibility regulations'). If you're not happy with how we respond to your complaint, <a class="govuk-link" rel="noopener" target="_blank" href="https://www.equalityadvisoryservice.com/">contact the Equality Advisory and Support Service (EASS) (opens in new tab)</a>.</p>
+            <p class="govuk-body">The Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the ‘accessibility regulations’).</p>
+            <p class="govuk-body">If you’re not happy with how we respond to your complaint, <a class="govuk-link" rel="noopener" target="_blank" href="https://www.equalityadvisoryservice.com/">contact the Equality Advisory and Support Service (opens in new tab)</a>, which is run on behalf of EHRC.</p>
 
-            <h1 class="govuk-heading-l">Technical information about this website's accessibility</h1>
-            <p class="govuk-body">The Government Digital Service is committed to making its websites accessible, in accordance with the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018.</p>
             <h1 class="govuk-heading-l">Preparation of this accessibility statement</h1>
-            <p class="govuk-body">This statement was prepared on 26 September 2023.</p>
+            <p class="govuk-body">This statement was prepared on 27 September 2023. It was last updated on 28 February 2025.</p>
+            <p class="govuk-body">It is based on:</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>the findings and recommendations of the summer 2024 DAC audit</li>
+                <li>remediation work completed between summer and winter 2024</li>
+                <li>continuous accessibility testing and feedback</li>
+            </ul>
+
+            <p class="govuk-body">Last updated 28 February 2025</p>
         </div>
     </div>
 </div>

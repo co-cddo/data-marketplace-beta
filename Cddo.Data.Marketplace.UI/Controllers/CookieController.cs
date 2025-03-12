@@ -92,7 +92,6 @@ namespace Cddo.Data.Marketplace.UI.Controllers
                 });
             }
         }
-
         private IActionResult ReloadCallingPage()
         {
             var referrerUrl = Request.Headers.Referer.ToString();

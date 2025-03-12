@@ -34,6 +34,9 @@
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddDescriptionSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
                 <input type="hidden" name="@nameof(QuestionDescriptionRequest.Identifier)" value="@Model.Identifier" />
                 <div class="govuk-form-group">
+                    <div class="govuk-caption-l">
+                        @Model.Title
+                    </div>
                     <h1 class="govuk-label-wrapper">
                         <label class="govuk-label govuk-label--l" for="metadataDescription">
                             Description
