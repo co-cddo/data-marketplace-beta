@@ -196,8 +196,10 @@
                 @foreach (var item in new[] {
                 new { Title = "Date first made available", Action = nameof(CatalogDataDescriptionController.AddPublishedDate), Done = dataAsset.Issued != null },
                 new { Title = "Frequency of update", Action = nameof(CatalogDataDescriptionController.AddFrequency), Done = !string.IsNullOrEmpty(dataAsset.UpdateFrequencyString) },
-                new { Title = "Supply format", Action = nameof(CatalogDataDescriptionController.AddSupplyFormat), Done = dataAsset.DataAssetDistribution?.MediaType is not null }
-                })
+               // new { Title = "Supply format", Action = nameof(CatalogDataDescriptionController.AddSupplyFormat), Completed = dataAsset.DataAssetDistribution?.MediaType is not null },
+                new { Title = "Public or restricted data", Action = nameof(CatalogDataDescriptionController.AccessRights), Done = dataAsset.AccessRights is not null }
+
+                          })
                 {
                     <li class="govuk-task-list__item govuk-task-list__item--with-link">
                         <div class="govuk-task-list__name-and-hint">
@@ -211,6 +213,75 @@
                         </div>
                         <div class="govuk-task-list__status">
                             @if (item.Done)
+                            {
+                                <span>Done</span>
+                            }
+                            else
+                            {
+                                <strong class="govuk-tag govuk-tag--blue">To do</strong>
+                            }
+                        </div>
+                    </li>
+                }
+                @if (dataAsset.AccessRights == "RESTRICTED")
+                {
+                    <li class="govuk-task-list__item govuk-task-list__item--with-link">
+                        <div class="govuk-task-list__name-and-hint">
+                            <a class="govuk-link govuk-task-list__link"
+                               asp-controller="CatalogDataDescription"
+                               asp-action="@nameof(CatalogDataDescriptionController.AddRestrictedSupplyFormatSubmit)"
+                               asp-route-identifier="@dataAsset.Id"
+                               asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                                Formats
+                            </a>
+                        </div>
+                        <div class="govuk-task-list__status">
+                            @if (dataAsset.DataAssetDistribution?.Count > 0)
+                            {
+                                <span>Done</span>
+                            }
+                            else
+                            {
+                                <strong class="govuk-tag govuk-tag--blue">To do</strong>
+                            }
+                        </div>
+                    </li>
+                }
+                @if (dataAsset.AccessRights == "OPEN")
+                {
+                    <li class="govuk-task-list__item govuk-task-list__item--with-link">
+                        <div class="govuk-task-list__name-and-hint">
+                            <a class="govuk-link govuk-task-list__link"
+                               asp-controller="CatalogDataDescription"
+                               asp-action="@nameof(CatalogDataDescriptionController.Licence)"
+                               asp-route-identifier="@dataAsset.Id"
+                               asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                                Licence
+                            </a>
+                        </div>
+                        <div class="govuk-task-list__status">
+                            @if (dataAsset.License?.Title is not null)
+                            {
+                                <span>Done</span>
+                            }
+                            else
+                            {
+                                <strong class="govuk-tag govuk-tag--blue">To do</strong>
+                            }
+                        </div>
+                    </li>
+                    <li class="govuk-task-list__item govuk-task-list__item--with-link">
+                        <div class="govuk-task-list__name-and-hint">
+                            <a class="govuk-link govuk-task-list__link"
+                               asp-controller="CatalogDataDescription"
+                               asp-action="@nameof(CatalogDataDescriptionController.AddSupplyFormat)"
+                               asp-route-identifier="@dataAsset.Id"
+                               asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                                Links
+                            </a>
+                        </div>
+                        <div class="govuk-task-list__status">
+                            @if (dataAsset.DataAssetDistribution?.Count > 0)
                             {
                                 <span>Done</span>
                             }

@@ -1,0 +1,78 @@
+﻿@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums
+@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
+@using Cddo.Data.Marketplace.UI.Controllers
+
+@model QuestionDistributionRequest
+
+@{
+    ViewData["Title"] = "Supply Format";
+    var selectedMediaType = Model?.Distribution?.FirstOrDefault()?.MediaType;
+    bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
+    bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
+    bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
+
+    string saveButtonName;
+
+    if (isCheckList)
+    {
+        saveButtonName = "isCheckList";
+    }
+    else if (isCheckAnswers)
+    {
+        saveButtonName = "isCheckAnswers";
+    }
+    else
+    {
+        saveButtonName = "isCheckList";
+    }
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinksRestricted)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                <span class="govuk-caption-l">
+                    @ViewBag.DatadescriptionTitle
+                </span>
+                <input type="hidden" name="@nameof(QuestionDistributionRequest.Identifier)" value="@Model?.Identifier" />  
+                @foreach (var distribution in Model.Distribution.Where(t => t.MediaType?.FirstOrDefault() == "API"))
+                {
+
+                    <input type="hidden" name="mediaType" value="@distribution?.MediaType?.FirstOrDefault()" />
+
+                    <h1 class="govuk-heading-l">
+                        API Details (Optional)
+                    </h1>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-label--s" for="title">
+                            Title
+                        </label>
+                        <div id="link-title-hint" class="govuk-hint">
+                            If there is only one API, the title can be the same as your listing.
+                        </div>
+                        <input class="govuk-input" id="title" type="text" aria-describedby="link-title-hint" name="title" value="@distribution?.Title">
+                    </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-label--s" for="url">
+                            Documentation URL
+                        </label>
+                        <input class="govuk-input" id="url" type="text" name="accessUrl" value="@distribution?.AccessUrl">
+                    </div>
+
+                    
+                }
+                
+                <div class="govuk-button-group">
+                    <button type="submit" class="govuk-button" data-module="govuk-button" data-govuk-button-init="">
+                        Continue
+                    </button>
+                    <button type="submit" name="@saveButtonName" value="true" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        Save and return
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

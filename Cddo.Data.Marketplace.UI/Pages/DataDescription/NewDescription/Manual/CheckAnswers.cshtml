@@ -439,31 +439,35 @@
                             </dd>
                         </div>
 
-                        @* Supply Format *@
-                        <div id="@($"{nameof(DataSet.Distribution)}")" class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                                Supply format
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                @foreach (var errorMessage in GetErrorMessages(nameof(DataSet.Distribution)))
-                                {
-                                    <p class="govuk-error-message">@errorMessage</p>
-                                }
+                    @* Supply Format *@
+                    <div id="@($"{nameof(DataSet.Distribution)}")" class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Supply format
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @foreach (var errorMessage in GetErrorMessages(nameof(DataSet.Distribution)))
+                            {
+                                <p class="govuk-error-message">@errorMessage</p>
+                            }
+                            @foreach (var distribution in cddoDataAsset.DataAssetDistribution)
+                            {
                                 <ul class="govuk-list">
-                                    @if (!string.IsNullOrEmpty(cddoDataAsset.DataAssetDistribution?.MediaType))
+                                    @if (!string.IsNullOrEmpty(distribution?.MediaType))
                                     {
-                                        @cddoDataAsset.DataAssetDistribution.MediaType
+                                        @distribution.MediaType
                                     }
                                 </ul>
-                            </dd>
-                            <dd class="govuk-summary-list__actions">
-                                <a class="govuk-link" asp-controller="CatalogDataDescription" asp-route-identifier="@cddoDataAsset.Id"
-                                   asp-action="@(nameof(CatalogDataDescriptionController.AddSupplyFormat))" asp-route-isCheckAnswers="true">
-                                    Change
-                                    <span class="govuk-visually-hidden">Data set - Delivery mechanism</span>
-                                </a>
-                            </dd>
-                        </div>
+                            }
+                            
+                        </dd>
+                        <dd class="govuk-summary-list__actions">
+                            <a class="govuk-link" asp-controller="CatalogDataDescription" asp-route-identifier="@cddoDataAsset.Id"
+                               asp-action="@(nameof(CatalogDataDescriptionController.AddSupplyFormat))" asp-route-isCheckAnswers="true">
+                                Change
+                                <span class="govuk-visually-hidden">Data set - Delivery mechanism</span>
+                            </a>
+                        </dd>
+                    </div>
 
                         @* Date Modified *@
                         <div id="@nameof(CataloguedResource.Modified)" class="govuk-summary-list__row">

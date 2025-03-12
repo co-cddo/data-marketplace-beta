@@ -1,11 +1,13 @@
 ﻿@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums
 @using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
 @using Cddo.Data.Marketplace.UI.Controllers
+@using Newtonsoft.Json
 
 @model QuestionDistributionRequest
 
 @{
     ViewData["Title"] = "Supply Format";
+    ViewData["identifier"] = Model?.Identifier;
     var selectedMediaType = Model?.Distribution?.FirstOrDefault()?.MediaType;
     bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
     bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
@@ -34,21 +36,42 @@
         <div class="govuk-grid-column-two-thirds">
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddSupplyFormatSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
                 <input type="hidden" name="@nameof(QuestionDistributionRequest.Identifier)" value="@Model?.Identifier" />
+                <input type="hidden" name="@nameof(QuestionDistributionRequest.Distribution)" value="@JsonConvert.SerializeObject(Model?.Distribution)" />
 
                 <div class="govuk-form-group">
                     <fieldset class="govuk-fieldset" aria-describedby="mediaType-hint">
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                            <div class="govuk-caption-l">
-                                @Model.Title
-                            </div>
+                            <span class="govuk-caption-l">
+                                @ViewBag.DatadescriptionTitle
+                            </span>
                             <h1 class="govuk-fieldset__heading">
-                                How is the data set made available? (optional)
+                                How can users access the data?
                             </h1>
                         </legend>
                         <div id="mediaType-hint" class="govuk-hint">
-                            Select one option.
+                            You’ll be able to add more access methods if needed.
                         </div>
                         <div class="govuk-radios" data-module="govuk-radios">
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="filedownload" name="MediaType" type="radio" value="File download" >
+                                <label class="govuk-label govuk-radios__label" for="filedownload">
+                                        File download
+                                    </label>
+                                </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="api" name="MediaType" type="radio" value="API">
+                                <label class="govuk-label govuk-radios__label" for="api">
+                                    API
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="webPage" name="MediaType" type="radio" value="Webpage">
+                                <label class="govuk-label govuk-radios__label" for="webPage">
+                                    Webpage
+                                </label>
+                            </div>
+                        </div>
+                        @* <div class="govuk-radios" data-module="govuk-radios">
                             @foreach (var mediaType in Enum.GetValues(typeof(MediaType)).Cast<MediaType>())
                             {
                                 <div class="govuk-radios__item">
@@ -65,7 +88,7 @@
                                     </label>
                                 </div>
                             }
-                        </div>
+                        </div> *@
                     </fieldset>
                 </div>
                 <div class="govuk-button-group">
@@ -80,6 +103,11 @@
                     </button>
                 </div>
             </form>
+            @if(Model.Distribution.Count() > 0)
+            {
+                @await Html.PartialAsync("_AccessLinksPartial", Model.Distribution, ViewData)
+
+            }
         </div>
     </div>
 </div>

@@ -1,0 +1,110 @@
+﻿@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Newtonsoft.Json
+@model QuestionDistributionRequest
+@{
+    var selectedMediaType = Model?.Distribution?.Select(x => x?.MediaType?.FirstOrDefault()).ToList();
+    bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
+    bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
+    bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
+
+    string saveButtonName;
+
+    if (isCheckList)
+    {
+        saveButtonName = "isCheckList";
+    }
+    else if (isCheckAnswers)
+    {
+        saveButtonName = "isCheckAnswers";
+    }
+    else
+    {
+        saveButtonName = "isCheckList";
+    }
+}
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddRestrictedSupplyFormatSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                @Html.AntiForgeryToken()
+                @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
+
+                @{
+                    var hasError = ViewData.ModelState["confirmDataDescription"]?.Errors.Any() == true;
+                }
+
+                <input type="hidden" name="@nameof(QuestionDistributionRequest.Identifier)" value="@Model?.Identifier" />
+                <input type="hidden" name="@nameof(QuestionDistributionRequest.Distribution)" value="@JsonConvert.SerializeObject(Model?.Distribution)" />
+
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset" aria-describedby="mediaType-hint">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                            <span class="govuk-caption-l">
+                                @ViewBag.DatadescriptionTitle
+                            </span>
+                            <h1 class="govuk-fieldset__heading">
+                                How could users access the data?
+                            </h1>
+                        </legend>
+                        <div id="mediaType-hint" class="govuk-hint">
+                            Select all that apply.
+                        </div>
+                        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input @(hasError ? "govuk-input--error" : "")"
+                                       id="fileDownLoad"
+                                       name="supplyFormat"
+                                       type="checkbox"
+                                       value="File download"
+                                       @(selectedMediaType.Contains("File download") ? "checked" : "")
+                                       aria-describedby="confirm-data-error">
+                                <label class="govuk-label govuk-checkboxes__label" for="fileDownLoad">
+                                    File download
+                                </label>
+                            </div>
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input @(hasError ? "govuk-input--error" : "")"
+                                       id="api"
+                                       name="supplyFormat"
+                                       type="checkbox"
+                                       value="API"
+                                @(selectedMediaType.Contains("API") ? "checked" : "")
+                                       aria-describedby="confirm-data-error">
+                                <label class="govuk-label govuk-checkboxes__label" for="api">
+                                    API
+                                </label>
+                            </div>
+
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input @(hasError ? "govuk-input--error" : "")"
+                                       id="webpage"
+                                       name="supplyFormat"
+                                       type="checkbox"
+                                       value="text/html"
+                                @(selectedMediaType.Contains("text/html") ? "checked" : "")
+                                       aria-describedby="confirm-data-error">
+                                <label class="govuk-label govuk-checkboxes__label" for="webpage">
+                                    Webpage
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="govuk-button-group">
+                    @if (!isEditMode)
+                    {
+                        <button type="submit" name="showNextQuestion" value="true" class="govuk-button" data-module="govuk-button">
+                            Continue
+                        </button>
+                    }
+                    <button type="submit" name="@saveButtonName" value="true" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        Save and return
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

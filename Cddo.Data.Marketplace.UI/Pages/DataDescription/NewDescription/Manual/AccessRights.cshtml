@@ -1,0 +1,78 @@
+﻿@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Model.Enum
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model QuestionAccessRightsRequest
+@{
+
+    bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
+    bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
+    bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
+    string saveButtonName;
+    if (isCheckList)
+    {
+        saveButtonName = "isCheckList";
+    }
+    else if (isCheckAnswers)
+    {
+        saveButtonName = "isCheckAnswers";
+    }
+    else
+    {
+        saveButtonName = "isCheckList";
+    }
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AccessRights)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                <input type="hidden" name="@nameof(QuestionAccessRightsRequest.Identifier)" value="@Model.Identifier" />
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset" aria-describedby="metadataAccessRights-hint">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                            <span class="govuk-caption-l">
+                                @ViewBag.DataDescriptionTitle
+                            </span>
+                            <h1 class="govuk-fieldset__heading">
+                                Is the data publicly available?
+                            </h1>
+                        </legend>
+                        <div id="metadataAccessRights-hint" class="govuk-hint">
+                            Select one option.
+                        </div>
+                        <div class="govuk-radios" data-module="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="accessRightsOpen" name="accessRightsSelection" type="radio" value="true"
+                                       data-aria-controls="conditional-accessRightsOpen"
+                                       @(Model.AccessRights == "OPEN" ? "checked" : "")>
+                                <label class="govuk-label govuk-radios__label" for="accessRightsOpen">
+                                    Yes – anyone can access it
+                                </label>
+                            </div>
+                            
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="accessRightsRestricted" name="accessRightsSelection" type="radio" value="false"
+                                       data-aria-controls="conditional-accessRightsRestricted"
+                                       @(Model.AccessRights == "RESTRICTED" ? "checked" : "")>
+                                <label class="govuk-label govuk-radios__label" for="accessRightsRestricted">
+                                    No – it requires a data share agreement
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="govuk-button-group">
+                   
+                        <button type="submit" name="showNextQuestion" value="true" class="govuk-button" data-module="govuk-button">
+                            Continue
+                        </button>
+                    <button type="submit" name="@saveButtonName" value="true" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        Save and return
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

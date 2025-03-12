@@ -144,38 +144,22 @@
                     </li>
                 </ul>
             </div>
-
-            <div class="govuk-grid-column-one-half govuk-!-margin-bottom-6">
-                <h2 class="govuk-heading-m">List your data</h2>
-                <p class="govuk-body">View or add listings of your organisation’s data.</p>
-                <ul class="govuk-list">
-                    <li>
-                        <p govuk-body>
-                            <a asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.DataDescriptionDashboard)" class="govuk-link govuk-!-font-weight-bold">Manage your listings</a>
-                        </p>
-                    </li>
-                </ul>
-            </div>
         }
-        else
-        {
-            <div class="govuk-grid-column-one-half govuk-!-margin-bottom-6">
-                <h2 class="govuk-heading-m">Find government data</h2>
-                <p class="govuk-body">This includes open data and data that is not publicly available. For example, <a class="govuk-link" href="https://www.gov.uk/government/publications/essential-shared-data-assets-and-data-ownership-in-government">Essential Shared Data Assets</a>.</p>
-            </div>
-            <div class="govuk-grid-column-one-half govuk-!-margin-bottom-6">
-                <h2 class="govuk-heading-m">Request data from other organisations</h2>
-                <p class="govuk-body">The Data Marketplace guides you through the data request process. Answer a short, standardised  <a class="govuk-link" href="/support/data-share-request-questions">set of questions</a> to submit your request.</p>
-            </div>
-            <div class="govuk-grid-column-one-half govuk-!-margin-bottom-6">
-                <h2 class="govuk-heading-m">Publish your data</h2>
-                <p class="govuk-body">List your data in the Data Marketplace catalogue so other users can find and request it. You can complete a web form, or  <a class="govuk-link" href="/support/support-api">automate your listings with our API</a>.</p>
-            </div>
-
-            <div class="govuk-grid-column-one-half govuk-!-margin-bottom-6">
-                <h2 class="govuk-heading-m">Manage data requests</h2>
-                <p class="govuk-body">Review and approve requests for your data from other organisations. You can  <a class="govuk-link" href="/support/roles">assign roles</a> in your organisation so people only have the permissions they need.</p>
-            </div>
-        }
+        <div class="govuk-grid-column-one-half govuk-!-margin-bottom-6">
+            <h2 class="govuk-heading-m">List your data</h2>
+            <p class="govuk-body">View or add listings of your organisation’s data.</p>
+            <ul class="govuk-list">
+                <li>
+                    <p govuk-body>
+                        <a asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.DataDescriptionDashboard)" class="govuk-link govuk-!-font-weight-bold">List your data</a>
+                    </p>
+                </li>
+             @*    <li>
+                    <p govuk-body>
+                        <a asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddNewDataDescription)" class="govuk-link  govuk-!-font-weight-bold">Add data description</a>
+                    </p>
+                </li> *@
+            </ul>
+        </div>        
     </div>
 </div>

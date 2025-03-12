@@ -17,6 +17,11 @@ using Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums;
 using System.Text.RegularExpressions;
 using Microsoft.IdentityModel.Tokens;
 using Agm.Catalog.DotNet.Core.Validation.EmailAddress;
+using Cddo.Data.Marketplace.Api.Dto.Responses.Catalog;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using System.Linq;
+using System.Data;
 
 namespace Cddo.Data.Marketplace.UI.Controllers;
 
@@ -233,6 +238,7 @@ public class CatalogDataDescriptionController(
                 var response = await _catalogQuestionsService.UpdateTitleAsync(questionTitleRequest, DataAssetType.DataSet);
 
                 dataAssetId = response?.DataAssetId;
+
             }
             catch (UnauthorizedAccessException)
             {
@@ -270,13 +276,14 @@ public class CatalogDataDescriptionController(
             if (dataAsset is not null)
             {
                 questionDescriptionRequest.Description = dataAsset.CddoDataAsset.Description!;
-                questionDescriptionRequest.Title = dataAsset.CddoDataAsset.Title;
+                ViewBag.DataAssetTitle = dataAsset.CddoDataAsset.Title;
             }
         }
 
         ViewBag.isCheckList = isCheckList;
         ViewBag.isCheckAnswers = isCheckAnswers;
         ViewBag.isEditMode = isEditMode;
+        
         return await SecureActionAsync(DescriptionViewPath, questionDescriptionRequest);
     }
 
@@ -973,6 +980,7 @@ public class CatalogDataDescriptionController(
         {
             questionUpdateFrequencyRequest.Identifier = identifier;
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+
             if (dataAsset is not null)
             {
                 questionUpdateFrequencyRequest.Title = dataAsset.CddoDataAsset.Title;
@@ -1031,6 +1039,94 @@ public class CatalogDataDescriptionController(
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/UpdateFrequency.cshtml", questionUpdateFrequencyRequest);
     }
 
+    [Route("access-rights")]
+    public async Task<IActionResult> AccessRights(QuestionAccessRightsRequest accessRightsRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
+    {
+
+        if (!string.IsNullOrEmpty(identifier))
+        {
+            accessRightsRequest.Identifier = identifier;
+            var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+            ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
+            if (dataAsset is not null)
+            {
+                accessRightsRequest.AccessRights = dataAsset.CddoDataAsset.AccessRights;
+                ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
+
+            }
+        }
+        ViewBag.isCheckList = isCheckList;
+        ViewBag.isCheckAnswers = isCheckAnswers;
+        ViewBag.isEditMode = isEditMode;
+        return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/AccessRights.cshtml", accessRightsRequest);
+    }
+
+    [HttpPost("access-rights")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AccessRights(QuestionAccessRightsRequest accessRightsRequest, bool? accessRightsSelection, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    {
+        if (accessRightsSelection != null)
+        {
+            accessRightsRequest.AccessRights = accessRightsSelection.Value ? "OPEN" : "RESTRICTED";
+        }
+       
+        var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(accessRightsRequest.Identifier));
+
+        
+
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+
+            if (validationErrors.Count() > 0)
+            {
+                _insightsLogger.LogEvent(EventTypes.MetadataEvent.MetadataEdited, new Dictionary<string, string>
+                {
+                    { LogValidationErrors, string.Join(", ", validationErrors) },
+                    { "AccessRights", accessRightsRequest.AccessRights }
+                });
+            }
+        }
+
+        PatchProfiledDataAssetResponse? response;
+
+        try
+        {
+            if (dataAsset?.CddoDataAsset.AccessRights != accessRightsRequest.AccessRights)
+            {
+                var questionDistributionRequest = new QuestionDistributionRequest()
+                {
+                    Identifier = accessRightsRequest.Identifier,
+                    Distribution = new List<Distribution>()
+                };
+                var responseUpdate = await _catalogQuestionsService.UpdateDistributionAsync(questionDistributionRequest, DataAssetType.DataSet);
+            }
+            response = await _catalogQuestionsService.UpdateAccessRightsAsync(accessRightsRequest, DataAssetType.DataSet);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return RedirectToPage(AccessDeniedPage);
+        }
+
+        if (response is not null)
+        {
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddFrequency, "Access-Rights", $"Updated the access rights of data set {response.DataAssetId}");
+            if(accessRightsSelection != null && accessRightsSelection.Value)
+            {
+                return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(Licence), isEditMode)
+                   ?? RedirectToAction(nameof(Licence), new { identifier = response.DataAssetId.ToString() });
+            }else if(showNextQuestion != null && ParseBoolean(showNextQuestion) && accessRightsSelection == null)
+            {
+                return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/AccessRights.cshtml", accessRightsRequest);
+            }
+
+            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddRestrictedSupplyFormatSubmit), isEditMode)
+                   ?? RedirectToAction(nameof(AddRestrictedSupplyFormatSubmit), new { identifier = response.DataAssetId.ToString() });
+        }
+
+        return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/AccessRights.cshtml", accessRightsRequest);
+    }
+
     [Route("Add-Supply-Format")]
     public async Task<IActionResult> AddSupplyFormat(QuestionDistributionRequest questionKeywordRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
     {
@@ -1048,15 +1144,19 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset is not null)
             {
-                questionKeywordRequest.Title = dataAsset.CddoDataAsset.Title;
-                questionKeywordRequest.Distribution =
-                [
-                    new Distribution
+                ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
+                foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
+                {
+                    questionKeywordRequest.Distribution?.Add(new Distribution
                     {
-                        MediaType = [dataAsset.CddoDataAsset.DataAssetDistribution?.MediaType!],
-
-                    }
-                ];
+                        MediaType = [distribution?.MediaType!],
+                        DownloadUrl = distribution?.DownloadUrl,
+                        Title = distribution?.Title,
+                        Format = distribution?.Format,
+                        AccessUrl = distribution?.AccessUrl,
+                        Id = distribution?.Id
+                    });
+                }
             }
         }
 
@@ -1068,8 +1168,90 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Supply-Format")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddSupplyFormatSubmit(QuestionDistributionRequest questionDistributionRequest, string isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode)
+    public async Task<IActionResult> AddSupplyFormatSubmit(QuestionDistributionRequest questionDistributionRequest, string? mediaType, string? distribution, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
+        
+        if(distribution != null)
+        {
+            var distributionList = JsonConvert.DeserializeObject<List<Distribution>>(distribution);
+            questionDistributionRequest.Distribution = distributionList;
+        }
+        var distributionId = SetDistributionId(questionDistributionRequest.Distribution);
+       
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+
+            string summary = $"Validation failed for Add-Supply-Format. Errors: {string.Join(", ", validationErrors)}";
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", summary);
+        }
+
+        PatchProfiledDataAssetResponse? response;
+
+        try
+        {
+            response = await _catalogQuestionsService.UpdateDistributionAsync(questionDistributionRequest, DataAssetType.DataSet);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return RedirectToPage(AccessDeniedPage);
+        }
+        if (mediaType != null)
+        {
+            return RedirectToAction(nameof(AddDistributionLinks), new { identifier = response.DataAssetId.ToString(), mediaType = mediaType, distributionId });
+        }
+
+        if (response is not null)
+        {
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", $"Updated the update supply format of data set {response.DataAssetId}");
+
+            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddDistributionLinks), isEditMode)
+                   ?? RedirectToAction(nameof(AddDistributionLinks), new { identifier = response.DataAssetId.ToString() });
+        }
+
+        return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/SupplyFormat.cshtml", questionDistributionRequest);
+    }
+
+    [HttpPost("access-method-restricted")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddRestrictedSupplyFormatSubmit(QuestionDistributionRequest questionDistributionRequest, List<string>? supplyFormat, string? distribution, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    {
+
+        if (distribution != null)
+        {
+            var distributionList = JsonConvert.DeserializeObject<List<Distribution>>(distribution);
+            questionDistributionRequest.Distribution = distributionList;
+        }
+        if (supplyFormat != null && !questionDistributionRequest.Distribution.Any())
+        {
+            questionDistributionRequest.Distribution = new List<Distribution>();
+            foreach (var mediaType in supplyFormat)
+            {
+                questionDistributionRequest.Distribution.Add(new Distribution() {Id = SetDistributionId(questionDistributionRequest.Distribution), MediaType = new List<string>() { mediaType } });
+            }
+
+        }
+        else if(supplyFormat != null)
+        {
+           
+            var currentMediaTypes = questionDistributionRequest?.Distribution?.Select(x => x?.MediaType?.FirstOrDefault()).ToList();
+
+            var unCommonElements = supplyFormat?.Where(item => !currentMediaTypes.Contains(item)).ToList();
+            foreach (var item in unCommonElements)
+            {
+                questionDistributionRequest?.Distribution?.Add(new Distribution() { Id= SetDistributionId(questionDistributionRequest?.Distribution), MediaType = new List<string>() { item } });
+            }
+
+            if(supplyFormat?.Count() != questionDistributionRequest?.Distribution?.Count())
+            {
+                questionDistributionRequest?.Distribution?.RemoveAll(item => !supplyFormat.Contains(item?.MediaType?.FirstOrDefault()));
+            }
+           
+        }
+        //else if (mediaType != null)
+        //{
+        //    questionDistributionRequest.Distribution.FirstOrDefault().MediaType = new List<string>() { mediaType };
+        //}
         if (!ModelState.IsValid)
         {
             var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
@@ -1093,11 +1275,59 @@ public class CatalogDataDescriptionController(
         {
             await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", $"Updated the update supply format of data set {response.DataAssetId}");
 
-            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(CheckAnswers), isEditMode)
-                   ?? RedirectToAction(nameof(CheckAnswers), new { identifier = response.DataAssetId.ToString() });
+            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddFormatsSubmit), isEditMode)
+                   ?? RedirectToAction(nameof(AddFormatsSubmit), new { identifier = response.DataAssetId.ToString() });
         }
 
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/SupplyFormat.cshtml", questionDistributionRequest);
+    }
+
+    private int? SetDistributionId(List<Distribution>? distributions)
+    {
+        if(distributions == null || !distributions.Any()) {return 1;}
+
+        return distributions.Max(d=>d.Id) + 1;
+    }
+
+    [Route("access-method-restricted")]
+    public async Task<IActionResult> AddRestrictedSupplyFormatSubmit(QuestionDistributionRequest questionKeywordRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
+    {
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+
+            string summary = $"Validation failed for Add-Supply-Format. Errors: {string.Join(", ", validationErrors)}";
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", summary);
+        }
+
+        if (!string.IsNullOrEmpty(identifier))
+        {
+            questionKeywordRequest.Identifier = identifier;
+            var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+            if (dataAsset is not null)
+            {
+                ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
+
+                foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
+                {
+                    questionKeywordRequest.Distribution.Add(new Distribution
+                    {
+                        MediaType = [distribution?.MediaType!],
+                        DownloadUrl = distribution?.DownloadUrl,
+                        Title = distribution?.Title,
+                        Format = distribution?.Format,
+                        AccessUrl = distribution?.AccessUrl,
+                        Id = distribution?.Id,
+
+                    });
+                }
+            }
+        }
+
+        ViewBag.isCheckList = isCheckList;
+        ViewBag.isCheckAnswers = isCheckAnswers;
+        ViewBag.isEditMode = isEditMode;
+        return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/AccessRightsRestricted.cshtml", questionKeywordRequest);
     }
 
     [Route("Task-List")]
@@ -1170,6 +1400,443 @@ public class CatalogDataDescriptionController(
         };
 
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/CheckAnswers.cshtml", model);
+    }
+
+    [Route("licence")]
+    public async Task<IActionResult> Licence(QuestionLicenceRequest licenceRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    {
+        if (!string.IsNullOrEmpty(identifier))
+        {
+            licenceRequest.Identifier = identifier;
+            var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+
+            if (dataAsset is not null)
+            {
+                ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
+                licenceRequest.License = new License() {Title = dataAsset.CddoDataAsset?.License?.Title, LicenseUrl = dataAsset.CddoDataAsset?.License?.LicenseUrl };
+            }
+        }
+
+        ViewBag.isCheckList = isCheckList;
+        ViewBag.isCheckAnswers = isCheckAnswers;
+        ViewBag.isEditMode = isEditMode;
+        return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/Licence.cshtml", licenceRequest);
+
+    }
+
+    [HttpPost("licence")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Licence(QuestionLicenceRequest questionLicenceRequest, string? license, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    {
+        //if (accessRightsSelection != null)
+        //{
+        //    questionLicenceRequest.Licence = accessRightsSelection.Value ? "OPEN" : "RESTRICTED";
+        //}
+        if(!string.IsNullOrEmpty(license) && license != "Other")
+        {
+            questionLicenceRequest.License.Title = license;
+
+        }
+        if(license == "Open Government Licence")
+        {
+            questionLicenceRequest.License.LicenseUrl = "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/";
+        }
+
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+
+            if (validationErrors.Count() > 0)
+            {
+                _insightsLogger.LogEvent(EventTypes.MetadataEvent.MetadataEdited, new Dictionary<string, string>
+                {
+                    { LogValidationErrors, string.Join(", ", validationErrors) },
+                    { "Licence", questionLicenceRequest.License.Title }
+                });
+            }
+        }
+
+        PatchProfiledDataAssetResponse? response = new PatchProfiledDataAssetResponse();
+
+        try
+        {
+            response = await _catalogQuestionsService.UpdateLicenceAsync(questionLicenceRequest, DataAssetType.DataSet);
+            //TODO: Stub the licence update
+
+            response.DataAssetId = new Guid(questionLicenceRequest.Identifier);
+
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return RedirectToPage(AccessDeniedPage);
+        }
+
+        if (response is not null)
+        {
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddFrequency, "licence", $"Updated the licence of data set {response.DataAssetId}");
+
+            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddSupplyFormat), isEditMode)
+                   ?? RedirectToAction(nameof(AddSupplyFormat), new { identifier = response.DataAssetId.ToString() });
+        }
+
+        return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/Licence.cshtml", questionLicenceRequest);
+    }
+
+    [Route("distribution-links")]
+    public async Task<IActionResult> AddDistributionLinks(QuestionDistributionRequest questionKeywordRequest, string? identifier, string? mediaType, int? distributionId, string? isCheckList, string? isCheckAnswers, string? isEditMode)
+    {
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+
+            string summary = $"Validation failed for Add-Supply-Format. Errors: {string.Join(", ", validationErrors)}";
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", summary);
+        }
+
+        if (!string.IsNullOrEmpty(identifier))
+        {
+            questionKeywordRequest.Identifier = identifier;
+            var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+            if (dataAsset is not null)
+            {
+                ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
+                foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
+                {
+                    questionKeywordRequest.Distribution?.Add(new Distribution
+                    {
+                        MediaType = [distribution?.MediaType!],
+                        DownloadUrl = distribution?.DownloadUrl,
+                        Title = distribution?.Title,
+                        Format = distribution?.Format,
+                        AccessUrl = distribution?.AccessUrl,
+                        Id = distribution?.Id,
+
+                    });
+                }
+            }
+        }
+
+        ViewBag.isCheckList = isCheckList;
+        ViewBag.isCheckAnswers = isCheckAnswers;
+        ViewBag.isEditMode = isEditMode;
+        ViewBag.distributions = questionKeywordRequest.Distribution;
+        bool result;
+        bool.TryParse(isEditMode, out result);
+        if (result)
+        {
+            questionKeywordRequest.Distribution = [questionKeywordRequest?.Distribution?.FirstOrDefault(x => x.Id == distributionId)];
+        }
+        else
+        {
+            questionKeywordRequest.Distribution = new List<Distribution>() { new Distribution() { Id = distributionId, MediaType = new List<string>() { mediaType } } };
+        }
+       
+        return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/DistributionLink.cshtml", questionKeywordRequest);
+    }
+
+    [HttpPost("distribution-links")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddDistributionLinks(QuestionDistributionRequest questionDistributionRequest, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    {
+       
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+
+            string summary = $"Validation failed for Add-Distribution-Link. Errors: {string.Join(", ", validationErrors)}";
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Distribution-Link", summary);
+        }
+        var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(questionDistributionRequest.Identifier));
+        bool result;
+        bool.TryParse(isEditMode, out result);
+        if (questionDistributionRequest.Distribution != null && !result)
+        {
+            foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution)
+            {
+                questionDistributionRequest.Distribution.Add(new Distribution()
+                {
+                    MediaType = new List<string>() { distribution.MediaType },
+                    AccessUrl = distribution.AccessUrl,
+                    DownloadUrl = distribution.DownloadUrl,
+                    Format = distribution.Format,
+                    Title = distribution.Title,
+                    Id = distribution.Id
+                });
+            }
+        }
+        else if(dataAsset?.CddoDataAsset?.DataAssetDistribution != null)
+        {
+            foreach (var distribution in dataAsset?.CddoDataAsset?.DataAssetDistribution.Where(x=>x.Id != questionDistributionRequest?.Distribution?.FirstOrDefault().Id))
+            {
+                questionDistributionRequest?.Distribution?.Add(new Distribution()
+                {
+                    MediaType = new List<string>() { distribution.MediaType },
+                    AccessUrl = distribution.AccessUrl,
+                    DownloadUrl = distribution.DownloadUrl,
+                    Format = distribution.Format,
+                    Title = distribution.Title,
+                    Id = distribution.Id
+                });
+            }
+        }
+
+        PatchProfiledDataAssetResponse? response;
+
+        try
+        {
+            response = await _catalogQuestionsService.UpdateDistributionAsync(questionDistributionRequest, DataAssetType.DataSet);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return RedirectToPage(AccessDeniedPage);
+        }
+
+        if (response is not null)
+        {
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", $"Updated the update supply format of data set {response.DataAssetId}");
+
+            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddAccessLinksSubmit), isEditMode)
+                   ?? RedirectToAction(nameof(AddAccessLinksSubmit), new { identifier = response.DataAssetId.ToString() });
+        }
+
+        return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/AccessLinks.cshtml", questionDistributionRequest);
+    }
+    [Route("distribution-links-restricted")]
+    public async Task<IActionResult> AddDistributionLinksRestricted(QuestionDistributionRequest questionKeywordRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
+    {
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+
+            string summary = $"Validation failed for Add-Supply-Format. Errors: {string.Join(", ", validationErrors)}";
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", summary);
+        }
+
+        if (!string.IsNullOrEmpty(identifier))
+        {
+            questionKeywordRequest.Identifier = identifier;
+            var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+            if (dataAsset is not null)
+            {
+                ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
+                foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
+                {
+                    questionKeywordRequest.Distribution?.Add(new Distribution
+                    {
+                        MediaType = [distribution?.MediaType!],
+                        DownloadUrl = distribution?.DownloadUrl,
+                        Title = distribution?.Title,
+                        Format = distribution?.Format,
+                        AccessUrl = distribution?.AccessUrl,
+                        Id = distribution?.Id,
+
+                    });
+                }
+            }
+        }
+
+        ViewBag.isCheckList = isCheckList;
+        ViewBag.isCheckAnswers = isCheckAnswers;
+        ViewBag.isEditMode = isEditMode;
+        if(questionKeywordRequest.Distribution.Where(t => t.MediaType?.FirstOrDefault() == "API").Any())
+        {
+            return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/DistributionApiRestricted.cshtml", questionKeywordRequest);
+        }
+
+        return RedirectToAction(nameof(CheckAnswers), new { identifier = identifier });
+    }
+
+    [HttpPost("distribution-links-restricted")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddDistributionLinksRestricted(QuestionDistributionRequest questionDistributionRequest, string? title, string? accessUrl, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    {
+       if(questionDistributionRequest.Identifier == null)
+        {
+            return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/DistributionApiRestricted.cshtml", questionDistributionRequest);
+        }
+
+        var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(questionDistributionRequest.Identifier));
+        if (dataAsset != null)
+        {
+            foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
+            {
+                questionDistributionRequest.Distribution?.Add(new Distribution
+                {
+                    MediaType = [distribution?.MediaType!],
+                    DownloadUrl = distribution?.DownloadUrl,
+                    Title = distribution?.Title,
+                    Format = distribution?.Format,
+                    AccessUrl = distribution?.AccessUrl,
+                    Id = SetDistributionId(questionDistributionRequest.Distribution)
+
+                });
+            }
+
+            var updateDistribution = questionDistributionRequest?.Distribution?.Where(t => t.MediaType.FirstOrDefault() == "API").FirstOrDefault();
+
+            if (updateDistribution != null && questionDistributionRequest?.Distribution != null)
+            {
+                var index = questionDistributionRequest?.Distribution?.IndexOf(updateDistribution);
+                if (index != null && index >= 0)
+                {
+                    updateDistribution.Title = title;
+                    updateDistribution.AccessUrl = accessUrl;
+                    questionDistributionRequest.Distribution[(int)index] = updateDistribution;
+                }
+            }
+
+            PatchProfiledDataAssetResponse? response;
+            try
+            {
+                response = await _catalogQuestionsService.UpdateDistributionAsync(questionDistributionRequest, DataAssetType.DataSet);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return RedirectToPage(AccessDeniedPage);
+            }
+
+            if (response is not null)
+            {
+                await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", $"Updated the update supply format of data set {response.DataAssetId}");
+
+                return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, questionDistributionRequest.Identifier, nameof(CheckAnswers), isEditMode)
+            ?? RedirectToAction(nameof(CheckAnswers), new { identifier = questionDistributionRequest.Identifier });
+            }
+        }
+        return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/DistributionApiRestricted.cshtml", questionDistributionRequest);
+    }
+    [Route("accesslinks")]
+    public async Task<IActionResult> AddAccessLinksSubmit(QuestionDistributionRequest questionFormatsRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
+    {
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+
+            string summary = $"Validation failed for Add-Supply-Format. Errors: {string.Join(", ", validationErrors)}";
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", summary);
+        }
+
+        if (!string.IsNullOrEmpty(identifier))
+        {
+            questionFormatsRequest.Identifier = identifier;
+            var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+            ViewBag.DataDescriptionTitle = dataAsset?.CddoDataAsset.Title;
+            if (dataAsset is not null)
+            {
+                foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
+                {
+                    questionFormatsRequest.Distribution?.Add(new Distribution
+                    {
+                        MediaType = [distribution?.MediaType!],
+                        DownloadUrl = distribution?.DownloadUrl,
+                        Title = distribution?.Title,
+                        Format = distribution?.Format,
+                        AccessUrl = distribution?.AccessUrl,
+                        Id = distribution?.Id
+                    });
+                }
+            }
+        }
+
+        ViewBag.isCheckList = isCheckList;
+        ViewBag.isCheckAnswers = isCheckAnswers;
+        ViewBag.isEditMode = isEditMode;
+        return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/AccessLinks.cshtml", questionFormatsRequest);
+
+    }
+    [HttpPost("accesslinks")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddAccessLinksSubmit(QuestionDistributionRequest questionFormatsRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    {
+        return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, questionFormatsRequest.Identifier, nameof(CheckAnswers), isEditMode)
+               ?? RedirectToAction(nameof(CheckAnswers), new { identifier = questionFormatsRequest.Identifier });
+
+    }
+    [Route("formats")]
+    public async Task<IActionResult> AddFormatsSubmit(QuestionDistributionRequest questionFormatsRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? showNextQuestion,  string? isEditMode)
+    {
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+
+            string summary = $"Validation failed for Add-Supply-Format. Errors: {string.Join(", ", validationErrors)}";
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", summary);
+        }
+
+        if (!string.IsNullOrEmpty(identifier))
+        {
+            questionFormatsRequest.Identifier = identifier;
+            var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+            if (dataAsset is not null)
+            {
+                ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
+                foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
+                {
+                    questionFormatsRequest.Distribution?.Add(new Distribution
+                    {
+                        MediaType = [distribution?.MediaType!],
+                        DownloadUrl = distribution?.DownloadUrl,
+                        Title = distribution?.Title,
+                        Format = distribution?.Format,
+                        AccessUrl = distribution?.AccessUrl,
+                        Id = distribution?.Id
+
+                    });
+                }
+            }
+        }
+
+        ViewBag.isCheckList = isCheckList;
+        ViewBag.isCheckAnswers = isCheckAnswers;
+        ViewBag.isEditMode = isEditMode;
+        return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/Formats.cshtml", questionFormatsRequest);
+
+    }
+
+    [HttpPost("formats")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddFormatsSubmit(QuestionDistributionRequest questionFormatsRequest, string? distribution, List<string>? formats, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    {
+
+        if (distribution != null)
+        {
+            var distributionList = JsonConvert.DeserializeObject<List<Distribution>>(distribution);
+            questionFormatsRequest.Distribution = distributionList;
+        }
+
+        if(formats != null && formats.Any()) 
+        {
+            questionFormatsRequest.Distribution.Where(f=>f.MediaType.FirstOrDefault() == "File download").FirstOrDefault().Format = String.Join(",", formats);
+        }
+
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+
+            string summary = $"Validation failed for Add-Distribution-Link. Errors: {string.Join(", ", validationErrors)}";
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Distribution-Link", summary);
+        }
+
+        PatchProfiledDataAssetResponse? response;
+
+        try
+        {
+            response = await _catalogQuestionsService.UpdateDistributionAsync(questionFormatsRequest, DataAssetType.DataSet);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return RedirectToPage(AccessDeniedPage);
+        }
+
+        if (response is not null)
+        {
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", $"Updated the update supply format of data set {response.DataAssetId}");
+
+            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddDistributionLinksRestricted), isEditMode)
+                   ?? RedirectToAction(nameof(AddDistributionLinksRestricted), new { identifier = response.DataAssetId.ToString() });
+        }
+
+        return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/Formats.cshtml", questionFormatsRequest);
     }
     private static bool ParseBoolean(string input)
     {
