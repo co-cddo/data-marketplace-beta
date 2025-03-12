@@ -6,7 +6,7 @@
     bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
     bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
     bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
-
+    string dataAssertTitle = ViewBag.DataAssetTitle;
     string saveButtonName;
 
     if (isCheckList)
@@ -28,6 +28,9 @@
 <div class="govuk-main-wrapper">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-caption-l">
+                @dataAssertTitle
+            </div>
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddDescriptionSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
                 <input type="hidden" name="@nameof(QuestionDescriptionRequest.Identifier)" value="@Model.Identifier" />
                 <div class="govuk-form-group">

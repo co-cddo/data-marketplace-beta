@@ -1,0 +1,117 @@
+﻿@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
+@using Cddo.Data.Marketplace.UI.Controllers
+@using Newtonsoft.Json
+@model QuestionDistributionRequest
+@{
+
+    bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
+    bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
+    bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
+
+    string saveButtonName;
+
+    if (isCheckList)
+    {
+        saveButtonName = "isCheckList";
+    }
+    else if (isCheckAnswers)
+    {
+        saveButtonName = "isCheckAnswers";
+    }
+    else
+    {
+        saveButtonName = "isCheckList";
+    }
+}
+@section Scripts
+{
+    <script src="~/js/Pages/NewDataDescription/Formats.js" asp-add-nonce="true"></script>
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddFormatsSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                @Html.AntiForgeryToken()
+                @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
+
+                <input type="hidden" name="@nameof(QuestionDistributionRequest.Identifier)" value="@Model.Identifier" />
+
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset" aria-describedby="question-hint" id="format-addition">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                            <span class="govuk-caption-l">
+                                @ViewBag.DataDescriptionTitle
+                            </span>
+                            <h1 class="govuk-fieldset__heading">
+                                What formats is the data available in? (optional)
+                            </h1>
+                        </legend>
+                        <div id="question-hint" class="govuk-hint">
+                            For example, CSV or JSON.
+                        </div>
+
+                        @if (Model.Distribution != null)
+                        {
+                            <input type="hidden" name="@nameof(QuestionDistributionRequest.Distribution)" value="@JsonConvert.SerializeObject(Model?.Distribution)" />
+                            @foreach (var distribution in Model.Distribution.Where(t => t.MediaType?.FirstOrDefault() == "File download"))
+                            {
+                                <div class="govuk-form-group @(ViewData.ModelState[$"Formats_{distribution.Format}"]?.Errors.Any() == true ? "govuk-form-group--error" : "")">
+                                    <label class="govuk-label govuk-visually-hidden" for="Format_@distribution.Format">Format</label>
+                                   
+                                        @{
+                                            var formats = distribution?.Format?.Split(",");
+                                        }
+                                        @if (formats != null)
+                                        {
+                                            for (int index = 0; index < formats.Length; index++)
+                                            {
+                                                <div class="govuk-form-group">
+                                                <div class="govuk-input__wrapper">
+                                                <input class="govuk-input govuk-input--width-10" type="text" name="formats" aria-describedby="link-title-hint" value="@formats[index]">
+                                                </div>
+                                                @if (index >= 1)
+                                                {
+                                                    <button type="button" class="remove-input govuk-button govuk-button--secondary mb-0">Remove</button>
+                                                }
+                                            </div>
+                                            }
+                                        }else
+                                    {
+                                        <div class="govuk-form-group">
+                                            <label class="govuk-label govuk-visually-hidden" for="Format_0">Format</label>
+                                            <input class="govuk-input" id="Format_0" name="formats" type="text">
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-visually-hidden" for="Format_0">Format</label>
+                                <input class="govuk-input" id="Format_0" name="formats" type="text">
+                            </div>
+                        }
+
+                    </fieldset>
+                </div>
+                <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-4" id="add-another-format" type="button">Add another format</button><br />
+                <div class="govuk-button-group">
+                    @if (!isEditMode)
+                    {
+                        <button type="submit" name="showNextQuestion" value="true" class="govuk-button" data-module="govuk-button">
+                            Continue
+                        </button>
+                    }
+                    <button type="submit" name="@saveButtonName" value="true" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        Save and return
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

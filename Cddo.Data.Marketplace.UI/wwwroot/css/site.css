@@ -47,7 +47,7 @@ code {
 }
 
     .app-navigation__list .app-navigation__list-item {
-        padding: 10px;
+        padding: 20px 10px;
     }
 
 @media (min-width: 844px) {
@@ -58,7 +58,6 @@ code {
 
 .app-navigation__list .app-navigation__list-item a {
     font-size: 1.1875rem;
-    font-weight: 600;
 }
 
 /*landing navigation style*/
@@ -68,7 +67,7 @@ code {
 
 /*landing phase banner style*/
 .landing-phase-banner {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
     .landing-phase-banner .govuk-tag {
@@ -100,7 +99,7 @@ aside.related-items {
 }
 
 .govuk-masterhead {
-    padding-bottom: 25px;
+    padding-bottom: 40px;
     padding-top: 0;
     color: #ffffff !important;
     background-color: #1d70b8;
@@ -196,6 +195,10 @@ button.govuk-link {
     width: 30px;
 }
 
+.govuk-header {
+    border-bottom: 10px solid #1d70b8 !important;
+}
+
 .govuk-header__link {
     color: white;
 }
@@ -237,4 +240,12 @@ button.govuk-link {
     overflow-x: auto;
     max-width: 100%;
     scrollbar-width: thin;
+}
+
+.pl-0 {
+    padding-left: 0!important;
+}
+
+.pr-0 {
+    padding-right: 0 !important;
 }

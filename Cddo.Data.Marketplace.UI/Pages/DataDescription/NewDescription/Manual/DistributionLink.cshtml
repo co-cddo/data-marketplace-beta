@@ -1,0 +1,140 @@
+﻿@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums
+@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1
+@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
+@using Cddo.Data.Marketplace.UI.Controllers
+
+@model QuestionDistributionRequest
+
+@{
+    ViewData["Title"] = "Supply Format";
+    ViewData["identifier"] = Model?.Identifier;
+    var selectedMediaType = Model?.Distribution?.FirstOrDefault()?.MediaType;
+    bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
+    bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
+    bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
+
+    string saveButtonName;
+
+    if (isCheckList)
+    {
+        saveButtonName = "isCheckList";
+    }
+    else if (isCheckAnswers)
+    {
+        saveButtonName = "isCheckAnswers";
+    }
+    else
+    {
+        saveButtonName = "isCheckList";
+    }
+}
+
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
+                <span class="govuk-caption-l">
+                    @ViewBag.DataDescriptionTitle
+                </span>
+                <input type="hidden" name="@nameof(QuestionDistributionRequest.Identifier)" value="@Model?.Identifier" />  
+                @foreach (var distribution in Model.Distribution.Select((value, index) => new { value, index}))
+                {
+                    var mediaType = Model.Distribution[distribution.index].MediaType.FirstOrDefault();
+                    switch (mediaType)
+                    {
+                        case "File download":
+                            <input type="hidden" name="Distribution[@distribution.index].MediaType" value="@mediaType" />
+                            <input type="hidden" name="Distribution[@distribution.index].Id" value="@Model.Distribution[@distribution.index].Id" />
+                            <h1 class="govuk-heading-l">
+                                Add a download link
+                            </h1>
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-label--s" for="title">
+                                    Link title
+                                </label>
+                                <div id="link-title-hint" class="govuk-hint">
+                                    If there is only one link, the title can be the same as your listing.
+                                </div>
+                                <input class="govuk-input" id="title" type="text" aria-describedby="link-title-hint" asp-for="@Model.Distribution[distribution.index].Title">
+                            </div>
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-label--s" for="url">
+                                    Link URL
+                                </label>
+                                <input class="govuk-input" id="url" type="text" asp-for="@Model.Distribution[distribution.index].DownloadUrl">
+                            </div>
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-label--s" for="format">
+                                    File format
+                                </label>
+                                <input class="govuk-input govuk-input--width-10" id="link-download-format" type="text" asp-for="@Model.Distribution[distribution.index].Format">
+                            </div>
+                        break;
+
+                        case "API":
+                            <input type="hidden" name="Distribution[@distribution.index].MediaType" value="@mediaType" />
+                            <input type="hidden" name="Distribution[@distribution.index].Id" value="@Model.Distribution[@distribution.index].Id" />
+                            <h1 class="govuk-heading-l">
+                                API Details
+                            </h1>
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-label--s" for="title">
+                                    Title
+                                </label>
+                                <div id="link-title-hint" class="govuk-hint">
+                                    If there is only one API, the title can be the same as your listing.
+                                </div>
+                                <input class="govuk-input" id="title" type="text" aria-describedby="link-title-hint" asp-for="@Model.Distribution[distribution.index].Title">
+                            </div>
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-label--s" for="url">
+                                    Documentation URL
+                                </label>
+                                <input class="govuk-input" id="url" type="text" asp-for="@Model.Distribution[distribution.index].AccessUrl">
+                            </div>
+                        break;
+
+                        case "text/html":
+                            <input type="hidden" name="Distribution[@distribution.index].MediaType" value="@mediaType" />
+                            <input type="hidden" name="Distribution[@distribution.index].Id" value="@Model.Distribution[@distribution.index].Id" />
+                            <h1 class="govuk-heading-l">
+                                Add a webpage link
+                            </h1>
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-label--s" for="title">
+                                    Link title
+                                </label>
+                                <div id="link-title-hint" class="govuk-hint">
+                                    If there is only one Link, the title can be the same as your listing.
+                                </div>
+                                <input class="govuk-input" id="title" type="text" aria-describedby="link-title-hint" asp-for="@Model.Distribution[distribution.index].Title">
+                            </div>
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-label--s" for="url">
+                                    Link URL
+                                </label>
+                                <input class="govuk-input" id="url" type="text" asp-for="@Model.Distribution[distribution.index].DownloadUrl">
+                            </div>
+                        break;
+                    }
+                    
+                }
+                
+                <div class="govuk-button-group">
+                    <button type="submit" class="govuk-button" data-module="govuk-button" data-govuk-button-init="">
+                        Continue
+                    </button>
+                    <button type="submit" name="@saveButtonName" value="true" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        Save and return
+                    </button>
+                </div>
+            </form>
+            @if (ViewBag.distributions.Count > 0)
+            {
+                @await Html.PartialAsync("_AccessLinksPartial", ViewBag.distributions as List<Distribution>, ViewData)
+            }
+        </div>
+    </div>
+</div>
