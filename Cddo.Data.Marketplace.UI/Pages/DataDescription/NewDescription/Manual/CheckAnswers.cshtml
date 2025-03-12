@@ -461,11 +461,23 @@
                             
                         </dd>
                         <dd class="govuk-summary-list__actions">
-                            <a class="govuk-link" asp-controller="CatalogDataDescription" asp-route-identifier="@cddoDataAsset.Id"
-                               asp-action="@(nameof(CatalogDataDescriptionController.AddSupplyFormat))" asp-route-isCheckAnswers="true">
-                                Change
-                                <span class="govuk-visually-hidden">Data set - Delivery mechanism</span>
-                            </a>
+                            @if (cddoDataAsset.AccessRights == "RESTRICTED")
+                            {
+                                <a class="govuk-link" asp-controller="CatalogDataDescription" asp-route-identifier="@cddoDataAsset.Id"
+                                       asp-action="@(nameof(CatalogDataDescriptionController.AddRestrictedSupplyFormatSubmit))" asp-route-isCheckAnswers="true">
+                                    Change
+                                    <span class="govuk-visually-hidden">Data set - Delivery mechanism</span>
+                                </a>
+                            }
+                            else
+                            {
+                                <a class="govuk-link" asp-controller="CatalogDataDescription" asp-route-identifier="@cddoDataAsset.Id"
+                                    asp-action="@(nameof(CatalogDataDescriptionController.AddSupplyFormat))" asp-route-isCheckAnswers="true">
+                                    Change
+                                    <span class="govuk-visually-hidden">Data set - Delivery mechanism</span>
+                                </a>
+                            }
+                                
                         </dd>
                     </div>
 
