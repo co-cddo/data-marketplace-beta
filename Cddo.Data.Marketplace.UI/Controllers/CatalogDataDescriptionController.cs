@@ -1201,10 +1201,6 @@ public class CatalogDataDescriptionController(
             questionDistributionRequest.Distribution = distributionList;
         }
         var distributionId = SetDistributionId(questionDistributionRequest.Distribution);
-        if (mediaType != null && !questionDistributionRequest.Distribution.Any())
-        {
-            questionDistributionRequest.Distribution = new List<Distribution>() { new Distribution() {Id = distributionId, MediaType = new List<string>() { mediaType } } };
-        }
        
         if (!ModelState.IsValid)
         {
@@ -1310,11 +1306,11 @@ public class CatalogDataDescriptionController(
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/SupplyFormat.cshtml", questionDistributionRequest);
     }
 
-    private int? SetDistributionId(List<Distribution>? distribution)
+    private int? SetDistributionId(List<Distribution>? distributions)
     {
-        if(distribution == null || !distribution.Any()) {return 1;}
+        if(distributions == null || !distributions.Any()) {return 1;}
 
-        return distribution.Count() + 1;
+        return distributions.Max(d=>d.Id) + 1;
     }
 
     [Route("access-method-restricted")]
@@ -1545,17 +1541,17 @@ public class CatalogDataDescriptionController(
         ViewBag.isCheckAnswers = isCheckAnswers;
         ViewBag.isEditMode = isEditMode;
         ViewBag.distributions = questionKeywordRequest.Distribution;
-        if (mediaType != null)
+        bool result;
+        bool.TryParse(isEditMode, out result);
+        if (result)
         {
-            if(questionKeywordRequest?.Distribution?.FirstOrDefault(x => x.Id == distributionId) == null)
-            {
-                questionKeywordRequest.Distribution = new List<Distribution>() { new Distribution() { Id = distributionId, MediaType = new List<string>() { mediaType } } };
-            }
-            else
-            {
-                questionKeywordRequest.Distribution = [questionKeywordRequest?.Distribution?.FirstOrDefault(x => x.Id == distributionId)];
-            }
+            questionKeywordRequest.Distribution = [questionKeywordRequest?.Distribution?.FirstOrDefault(x => x.Id == distributionId)];
         }
+        else
+        {
+            questionKeywordRequest.Distribution = new List<Distribution>() { new Distribution() { Id = distributionId, MediaType = new List<string>() { mediaType } } };
+        }
+       
         return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/DistributionLink.cshtml", questionKeywordRequest);
     }
 
