@@ -1047,7 +1047,6 @@ public class CatalogDataDescriptionController(
         {
             accessRightsRequest.Identifier = identifier;
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
-            ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
             if (dataAsset is not null)
             {
                 accessRightsRequest.AccessRights = dataAsset.CddoDataAsset.AccessRights;
@@ -1648,7 +1647,7 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("distribution-links-restricted")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddDistributionLinksRestricted(QuestionDistributionRequest questionDistributionRequest, string? title, string? accessUrl, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
+    public async Task<IActionResult> AddDistributionLinksRestricted(QuestionDistributionRequest questionDistributionRequest, string? distributionTitle, string? accessUrl, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
        if(questionDistributionRequest.Identifier == null)
         {
@@ -1679,7 +1678,7 @@ public class CatalogDataDescriptionController(
                 var index = questionDistributionRequest?.Distribution?.IndexOf(updateDistribution);
                 if (index != null && index >= 0)
                 {
-                    updateDistribution.Title = title;
+                    updateDistribution.Title = distributionTitle;
                     updateDistribution.AccessUrl = accessUrl;
                     questionDistributionRequest.Distribution[(int)index] = updateDistribution;
                 }
