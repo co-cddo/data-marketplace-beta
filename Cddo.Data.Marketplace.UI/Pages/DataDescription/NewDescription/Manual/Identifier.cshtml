@@ -37,12 +37,12 @@
                     </div>
                     <h1 class="govuk-label-wrapper">
                         <label class="govuk-label govuk-label--l" for="supplierIdentifier">
-                            What internal identifier do you have for the data set?
+                            Your reference (optional)
                         </label>
                     </h1>
                     <div id="supplierIdentifier-hint" class="govuk-hint">
-                        Provide the ID number, code or URL that you use to identify this data set in your organisation’s data catalogue or system.
-                        This can help you match the metadata record in your system with the record in the Data Marketplace’s catalogue.
+                        A reference that you use to identify this listing in your organisation. This might be a number, code or URL, for example.<br />
+                        This will not be visible to users outside your organisation.
                     </div>
                     <input class="govuk-input" id="supplierIdentifier" name="@nameof(QuestionSupplierIdentifierRequest.SupplierIdentifier)"
                            type="text" aria-describedby="supplierIdentifier-hint" autocomplete="off" value="@Model.SupplierIdentifier">

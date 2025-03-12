@@ -41,7 +41,7 @@
                                 @Model.Title
                             </div>
                             <h1 class="govuk-fieldset__heading">
-                                How often is the data set updated? (optional)
+                                How often is the data updated?
                             </h1>
                         </legend>
                         <div id="metadataFrequency-hint" class="govuk-hint">
@@ -66,7 +66,7 @@
                                     <div class="govuk-radios__conditional @(isOtherSelected ? "" : "govuk-radios__conditional--hidden")" id="conditional-Other">
                                         <div class="govuk-form-group">
                                             <label class="govuk-label" for="otherUpdateFrequency">
-                                                Enter a custom time period, for example ‘weekly’ or ‘every 3 years’.
+                                                Enter a custom time period, for example ‘hourly’ or ‘every 3 years’.
                                             </label>
                                             <input class="govuk-input" id="otherUpdateFrequency" name="otherFrequency" type="text"
                                                    value="@(isOtherSelected ? Model.UpdateFrequency : "")" spellcheck="false" />

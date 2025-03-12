@@ -39,11 +39,11 @@
                 @Model.Title
             </div>
             <h1 class="govuk-heading-l">
-                Who is the point of contact for the data set?
+                Contact details
             </h1>
             <div id="contact-hint" class="govuk-hint">
-                Provide the name and email of the team or individual that will respond to requests for this data set. This might be different from the data owner.
-                You’ll be able to change this later, once your description is published.
+                Provide details of the team or individual that will respond to queries or requests for this listing.<br />
+                These details will be visible to users on the Data Marketplace.
             </div>
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddContactPointSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
                 <input type="hidden" name="identifier" value="@Model.Identifier" />

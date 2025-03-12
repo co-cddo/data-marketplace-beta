@@ -98,7 +98,7 @@
                 @foreach (var item in new[] {
                 new { Title = "Title", Action = nameof(CatalogDataDescriptionController.AddTitle), Done = !string.IsNullOrEmpty(dataAsset.Title) },
                 new { Title = "Description", Action = nameof(CatalogDataDescriptionController.AddDescription), Done = !string.IsNullOrEmpty(dataAsset.Description) },
-                new { Title = "Internal identifier", Action = nameof(CatalogDataDescriptionController.AddInternalIdentifier), Done = !string.IsNullOrEmpty(dataAsset.InternalIdentifier) }
+                new { Title = "Reference", Action = nameof(CatalogDataDescriptionController.AddInternalIdentifier), Done = !string.IsNullOrEmpty(dataAsset.InternalIdentifier) }
                 })
                 {
                     <li class="govuk-task-list__item govuk-task-list__item--with-link">
