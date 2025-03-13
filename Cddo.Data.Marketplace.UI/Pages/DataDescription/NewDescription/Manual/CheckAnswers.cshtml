@@ -465,10 +465,10 @@
                         </div>
                         @if (cddoDataAsset.AccessRights == "RESTRICTED")
                         {
-                            @* Supply Format *@
+                            @* Formats *@
                             <div id="@($"{nameof(DataSet.Distribution)}")" class="govuk-summary-list__row">
                                 <dt class="govuk-summary-list__key">
-                                    Supply format
+                                    Formats
                                 </dt>
                                 <dd class="govuk-summary-list__value">
                                     @foreach (var errorMessage in GetErrorMessages(nameof(DataSet.Distribution)))
