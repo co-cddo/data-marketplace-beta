@@ -133,7 +133,7 @@
         {
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
-                    <h2 class="govuk-heading-xl">Check your answers</h2>
+                    <h2 class="govuk-heading-xl">Check your answers before submitting your data</h2>
 
                     @Html.AntiForgeryToken()
                     @if (propertyValidationErrors.Any())
@@ -418,7 +418,7 @@
                         @* Frequency of update *@
                         <div id="@nameof(DataSet.UpdateFrequency)" class="govuk-summary-list__row @(GetErrorMessages(nameof(DataSet.UpdateFrequency)).Any() ? "govuk-form-group--error" : "")">
                             <dt class="govuk-summary-list__key">
-                                Frequency of update
+                                Update frequency
                             </dt>
                             <dd class="govuk-summary-list__value">
                                 @foreach (var errorMessage in GetErrorMessages(nameof(DataSet.UpdateFrequency)))
@@ -555,7 +555,7 @@
                             <form asp-controller="DataDescription" asp-action="@nameof(DataDescriptionController.DataShareRequestNotificationsSelection)"
                                   asp-route-identifier="@cddoDataAsset.Id">
                                 <button class="govuk-button" data-module="govuk-button">
-                                    Publish data description
+                                    Publish listing
                                 </button>
                             </form>
                         }
