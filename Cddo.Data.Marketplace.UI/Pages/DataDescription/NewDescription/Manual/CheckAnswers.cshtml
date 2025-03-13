@@ -133,7 +133,7 @@
         {
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
-                    <h2 class="govuk-heading-xl">Check your answers before submitting your data</h2>
+                    <h2 class="govuk-heading-xl">Check your answers</h2>
 
                     @Html.AntiForgeryToken()
                     @if (propertyValidationErrors.Any())
@@ -569,14 +569,16 @@
                             </form>
                             <a class="govuk-button govuk-button--secondary" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAsset)" asp-route-dataAssetId="@cddoDataAsset.Id">View the published data description</a>
                         }
-
-                        <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.TaskList)" asp-route-identifier="@cddoDataAsset.Id">
-                            View the list of questions
-                        </a>
-                        <a class="govuk-link" class="govuk-link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssetsByUser)">
-                            View your department’s published records
-                        </a>
                     </div>
+                    @if (canPublish)
+                    {
+                        <p class="govuk-body">
+                            <a class="govuk-link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.DeleteCddoDataAssetConfirmation)"
+                               asp-route-identifier="@cddoDataAsset.Id" asp-route-title="@cddoDataAsset.Title">
+                                Delete draft
+                            </a>
+                        </p>
+                    }
                 </div>
             </div>
         }
