@@ -3,6 +3,7 @@
 @using Newtonsoft.Json
 @model QuestionDistributionRequest
 @{
+    ViewData["Title"] = "Access Options";
     var selectedMediaType = Model?.Distribution?.Select(x => x?.MediaType?.FirstOrDefault()).ToList();
     bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
     bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);

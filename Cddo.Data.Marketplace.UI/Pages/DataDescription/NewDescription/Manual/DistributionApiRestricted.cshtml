@@ -5,7 +5,7 @@
 @model QuestionDistributionRequest
 
 @{
-    ViewData["Title"] = "Supply Format";
+    ViewData["Title"] = "API Details";
     var selectedMediaType = Model?.Distribution?.FirstOrDefault()?.MediaType;
     bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
     bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);

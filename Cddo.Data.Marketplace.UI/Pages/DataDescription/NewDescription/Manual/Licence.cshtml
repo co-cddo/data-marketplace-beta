@@ -5,7 +5,7 @@
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @model Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions.QuestionLicenceRequest
 @{
-
+    ViewData["Title"] = "Licence";
     bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
     bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
     bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
