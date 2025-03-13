@@ -10,9 +10,10 @@
     var fileDownloads = Model.Where(d => d.MediaType.FirstOrDefault() == "File download").ToList();
     var apis = Model.Where(d => d.MediaType.FirstOrDefault() == "API").ToList();
     var webpages = Model.Where(d => d.MediaType.FirstOrDefault() == "text/html").ToList();
+    var linksTitle = ViewData["LinksTitle"] ?? "Access Links";
 }
 <h1 class="govuk-heading-l">
-    Access links
+    @linksTitle
 </h1>
 
 <p>
@@ -111,7 +112,7 @@
 
 }
 <div class="govuk-form-group">
-    <a class="govuk-link" asp-action="@nameof(CatalogDataDescriptionController.AddSupplyFormat)" asp-route-identifier="@identifier" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button" data-govuk-button-init="">
+    <a class="govuk-button govuk-button--secondary" asp-action="@nameof(CatalogDataDescriptionController.AddSupplyFormat)" asp-route-identifier="@identifier" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button" data-govuk-button-init="">
         Add another access method
     </a>
 
