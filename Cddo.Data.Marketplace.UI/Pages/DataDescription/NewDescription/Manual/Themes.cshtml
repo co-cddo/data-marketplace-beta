@@ -23,6 +23,8 @@
     {
         saveButtonName = "isCheckList";
     }
+
+    bool isNoneSelected = Model.Theme?.Contains("None of the above") == true;
 }
 <a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
 
@@ -59,6 +61,15 @@
                                     </label>
                                 </div>
                             }
+
+                            <div class="govuk-checkboxes__divider">or</div>
+
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="none" name="@nameof(QuestionThemeRequest.Theme)" type="checkbox" value="None of the above" @(isNoneSelected ? "checked" : "")>
+                                <label class="govuk-label govuk-checkboxes__label" for="none">
+                                    None of the above
+                                </label>
+                            </div>
                         </div>
                     </fieldset>
                 </div>

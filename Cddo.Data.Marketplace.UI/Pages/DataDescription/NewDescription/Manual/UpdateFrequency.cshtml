@@ -47,20 +47,28 @@
                             </h1>
                         </legend>
                         <div class="govuk-radios" data-module="govuk-radios">
-                            @foreach (var updateFrequency in Enum.GetValues(typeof(UpdateFrequency)).Cast<UpdateFrequency>())
+                            @foreach (var frequency in Enum.GetValues(typeof(UpdateFrequency)).Cast<UpdateFrequency>())
                             {
+                                var frequencyValue = EnumMemberConverter.GetEnumMemberValue(frequency);
+                                var frequencyDescription = EnumMemberConverter.GetEnumDescription(frequency);
+                                var isChecked = Model.UpdateFrequency == frequencyValue;
+                                var isOther = frequency == UpdateFrequency.Other;
+
+                                // Insert divider before "I don’t know"
+                                if (frequency == UpdateFrequency.DontKnow)
+                                {
+                                    <div class="govuk-radios__divider">or</div>
+                                }
+
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="@updateFrequency" name="@nameof(QuestionUpdateFrequencyRequest.UpdateFrequency)" type="radio" value="@updateFrequency"
-                                           data-aria-controls="conditional-@updateFrequency"
-                                    @(Model.UpdateFrequency == updateFrequency.ToString() ? "checked" : "")
-                                    @(!string.IsNullOrEmpty(Model.UpdateFrequency) && isOtherSelected && updateFrequency.ToString() == "Other" ? "checked" : "")>
-                                    <label class="govuk-label govuk-radios__label" for="@updateFrequency">
-                                        @EnumMemberConverter.GetEnumDescription(@updateFrequency)
+                                    <input class="govuk-radios__input" id="@frequency" name="UpdateFrequency" type="radio" value="@frequencyValue" @(isChecked ? "checked" : "") data-aria-controls="conditional-Other">
+                                    <label class="govuk-label govuk-radios__label" for="@frequency">
+                                        @frequencyDescription
                                     </label>
                                 </div>
 
                                 @* Check if the current option is "Other" to add conditional input *@
-                                @if (updateFrequency == UpdateFrequency.Other)
+                                @if (frequency == UpdateFrequency.Other)
                                 {
                                     <div class="govuk-radios__conditional @(isOtherSelected ? "" : "govuk-radios__conditional--hidden")" id="conditional-Other">
                                         <div class="govuk-form-group">
