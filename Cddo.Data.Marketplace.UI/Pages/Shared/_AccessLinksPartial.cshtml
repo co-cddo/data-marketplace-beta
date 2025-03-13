@@ -111,9 +111,12 @@
     </table>
 
 }
-<div class="govuk-form-group">
-    <a class="govuk-button govuk-button--secondary" asp-action="@nameof(CatalogDataDescriptionController.AddSupplyFormat)" asp-route-identifier="@identifier" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button" data-govuk-button-init="">
-        Add another access method
-    </a>
+@if (linksTitle != "Links")
+{
+    <div class="govuk-form-group">
+        <a class="govuk-button govuk-button--secondary" asp-action="@nameof(CatalogDataDescriptionController.AddSupplyFormat)" asp-route-identifier="@identifier" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button" data-govuk-button-init="">
+            Add another access method
+        </a>
 
-</div>
+    </div>
+}
