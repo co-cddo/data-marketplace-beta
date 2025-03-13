@@ -11,7 +11,7 @@
         <div class="govuk-grid-column-two-thirds">
             <form asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.DeleteCddoDataAssetSubmit)" asp-route-identifier="@Model.Identifier">
                 <input type="hidden" name="@nameof(DeleteDataAssetModel.Identifier)" value="@Model.Identifier" />
-                <h2 class="govuk-heading-l">Are you sure you want to delete this data description?</h2>
+                <h2 class="govuk-heading-l">Are you sure you want to delete this listing?</h2>
                 <p class="govuk-body">@Model.Title</p>
                 <div class="govuk-button-group">                    
                     <button class="govuk-button govuk-button--warning" type="submit">Confirm delete</button>
