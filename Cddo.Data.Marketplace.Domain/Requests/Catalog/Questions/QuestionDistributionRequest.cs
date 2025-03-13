@@ -4,5 +4,5 @@ namespace Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions;
 
 public class QuestionDistributionRequest : CatalogDataRequestBase
 {
-    public List<Distribution>? Distribution { get; set; }
+    public List<Distribution> Distribution { get; set; } = new List<Distribution>();
 }

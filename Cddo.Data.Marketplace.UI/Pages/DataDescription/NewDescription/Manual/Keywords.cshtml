@@ -46,14 +46,11 @@
                                 @Model.Title
                             </div>
                             <h1 class="govuk-fieldset__heading">
-                                What keywords are associated with the data set?
+                                Keywords
                             </h1>
                         </legend>
-                        <p class="govuk-body">
-                            Enter at least 5 keywords to help other users find this data set. Add one word or phrase at a time, for example ‘schools’, ‘exam results’ or ‘Covid-19’.
-                        </p>
                         <div id="question-hint" class="govuk-hint">
-                            Only use alphanumeric characters, spaces, hyphens and underscores.
+                            Enter one or more keywords. Add one word or phrase at a time, for example ‘schools’ or ‘exam results’. Do not use commas.
                         </div>
 
                         @if (Model.Keyword != null && Model.Keyword.Any())

@@ -2,9 +2,11 @@
 @using Cddo.Data.Marketplace.UI.Controllers
 @using Cddo.Data.Marketplace.UI.Model.Enum
 @using GovUk.Frontend.AspNetCore.TagHelpers
+@inject Agm.Catalog.DotNet.Core.Utilities.IEnumMemberConverter EnumMemberConverter
 
 @model QuestionUpdateFrequencyRequest
 @{
+    ViewData["Title"] = "Update Frequency";
     // Get the list of enum names
     var enumNames = Enum.GetNames(typeof(UpdateFrequency));
 
@@ -41,32 +43,37 @@
                                 @Model.Title
                             </div>
                             <h1 class="govuk-fieldset__heading">
-                                How often is the data set updated? (optional)
+                                How often is the data updated?
                             </h1>
                         </legend>
-                        <div id="metadataFrequency-hint" class="govuk-hint">
-                            Select one option.
-                        </div>
                         <div class="govuk-radios" data-module="govuk-radios">
-                            @foreach (var updateFrequency in Enum.GetValues(typeof(UpdateFrequency)).Cast<UpdateFrequency>())
+                            @foreach (var frequency in Enum.GetValues(typeof(UpdateFrequency)).Cast<UpdateFrequency>())
                             {
+                                var frequencyValue = EnumMemberConverter.GetEnumMemberValue(frequency);
+                                var frequencyDescription = EnumMemberConverter.GetEnumDescription(frequency);
+                                var isChecked = Model.UpdateFrequency == frequencyValue;
+                                var isOther = frequency == UpdateFrequency.Other;
+
+                                // Insert divider before "I don’t know"
+                                if (frequency == UpdateFrequency.DontKnow)
+                                {
+                                    <div class="govuk-radios__divider">or</div>
+                                }
+
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="@updateFrequency" name="@nameof(QuestionUpdateFrequencyRequest.UpdateFrequency)" type="radio" value="@updateFrequency"
-                                           data-aria-controls="conditional-@updateFrequency"
-                                    @(Model.UpdateFrequency == updateFrequency.ToString() ? "checked" : "")
-                                    @(!string.IsNullOrEmpty(Model.UpdateFrequency) && isOtherSelected && updateFrequency.ToString() == "Other" ? "checked" : "")>
-                                    <label class="govuk-label govuk-radios__label" for="@updateFrequency">
-                                        @updateFrequency
+                                    <input class="govuk-radios__input" id="@frequency" name="UpdateFrequency" type="radio" value="@frequencyValue" @(isChecked ? "checked" : "") data-aria-controls="conditional-Other">
+                                    <label class="govuk-label govuk-radios__label" for="@frequency">
+                                        @frequencyDescription
                                     </label>
                                 </div>
 
                                 @* Check if the current option is "Other" to add conditional input *@
-                                @if (updateFrequency == UpdateFrequency.Other)
+                                @if (frequency == UpdateFrequency.Other)
                                 {
                                     <div class="govuk-radios__conditional @(isOtherSelected ? "" : "govuk-radios__conditional--hidden")" id="conditional-Other">
                                         <div class="govuk-form-group">
                                             <label class="govuk-label" for="otherUpdateFrequency">
-                                                Enter a custom time period, for example ‘weekly’ or ‘every 3 years’.
+                                                Enter a custom time period, for example ‘hourly’ or ‘every 3 years’.
                                             </label>
                                             <input class="govuk-input" id="otherUpdateFrequency" name="otherFrequency" type="text"
                                                    value="@(isOtherSelected ? Model.UpdateFrequency : "")" spellcheck="false" />

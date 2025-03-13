@@ -19,4 +19,8 @@ public interface ICatalogQuestionsService
     Task<PatchProfiledDataAssetResponse?> UpdateUpdateFrequencyAsync(QuestionUpdateFrequencyRequest questionUpdateFrequencyRequest, DataAssetType dataAssetType);
     Task<PatchProfiledDataAssetResponse?> UpdateDataShareRequestNotificationsSelectionAsync(DataShareRequestNotificationsRequest dataShareRequestNotificationsRequest, DataAssetType dataAssetType);
     Task<PatchProfiledDataAssetResponse?> UpdateDataAssetStatusAsync(string identifier, DataAssetStatus dataAssetStatus, DataAssetType dataAssetType);
+
+    Task<PatchProfiledDataAssetResponse?> UpdateAccessRightsAsync(
+        QuestionAccessRightsRequest questionAccessRightsRequest, DataAssetType dataAssetType);
+    Task<PatchProfiledDataAssetResponse?> UpdateLicenceAsync(QuestionLicenceRequest questionLicenceRequest, DataAssetType dataSet);
 }

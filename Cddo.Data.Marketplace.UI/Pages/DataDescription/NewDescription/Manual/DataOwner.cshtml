@@ -25,63 +25,41 @@
     }
 
     var dataOwner = Model.ContactPoint?.Where(c => c.Role == ContactRoleEnum.Owner);
-
-    var contactPoint = Model.ContactPoint?.Where(c => c.Role == ContactRoleEnum.Contact);
 }
 <a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
 
 <div class="govuk-main-wrapper">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-caption-l">
+                @Model.Title
+            </div>
+            <h1 class="govuk-heading-l">
+                Data owner
+            </h1>
+            <div id="contact-hint" class="govuk-hint">
+                <p class="govuk-hint">
+                    The data you're listing must have an owner that can make decisions. This must be an individual.
+                </p>
+                <p class="govuk-hint">These details will not be visible to users outside your organisation.</p>
+            </div>
+
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddDataOwnerSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
                 <input type="hidden" name="identifier" value="@Model.Identifier" />
+                <input hidden name="@nameof(Contact.Role)" value="@nameof(ContactRoleEnum.Owner)" />
                 <div class="govuk-form-group">
-                    <fieldset class="govuk-fieldset" aria-describedby="contact-hint">
-                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                            <div class="govuk-caption-l">
-                                @Model.Title
-                            </div>
-                            <h1 class="govuk-fieldset__heading">
-                                Who is the owner of the data set?
-                            </h1>
-                        </legend>
-                        <div id="contact-hint" class="govuk-hint">
-                            The data set must have a responsible owner that can make decisions about the data, even if they’re not the point of contact.
-                            Find out more about <a target="_blank" href="https://www.gov.uk/government/publications/essential-shared-data-assets-and-data-ownership-in-government/data-ownership-in-government-html" class="govuk-link">data ownership in government (opens in new tab)</a>.
-                        </div>
-                        <div class="govuk-radios" data-module="govuk-radios">
-                            <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="contact" name="@nameof(Contact.Role)" type="radio" value="@nameof(ContactRoleEnum.Contact)" @(!dataOwner.Any() && contactPoint.Any() ? "checked" : "")>
-                                <label class="govuk-label govuk-radios__label" for="contact">
-                                    The owner is the point of contact
-                                </label>
-                            </div>
-                            <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="contact-2" name="@nameof(Contact.Role)" type="radio" value="@nameof(ContactRoleEnum.Owner)" data-aria-controls="conditional-contact" @(dataOwner.Any() ? "checked" : "")>
-                                <label class="govuk-label govuk-radios__label" for="contact-2">
-                                    The owner is not the point of contact
-                                </label>
-                            </div>
-                            <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-contact">
-                                <h2 class="govuk-heading-m">
-                                    Provide the name and email of the data owner
-                                </h2>
-                                <div class="govuk-form-group">
-                                    <label class="govuk-label" for="ContactName">
-                                        Name
-                                    </label>
-                                    <input class="govuk-input" id="ContactName" name="@nameof(Contact.Name)" type="text" autocomplete="name" value="@dataOwner?.FirstOrDefault()?.Name">
-                                </div>
-                                <div class="govuk-form-group">
-                                    <label class="govuk-label" for="ContactEmail">
-                                        Email address
-                                    </label>
-                                    <input class="govuk-input" id="ContactEmail" name="@nameof(Contact.Email)" type="email" autocomplete="email" value="@dataOwner?.FirstOrDefault()?.Email">
-                                </div>
-                            </div>
-                        </div>
-                    </fieldset>
+                    <label class="govuk-label" for="ContactName">
+                        Name
+                    </label>
+                    <input class="govuk-input" id="ContactName" name="@nameof(Contact.Name)" type="text" autocomplete="name" value="@dataOwner?.FirstOrDefault()?.Name">
                 </div>
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="ContactEmail">
+                        Email address
+                    </label>
+                    <input class="govuk-input" id="ContactEmail" name="@nameof(Contact.Email)" type="email" autocomplete="email" value="@dataOwner?.FirstOrDefault()?.Email">
+                </div>
+
                 <div class="govuk-button-group">
                     @if (!isEditMode)
                     {

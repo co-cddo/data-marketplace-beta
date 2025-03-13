@@ -1,0 +1,122 @@
+﻿@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums
+@using Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1
+@using Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions
+@using Cddo.Data.Marketplace.UI.Controllers
+
+@model List<Distribution>
+
+@{
+    var identifier = ViewData["identifier"] as string;
+    var fileDownloads = Model.Where(d => d.MediaType.FirstOrDefault() == "File download").ToList();
+    var apis = Model.Where(d => d.MediaType.FirstOrDefault() == "API").ToList();
+    var webpages = Model.Where(d => d.MediaType.FirstOrDefault() == "text/html").ToList();
+    var linksTitle = ViewData["LinksTitle"] ?? "Access Links";
+}
+<h1 class="govuk-heading-l">
+    @linksTitle
+</h1>
+
+<p>
+    These links open in a new tab.
+</p>
+
+@if (fileDownloads.Any())
+{
+
+    <table class="govuk-table">
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header govuk-!-width-one-half">Downloads</th>
+                <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
+                <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
+            </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+
+            @foreach (var distribution in fileDownloads)
+            {
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header govuk-!-font-weight-regular">
+                        <a href="@distribution.DownloadUrl">
+                            @distribution.Title
+                        </a>
+                    </th>
+                    <td class="govuk-table__cell">
+                        @distribution.Format
+                    </td>
+                    <td class="govuk-table__cell">
+                        <a class="govuk-link" asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@identifier" asp-route-mediaType="@distribution.MediaType.FirstOrDefault()" asp-route-distributionId="@distribution.Id" asp-route-isEditMode="true">Change</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@if (apis.Any())
+{
+    <table class="govuk-table">
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header govuk-!-width-three-quarters">
+                    API
+                </th>
+                <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">
+                </th>
+            </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+            @foreach (var distribution in apis)
+            {
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header govuk-!-font-weight-regular">
+                        <a href="@distribution.AccessUrl">
+                            @distribution.Title
+                        </a>
+                    </th>
+                    <td class="govuk-table__cell">
+                        <a class="govuk-link" asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@identifier" asp-route-mediaType="@distribution.MediaType.FirstOrDefault()" asp-route-distributionId="@distribution.Id" asp-route-isEditMode="true">Change</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@if (webpages.Any())
+{
+    <table class="govuk-table">
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header govuk-!-width-three-quarters">
+                    Webpages
+                </th>
+                <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">
+                </th>
+            </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+            @foreach (var distribution in webpages)
+            {
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header govuk-!-font-weight-regular">
+                        <a href="@distribution.DownloadUrl">
+                            @distribution.Title
+                        </a>
+                    </th>
+                    <td class="govuk-table__cell">
+                        <a class="govuk-link" asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@identifier" asp-route-mediaType="@distribution.MediaType.FirstOrDefault()" asp-route-distributionId="@distribution.Id" asp-route-isEditMode="true">Change</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+}
+@if (linksTitle != "Links")
+{
+    <div class="govuk-form-group">
+        <a class="govuk-button govuk-button--secondary" asp-action="@nameof(CatalogDataDescriptionController.AddSupplyFormat)" asp-route-identifier="@identifier" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button" data-govuk-button-init="">
+            Add another access method
+        </a>
+
+    </div>
+}

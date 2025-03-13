@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Cddo.Data.Marketplace.UI.Model.Enum
 {
     public enum UpdateFrequency
-    
+
     {
         [EnumMember(Value = "Never")]
         [Description("Never")]
@@ -26,8 +26,12 @@ namespace Cddo.Data.Marketplace.UI.Model.Enum
         [Description("Annually")]
         Annually = 4,
 
+        [EnumMember(Value = "DontKnow")]
+        [Description("I don’t know")]
+        DontKnow = 5,
+
         [EnumMember(Value = "Other")]
-        [Description("Other")]
-        Other = 5,
+        [Description("Other - I'll enter a different time period")]
+        Other = 6,
     }
 }

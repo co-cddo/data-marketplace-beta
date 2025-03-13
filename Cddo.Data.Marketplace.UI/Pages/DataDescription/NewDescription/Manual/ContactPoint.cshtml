@@ -4,7 +4,7 @@
 @using Cddo.Data.Marketplace.UI.Controllers
 @model QuestionContactPointRequest
 @{
-    ViewData["Title"] = "Contact Point";
+    ViewData["Title"] = "Contact Details";
     var errorMessage = ViewData.ModelState[nameof(Contact.Email)]?.Errors?.FirstOrDefault()?.ErrorMessage;
     var errorMessageName = ViewData.ModelState[nameof(Contact.Name)]?.Errors?.FirstOrDefault()?.ErrorMessage;
 
@@ -39,11 +39,13 @@
                 @Model.Title
             </div>
             <h1 class="govuk-heading-l">
-                Who is the point of contact for the data set?
+                Contact details
             </h1>
             <div id="contact-hint" class="govuk-hint">
-                Provide the name and email of the team or individual that will respond to requests for this data set. This might be different from the data owner.
-                You’ll be able to change this later, once your description is published.
+                <p class="govuk-hint">
+                    Provide details of the team or individual that will respond to queries or requests for this listing.
+                </p>
+                <p class="govuk-hint">These details will be visible to users on the Data Marketplace.</p>
             </div>
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddContactPointSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
                 <input type="hidden" name="identifier" value="@Model.Identifier" />
@@ -61,7 +63,7 @@
                     }
                     <input class="govuk-input  @(ViewData.ModelState[nameof(Contact.Name)]?.Errors.Any() == true ? "govuk-input--error" : "")" id="metadataContact" name="@nameof(Contact.Name)" type="text" value="@dataAssetContactPoint?.Name">
                 </div>
-                <div class="govuk-form-group">                    
+                <div class="govuk-form-group">
                     <label class="govuk-label govuk-label--m" for="metadataContactEmail">
                         Email address
                     </label>

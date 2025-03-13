@@ -8,6 +8,8 @@
 @model CheckAnswersModel
 @{
     ViewData["Title"] = "Check Answers";
+    ViewData["LinksTitle"] = "Links";
+    ViewData["identifier"] = Model.CddoDataAsset?.Id.ToString();
 
     var cddoDataAsset = Model.CddoDataAsset;
     var propertyValidationErrors = Model.PropertyValidationErrors;
@@ -131,7 +133,7 @@
         {
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
-                    <h2 class="govuk-heading-xl">Check your answers</h2>
+                    <h2 class="govuk-heading-xl">Check your answers before submitting your data</h2>
 
                     @Html.AntiForgeryToken()
                     @if (propertyValidationErrors.Any())
@@ -242,10 +244,10 @@
                             </dd>
                         </div>
 
-                        @* Internal Identifier *@
+                        @* Reference *@
                         <div id="@nameof(CataloguedResource.Identifier)" class="govuk-summary-list__row @(GetErrorMessages(nameof(CataloguedResource.Identifier)).Any() ? "govuk-form-group--error" : "")">
                             <dt class="govuk-summary-list__key">
-                                Internal identifier
+                                Reference
                             </dt>
                             <dd class="govuk-summary-list__value">
                                 @foreach (var errorMessage in GetErrorMessages(nameof(CataloguedResource.Identifier)))
@@ -258,7 +260,7 @@
                                 <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddInternalIdentifier)" asp-route-identifier="@cddoDataAsset.Id"
                                    asp-route-isCheckAnswers="true">
                                     Change
-                                    <span class="govuk-visually-hidden">Internal Identifier</span>
+                                    <span class="govuk-visually-hidden">Reference</span>
                                 </a>
                             </dd>
                         </div>
@@ -416,7 +418,7 @@
                         @* Frequency of update *@
                         <div id="@nameof(DataSet.UpdateFrequency)" class="govuk-summary-list__row @(GetErrorMessages(nameof(DataSet.UpdateFrequency)).Any() ? "govuk-form-group--error" : "")">
                             <dt class="govuk-summary-list__key">
-                                Frequency of update
+                                Update frequency
                             </dt>
                             <dd class="govuk-summary-list__value">
                                 @foreach (var errorMessage in GetErrorMessages(nameof(DataSet.UpdateFrequency)))
@@ -438,32 +440,93 @@
                                 </a>
                             </dd>
                         </div>
-
-                        @* Supply Format *@
-                        <div id="@($"{nameof(DataSet.Distribution)}")" class="govuk-summary-list__row">
+                        @* Access Rights *@
+                        <div id="@nameof(DataSet.AccessRights)" class="govuk-summary-list__row @(GetErrorMessages(nameof(DataSet.AccessRights)).Any() ? "govuk-form-group--error" : "")">
                             <dt class="govuk-summary-list__key">
-                                Supply format
+                                Access Rights
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @foreach (var errorMessage in GetErrorMessages(nameof(DataSet.Distribution)))
+                                @foreach (var errorMessage in GetErrorMessages(nameof(DataSet.UpdateFrequency)))
                                 {
                                     <p class="govuk-error-message">@errorMessage</p>
                                 }
                                 <ul class="govuk-list">
-                                    @if (!string.IsNullOrEmpty(cddoDataAsset.DataAssetDistribution?.MediaType))
-                                    {
-                                        @cddoDataAsset.DataAssetDistribution.MediaType
-                                    }
+                                    @cddoDataAsset.AccessRights
                                 </ul>
                             </dd>
                             <dd class="govuk-summary-list__actions">
                                 <a class="govuk-link" asp-controller="CatalogDataDescription" asp-route-identifier="@cddoDataAsset.Id"
-                                   asp-action="@(nameof(CatalogDataDescriptionController.AddSupplyFormat))" asp-route-isCheckAnswers="true">
+                                    asp-action="@(nameof(CatalogDataDescriptionController.AccessRights))" asp-route-isCheckAnswers="true">
                                     Change
-                                    <span class="govuk-visually-hidden">Data set - Delivery mechanism</span>
+                                    <span class="govuk-visually-hidden">Data set - Access rights</span>
                                 </a>
+                               
                             </dd>
                         </div>
+                        @if (cddoDataAsset.AccessRights == "RESTRICTED")
+                        {
+                            @* Formats *@
+                            <div id="@($"{nameof(DataSet.Distribution)}")" class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                    Formats
+                                </dt>
+                                <dd class="govuk-summary-list__value">
+                                    @foreach (var errorMessage in GetErrorMessages(nameof(DataSet.Distribution)))
+                                    {
+                                        <p class="govuk-error-message">@errorMessage</p>
+                                    }
+                                    @foreach (var distribution in cddoDataAsset.DataAssetDistribution)
+                                    {
+                                        <ul class="govuk-list">
+                                            @if (!string.IsNullOrEmpty(distribution?.MediaType))
+                                            {
+                                                @distribution.MediaType
+                                            }
+                                        </ul>
+                                    }
+                            
+                                </dd>
+                                <dd class="govuk-summary-list__actions">                                
+                                    <a class="govuk-link" asp-controller="CatalogDataDescription" asp-route-identifier="@cddoDataAsset.Id"
+                                            asp-action="@(nameof(CatalogDataDescriptionController.AddRestrictedSupplyFormatSubmit))" asp-route-isCheckAnswers="true">
+                                        Change
+                                        <span class="govuk-visually-hidden">Data set - Delivery mechanism</span>
+                                    </a>                                
+                                
+                                </dd>
+                            </div>
+                        }
+                        @if (cddoDataAsset.AccessRights == "OPEN" && cddoDataAsset.License != null)
+                        {
+                            @* Licence *@
+                            <div id="@($"{nameof(DataSet.Distribution)}")" class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                    License
+                                </dt>
+                                <dd class="govuk-summary-list__value">
+                                    @foreach (var errorMessage in GetErrorMessages(nameof(DataSet.Distribution)))
+                                    {
+                                        <p class="govuk-error-message">@errorMessage</p>
+                                    }
+                                    <ul class="govuk-list">
+                                        @if (cddoDataAsset.License.Title != null)
+                                        {
+                                            @cddoDataAsset.License.Title
+                                        }
+                                    </ul>
+                                    
+                            
+                                </dd>
+                                <dd class="govuk-summary-list__actions">                                
+                                    <a class="govuk-link" asp-controller="CatalogDataDescription" asp-route-identifier="@cddoDataAsset.Id"
+                                            asp-action="@(nameof(CatalogDataDescriptionController.Licence))" asp-route-isCheckAnswers="true">
+                                        Change
+                                        <span class="govuk-visually-hidden">Data set - License</span>
+                                    </a>                                
+                                
+                                </dd>
+                            </div>
+                        }
 
                         @* Date Modified *@
                         <div id="@nameof(CataloguedResource.Modified)" class="govuk-summary-list__row">
@@ -478,13 +541,21 @@
                         </div>
                     </dl>
 
+
+                    @if (Model.Distributions != null)
+                    {
+                        @await Html.PartialAsync("_AccessLinksPartial", Model.Distributions, ViewData)
+
+                    }
+
+
                     <div class="govuk-button-group">
                         @if (canPublish)
                         {
                             <form asp-controller="DataDescription" asp-action="@nameof(DataDescriptionController.DataShareRequestNotificationsSelection)"
                                   asp-route-identifier="@cddoDataAsset.Id">
                                 <button class="govuk-button" data-module="govuk-button">
-                                    Publish data description
+                                    Publish listing
                                 </button>
                             </form>
                         }
@@ -498,14 +569,16 @@
                             </form>
                             <a class="govuk-button govuk-button--secondary" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAsset)" asp-route-dataAssetId="@cddoDataAsset.Id">View the published data description</a>
                         }
-
-                        <a class="govuk-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.TaskList)" asp-route-identifier="@cddoDataAsset.Id">
-                            View the list of questions
-                        </a>
-                        <a class="govuk-link" class="govuk-link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssetsByUser)">
-                            View your department’s published records
-                        </a>
                     </div>
+                    @if (canPublish)
+                    {
+                        <p class="govuk-body">
+                            <a class="govuk-link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.DeleteCddoDataAssetConfirmation)"
+                               asp-route-identifier="@cddoDataAsset.Id" asp-route-title="@cddoDataAsset.Title">
+                                Delete draft
+                            </a>
+                        </p>
+                    }
                 </div>
             </div>
         }
