@@ -863,10 +863,11 @@ public class CatalogDataDescriptionController(
         if (!string.IsNullOrEmpty(identifier))
         {
             questionIssuedRequest.Identifier = identifier;
-
+            
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+            questionIssuedRequest.Title = dataAsset.CddoDataAsset.Title;
             if (dataAsset!.CddoDataAsset.Issued.HasValue)
-            {
+            {               
                 questionIssuedRequest.metadataIssuedDay = dataAsset.CddoDataAsset.Issued.Value.Day.ToString();
                 questionIssuedRequest.metadataIssuedMonth = dataAsset.CddoDataAsset.Issued.Value.Month.ToString();
                 questionIssuedRequest.metadataIssuedYear = dataAsset.CddoDataAsset.Issued.Value.Year.ToString();

@@ -9,6 +9,7 @@ public class QuestionIssuedRequest : CatalogDataRequestBase
 public class QuestionIssuedRequestModel
 {
     public string? Identifier { get; set; }
+    public string? Title { get; set; }
     public string metadataIssuedDay { get; set; }
     public string metadataIssuedMonth { get; set; }
     public string metadataIssuedYear { get; set; }

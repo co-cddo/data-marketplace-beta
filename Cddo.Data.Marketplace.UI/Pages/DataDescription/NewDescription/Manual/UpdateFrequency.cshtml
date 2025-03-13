@@ -45,9 +45,6 @@
                                 How often is the data updated?
                             </h1>
                         </legend>
-                        <div id="metadataFrequency-hint" class="govuk-hint">
-                            Select one option.
-                        </div>
                         <div class="govuk-radios" data-module="govuk-radios">
                             @foreach (var updateFrequency in Enum.GetValues(typeof(UpdateFrequency)).Cast<UpdateFrequency>())
                             {

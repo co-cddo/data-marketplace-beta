@@ -38,6 +38,9 @@
                 <div class="govuk-form-group @(ViewData.ModelState["metadataIssuedDate"]?.Errors.Any() == true ? "govuk-form-group--error" : "")">
                     <fieldset class="govuk-fieldset" role="group" aria-describedby="passport-issued-hint">
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                            <div class="govuk-caption-l">
+                                @Model?.Title
+                            </div>
                             <h1 class="govuk-fieldset__heading">
                                 When was the data first made available?
                             </h1>
