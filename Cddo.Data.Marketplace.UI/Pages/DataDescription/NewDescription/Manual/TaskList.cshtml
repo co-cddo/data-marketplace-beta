@@ -88,8 +88,15 @@
                 </div>
             }
 
+            @if (dataAsset.DataAssetStatus == DataAssetStatus.Draft)
+            {
+                <span class="govuk-caption-l">
+                    Draft listing
+                </span>
+            }
+      
             <h1 class="govuk-heading-xl">
-                @dataAsset.Title @(dataAsset.DataAssetStatus == DataAssetStatus.Draft ? "(draft)" : "")
+                @dataAsset.Title
             </h1>
 
             @* General Section *@
@@ -195,7 +202,7 @@
             <ul class="govuk-task-list">
                 @foreach (var item in new[] {
                 new { Title = "Date first made available", Action = nameof(CatalogDataDescriptionController.AddPublishedDate), Done = dataAsset.Issued != null },
-                new { Title = "Frequency of update", Action = nameof(CatalogDataDescriptionController.AddFrequency), Done = !string.IsNullOrEmpty(dataAsset.UpdateFrequencyString) },
+                new { Title = "Update frequency", Action = nameof(CatalogDataDescriptionController.AddFrequency), Done = !string.IsNullOrEmpty(dataAsset.UpdateFrequencyString) },
                 // new { Title = "Supply format", Action = nameof(CatalogDataDescriptionController.AddSupplyFormat), Completed = dataAsset.DataAssetDistribution?.MediaType is not null },
                 new { Title = "Public or restricted data", Action = nameof(CatalogDataDescriptionController.AccessRights), Done = dataAsset.AccessRights is not null }
 

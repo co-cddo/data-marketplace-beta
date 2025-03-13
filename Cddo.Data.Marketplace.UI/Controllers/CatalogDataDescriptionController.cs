@@ -463,6 +463,11 @@ public class CatalogDataDescriptionController(
 
         try
         {
+            if (questionThemeRequest.Theme?.Contains("None of the above") == true)
+            {
+                questionThemeRequest.Theme = new List<string> { "None of the above" };
+            }
+
             response = await _catalogQuestionsService.UpdateThemesAsync(questionThemeRequest, DataAssetType.DataSet);
         }
         catch (UnauthorizedAccessException)
@@ -1033,8 +1038,8 @@ public class CatalogDataDescriptionController(
         {
             await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddFrequency, "Add-Frequency", $"Updated the update frequency of data set {response.DataAssetId}");
 
-            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddSupplyFormat), isEditMode)
-                   ?? RedirectToAction(nameof(AddSupplyFormat), new { identifier = response.DataAssetId.ToString() });
+            return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AccessRights), isEditMode)
+                   ?? RedirectToAction(nameof(AccessRights), new { identifier = response.DataAssetId.ToString() });
         }
 
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/UpdateFrequency.cshtml", questionUpdateFrequencyRequest);
