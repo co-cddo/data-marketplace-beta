@@ -4,7 +4,7 @@
 @using Cddo.Data.Marketplace.UI.Controllers
 @model QuestionContactPointRequest
 @{
-    ViewData["Title"] = "Contact Point";
+    ViewData["Title"] = "Contact Details";
     var errorMessage = ViewData.ModelState[nameof(Contact.Email)]?.Errors?.FirstOrDefault()?.ErrorMessage;
     var errorMessageName = ViewData.ModelState[nameof(Contact.Name)]?.Errors?.FirstOrDefault()?.ErrorMessage;
 

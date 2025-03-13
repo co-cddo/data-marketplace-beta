@@ -3,7 +3,7 @@
 @using Newtonsoft.Json
 @model QuestionDistributionRequest
 @{
-
+    ViewData["Title"] = "Data Format";
     bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
     bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
     bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);

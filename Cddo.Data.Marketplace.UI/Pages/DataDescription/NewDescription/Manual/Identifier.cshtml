@@ -2,7 +2,7 @@
 @using Cddo.Data.Marketplace.UI.Controllers
 @model QuestionSupplierIdentifierRequest
 @{
-    ViewData["Title"] = "Identifier";
+    ViewData["Title"] = "Reference";
     bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
     bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
     bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
