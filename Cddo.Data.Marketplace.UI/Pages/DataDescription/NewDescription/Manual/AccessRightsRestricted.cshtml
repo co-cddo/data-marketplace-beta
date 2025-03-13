@@ -91,6 +91,20 @@
                                     Webpage
                                 </label>
                             </div>
+                            
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input @(hasError ? "govuk-input--error" : "")"
+                                       id="other"
+                                       name="supplyFormat"
+                                       type="checkbox"
+                                       value="Other"
+                                @(selectedMediaType.Contains("Other") ? "checked" : "")
+                                       aria-describedby="confirm-data-error">
+                                <label class="govuk-label govuk-checkboxes__label" for="webpage">
+                                    Other
+                                </label>
+                            </div>
+
                         </div>
                     </fieldset>
                 </div>
