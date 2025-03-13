@@ -1384,10 +1384,10 @@ public class CatalogDataDescriptionController(
                                                     .Select(e => e.ErrorMessage)
                                                     .ToList();
             _insightsLogger.LogEvent(EventTypes.MetadataEvent.MetadataAccessDenied, new Dictionary<string, string>
-        {
-            { "ValidationErrors", string.Join(", ", validationErrors) },
-            { "Identifier", identifier ?? "null" }
-        });
+            {
+                { "ValidationErrors", string.Join(", ", validationErrors) },
+                { "Identifier", identifier ?? "null" }
+            });
         }
 
         ArgumentNullException.ThrowIfNull(identifier);
@@ -1403,11 +1403,28 @@ public class CatalogDataDescriptionController(
         var checkForPotentialDuplicatesToDataAssetResponse = await
             _catalogDataService.CheckForPotentialDuplicatesToDataAssetAsync(dataAssetId);
 
+        var distributions = new List<Distribution>();
+
+        foreach (var distribution in dataAssetResponse?.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
+        {
+            distributions.Add(new Distribution
+            {
+                MediaType = [distribution?.MediaType!],
+                DownloadUrl = distribution?.DownloadUrl,
+                Title = distribution?.Title,
+                Format = distribution?.Format,
+                AccessUrl = distribution?.AccessUrl,
+                Id = distribution?.Id,
+
+            });
+        }
+
         var model = new CheckAnswersModel
         {
             CddoDataAsset = dataAssetResponse?.CddoDataAsset,
             PropertyValidationErrors = validationErrorsResponse?.PropertyValidationErrors ?? [],
-            PotentialDuplicatesToDataAsset = checkForPotentialDuplicatesToDataAssetResponse?.PotentialDuplicatesToDataAsset ?? []
+            PotentialDuplicatesToDataAsset = checkForPotentialDuplicatesToDataAssetResponse?.PotentialDuplicatesToDataAsset ?? [],
+            Distributions = distributions
         };
 
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/CheckAnswers.cshtml", model);
