@@ -306,6 +306,11 @@ namespace CDDO.DataMarketplace.Controllers.External
                 });
             }
 
+            if (dataset.Distribution != null)
+            {
+                SetIncrementalIds(dataset.Distribution);
+            }
+
             var validateCataloguedResourceResult = await _dataAssetService.ValidateCataloguedResourceAsync(
                 profileId, dataset, DataAssetType.DataSet, true);
 
@@ -485,6 +490,11 @@ namespace CDDO.DataMarketplace.Controllers.External
                         }
                     ]
                 });
+            }
+
+            if (patchModel.Distribution != null)
+            {
+                SetIncrementalIds(patchModel.Distribution);
             }
 
             var validateCataloguedResourceResult = await _dataAssetService.ValidateCataloguedResourceAsync(
@@ -1266,8 +1276,17 @@ namespace CDDO.DataMarketplace.Controllers.External
 
             return initiatingUserDetails;
         }
+        public void SetIncrementalIds(List<Distribution> distributions)
+        {
+            int idCounter = 1;
 
-       
+            foreach (var distribution in distributions)
+            {
+                distribution.Id = idCounter++;
+            }
+        }
+
+
     }
 }
 
