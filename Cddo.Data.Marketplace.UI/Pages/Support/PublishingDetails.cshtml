@@ -1,0 +1,224 @@
+﻿@model Cddo.Data.Marketplace.UI.Pages.Support.PublishingDetailsModel
+@{
+    ViewData["Title"] = "Support - Publishing Details";
+    Layout = "~/Pages/Shared/_SupportLayout.cshtml";
+}
+<h1 class="govuk-heading-l">
+    Details for your listing
+</h1>
+<div class="govuk-body">
+    <p class="govuk-body">
+        Find out what information you need to provide and why we ask for this.
+        Your listing should be clear, accurate and up to date.
+        This will help users find it, and should reduce the number of queries you receive.
+    </p>
+    <p class="govuk-body"><strong>On this page</strong></p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li> <a class="govuk-link" href="#type-of-data">Type of data you’re listing</a> </li>
+        <li> <a class="govuk-link" href="#security-classification">Security classification</a> </li>
+        <li> <a class="govuk-link" href="#title">Title</a> </li>
+        <li> <a class="govuk-link" href="#description">Description</a> </li>
+        <li> <a class="govuk-link" href="#reference">Reference</a> </li>
+        <li> <a class="govuk-link" href="#themes">Themes</a> </li>
+        <li> <a class="govuk-link" href="#keywords">Keywords</a> </li>
+        <li> <a class="govuk-link" href="#point-of-contact">Point of contact</a> </li>
+        <li> <a class="govuk-link" href="#data-owner">Data owner</a> </li>
+        <li> <a class="govuk-link" href="#date-available">Date first made available</a> </li>
+        <li> <a class="govuk-link" href="#frequency-update">Frequency of update</a> </li>
+        <li> <a class="govuk-link" href="#public-restricted">Public or restricted data</a> </li>
+        <li> <a class="govuk-link" href="#listing-public">Listing public data</a> </li>
+        <li> <a class="govuk-link" href="#listing-restricted">Listing restricted data</a></li>
+    </ul>
+    <h2 id="type-of-data" class="govuk-heading-m">Type of data you’re listing</h2>
+    <p class="govuk-body">You’ll need to confirm that your listing is for a data set or API.</p>
+    <p class="govuk-body">A data set is an individual, structured collection of data that can be accessed in one or more representations. Data comes in numbers, text, pixels, imagery, sound and other multimedia – any of which might be collected into a data set.</p>
+    <p class="govuk-body">A data service provides a way to access data sets – for example, through an Application Programming Interface (API) or File Transfer Protocol (FTP).</p>
+    <p class="govuk-body">APIs are the most common type of data service.</p>
+
+    <h2 id="security-classification" class="govuk-heading-m">Security classification</h2>
+    <p class="govuk-body">You must confirm that the data in your data set or API has an <a class="govuk-link" href="https://www.gov.uk/government/publications/government-security-classifications/government-security-classifications-policy-html#definitions-for-official-secret-and-top-secret">OFFICIAL classification</a>. The Data Marketplace does not contain listings of data that has a SECRET or TOP SECRET classification.</p>
+    <p class="govuk-body">The OFFICIAL classification covers data for most of the day-to-day business of government, service delivery, commercial activity and policy development.</p>
+    <p class="govuk-body">You can include listings of data that has an  <a class="govuk-link" href="https://www.gov.uk/government/publications/government-security-classifications/government-security-classifications-policy-html#additional-markings">OFFICIAL-SENSITIVE marking</a> but not SECRET or TOP SECRET data because this requires bespoke protection.</p>
+    
+    <h2 id="title" class="govuk-heading-m">Title</h2>
+    <p class="govuk-body">The title of your listing should meaningfully describe what the data is.</p>
+    <p class="govuk-body">Your title will usually be the first thing a user sees in your listing, so it should be:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>clear – use plain English and avoid acronyms or technical jargon</li>
+        <li>unique – consider including a version number or date range to identify the data set or API</li>
+        <li>consistent with the naming convention of similar data sets or APIs– for example, if you have a listing for ‘Student exam results in England, 2022-23’, for the following year use ‘Student exam results in England, 2023-24’</li>
+    </ul>
+    <p class="govuk-body">Examples of a good title:</p>
+    <p class="govuk-body">
+        A title like ‘Exam results for year 11 pupils in England and Wales, 2020-2022’
+        is better than ‘Educational Attainment’.
+    </p>
+    <p class="govuk-body">Other examples:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>‘UK River Water Quality Monitoring Results - 2021’</li>
+        <li>‘Annual Inflation Rates and Consumer Price Index (2000-2022)’</li>
+    </ul>
+    
+    <h2 id="description" class="govuk-heading-m">Description</h2>
+    <p class="govuk-body">Your description should explain what the data is about and what’s in it.</p>
+    <p class="govuk-body">Help users understand what the main attributes are. This should reduce the number of queries you’ll receive because users will have a better idea of the data and whether it will meet their needs.</p>
+    <p class="govuk-body">Your description should:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>not repeat the title  </li>
+        <li>be in plain English  </li>
+        <li>start with the most important information because this will be used as a summary in search results  </li>
+        <li>set out the main entities and attributes in the data  </li>
+        <li>explain other useful details about the data – for example, why the data was collected, what it measures or how it could be used</li>
+    </ul>
+
+    <h2 id="reference" class="govuk-heading-m">Reference</h2>
+    <p class="govuk-body">Your reference is whatever you use to identify the data set or API in your organisation’s system or data catalogue. It will help you link the listing in the Data Marketplace with the information in your own system.</p>
+    <p class="govuk-body">For example, you might have given this data set or API a unique:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>number</li>
+        <li>code</li>
+        <li>URI (Uniform Resource Identifier)</li>
+    </ul>
+
+    <h2 id="themes" class="govuk-heading-m">Themes</h2>
+    <p class="govuk-body">Associate the data set or API with one or more themes to help users understand what topics the data broadly relates to – for example, education or energy.</p>
+    <p class="govuk-body">Users can filter by theme when searching the Data Marketplace catalogue.</p>
+    <details class="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+                List of themes
+            </span>
+        </summary>
+        <div class="govuk-details__text">
+            <ul class="govuk-list govuk-list--bullet">
+                <li>Agriculture, fisheries and forestry</li>
+                <li>Business, economics and finance</li>
+                <li>Crime and justice</li>
+                <li>Culture, leisure and sport</li>
+                <li>Education</li>
+                <li>Energy</li>
+                <li>Environment and nature</li>
+                <li>Geography</li>
+                <li>Government and public sector</li>
+                <li>Health and care</li>
+                <li>Population and society</li>
+                <li>Science and technology</li>
+                <li>Transport and infrastructure</li>
+            </ul>
+            <p class="govuk-body">Or</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>None of the above</li>
+            </ul>
+        </div>
+    </details>
+
+    <h2 id="keywords" class="govuk-heading-m">Keywords</h2>
+    <p class="govuk-body">Adding keywords will help users find your data set or API if they search for terms that do not appear in your title or description. </p>
+    <p class="govuk-body">Each keyword should be:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>relevant to what your data is about  </li>
+        <li>a word or phrase – for example, ‘schools’ or ‘exam results’</li>
+    </ul>
+    <p class="govuk-body">Examples of good keywords for a data set titled ‘UK Border Crossing’:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>airport</li>
+        <li>seaport</li>
+        <li>railport</li>
+        <li>UK border</li>
+        <li>passport</li>
+        <li>passport numbers</li>
+        <li>daily border crossings</li>
+        <li>monthly border crossings</li>
+    </ul>
+
+    <h2 id="point-of-contact" class="govuk-heading-m">Point of contact</h2>
+    <p class="govuk-body">You must provide the name and email address of the team or individual that will respond to queries about, or requests for, this data set or API.</p>
+    <p class="govuk-body">Providing a team is better if there are several people who can respond. If you’re providing an individual, include their first and last name.</p>
+    <p class="govuk-body">Other Data Marketplace users will be able to see these details.</p>
+
+    <h2 id="data-owner" class="govuk-heading-m">Data owner</h2>
+    <p class="govuk-body">You must provide the name and email address of the owner of the data set or API.</p>
+    <p class="govuk-body">Other Data Marketplace users will not be able to see these details – they are only visible to publishers in your organisation.</p>
+    <p class="govuk-body">
+        A data owner is an individual that is accountable for the data, including how it’s defined and managed.
+        They tend to be different from the point of contact.
+    </p>
+    <p class="govuk-body">Find out more about the  <a class="govuk-link" href="https://www.gov.uk/government/publications/essential-shared-data-assets-and-data-ownership-in-government/data-ownership-in-government-html">role of data owners</a> in government.</p>
+    <p class="govuk-body">Some organisations have a dedicated data owner role. In others, this role is played by an  <a class="govuk-link" href="https://www.gov.uk/government/publications/information-asset-owner-role-guidance">Information Asset Owner (IAO)</a>.</p>
+    
+    <h2 id="date-available" class="govuk-heading-m">Date first made available</h2>
+    <p class="govuk-body">This refers to when the data set or API was first published in your organisation’s data catalogue, or made publicly available (if applicable).</p>
+    
+    <h2 id="frequency-update" class="govuk-heading-m">Frequency of update</h2>
+    <p class="govuk-body">This refers to the expected interval between updates to the data.</p>
+    <p class="govuk-body">Knowing this can help users understand when the data may be republished.</p>
+    <details class="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+                Options for update frequency
+            </span>
+        </summary>
+        <div class="govuk-details__text">
+            <ul class="govuk-list govuk-list--bullet">
+                <li>Never – select this if the data is a ‘one off’ and you do not expect to update it</li>
+                <li>Daily</li>
+                <li>Weekly</li>
+                <li>Monthly</li>
+                <li>Quarterly</li>
+                <li>Yearly</li>
+            </ul>
+            <p class="govuk-body">Or</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>I don’t know</li>
+                <li>Other – you can enter a custom time period, for example ‘hourly’ or ‘every 3 years’</li>
+            </ul>
+        </div>
+    </details>
+
+    <h2 id="public-restricted" class="govuk-heading-m">Public or restricted data</h2>
+    <p class="govuk-body">You can add listings of data that is:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>public – anyone can access the data</li>
+        <li>restricted – accessing the data requires a data share agreement</li>
+    </ul>
+
+    <h2 id="listing-public" class="govuk-heading-m">Listing public data</h2>
+    <p class="govuk-body">Select a licence for how the data can be used, if you know this.</p>
+    <p class="govuk-body">The options are:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li> <a class="govuk-link" href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence</a>  </li>
+        <li>Not known  </li>
+        <li>Other – you can enter a custom licence name and URL</li>
+    </ul>
+    <p class="govuk-body">You must then provide one or more links to access the data.</p>
+    <p class="govuk-body">Each link can be to:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>download a file directly</li>
+        <li>a webpage that contains the data</li>
+        <li>API documentation</li>
+    </ul>
+    <p class="govuk-body">If the link is to download a file, you also need to provide a:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>link title to describe that distribution – you can use the listing title if you're only adding one link</li>
+        <li>file format</li>
+    </ul>
+
+    <h2 id="listing-restricted" class="govuk-heading-m">Listing restricted data</h2>
+    <p class="govuk-body">
+        When you list a restricted data set or API for your organisation, other Data Marketplace users can request it.
+    </p>
+    <p class="govuk-body">Your organisation must be prepared to:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>review requests for that data set or API</li>
+        <li>provide access to the data if it approves the request</li>
+    </ul>
+    <p class="govuk-body">
+        You must specify how users will be able to access the data if their request is approved, selecting one or more from:
+    </p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>file download – you can choose to specify one or more formats</li>
+        <li>API – you can choose to add a link to API documentation</li>
+        <li>webpage</li>
+        <li>other – select this if the data is available by any other method</li>
+    </ul>
+</div>

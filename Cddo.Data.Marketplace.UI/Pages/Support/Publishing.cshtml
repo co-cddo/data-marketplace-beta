@@ -1,0 +1,78 @@
+﻿@using Cddo.Data.Marketplace.UI.Controllers
+@model Cddo.Data.Marketplace.UI.Pages.Support.PublishingModel
+@{
+    ViewData["Title"] = "Support - Publishing";
+    Layout = "~/Pages/Shared/_SupportLayout.cshtml";
+}
+
+<h1 class="govuk-heading-l">
+    Publishing on the Data Marketplace
+</h1>
+
+<div class="govuk-body">
+    <p class="govuk-body">Find out how to publish listings of your data on the Data Marketplace.</p>
+    <p class="govuk-body">You can also learn about the <a class="govuk-link" asp-controller="Support" asp-action="@nameof(SupportController.PublishingDetails)">details that make up your listing</a>.</p>
+    <p class="govuk-body"><strong>On this page</strong></p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li><a class="govuk-link" href="#type-of-listing">Types of listing</a>  </li>
+        <li><a class="govuk-link" href="#add-listing">Why you should add listings</a>  </li>
+        <li><a class="govuk-link" href="#become-publisher">Become a publisher</a>  </li>
+        <li><a class="govuk-link" href="#select-method">Select a publishing method</a></li>
+        <li><a class="govuk-link" href="#before-publish">Before you publish anything</a></li>
+    </ul>
+    <h2 id="type-of-listing" class="govuk-heading-m">Types of listing</h2>
+    <p class="govuk-body">The Data Marketplace has a catalogue of listings.</p>
+    <p class="govuk-body">Each listing describes a data set or API that users can:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>access immediately – if the data set or API is public</li>
+        <li>request access to – if the data set or API is restricted</li>
+    </ul>
+    <p class="govuk-body">Public (or ‘open’) data listings include links that users can follow to download the data. This data is publicly available so there is no need for a data share agreement.</p>
+    <p class="govuk-body"><a class="govuk-link" asp-controller="Support" asp-action="@nameof(SupportController.RequestingRestrictedData)">Restricted data</a> requires a data share agreement to be set up between the organisation that wants the data and the organisation that owns it.</p>
+    <h2 id="add-listing" class="govuk-heading-m">Why you should add listings</h2>
+    <p class="govuk-body">Before the Data Marketplace there was no central catalogue of the data that government organisations share.</p>
+    <p class="govuk-body">If you share your organisation’s data with other government organisations, or make it available to the public, using the Data Marketplace can save you time and effort.</p>
+    <p class="govuk-body">By publishing listings of your available data sets or APIs, other government colleagues will be able to find your data and understand how to access it.</p>
+    <p class="govuk-body">This may help to:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>reduce the number of queries you receive about your data  </li>
+        <li>save you time when reviewing data requests from other organisations</li>
+    </ul>
+    <h2 id="become-publisher" class="govuk-heading-m">Become a publisher</h2>
+    <p class="govuk-body">Follow the steps below if you want to publish listings on the Data Marketplace.</p>
+    <ol>
+        <li><a class="govuk-link"  href="/auth/signin">Create a Data Marketplace account</a> using your government email address.  </li>
+        <li>Request the Metadata Publisher role from your user profile.</li>
+    </ol>
+    <h2 id="select-method" class="govuk-heading-m">Select a publishing method</h2>
+    <p class="govuk-body">There are 2 ways to publish listings:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>complete a web form  </li>
+        <li>connect to the Data Marketplace API</li>
+    </ul>
+    <h3 class="govuk-heading-s">Web form</h3>
+    <p class="govuk-body">
+        This method is the most straightforward if you want to add one listing at a
+        time. You’ll answer questions about the data set or API, check your answers and then publish the listing.
+    </p>
+    <h3 class="govuk-heading-s">API</h3>
+    <p class="govuk-body">You can synchronise your organisation’s metadata with the Data Marketplace by using the Data Marketplace publish API.</p>
+    <p class="govuk-body">This allows you to automatically publish and update listings in the Data Marketplace catalogue, using information from your organisation’s data catalogue or data store.</p>
+    <p class="govuk-body">You’ll need someone with technical expertise and knowledge of APIs to carry out this integration. Typically this will be an API developer.</p>
+    <details class="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+                Onboard your API developer
+            </span>
+        </summary>
+        <div class="govuk-details__text">
+            <p class="govuk-body">Your API developer must work in your organisation and have an email address with your organisation’s domain (for example, hmrc.gov.uk).</p>
+            <p class="govuk-body">They will need to create a Data Marketplace account using this address.  Once they’ve signed in, they will be able to access the API.</p>
+            <p class="govuk-body"><a class="govuk-link" href="/support/support-api">API documentation</a></p>
+            <p class="govuk-body"></p>
+        </div>
+    </details>
+    <h2 id="before-publish" class="govuk-heading-m">Before you publish anything</h2>
+    <p class="govuk-body">Make sure that your Chief Data Officer (CDO), or the senior person responsible for data in your organisation, is aware that the data is being listed in the Data Marketplace.</p>
+    <p class="govuk-body">Whichever publishing method you choose, the <a class="govuk-link" asp-controller="Support" asp-action="@nameof(SupportController.PublishingDetails)">details you need to provide for your listing</a> are the same.</p>
+</div>
