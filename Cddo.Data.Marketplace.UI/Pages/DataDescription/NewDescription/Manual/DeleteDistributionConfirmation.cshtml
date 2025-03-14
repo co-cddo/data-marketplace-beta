@@ -1,0 +1,25 @@
+﻿@using Cddo.Data.Marketplace.UI.Controllers
+@using Cddo.Data.Marketplace.UI.Model
+@model DeleteDistribtionModel
+@{
+    ViewData["Title"] = "Assert Confirmation";
+}
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
+
+<div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form asp-controller="CatalogData" asp-action="@nameof(CatalogDataDescriptionController.RemoveDistributionLinks)" asp-route-identifier="@Model.Identifier">
+                <input type="hidden" name="@nameof(DeleteDataAssetModel.Identifier)" value="@Model.Identifier" />
+                <h2 class="govuk-heading-l">Are you sure you want to delete this link?</h2>
+                <p class="govuk-body">@Model.Title</p>
+                <div class="govuk-button-group">
+                    <button class="govuk-button govuk-button--warning" type="submit" asp-action="@nameof(CatalogDataDescriptionController.RemoveDistributionLinks)" asp-route-identifier="@Model.Identifier" asp-route-distributionId="@Model.DistributionId" asp-route-isEditMode="true">Confirm delete</button>
+                    <a class="govuk-button govuk-button--secondary" href="javascript:window.history.back()">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
