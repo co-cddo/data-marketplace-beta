@@ -5,8 +5,5 @@ namespace Cddo.Data.Marketplace.UI.Pages.Support
 {
     public class PublishingDetailsModel : PageModel
     {
-        public void OnGet()
-        {
-        }
     }
 }
