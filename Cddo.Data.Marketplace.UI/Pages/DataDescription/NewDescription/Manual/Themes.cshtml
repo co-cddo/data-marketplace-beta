@@ -65,7 +65,7 @@
                             <div class="govuk-checkboxes__divider">or</div>
 
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" id="none" name="@nameof(QuestionThemeRequest.Theme)" type="checkbox" value="None of the above" @(isNoneSelected ? "checked" : "")>
+                                <input class="govuk-checkboxes__input" id="none" name="@nameof(QuestionThemeRequest.Theme)" type="checkbox" value="None of the above" @(isNoneSelected ? "checked" : "") data-behaviour="exclusive">
                                 <label class="govuk-label govuk-checkboxes__label" for="none">
                                     None of the above
                                 </label>
