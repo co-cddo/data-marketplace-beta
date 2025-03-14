@@ -47,6 +47,27 @@ public class SupportController : Controller
         ViewData["Tags"] = tags;
         return View("~/Pages/Support/DataShareQuestions.cshtml");
     }
+
+    [Route("publishing")]
+    public async Task<IActionResult> PublishingPage()
+    {
+        List<TagLinks> tags = await SetEndpointLinks();
+
+        ViewData["Tags"] = tags;
+
+        return View("~/Pages/Support/Publishing.cshtml");
+    }
+
+    [Route("publishing-details")]
+    public async Task<IActionResult> PublishingDetails()
+    {
+        List<TagLinks> tags = await SetEndpointLinks();
+
+        ViewData["Tags"] = tags;
+
+        return View("~/Pages/Support/PublishingDetails.cshtml");
+    }
+
     [Route("support-api")]
     public async Task<IActionResult> ApiSupport()
     {

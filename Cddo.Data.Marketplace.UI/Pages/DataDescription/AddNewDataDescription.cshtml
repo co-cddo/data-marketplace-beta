@@ -24,12 +24,11 @@
                     <fieldset class="govuk-fieldset" aria-describedby="dataDescription-hint">
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                             <h1 class="govuk-fieldset__heading">
-                                How do you want to add your data description?
+                                Choose how to add your listing
                             </h1>
                         </legend>
                         <div id="dataDescription-hint" class="govuk-hint">
-                            Your data description will be added to the Data Marketplace's catalogue.
-                            Other users will then be able to find it and start a data share request to access the data from your organisation.
+                            Your listing will be published in the Data Marketplace.
                         </div>
 
                         @if (hasError)
@@ -76,6 +75,16 @@
 
                 <button class="govuk-button" data-module="govuk-button">Start now</button>
             </form>
+        </div>
+        <div class="govuk-grid-column-one-third">
+            <h2 class="govuk-heading-m">
+                More information
+            </h2>
+            <p class="govuk-body">
+                <a class="govuk-link" asp-controller="Support" asp-action="@nameof(SupportController.PublishingPage)">
+                    Learn about listings and the details we ask for
+                </a>
+            </p>
         </div>
     </div>
 </div>
