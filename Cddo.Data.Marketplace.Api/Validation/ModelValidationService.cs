@@ -291,6 +291,7 @@ namespace Cddo.Data.Marketplace.Api.Validation
                     {
                         Type = ResourceEnum.DataSet,
                         Identifier = Guid.NewGuid().ToString(),
+                        License = new Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.License{ Title = "Creative Commons", LicenseUrl="https://creativecommons.org/licenses/by/4.0"},
                         Title = "Mocked Dataset Title",
                         AccessRights = AccessRightsEnum.Open,
                         ContactPoint = new List<Contact>
@@ -310,8 +311,9 @@ namespace Cddo.Data.Marketplace.Api.Validation
                     {
                         Type = ResourceEnum.DataService,
                         Identifier = Guid.NewGuid().ToString(),
+                        License = new Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.License{ Title = "Restricted", LicenseUrl="https://restrictedlicence.gov.uk"},
                         Title = "Mocked Data Service Title",
-                        AccessRights = AccessRightsEnum.Internal,
+                        AccessRights = AccessRightsEnum.Restricted,
                         ContactPoint = new List<Contact>
                         {
                             new() { Name = "Jane Smith", Email = "servicecontact@example.com", Role = ContactRoleEnum.Contact }
@@ -337,6 +339,7 @@ namespace Cddo.Data.Marketplace.Api.Validation
             {
                 Type = ResourceEnum.DataSet,
                 Identifier = datasetId,
+                License = new Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.License { Title = "Creative Commons", LicenseUrl = "https://creativecommons.org/licenses/by/4.0" },
                 Title = "Mocked Dataset Title",
                 AccessRights = AccessRightsEnum.Open,
                 ContactPoint = new List<Contact>
@@ -356,9 +359,12 @@ namespace Cddo.Data.Marketplace.Api.Validation
                     {
                         new()
                         {
+                            Title = "CSV Download",
+                            Description = "Complete dataset provided as a downloadable file",
                             AccessService = ["17554d2c-7251-4822-8813-872effcc5650"],
                             DownloadUrl = "https://testing.com/api",
-                            MediaType = ["application/xml"]
+                            MediaType = ["text/csv"],
+                            Format = "CSV File"
                         }
                     },
                 UpdateFrequency = "Yearly"
@@ -373,6 +379,7 @@ namespace Cddo.Data.Marketplace.Api.Validation
             {
                 Identifier = datasetId,
                 Title = patchModel.Title ?? "Mocked Updated Dataset",
+                License = patchModel.License ?? new Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.License { Title = "Creative Commons", LicenseUrl = "https://creativecommons.org/licenses/by/4.0" },
                 Description = patchModel.Description ?? "This is a mocked description for the sandbox environment.",
                 Status = patchModel.Status ?? ResourceStatusEnum.Published,
                 SupplierIdentifier = patchModel.SupplierIdentifier ?? "mocked-supplier-123",
@@ -391,13 +398,16 @@ namespace Cddo.Data.Marketplace.Api.Validation
                     {
                         new()
                         {
+                            Title = "CSV Download",
+                            Description = "Complete dataset provided as a downloadable file",
                             AccessService = ["17554d2c-7251-4822-8813-872effcc5650"],
                             DownloadUrl = "https://testing.com/api",
-                            MediaType = ["application/xml"],
+                            MediaType = ["text/csv"],
+                            Format = "CSV File"
                         }
                     },
-                AccessRights = AccessRightsEnum.Internal,
-                UpdateFrequency = "Yearly"
+                UpdateFrequency = "Yearly",
+                AccessRights = AccessRightsEnum.Open
             };
 
             return updatedDataset;
