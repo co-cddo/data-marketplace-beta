@@ -295,7 +295,7 @@ namespace Cddo.Data.Marketplace.Api.Validation
                         AccessRights = AccessRightsEnum.Open,
                         ContactPoint = new List<Contact>
                         {
-                            new() { Name = "John Doe", Email = "contact@example.com", Role = ContactRoleEnum.Owner }
+                            new() { Name = "John Doe", Email = "contact@example.com", Role = ContactRoleEnum.Contact }
                         },
                         Description = "This is a mocked dataset description for sandbox.",
                         Keyword = new List<string> { "mock", "dataset", sandbox },
@@ -346,7 +346,7 @@ namespace Cddo.Data.Marketplace.Api.Validation
                 AccessRights = AccessRightsEnum.Open,
                 ContactPoint = new List<Contact>
                     {
-                        new() { Name = "Mock Dataset Owner", Email = "owner@example.com", Role = ContactRoleEnum.Owner }
+                        new() { Name = "Mock Dataset Owner", Email = "owner@example.com", Role = ContactRoleEnum.Contact }
                     },
                 Description = "This is a mocked dataset description tailored for the sandbox environment.",
                 Keyword = new List<string> { sandbox, "mocked", "dataset" },
@@ -400,7 +400,7 @@ namespace Cddo.Data.Marketplace.Api.Validation
                 },
                 ContactPoint = new List<Contact>
                     {
-                        new() { Name = "Mock Dataset Owner", Email = "owner@example.com", Role = ContactRoleEnum.Owner }
+                        new() { Name = "Mock Dataset Owner", Email = "owner@example.com", Role = ContactRoleEnum.Contact }
                     },
                 Distribution = new List<Distribution>
                     {
@@ -429,7 +429,7 @@ namespace Cddo.Data.Marketplace.Api.Validation
                 Publisher = "Mocked Publisher",
                 ContactPoint = new List<Contact>
                     {
-                        new() { Name = "Mocked Contact", Email = "mocked.contact@example.com", Role = ContactRoleEnum.Owner }
+                        new() { Name = "Mocked Contact", Email = "mocked.contact@example.com", Role = ContactRoleEnum.Contact }
                     },
                 AccessRights = AccessRightsEnum.Open,
                 Status = ResourceStatusEnum.Published,

@@ -1276,6 +1276,8 @@ namespace CDDO.DataMarketplace.Controllers.External
 
             return initiatingUserDetails;
         }
+
+        [NonAction]
         public void SetIncrementalIds(List<Distribution> distributions)
         {
             int idCounter = 1;
@@ -1285,8 +1287,6 @@ namespace CDDO.DataMarketplace.Controllers.External
                 distribution.Id = idCounter++;
             }
         }
-
-
     }
 }
 
