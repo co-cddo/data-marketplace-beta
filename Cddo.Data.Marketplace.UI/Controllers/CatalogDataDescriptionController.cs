@@ -1591,6 +1591,9 @@ public class CatalogDataDescriptionController(
             ViewBag.distributions = await getExistingDistributions(questionDistributionRequest.Identifier, questionDistributionRequest.Distribution?.FirstOrDefault()?.Id);
 
             //return RedirectToAction(nameof(AddDistributionLinks), new { identifier = questionDistributionRequest.Identifier });
+            ViewBag.isCheckList = isCheckList;
+            ViewBag.isCheckAnswers = isCheckAnswers;
+            ViewBag.isEditMode = isEditMode;
 
             return ViewOrRedirect(DistributionLinkViewPath, questionDistributionRequest);
         }
