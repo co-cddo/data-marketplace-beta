@@ -22,6 +22,8 @@ using Newtonsoft.Json;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using System.Linq;
 using System.Data;
+using Microsoft.Azure.Cosmos.Linq;
+using Cddo.Data.Marketplace.UI.Model;
 
 namespace Cddo.Data.Marketplace.UI.Controllers;
 
@@ -48,6 +50,7 @@ public class CatalogDataDescriptionController(
     private const string KeywordsViewPath = "~/Pages/DataDescription/NewDescription/Manual/Keywords.cshtml";
     private const string DataOwnerViewPath = "~/Pages/DataDescription/NewDescription/Manual/DataOwner.cshtml";
     private const string PublishedDateViewPath = "~/Pages/DataDescription/NewDescription/Manual/PublishedDate.cshtml";
+    private const string DistributionLinkViewPath = "~/Pages/DataDescription/NewDescription/Manual/DistributionLink.cshtml";
     private const string ContactPointViewPath = "~/Pages/DataDescription/NewDescription/Manual/ContactPoint.cshtml";
 
     // Centralised roles definition
@@ -1517,7 +1520,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("distribution-links")]
-    public async Task<IActionResult> AddDistributionLinks(QuestionDistributionRequest questionKeywordRequest, string? identifier, string? mediaType, int? distributionId, string? isCheckList, string? isCheckAnswers, string? isEditMode)
+    public async Task<IActionResult> AddDistributionLinks(QuestionDistributionRequest questionDistributionRequest, string? identifier, string? mediaType, int? distributionId, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -1529,14 +1532,14 @@ public class CatalogDataDescriptionController(
 
         if (!string.IsNullOrEmpty(identifier))
         {
-            questionKeywordRequest.Identifier = identifier;
+            questionDistributionRequest.Identifier = identifier;
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             if (dataAsset is not null)
             {
                 ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
                 foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
                 {
-                    questionKeywordRequest.Distribution?.Add(new Distribution
+                    questionDistributionRequest.Distribution?.Add(new Distribution
                     {
                         MediaType = [distribution?.MediaType!],
                         DownloadUrl = distribution?.DownloadUrl,
@@ -1553,26 +1556,25 @@ public class CatalogDataDescriptionController(
         ViewBag.isCheckList = isCheckList;
         ViewBag.isCheckAnswers = isCheckAnswers;
         ViewBag.isEditMode = isEditMode;
-        ViewBag.distributions = questionKeywordRequest.Distribution;
+        ViewBag.distributions = questionDistributionRequest.Distribution;
         bool result;
         bool.TryParse(isEditMode, out result);
         if (result)
         {
-            questionKeywordRequest.Distribution = [questionKeywordRequest?.Distribution?.FirstOrDefault(x => x.Id == distributionId)];
+            questionDistributionRequest.Distribution = [questionDistributionRequest?.Distribution?.FirstOrDefault(x => x.Id == distributionId)];
         }
         else
         {
-            questionKeywordRequest.Distribution = new List<Distribution>() { new Distribution() { Id = distributionId, MediaType = new List<string>() { mediaType } } };
+            questionDistributionRequest.Distribution = new List<Distribution>() { new Distribution() { Id = distributionId, MediaType = new List<string>() { mediaType } } };
         }
        
-        return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/DistributionLink.cshtml", questionKeywordRequest);
+        return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/DistributionLink.cshtml", questionDistributionRequest);
     }
-
     [HttpPost("distribution-links")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddDistributionLinks(QuestionDistributionRequest questionDistributionRequest, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
-       
+
         if (!ModelState.IsValid)
         {
             var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
@@ -1580,7 +1582,25 @@ public class CatalogDataDescriptionController(
             string summary = $"Validation failed for Add-Distribution-Link. Errors: {string.Join(", ", validationErrors)}";
             await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Distribution-Link", summary);
         }
+        ModelState.Clear();
+
+        if (!isDistributionValid(questionDistributionRequest.Distribution?.FirstOrDefault()))
+        {
+            addDistributionModelErrors(questionDistributionRequest.Distribution?.FirstOrDefault());
+
+            ViewBag.distributions = await GetExistingDistributions(questionDistributionRequest.Identifier);
+
+            //return RedirectToAction(nameof(AddDistributionLinks), new { identifier = questionDistributionRequest.Identifier });
+            ViewBag.isCheckList = isCheckList;
+            ViewBag.isCheckAnswers = isCheckAnswers;
+            ViewBag.isEditMode = isEditMode;
+
+            return ViewOrRedirect(DistributionLinkViewPath, questionDistributionRequest);
+        }
+
         var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(questionDistributionRequest.Identifier));
+
+
         bool result;
         bool.TryParse(isEditMode, out result);
         if (questionDistributionRequest.Distribution != null && !result)
@@ -1598,9 +1618,9 @@ public class CatalogDataDescriptionController(
                 });
             }
         }
-        else if(dataAsset?.CddoDataAsset?.DataAssetDistribution != null)
+        else if (dataAsset?.CddoDataAsset?.DataAssetDistribution != null)
         {
-            foreach (var distribution in dataAsset?.CddoDataAsset?.DataAssetDistribution.Where(x=>x.Id != questionDistributionRequest?.Distribution?.FirstOrDefault().Id))
+            foreach (var distribution in dataAsset?.CddoDataAsset?.DataAssetDistribution.Where(x => x.Id != questionDistributionRequest?.Distribution?.FirstOrDefault().Id))
             {
                 questionDistributionRequest?.Distribution?.Add(new Distribution()
                 {
@@ -1627,13 +1647,196 @@ public class CatalogDataDescriptionController(
 
         if (response is not null)
         {
+            //ViewBag.distributions = questionDistributionRequest.Distribution;
             await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", $"Updated the update supply format of data set {response.DataAssetId}");
 
             return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddAccessLinksSubmit), isEditMode)
                    ?? RedirectToAction(nameof(AddAccessLinksSubmit), new { identifier = response.DataAssetId.ToString() });
         }
+        //ViewBag.distributions = questionDistributionRequest.Distribution;
+
 
         return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/AccessLinks.cshtml", questionDistributionRequest);
+    }
+    [Route("remove-distribution-link-confirmation")]
+    public async Task<IActionResult> RemoveDistributionLinkConfirmation(string identifier, int distributionId, string? title)
+    {
+        DeleteDistribtionModel model = new()
+        {
+            Identifier = identifier,
+            DistributionId = distributionId,
+            Title = title??""
+        };
+        return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/DeleteDistributionConfirmation.cshtml", model);
+
+    }
+    [Route("remove-distribution-links")]
+    public async Task<IActionResult> RemoveDistributionLinks(QuestionDistributionRequest questionDistributionRequest, string? identifier,  int? distributionId, string? isCheckList, string? isCheckAnswers, string? isEditMode)
+    {
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+
+            string summary = $"Validation failed for remove-Supply-Format. Errors: {string.Join(", ", validationErrors)}";
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", summary);
+        }
+
+        if (!string.IsNullOrEmpty(identifier))
+        {
+            questionDistributionRequest.Identifier = identifier;
+            var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+            if (dataAsset is not null)
+            {
+                if (questionDistributionRequest.Distribution != null)
+                {
+                    foreach (var distribution in dataAsset.CddoDataAsset.DataAssetDistribution.Where(x => x.Id != distributionId))
+                    {
+                        questionDistributionRequest.Distribution.Add(new Distribution()
+                        {
+                            MediaType = new List<string>() { distribution.MediaType },
+                            AccessUrl = distribution.AccessUrl,
+                            DownloadUrl = distribution.DownloadUrl,
+                            Format = distribution.Format,
+                            Title = distribution.Title,
+                            Id = distribution.Id
+                        });
+                    }
+                }
+                else if (dataAsset?.CddoDataAsset?.DataAssetDistribution != null)
+                {
+                    foreach (var distribution in dataAsset?.CddoDataAsset?.DataAssetDistribution?.Where(x => x.Id != distributionId))
+                    {
+                        questionDistributionRequest?.Distribution?.Add(new Distribution()
+                        {
+                            MediaType = new List<string>() { distribution.MediaType },
+                            AccessUrl = distribution.AccessUrl,
+                            DownloadUrl = distribution.DownloadUrl,
+                            Format = distribution.Format,
+                            Title = distribution.Title,
+                            Id = distribution.Id
+                        });
+                    }
+                }
+                questionDistributionRequest!.Distribution?.RemoveAll(x => x.Id == distributionId);
+            }
+        }
+        PatchProfiledDataAssetResponse? response;
+
+        try
+        {
+            response = await _catalogQuestionsService.UpdateDistributionAsync(questionDistributionRequest, DataAssetType.DataSet);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return RedirectToPage(AccessDeniedPage);
+        }
+
+        if (response is not null)
+        {
+            await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", $"Updated the update supply format of data set {response.DataAssetId}");
+
+            return RedirectBasedOnFlags("false", isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(AddAccessLinksSubmit), isEditMode)
+                   ?? RedirectToAction(nameof(AddAccessLinksSubmit), new { identifier = response.DataAssetId.ToString() });
+        }
+
+        return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/AccessLinks.cshtml", questionDistributionRequest);
+    }
+
+
+    private bool isDistributionValid(Distribution? distribution)
+    {
+        if(distribution?.MediaType?.FirstOrDefault() == "File download")
+        {
+            if (distribution.Title.IsNullOrEmpty() || distribution.DownloadUrl.IsNullOrEmpty() || distribution.Format.IsNullOrEmpty()) 
+            {
+                return false;
+            }
+        }
+        if(distribution?.MediaType?.FirstOrDefault() == "API")
+        {
+            if (distribution.Title.IsNullOrEmpty() || distribution.AccessUrl.IsNullOrEmpty())
+            {
+                return false;
+            }
+        }
+        if (distribution?.MediaType?.FirstOrDefault() == "text/html")
+        {
+            if (distribution.Title.IsNullOrEmpty() || distribution.DownloadUrl.IsNullOrEmpty())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    private void addDistributionModelErrors(Distribution? distribution)
+    {
+        if(distribution?.MediaType?.FirstOrDefault() == "File download")
+        {
+            if (distribution.Title.IsNullOrEmpty())
+            {
+                ModelState.AddModelError("title", "Enter a Title");
+            }
+
+            if (distribution.DownloadUrl.IsNullOrEmpty())
+            {
+                ModelState.AddModelError("url", "Enter a Link URL");
+            }
+
+            if (distribution.Format.IsNullOrEmpty())
+            {
+                ModelState.AddModelError("link-download-format", "Enter a File Format");
+            }
+
+        }
+        if (distribution?.MediaType?.FirstOrDefault() == "API")
+        {
+            if (distribution.Title.IsNullOrEmpty())
+            {
+                ModelState.AddModelError("title", "Enter a Title");
+            }
+
+            if (distribution.AccessUrl.IsNullOrEmpty())
+            {
+                ModelState.AddModelError("url", "Enter  Documentation URL");
+            }
+        }
+        if (distribution?.MediaType?.FirstOrDefault() == "text/html")
+        {
+            if (distribution.Title.IsNullOrEmpty())
+            {
+                ModelState.AddModelError("title", "Enter a Title");
+            }
+
+            if (distribution.DownloadUrl.IsNullOrEmpty())
+            {
+                ModelState.AddModelError("url", "Enter a Link URL");
+            }
+        }
+
+    }
+    private async Task<List<Distribution>> GetExistingDistributions(string identifier)
+    {
+        List<Distribution> distributions = new();
+
+        var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+
+        if (dataAsset?.CddoDataAsset?.DataAssetDistribution != null)
+        {
+            foreach (var distribution in dataAsset?.CddoDataAsset?.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
+            {
+                distributions.Add(new Distribution()
+                {
+                    MediaType = new List<string>() { distribution.MediaType },
+                    AccessUrl = distribution.AccessUrl,
+                    DownloadUrl = distribution.DownloadUrl,
+                    Format = distribution.Format,
+                    Title = distribution.Title,
+                    Id = distribution.Id
+                });
+            }
+        }
+        return distributions;
     }
     [Route("distribution-links-restricted")]
     public async Task<IActionResult> AddDistributionLinksRestricted(QuestionDistributionRequest questionKeywordRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)

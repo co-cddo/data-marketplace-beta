@@ -10,9 +10,11 @@
     ViewData["Title"] = "Check Answers";
     ViewData["LinksTitle"] = "Links";
     ViewData["identifier"] = Model.CddoDataAsset?.Id.ToString();
+    ViewData["AccessRights"] = Model.CddoDataAsset?.AccessRights;
 
     var cddoDataAsset = Model.CddoDataAsset;
     var propertyValidationErrors = Model.PropertyValidationErrors;
+    var accessLinksInvalid = Model.CddoDataAsset?.AccessRights == "OPEN" && Model.Distributions?.Count <= 0;
 
     var blockingErrorsExist = propertyValidationErrors
         .Any(propertyError => propertyError.Errors
@@ -22,7 +24,7 @@
         .Any(propertyError => propertyError.Errors
             .Any(error => error.ErrorSeverity == DataAssetValidationPropertyErrorSeverity.Warning));
 
-    var hasErrors = blockingErrorsExist || warningErrorsExist;
+    var hasErrors = blockingErrorsExist || warningErrorsExist || accessLinksInvalid;
 
     var canPublish = cddoDataAsset?.DataAssetStatus != DataAssetStatus.Published && !hasErrors;
 
@@ -136,7 +138,7 @@
                     <h2 class="govuk-heading-xl">Check your answers before submitting your data</h2>
 
                     @Html.AntiForgeryToken()
-                    @if (propertyValidationErrors.Any())
+                    @if (propertyValidationErrors.Any() || hasErrors)
                     {
                         <div class="govuk-error-summary validation-summary-errors" data-module="govuk-error-summary">
                             <div role="alert">
@@ -153,6 +155,13 @@
                                                     <a href="#@propertyValidationError.PropertyName">@PrettifyValidationPropertyName(propertyValidationError.PropertyName): @FormatPropertyError(error)</a>
                                                 </li>
                                             }
+                                        }
+                                        @if (accessLinksInvalid)
+                                        {
+                                            <li>
+                                                <a href="#Links">Links: You must enter at least one Access Link before publishing</a>
+                                            </li>
+
                                         }
                                     </ul>
                                 </div>
@@ -540,12 +549,11 @@
                             </dd>
                         </div>
                     </dl>
-
-
-                    @if (Model.Distributions != null)
+                    @if (Model.CddoDataAsset?.AccessRights == "OPEN")
                     {
-                        @await Html.PartialAsync("_AccessLinksPartial", Model.Distributions, ViewData)
-
+                        <div id="Links">
+                            @await Html.PartialAsync("_AccessLinksPartial", Model.Distributions, ViewData)
+                        </div>
                     }
 
 

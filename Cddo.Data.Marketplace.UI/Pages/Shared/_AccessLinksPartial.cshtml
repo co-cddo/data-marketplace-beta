@@ -7,18 +7,39 @@
 
 @{
     var identifier = ViewData["identifier"] as string;
-    var fileDownloads = Model.Where(d => d.MediaType.FirstOrDefault() == "File download").ToList();
-    var apis = Model.Where(d => d.MediaType.FirstOrDefault() == "API").ToList();
-    var webpages = Model.Where(d => d.MediaType.FirstOrDefault() == "text/html").ToList();
+    var fileDownloads = Model.Where(d => d.MediaType?.FirstOrDefault() == "File download").ToList();
+    var apis = Model.Where(d => d.MediaType?.FirstOrDefault() == "API").ToList();
+    var webpages = Model.Where(d => d.MediaType?.FirstOrDefault() == "text/html").ToList();
     var linksTitle = ViewData["LinksTitle"] ?? "Access Links";
+    var accessRights = ViewData["AccessRights"] ?? "";
 }
 <h1 class="govuk-heading-l">
     @linksTitle
 </h1>
 
-<p>
-    These links open in a new tab.
-</p>
+
+
+@if (linksTitle.ToString() == "Links" && Model.Count <= 0 && accessRights.ToString() == "OPEN")
+{
+    <div class="govuk-error-summary validation-summary-errors" data-module="govuk-error-summary">
+        <div role="alert">
+            <div class="govuk-error-summary__body">
+                <ul class="govuk-list govuk-error-summary__list">
+                   <li>
+                        <a asp-action="@nameof(CatalogDataDescriptionController.AddSupplyFormat)" asp-route-identifier="@identifier">You must add at least one access link before publishing</a>
+                   </li>
+                  
+                </ul>
+            </div>
+        </div>
+    </div>
+}
+@if(Model.Any())
+{
+    <p>
+        These links open in a new tab.
+    </p>
+}
 
 @if (fileDownloads.Any())
 {
@@ -27,6 +48,7 @@
         <thead class="govuk-table__head">
             <tr class="govuk-table__row">
                 <th scope="col" class="govuk-table__header govuk-!-width-one-half">Downloads</th>
+                <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
                 <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
                 <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
             </tr>
@@ -47,6 +69,9 @@
                     <td class="govuk-table__cell">
                         <a class="govuk-link" asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@identifier" asp-route-mediaType="@distribution.MediaType.FirstOrDefault()" asp-route-distributionId="@distribution.Id" asp-route-isEditMode="true">Change</a>
                     </td>
+                    <td class="govuk-table__cell">
+                        <a type="submit" class="govuk-button govuk-button--warning mb-0" asp-action="@nameof(CatalogDataDescriptionController.RemoveDistributionLinkConfirmation)" asp-route-identifier="@identifier" asp-route-distributionId="@distribution.Id" asp-route-title="@distribution.Title">Delete</a>
+                    </td> 
                 </tr>
             }
         </tbody>
@@ -76,6 +101,9 @@
                     <td class="govuk-table__cell">
                         <a class="govuk-link" asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@identifier" asp-route-mediaType="@distribution.MediaType.FirstOrDefault()" asp-route-distributionId="@distribution.Id" asp-route-isEditMode="true">Change</a>
                     </td>
+                    <td class="govuk-table__cell">
+                        <a type="submit" class="govuk-button govuk-button--warning" asp-action="@nameof(CatalogDataDescriptionController.RemoveDistributionLinkConfirmation)" asp-route-identifier="@identifier" asp-route-distributionId="@distribution.Id" asp-route-title="@distribution.Title" style="margin-bottom: auto;">Delete</a>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -104,6 +132,9 @@
                     </th>
                     <td class="govuk-table__cell">
                         <a class="govuk-link" asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@identifier" asp-route-mediaType="@distribution.MediaType.FirstOrDefault()" asp-route-distributionId="@distribution.Id" asp-route-isEditMode="true">Change</a>
+                    </td>
+                    <td class="govuk-table__cell">
+                        <a type="submit" class="govuk-button govuk-button--warning" asp-action="@nameof(CatalogDataDescriptionController.RemoveDistributionLinkConfirmation)" asp-route-identifier="@identifier" asp-route-distributionId="@distribution.Id" asp-route-title="@distribution.Title" style="margin-bottom: auto;">Delete</a>
                     </td>
                 </tr>
             }
