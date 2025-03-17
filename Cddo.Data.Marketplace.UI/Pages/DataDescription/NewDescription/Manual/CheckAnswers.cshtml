@@ -16,6 +16,8 @@
     var propertyValidationErrors = Model.PropertyValidationErrors;
     var accessLinksInvalid = Model.CddoDataAsset?.AccessRights == "OPEN" && Model.Distributions?.Count <= 0;
 
+    var accessRightsInvalid = Model.CddoDataAsset?.AccessRights is null;
+
     var blockingErrorsExist = propertyValidationErrors
         .Any(propertyError => propertyError.Errors
             .Any(error => error.ErrorSeverity == DataAssetValidationPropertyErrorSeverity.Blocking));
@@ -24,7 +26,7 @@
         .Any(propertyError => propertyError.Errors
             .Any(error => error.ErrorSeverity == DataAssetValidationPropertyErrorSeverity.Warning));
 
-    var hasErrors = blockingErrorsExist || warningErrorsExist || accessLinksInvalid;
+    var hasErrors = blockingErrorsExist || warningErrorsExist || accessLinksInvalid || accessRightsInvalid;
 
     var canPublish = cddoDataAsset?.DataAssetStatus != DataAssetStatus.Published && !hasErrors;
 
@@ -160,6 +162,13 @@
                                         {
                                             <li>
                                                 <a href="#Links">Links: You must enter at least one Access Link before publishing</a>
+                                            </li>
+
+                                        }
+                                        @if (accessRightsInvalid)
+                                        {
+                                            <li>
+                                                <a href="#@nameof(DataSet.AccessRights)">Access Rights: You must select if the data is Open or Restricted</a>
                                             </li>
 
                                         }
@@ -450,14 +459,14 @@
                             </dd>
                         </div>
                         @* Access Rights *@
-                        <div id="@nameof(DataSet.AccessRights)" class="govuk-summary-list__row @(GetErrorMessages(nameof(DataSet.AccessRights)).Any() ? "govuk-form-group--error" : "")">
+                        <div id="@nameof(DataSet.AccessRights)" class="govuk-summary-list__row @(accessRightsInvalid ? "govuk-form-group--error" : "")">
                             <dt class="govuk-summary-list__key">
                                 Access Rights
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @foreach (var errorMessage in GetErrorMessages(nameof(DataSet.UpdateFrequency)))
+                                @if (accessRightsInvalid)
                                 {
-                                    <p class="govuk-error-message">@errorMessage</p>
+                                    <p class="govuk-error-message">You must select if the data is Open or Restricted </p>
                                 }
                                 <ul class="govuk-list">
                                     @cddoDataAsset.AccessRights

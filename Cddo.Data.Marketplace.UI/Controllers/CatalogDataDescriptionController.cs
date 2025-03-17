@@ -1125,6 +1125,8 @@ public class CatalogDataDescriptionController(
                    ?? RedirectToAction(nameof(Licence), new { identifier = response.DataAssetId.ToString() });
             }else if(showNextQuestion != null && ParseBoolean(showNextQuestion) && accessRightsSelection == null)
             {
+                ModelState.AddModelError("access-rights-radio", "You must select an option.");
+
                 return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/AccessRights.cshtml", accessRightsRequest);
             }
 
