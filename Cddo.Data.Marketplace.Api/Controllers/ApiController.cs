@@ -506,12 +506,6 @@ namespace CDDO.DataMarketplace.Controllers.External
 
             if (IsSandboxEnvironment())
             {
-                var validDataSet = _modelValidationService.HandleSimulatedErrors(null, datasetId, true);
-                if (validDataSet != null)
-                {
-                    return StatusCode(validDataSet.Value.Item1, validDataSet.Value.Item2);
-                }
-
                 var updatedDataset = _modelValidationService.GetMockedUpdatedDataset(datasetId, patchModel);
                 return Ok(updatedDataset);
             }
