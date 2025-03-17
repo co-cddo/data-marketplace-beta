@@ -50,6 +50,7 @@
                 <th scope="col" class="govuk-table__header govuk-!-width-one-half">Downloads</th>
                 <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
                 <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
+                <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
             </tr>
         </thead>
         <tbody class="govuk-table__body">
@@ -69,7 +70,7 @@
                         <a class="govuk-link" asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@identifier" asp-route-mediaType="@distribution.MediaType.FirstOrDefault()" asp-route-distributionId="@distribution.Id" asp-route-isEditMode="true">Change</a>
                     </td>
                     <td class="govuk-table__cell">
-                        <a type="submit" class="govuk-button govuk-button--warning" asp-action="@nameof(CatalogDataDescriptionController.RemoveDistributionLinkConfirmation)" asp-route-identifier="@identifier" asp-route-distributionId="@distribution.Id" asp-route-title="@distribution.Title" style="margin-bottom: auto;">Delete</a>
+                        <a type="submit" class="govuk-button govuk-button--warning mb-0" asp-action="@nameof(CatalogDataDescriptionController.RemoveDistributionLinkConfirmation)" asp-route-identifier="@identifier" asp-route-distributionId="@distribution.Id" asp-route-title="@distribution.Title">Delete</a>
                     </td> 
                 </tr>
             }

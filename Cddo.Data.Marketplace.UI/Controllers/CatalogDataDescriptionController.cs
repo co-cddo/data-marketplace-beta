@@ -1588,7 +1588,7 @@ public class CatalogDataDescriptionController(
         {
             addDistributionModelErrors(questionDistributionRequest.Distribution?.FirstOrDefault());
 
-            ViewBag.distributions = await getExistingDistributions(questionDistributionRequest.Identifier, questionDistributionRequest.Distribution?.FirstOrDefault()?.Id);
+            ViewBag.distributions = await GetExistingDistributions(questionDistributionRequest.Identifier);
 
             //return RedirectToAction(nameof(AddDistributionLinks), new { identifier = questionDistributionRequest.Identifier });
             ViewBag.isCheckList = isCheckList;
@@ -1815,17 +1815,15 @@ public class CatalogDataDescriptionController(
         }
 
     }
-    private async Task<List<Distribution>> getExistingDistributions(string? identifier, int? currentID)
+    private async Task<List<Distribution>> GetExistingDistributions(string identifier)
     {
         List<Distribution> distributions = new();
-
-        if (identifier.IsNullOrEmpty() || currentID == null) return distributions;
 
         var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
 
         if (dataAsset?.CddoDataAsset?.DataAssetDistribution != null)
         {
-            foreach (var distribution in dataAsset?.CddoDataAsset?.DataAssetDistribution.Where(x => x.Id != currentID))
+            foreach (var distribution in dataAsset?.CddoDataAsset?.DataAssetDistribution ?? Enumerable.Empty<CddoDataAssetDistribution>())
             {
                 distributions.Add(new Distribution()
                 {
