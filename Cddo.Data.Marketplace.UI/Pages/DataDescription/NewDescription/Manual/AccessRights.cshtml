@@ -39,7 +39,9 @@
                                 Is the data publicly available?
                             </h1>
                         </legend>
-                        <div class="govuk-radios" data-module="govuk-radios">
+                        @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
+
+                        <div id="access-rights-radio" class="govuk-radios" data-module="govuk-radios">
                             <div class="govuk-radios__item">
                                 <input class="govuk-radios__input" id="accessRightsOpen" name="accessRightsSelection" type="radio" value="true"
                                        data-aria-controls="conditional-accessRightsOpen"
