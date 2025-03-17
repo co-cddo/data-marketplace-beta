@@ -304,6 +304,11 @@ namespace Cddo.Data.Marketplace.Api.Validation
                         SecurityClassification = SecurityClassificationEnum.Official,
                         Status = ResourceStatusEnum.Published,
                         SupplierIdentifier = "supplier-12345",
+                        License = new Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.License
+                        { 
+                            Title = "Open Data Set",
+                            LicenseUrl = "https://openlicense.gov.uk"
+                        },
                         Theme = new List<string> { nameof(ThemeEnum.Education), nameof(ThemeEnum.ScienceAndTechnology) }
                     },
                     new()
@@ -311,7 +316,7 @@ namespace Cddo.Data.Marketplace.Api.Validation
                         Type = ResourceEnum.DataService,
                         Identifier = Guid.NewGuid().ToString(),
                         Title = "Mocked Data Service Title",
-                        AccessRights = AccessRightsEnum.Internal,
+                        AccessRights = AccessRightsEnum.Restricted,
                         ContactPoint = new List<Contact>
                         {
                             new() { Name = "Jane Smith", Email = "servicecontact@example.com", Role = ContactRoleEnum.Contact }
@@ -320,7 +325,7 @@ namespace Cddo.Data.Marketplace.Api.Validation
                         Keyword = new List<string> { "mock", "data-service", sandbox },
                         Modified = DateTime.UtcNow.AddDays(-3),
                         Publisher = "Another Mock Publisher",
-                        SecurityClassification = SecurityClassificationEnum.Secret,
+                        SecurityClassification = SecurityClassificationEnum.Official,
                         Status = ResourceStatusEnum.Draft,
                         SupplierIdentifier = "supplier-67890",
                         Theme = new List<string> { nameof(ThemeEnum.HealthAndCare), nameof(ThemeEnum.TransportAndInfrastructure) }
@@ -361,7 +366,12 @@ namespace Cddo.Data.Marketplace.Api.Validation
                             MediaType = ["application/xml"]
                         }
                     },
-                UpdateFrequency = "Yearly"
+                UpdateFrequency = "Yearly",
+                License = new Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.License
+                {
+                    Title = "Open Data Set",
+                    LicenseUrl = "https://openlicense.gov.uk"
+                },
             };
 
             return mockDataset;
@@ -383,6 +393,11 @@ namespace Cddo.Data.Marketplace.Api.Validation
                 Type = ResourceEnum.DataSet,
                 Theme = new List<string> { nameof(ThemeEnum.BusinessEconomicsAndFinance), nameof(ThemeEnum.EnvironmentAndNature) },
                 Issued = DateTime.Now,
+                License = new Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.License
+                {
+                    Title = "Open Data Set",
+                    LicenseUrl = "https://openlicense.gov.uk"
+                },
                 ContactPoint = new List<Contact>
                     {
                         new() { Name = "Mock Dataset Owner", Email = "owner@example.com", Role = ContactRoleEnum.Owner }
