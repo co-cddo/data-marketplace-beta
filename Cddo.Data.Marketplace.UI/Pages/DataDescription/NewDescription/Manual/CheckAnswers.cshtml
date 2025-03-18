@@ -15,8 +15,10 @@
     var cddoDataAsset = Model.CddoDataAsset;
     var propertyValidationErrors = Model.PropertyValidationErrors;
     var accessLinksInvalid = Model.CddoDataAsset?.AccessRights == "OPEN" && Model.Distributions?.Count <= 0;
-
+    var restrictedFormatsInvalid = Model.CddoDataAsset?.AccessRights != "OPEN" && Model.CddoDataAsset?.DataAssetDistribution?.Count <= 0;
     var accessRightsInvalid = Model.CddoDataAsset?.AccessRights is null;
+    var licenceInvalid = Model.CddoDataAsset?.License.Title == null && Model.CddoDataAsset?.AccessRights == "OPEN";
+    var ownerInvalid = cddoDataAsset.DataAssetContacts.FirstOrDefault(x => x.Role == DataAssetContactRoleType.Owner) == null;
 
     var blockingErrorsExist = propertyValidationErrors
         .Any(propertyError => propertyError.Errors
@@ -26,7 +28,9 @@
         .Any(propertyError => propertyError.Errors
             .Any(error => error.ErrorSeverity == DataAssetValidationPropertyErrorSeverity.Warning));
 
-    var hasErrors = blockingErrorsExist || warningErrorsExist || accessLinksInvalid || accessRightsInvalid;
+    var openClosedDataErrorsExist = accessLinksInvalid || accessRightsInvalid || restrictedFormatsInvalid || licenceInvalid || ownerInvalid;
+
+    var hasErrors = blockingErrorsExist || warningErrorsExist || openClosedDataErrorsExist;
 
     var canPublish = cddoDataAsset?.DataAssetStatus != DataAssetStatus.Published && !hasErrors;
 
@@ -161,7 +165,7 @@
                                         @if (accessLinksInvalid)
                                         {
                                             <li>
-                                                <a href="#Links">Links: You must enter at least one Access Link before publishing</a>
+                                                <a href="#Links">Links: Enter 1 or more links to access the data</a>
                                             </li>
 
                                         }
@@ -169,6 +173,27 @@
                                         {
                                             <li>
                                                 <a href="#@nameof(DataSet.AccessRights)">Access Rights: You must select if the data is Open or Restricted</a>
+                                            </li>
+
+                                        }
+                                        @if (restrictedFormatsInvalid)
+                                        {
+                                            <li>
+                                                <a href="#@nameof(DataSet.Distribution)">Formats: Select how users could access the data</a>
+                                            </li>
+
+                                        }
+                                        @if (licenceInvalid)
+                                        {
+                                            <li>
+                                                <a href="#@nameof(DataSet.License)">Licence: Select a licence for the data</a>
+                                            </li>
+
+                                        }
+                                        @if (ownerInvalid)
+                                        {
+                                            <li>
+                                                <a href="#data-owner">Data owner: Select an owner for this data</a>
                                             </li>
 
                                         }
@@ -378,15 +403,19 @@
                         </div>
 
                         @* Data Owner *@
-                        <div class="govuk-summary-list__row">
+                        <div id="data-owner" class="govuk-summary-list__row  @(ownerInvalid ? "govuk-form-group--error" : "")">
                             <dt class="govuk-summary-list__key">
                                 Data owner
                             </dt>
                             <dd class="govuk-summary-list__value">
+                                @if (ownerInvalid)
+                                {
+                                    <p class="govuk-error-message">Select an owner for the data</p>
+                                }
                                 @if (cddoDataAsset.DataAssetContacts is not null)
                                 {
                                     var ownerContact = cddoDataAsset.DataAssetContacts.FirstOrDefault(x => x.Role == DataAssetContactRoleType.Owner);
-
+                                    
                                     if (ownerContact is not null)
                                     {
                                         <span id="@($"{nameof(CataloguedResource.ContactPoint)}.{nameof(Contact.Name)}")">
@@ -396,10 +425,6 @@
                                         <span id="@($"{nameof(CataloguedResource.ContactPoint)}.{nameof(Contact.Email)}")">
                                             @ownerContact.Email
                                         </span>
-                                    }
-                                    else
-                                    {
-                                        <span>The owner is the point of contact</span>
                                     }
                                 }
                             </dd>
@@ -484,14 +509,14 @@
                         @if (cddoDataAsset.AccessRights == "RESTRICTED")
                         {
                             @* Formats *@
-                            <div id="@($"{nameof(DataSet.Distribution)}")" class="govuk-summary-list__row">
+                            <div id="@($"{nameof(DataSet.Distribution)}")" class="govuk-summary-list__row @(restrictedFormatsInvalid ? "govuk-form-group--error" : "")">
                                 <dt class="govuk-summary-list__key">
                                     Formats
                                 </dt>
                                 <dd class="govuk-summary-list__value">
-                                    @foreach (var errorMessage in GetErrorMessages(nameof(DataSet.Distribution)))
+                                    @if (restrictedFormatsInvalid)
                                     {
-                                        <p class="govuk-error-message">@errorMessage</p>
+                                        <p class="govuk-error-message">Select how users could access the data</p>
                                     }
                                     @foreach (var distribution in cddoDataAsset.DataAssetDistribution)
                                     {
@@ -514,17 +539,17 @@
                                 </dd>
                             </div>
                         }
-                        @if (cddoDataAsset.AccessRights == "OPEN" && cddoDataAsset.License != null)
+                        @if (cddoDataAsset.AccessRights == "OPEN")
                         {
                             @* Licence *@
-                            <div id="@($"{nameof(DataSet.Distribution)}")" class="govuk-summary-list__row">
+                            <div id="@($"{nameof(DataSet.License)}")" class="govuk-summary-list__row @(licenceInvalid ? "govuk-form-group--error" : "")">
                                 <dt class="govuk-summary-list__key">
                                     License
                                 </dt>
                                 <dd class="govuk-summary-list__value">
-                                    @foreach (var errorMessage in GetErrorMessages(nameof(DataSet.Distribution)))
+                                    @if (licenceInvalid)
                                     {
-                                        <p class="govuk-error-message">@errorMessage</p>
+                                        <p class="govuk-error-message">Select a licence for the data</p>
                                     }
                                     <ul class="govuk-list">
                                         @if (cddoDataAsset.License.Title != null)
