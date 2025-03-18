@@ -59,7 +59,7 @@
             {
                 <tr class="govuk-table__row">
                     <th scope="row" class="govuk-table__header govuk-!-font-weight-regular">
-                        <a href="@distribution.DownloadUrl">
+                        <a target="_blank" href="@distribution.DownloadUrl">
                             @distribution.Title
                         </a>
                     </th>
@@ -95,7 +95,7 @@
             {
                 <tr class="govuk-table__row">
                     <th scope="row" class="govuk-table__header govuk-!-font-weight-regular">
-                        <a href="@distribution.AccessUrl">
+                        <a target="_blank" href="@distribution.AccessUrl">
                             @distribution.Title
                         </a>
                     </th>
@@ -126,7 +126,7 @@
         <tbody class="govuk-table__body">
             @foreach (var distribution in webpages)
             {
-                <tr class="govuk-table__row">
+                <tr target="_blank" class="govuk-table__row">
                     <th scope="row" class="govuk-table__header govuk-!-font-weight-regular">
                         <a href="@distribution.DownloadUrl">
                             @distribution.Title
