@@ -105,7 +105,7 @@
                     </button>                    
                 </div>
             </form>
-            @if(Model.Distribution.Count() > 0)
+            @if(Model?.Distribution.Count() > 0)
             {
                 @await Html.PartialAsync("_AccessLinksPartial", Model.Distribution, ViewData)
 
