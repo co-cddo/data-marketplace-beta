@@ -1448,7 +1448,7 @@ namespace Cddo.Data.Marketplace.Api.Test.Controllers
             It.IsAny<bool>())).ReturnsAsync(mockResult.Object);
             testItems.MockModelValidationService.Setup(v => v.RecordDataAssetValidationErrorsAndBuildErrorResponseIfInvalid(It.IsAny<IEnumerable<IDataAssetValidationPropertyResult>>(), It.IsAny<IUserDetails>())).Returns((ErrorMessage)null);
             testItems.MockModelValidationService.Setup(v => v.HandleSimulatedErrors(It.IsAny<CataloguedResource>(), It.IsAny<string>(), It.IsAny<bool>())).Returns((400, errorMessage));
-            var result = (ObjectResult)await testItems.DataMarketApiController.UpdateDataset("datasetId", new DataSet());
+            var result = (ObjectResult)await testItems.DataMarketApiController.UpdateDataset("datasetId", (DataSet)null);
 
             //Assert
             result.Should().NotBeNull();
