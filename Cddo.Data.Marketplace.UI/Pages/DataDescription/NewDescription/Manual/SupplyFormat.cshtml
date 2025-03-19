@@ -100,15 +100,9 @@
                     </fieldset>
                 </div>
                 <div class="govuk-button-group">
-                    @if (!isEditMode)
-                    {
-                        <button type="submit" name="showNextQuestion" value="true" class="govuk-button" data-module="govuk-button">
+                     <button type="submit" name="showNextQuestion" value="true" class="govuk-button" data-module="govuk-button">
                             Continue
-                        </button>
-                    }
-                    <button type="submit" name="@saveButtonName" value="true" class="govuk-button govuk-button--secondary" data-module="govuk-button">
-                        Save and return
-                    </button>
+                    </button>                    
                 </div>
             </form>
             @if(Model.Distribution.Count() > 0)
