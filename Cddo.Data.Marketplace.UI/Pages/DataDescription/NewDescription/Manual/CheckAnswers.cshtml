@@ -17,8 +17,8 @@
     var accessLinksInvalid = Model.CddoDataAsset?.AccessRights == "OPEN" && Model.Distributions?.Count <= 0;
     var restrictedFormatsInvalid = Model.CddoDataAsset?.AccessRights != "OPEN" && Model.CddoDataAsset?.DataAssetDistribution?.Count <= 0;
     var accessRightsInvalid = Model.CddoDataAsset?.AccessRights is null;
-    var licenceInvalid = Model.CddoDataAsset?.License.Title == null && Model.CddoDataAsset?.AccessRights == "OPEN";
-    var ownerInvalid = cddoDataAsset.DataAssetContacts.FirstOrDefault(x => x.Role == DataAssetContactRoleType.Owner) == null;
+    var licenceInvalid = Model.CddoDataAsset?.License?.Title == null && Model.CddoDataAsset?.AccessRights == "OPEN";
+    var ownerInvalid = cddoDataAsset?.DataAssetContacts.FirstOrDefault(x => x.Role == DataAssetContactRoleType.Owner) == null;
 
     var blockingErrorsExist = propertyValidationErrors
         .Any(propertyError => propertyError.Errors
