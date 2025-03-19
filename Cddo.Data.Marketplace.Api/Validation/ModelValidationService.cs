@@ -231,7 +231,8 @@ namespace Cddo.Data.Marketplace.Api.Validation
             }
         }
 
-        public (int, ErrorMessage)? HandleSimulatedErrors(CataloguedResource? dataset, string? datasetId, bool isDataset)
+        public (int, ErrorMessage)? HandleSimulatedErrors(CataloguedResource? dataset, string? datasetId,
+            bool isDataset)
         {
             var datasetText = "Dataset";
             if (!isDataset)
@@ -239,48 +240,79 @@ namespace Cddo.Data.Marketplace.Api.Validation
                 datasetText = "Data service";
             }
 
-            var datasetIdErrorMappings = new Dictionary<string, (int StatusCode, string ErrorCode, string Message, string Detail, string ErrorType)>
-            {
-                { "trigger-404", (404, "DM00010", $"{datasetText} with identifier {datasetId} does not exist.", "Triggered by {datasetText} ID for sandbox testing.", "NotFoundError") },
-                { "trigger-500", (500, "DM00011", $"Internal server error occurred while deleting {datasetText} with ID {datasetId}.", "Simulated server-side exception for testing purposes.", applicationError) }
-            };
+            var datasetIdErrorMappings =
+                new Dictionary<string, (int StatusCode, string ErrorCode, string Message, string Detail, string
+                    ErrorType)>
+                {
+                    {
+                        "trigger-404",
+                        (404, "DM00010", $"{datasetText} with identifier {datasetId} does not exist.",
+                            "Triggered by {datasetText} ID for sandbox testing.", "NotFoundError")
+                    },
+                    {
+                        "trigger-500",
+                        (500, "DM00011",
+                            $"Internal server error occurred while deleting {datasetText} with ID {datasetId}.",
+                            "Simulated server-side exception for testing purposes.", applicationError)
+                    }
+                };
 
 
             //Lest check the datasetIds first since the dataset/dataservice can be null
-            if (!string.IsNullOrEmpty(datasetId) && datasetIdErrorMappings.TryGetValue(datasetId, out var datasetIdErrorResponse))
+            if (!string.IsNullOrEmpty(datasetId) &&
+                datasetIdErrorMappings.TryGetValue(datasetId, out var datasetIdErrorResponse))
             {
-                return  (datasetIdErrorResponse.StatusCode, CreateErrorMessage(datasetIdErrorResponse.ErrorCode, datasetIdErrorResponse.Message, datasetIdErrorResponse.Detail, datasetIdErrorResponse.ErrorType));
+                return (datasetIdErrorResponse.StatusCode,
+                    CreateErrorMessage(datasetIdErrorResponse.ErrorCode, datasetIdErrorResponse.Message,
+                        datasetIdErrorResponse.Detail, datasetIdErrorResponse.ErrorType));
             }
 
-            //Errormapping
-            var errorMappings = new Dictionary<string, (int StatusCode, string ErrorCode, string Message, string ErrorType)>
+            if (dataset != null)
             {
-                { "trigger-400", (400, "DM00012", "Simulated validation error for sandbox testing.", "ValidationError")},
-                { "trigger-409", (409, "DM00014", "Simulated conflict error for sandbox testing.", "ConflictError")},
-            };
+                //Errormapping
+                var errorMappings =
+                    new Dictionary<string, (int StatusCode, string ErrorCode, string Message, string ErrorType)>
+                    {
+                        {
+                            "trigger-400",
+                            (400, "DM00012", "Simulated validation error for sandbox testing.", "ValidationError")
+                        },
+                        {
+                            "trigger-409",
+                            (409, "DM00014", "Simulated conflict error for sandbox testing.", "ConflictError")
+                        },
+                    };
+                if (errorMappings.TryGetValue(dataset.Title, out var errorResponse))
+                {
+                    return (errorResponse.StatusCode,
+                        CreateErrorMessage(errorResponse.ErrorCode, errorResponse.Message,
+                            $"Triggered by {datasetText} title.", errorResponse.ErrorType));
+                }
 
-            if (errorMappings.TryGetValue(dataset.Title, out var errorResponse))
-            {
-                return (errorResponse.StatusCode, CreateErrorMessage(errorResponse.ErrorCode, errorResponse.Message, $"Triggered by {datasetText} title.", errorResponse.ErrorType));
+                if (dataset.SupplierIdentifier == "trigger-409")
+                {
+                    var conflictResponse = errorMappings["trigger-409"];
+                    return (conflictResponse.StatusCode,
+                        CreateErrorMessage(conflictResponse.ErrorCode, conflictResponse.Message,
+                            "Triggered by supplier identifier.", conflictResponse.ErrorType));
+                }
+
+                if (dataset.Title == trigger500)
+                {
+                    return (500,
+                        CreateErrorMessage(errorDM00015, errorMessage, $"Triggered by {datasetText} title.",
+                            applicationError));
+                }
+
+                if (dataset.Identifier != null && dataset.Identifier != datasetId && datasetId != null)
+                {
+                    return (500,
+                        CreateErrorMessage(errorDM00012, "Patch model identifier mismatch.",
+                            $"The patch model's identifier does not match the dataset ID.", validationError));
+                }
             }
 
-            if (dataset.SupplierIdentifier == "trigger-409")
-            {
-                var conflictResponse = errorMappings["trigger-409"];
-                return (conflictResponse.StatusCode, CreateErrorMessage(conflictResponse.ErrorCode, conflictResponse.Message, "Triggered by supplier identifier.", conflictResponse.ErrorType));
-            }
-
-            if (dataset.Title == trigger500)
-            {
-                return (500, CreateErrorMessage(errorDM00015, errorMessage, $"Triggered by {datasetText} title.", applicationError));
-            }
-
-            if (dataset.Identifier != null && dataset.Identifier != datasetId && datasetId != null)
-            {
-                return (500, CreateErrorMessage(errorDM00012, "Patch model identifier mismatch.", $"The patch model's identifier does not match the dataset ID.", validationError));
-            }
-
-                return null;
+            return null;
         }
 
         public List<CataloguedResource> GetMockedCataloguedResources()

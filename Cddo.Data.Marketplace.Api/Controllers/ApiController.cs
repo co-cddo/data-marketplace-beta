@@ -207,6 +207,13 @@ namespace CDDO.DataMarketplace.Controllers.External
 
             if (IsSandboxEnvironment())
             {
+                // Introduce controlled error responses for sandbox users
+                var validDataSet = _modelValidationService.HandleSimulatedErrors(null, datasetId, true);
+                if (validDataSet != null)
+                {
+                    return StatusCode(validDataSet.Value.Item1, validDataSet.Value.Item2);
+                }
+
                 // Normal mocked dataset for sandbox
                 var mockDataset = _modelValidationService.GetMockedDataset(datasetId);
                 return Ok(mockDataset);
@@ -506,6 +513,13 @@ namespace CDDO.DataMarketplace.Controllers.External
 
             if (IsSandboxEnvironment())
             {
+                // Introduce controlled error responses for sandbox users
+                var validDataSet = _modelValidationService.HandleSimulatedErrors(patchModel, datasetId, true);
+                if (validDataSet != null)
+                {
+                    return StatusCode(validDataSet.Value.Item1, validDataSet.Value.Item2);
+                }
+
                 var updatedDataset = _modelValidationService.GetMockedUpdatedDataset(datasetId, patchModel);
                 return Ok(updatedDataset);
             }
