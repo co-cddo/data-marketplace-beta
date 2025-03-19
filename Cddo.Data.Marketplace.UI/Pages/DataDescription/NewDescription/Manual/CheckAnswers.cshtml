@@ -518,7 +518,7 @@
                                     {
                                         <p class="govuk-error-message">Select how users could access the data</p>
                                     }
-                                    @foreach (var distribution in cddoDataAsset.DataAssetDistribution)
+                                    @foreach (var distribution in cddoDataAsset?.DataAssetDistribution)
                                     {
                                         <ul class="govuk-list">
                                             @if (!string.IsNullOrEmpty(distribution?.MediaType))
@@ -552,7 +552,7 @@
                                         <p class="govuk-error-message">Select a licence for the data</p>
                                     }
                                     <ul class="govuk-list">
-                                        @if (cddoDataAsset.License.Title != null)
+                                        @if (cddoDataAsset.License?.Title != null)
                                         {
                                             @cddoDataAsset.License.Title
                                         }
