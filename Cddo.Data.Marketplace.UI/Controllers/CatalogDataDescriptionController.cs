@@ -209,7 +209,7 @@ public class CatalogDataDescriptionController(
         if (string.IsNullOrWhiteSpace(questionTitleRequest.Title) && !ModelState.IsValid)
         {
             ModelState.Clear();
-            ModelState.AddModelError("Title", "Enter the title of the data set");
+            ModelState.AddModelError("Title", "Enter the title of the listing");
             ViewBag.isEditMode = isEditMode;
             if (securityClassification is not null) ViewBag.securityClassification = securityClassification;
             return ViewOrRedirect(TitleViewPath, questionTitleRequest);
@@ -955,7 +955,7 @@ public class CatalogDataDescriptionController(
     {
         ModelState.Clear();
 
-        ModelState.AddModelError("metadataIssuedDate", "Provide a valid date");
+        ModelState.AddModelError("metadataIssuedDate", "Enter a date in DD/MM/YYYY format");
 
 
         if (!questionIssuedRequest.metadataIssuedDay.IsNullOrEmpty() && !int.TryParse(questionIssuedRequest.metadataIssuedDay, out int dayResult))
@@ -1138,7 +1138,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("Add-Supply-Format")]
-    public async Task<IActionResult> AddSupplyFormat(QuestionDistributionRequest questionKeywordRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> AddSupplyFormat(QuestionDistributionRequest questionKeywordRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -1183,6 +1183,9 @@ public class CatalogDataDescriptionController(
         
         if(distribution != null)
         {
+            ViewBag.isCheckList = isCheckList;
+            ViewBag.isCheckAnswers = isCheckAnswers;
+            ViewBag.isEditMode = isEditMode;
             var distributionList = JsonConvert.DeserializeObject<List<Distribution>>(distribution);
             questionDistributionRequest.Distribution = distributionList;
         }
@@ -1195,7 +1198,15 @@ public class CatalogDataDescriptionController(
             string summary = $"Validation failed for Add-Supply-Format. Errors: {string.Join(", ", validationErrors)}";
             await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", summary);
         }
+        if(mediaType == null && (distribution == "[]" || string.IsNullOrEmpty(distribution)))
+        {
+            ViewBag.isCheckList = isCheckList;
+            ViewBag.isCheckAnswers = isCheckAnswers;
+            ViewBag.isEditMode = isEditMode;
+            ModelState.AddModelError("access-rights-selection", "Select how users could access the data");
+            return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/SupplyFormat.cshtml", questionDistributionRequest);
 
+        }
         PatchProfiledDataAssetResponse? response;
 
         try
@@ -1226,6 +1237,14 @@ public class CatalogDataDescriptionController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddRestrictedSupplyFormatSubmit(QuestionDistributionRequest questionDistributionRequest, List<string>? supplyFormat, string? distribution, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
+        if(supplyFormat?.Count <= 0 && (distribution == "[]" || string.IsNullOrEmpty(distribution)))
+        {
+            ViewBag.isCheckList = isCheckList;
+            ViewBag.isCheckAnswers = isCheckAnswers;
+            ViewBag.isEditMode = isEditMode;
+            ModelState.AddModelError("access-rights-selection", "Select how users could access the data");
+            return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/AccessRightsRestricted.cshtml", questionDistributionRequest);
+        }
 
         if (distribution != null)
         {
@@ -1471,7 +1490,16 @@ public class CatalogDataDescriptionController(
         //{
         //    questionLicenceRequest.Licence = accessRightsSelection.Value ? "OPEN" : "RESTRICTED";
         //}
-        if(!string.IsNullOrEmpty(license) && license != "Other")
+        if (string.IsNullOrEmpty(license))
+        {
+            ViewBag.isCheckList = isCheckList;
+            ViewBag.isCheckAnswers = isCheckAnswers;
+            ViewBag.isEditMode = isEditMode;
+            ModelState.AddModelError("licence-selection", "Select a licence for the data");
+            return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/Licence.cshtml", questionLicenceRequest);
+
+        }
+        if (!string.IsNullOrEmpty(license) && license != "Other")
         {
             questionLicenceRequest.License.Title = license;
 
@@ -1777,17 +1805,17 @@ public class CatalogDataDescriptionController(
         {
             if (distribution.Title.IsNullOrEmpty())
             {
-                ModelState.AddModelError("title", "Enter a Title");
+                ModelState.AddModelError("title", "Enter the title of the file");
             }
 
             if (distribution.DownloadUrl.IsNullOrEmpty())
             {
-                ModelState.AddModelError("url", "Enter a Link URL");
+                ModelState.AddModelError("url", "Enter a link to download the file");
             }
 
             if (distribution.Format.IsNullOrEmpty())
             {
-                ModelState.AddModelError("link-download-format", "Enter a File Format");
+                ModelState.AddModelError("link-download-format", "Enter the file format");
             }
 
         }
@@ -1795,24 +1823,24 @@ public class CatalogDataDescriptionController(
         {
             if (distribution.Title.IsNullOrEmpty())
             {
-                ModelState.AddModelError("title", "Enter a Title");
+                ModelState.AddModelError("title", "Enter the title of the API");
             }
 
             if (distribution.AccessUrl.IsNullOrEmpty())
             {
-                ModelState.AddModelError("url", "Enter  Documentation URL");
+                ModelState.AddModelError("url", "Enter a link to the API documentation");
             }
         }
         if (distribution?.MediaType?.FirstOrDefault() == "text/html")
         {
             if (distribution.Title.IsNullOrEmpty())
             {
-                ModelState.AddModelError("title", "Enter a Title");
+                ModelState.AddModelError("title", "Enter the title of the webpage");
             }
 
             if (distribution.DownloadUrl.IsNullOrEmpty())
             {
-                ModelState.AddModelError("url", "Enter a Link URL");
+                ModelState.AddModelError("url", "Enter a link to the webpage");
             }
         }
 

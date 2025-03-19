@@ -77,7 +77,7 @@ public class DataDescriptionController : Controller
             SelectedRecipientType = selectedRecipientType,
             EnteredCustomAddress = enteredCustomAddress,
             MaintainerEmailAddress = contactPoint?.Email,
-            DomainDsrNotificationMailboxAddress = userDomainInformation!.DataShareRequestMailboxAddress
+            DomainDsrNotificationMailboxAddress = userDomainInformation?.DataShareRequestMailboxAddress
         });
     }
 

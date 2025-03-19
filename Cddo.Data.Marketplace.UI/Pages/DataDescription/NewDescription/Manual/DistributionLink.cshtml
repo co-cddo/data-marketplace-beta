@@ -40,90 +40,133 @@
                 </span>
                 <input type="hidden" name="@nameof(QuestionDistributionRequest.Identifier)" value="@Model?.Identifier" />  
                 @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
+                <div class="govuk-form-group @(ViewData.ModelState.ErrorCount > 0 == true ? "govuk-form-group--error" : "")">
 
-                @foreach (var distribution in Model.Distribution.Select((value, index) => new { value, index}))
-                {
-                    var mediaType = Model.Distribution[distribution.index].MediaType.FirstOrDefault();
-                    switch (mediaType)
+                    @foreach (var distribution in Model.Distribution.Select((value, index) => new { value, index}))
                     {
-                        case "File download":
-                            <input type="hidden" name="Distribution[@distribution.index].MediaType" value="@mediaType" />
-                            <input type="hidden" name="Distribution[@distribution.index].Id" value="@Model.Distribution[@distribution.index].Id" />
-                            <h1 class="govuk-heading-l">
-                                Add a download link
-                            </h1>
-                            <div class="govuk-form-group">
-                                <label class="govuk-label govuk-label--s" for="title">
-                                    Link title
-                                </label>
-                                <div id="link-title-hint" class="govuk-hint">
-                                    If there is only one link, the title can be the same as your listing.
+                        var mediaType = Model.Distribution[distribution.index].MediaType.FirstOrDefault();
+                        switch (mediaType)
+                        {
+                            case "File download":
+                                <input type="hidden" name="Distribution[@distribution.index].MediaType" value="@mediaType" />
+                                <input type="hidden" name="Distribution[@distribution.index].Id" value="@Model.Distribution[@distribution.index].Id" />
+                                <h1 class="govuk-heading-l">
+                                    Add a download link
+                                </h1>
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label govuk-label--s" for="title">
+                                        Link title
+                                    </label>
+                                    <div id="link-title-hint" class="govuk-hint">
+                                        If there is only one link, the title can be the same as your listing.
+                                    </div>
+                                    @if (ViewData.ModelState["title"]?.Errors.Any() == true)
+                                    {
+                                        <p id="metadataTitle-error" class="govuk-error-message">
+                                            <span class="govuk-visually-hidden">Error:</span> Enter the title of the file
+                                        </p>
+                                    }
+                                    <input class="govuk-input @(ViewData.ModelState["title"]?.Errors.Any() == true ? "govuk-input--error" : "")" id="title" type="text" aria-describedby="link-title-hint" asp-for="@Model.Distribution[distribution.index].Title">
                                 </div>
-                                <input class="govuk-input @(ViewData.ModelState["title"]?.Errors.Any() == true ? "govuk-input--error" : "")" id="title" type="text" aria-describedby="link-title-hint" asp-for="@Model.Distribution[distribution.index].Title">
-                            </div>
-                            <div class="govuk-form-group">
-                                <label class="govuk-label govuk-label--s" for="url">
-                                    Link URL
-                                </label>
-                                <input class="govuk-input @(ViewData.ModelState["url"]?.Errors.Any() == true ? "govuk-input--error" : "")" id="url" type="text" asp-for="@Model.Distribution[distribution.index].DownloadUrl">
-                            </div>
-                            <div class="govuk-form-group">
-                                <label class="govuk-label govuk-label--s" for="format">
-                                    File format
-                                </label>
-                                <input class="govuk-input govuk-input--width-10 @(ViewData.ModelState["link-download-format"]?.Errors.Any() == true ? "govuk-input--error" : "")" id="link-download-format" type="text" asp-for="@Model.Distribution[distribution.index].Format">
-                            </div>
-                        break;
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label govuk-label--s" for="url">
+                                        Link URL
+                                    </label>
+                                    @if (ViewData.ModelState["url"]?.Errors.Any() == true)
+                                    {
+                                        <p id="metadataTitle-error" class="govuk-error-message">
+                                            <span class="govuk-visually-hidden">Error:</span> Enter a link to download the file
+                                        </p>
+                                    }
+                                    <input class="govuk-input @(ViewData.ModelState["url"]?.Errors.Any() == true ? "govuk-input--error" : "")" id="url" type="text" asp-for="@Model.Distribution[distribution.index].DownloadUrl">
+                                </div>
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label govuk-label--s" for="format">
+                                        File format
+                                    </label>
+                                    @if (ViewData.ModelState["link-download-format"]?.Errors.Any() == true)
+                                    {
+                                        <p id="metadataTitle-error" class="govuk-error-message">
+                                            <span class="govuk-visually-hidden">Error:</span> Enter the file format
+                                        </p>
+                                    }
+                                    <input class="govuk-input govuk-input--width-10 @(ViewData.ModelState["link-download-format"]?.Errors.Any() == true ? "govuk-input--error" : "")" id="link-download-format" type="text" asp-for="@Model.Distribution[distribution.index].Format">
+                                </div>
+                            break;
 
-                        case "API":
-                            <input type="hidden" name="Distribution[@distribution.index].MediaType" value="@mediaType" />
-                            <input type="hidden" name="Distribution[@distribution.index].Id" value="@Model.Distribution[@distribution.index].Id" />
-                            <h1 class="govuk-heading-l">
-                                API Details
-                            </h1>
-                            <div class="govuk-form-group">
-                                <label class="govuk-label govuk-label--s" for="title">
-                                    Title
-                                </label>
-                                <div id="link-title-hint" class="govuk-hint">
-                                    If there is only one API, the title can be the same as your listing.
+                            case "API":
+                                <input type="hidden" name="Distribution[@distribution.index].MediaType" value="@mediaType" />
+                                <input type="hidden" name="Distribution[@distribution.index].Id" value="@Model.Distribution[@distribution.index].Id" />
+                                <h1 class="govuk-heading-l">
+                                    API Details
+                                </h1>
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label govuk-label--s" for="title">
+                                        Title
+                                    </label>
+                                    <div id="link-title-hint" class="govuk-hint">
+                                        If there is only one API, the title can be the same as your listing.
+                                    </div>
+                                    @if (ViewData.ModelState["title"]?.Errors.Any() == true)
+                                    {
+                                        <p id="metadataTitle-error" class="govuk-error-message">
+                                            <span class="govuk-visually-hidden">Error:</span> Enter the title of the API
+                                        </p>
+                                    }
+                                    <input class="govuk-input @(ViewData.ModelState["title"]?.Errors.Any() == true ? "govuk-input--error" : "")" id="title" type="text" aria-describedby="link-title-hint" asp-for="@Model.Distribution[distribution.index].Title">
                                 </div>
-                                <input class="govuk-input @(ViewData.ModelState["title"]?.Errors.Any() == true ? "govuk-input--error" : "")" id="title" type="text" aria-describedby="link-title-hint" asp-for="@Model.Distribution[distribution.index].Title">
-                            </div>
-                            <div class="govuk-form-group">
-                                <label class="govuk-label govuk-label--s" for="url">
-                                    Documentation URL
-                                </label>
-                                <input class="govuk-input @(ViewData.ModelState["url"]?.Errors.Any() == true ? "govuk-input--error" : "")" id="url" type="text" asp-for="@Model.Distribution[distribution.index].AccessUrl">
-                            </div>
-                        break;
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label govuk-label--s" for="url">
+                                        Documentation URL
+                                    </label>
+                                   @if (ViewData.ModelState["url"]?.Errors.Any() == true)
+                                    {
+                                        <p id="metadataTitle-error" class="govuk-error-message">
+                                            <span class="govuk-visually-hidden">Error:</span> Enter a link to the API documentation
+                                        </p>
+                                    }
+                                    <input class="govuk-input @(ViewData.ModelState["url"]?.Errors.Any() == true ? "govuk-input--error" : "")" id="url" type="text" asp-for="@Model.Distribution[distribution.index].AccessUrl">
+                                </div>
+                            break;
 
-                        case "text/html":
-                            <input type="hidden" name="Distribution[@distribution.index].MediaType" value="@mediaType" />
-                            <input type="hidden" name="Distribution[@distribution.index].Id" value="@Model.Distribution[@distribution.index].Id" />
-                            <h1 class="govuk-heading-l">
-                                Add a webpage link
-                            </h1>
-                            <div class="govuk-form-group">
-                                <label class="govuk-label govuk-label--s" for="title">
-                                    Link title
-                                </label>
-                                <div id="link-title-hint" class="govuk-hint">
-                                    If there is only one Link, the title can be the same as your listing.
+                            case "text/html":
+                                <input type="hidden" name="Distribution[@distribution.index].MediaType" value="@mediaType" />
+                                <input type="hidden" name="Distribution[@distribution.index].Id" value="@Model.Distribution[@distribution.index].Id" />
+                                <h1 class="govuk-heading-l">
+                                    Add a webpage link
+                                </h1>
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label govuk-label--s" for="title">
+                                        Link title
+                                    </label>
+                                    <div id="link-title-hint" class="govuk-hint">
+                                        If there is only one Link, the title can be the same as your listing.
+                                    </div>
+                                    @if (ViewData.ModelState["title"]?.Errors.Any() == true)
+                                    {
+                                        <p id="metadataTitle-error" class="govuk-error-message">
+                                            <span class="govuk-visually-hidden">Error:</span> Enter the title of the webpage
+                                        </p>
+                                    }
+                                    <input class="govuk-input @(ViewData.ModelState["title"]?.Errors.Any() == true ? "govuk-input--error" : "")" id="title" type="text" aria-describedby="link-title-hint" asp-for="@Model.Distribution[distribution.index].Title">
                                 </div>
-                                <input class="govuk-input @(ViewData.ModelState["title"]?.Errors.Any() == true ? "govuk-input--error" : "")" id="title" type="text" aria-describedby="link-title-hint" asp-for="@Model.Distribution[distribution.index].Title">
-                            </div>
-                            <div class="govuk-form-group">
-                                <label class="govuk-label govuk-label--s" for="url">
-                                    Link URL
-                                </label>
-                                <input class="govuk-input @(ViewData.ModelState["url"]?.Errors.Any() == true ? "govuk-input--error" : "")" id="url" type="text" asp-for="@Model.Distribution[distribution.index].DownloadUrl">
-                            </div>
-                        break;
-                    }
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label govuk-label--s" for="url">
+                                        Link URL
+                                    </label>
+                                    @if (ViewData.ModelState["url"]?.Errors.Any() == true)
+                                    {
+                                        <p id="metadataTitle-error" class="govuk-error-message">
+                                                            <span class="govuk-visually-hidden">Error:</span> Enter a link to the webpage
+                                        </p>
+                                    }
+                                    <input class="govuk-input @(ViewData.ModelState["url"]?.Errors.Any() == true ? "govuk-input--error" : "")" id="url" type="text" asp-for="@Model.Distribution[distribution.index].DownloadUrl">
+                                </div>
+                            break;
+                        }
                     
-                }
-                
+                    }
+                </div>
                 <div class="govuk-button-group">
                     <button type="submit" class="govuk-button" data-module="govuk-button" data-govuk-button-init="">
                         Continue

@@ -35,7 +35,9 @@
         <div class="govuk-grid-column-two-thirds">
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.Licence)" asp-route-isEditMode="@isEditMode.ToString().ToLower()" method="post">
                 <input type="hidden" name="@nameof(QuestionLicenceRequest.Identifier)" value="@Model.Identifier" />
-                <div class="govuk-form-group">
+                @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
+
+                <div class="govuk-form-group @(ViewData.ModelState.ErrorCount > 0 == true ? "govuk-form-group--error" : "")">
                     <fieldset class="govuk-fieldset">
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                             <span class="govuk-caption-l">
@@ -45,7 +47,13 @@
                                 What is the licence for this data?
                             </h1>
                         </legend>
-                        <div class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
+                        @if (ViewData.ModelState["licence-selection"]?.Errors.Any() == true)
+                        {
+                            <p id="metadataTitle-error" class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span> Select a licence for the data
+                            </p>
+                        }
+                        <div id="licence-selection" class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
                             <div class="govuk-radios__item">
                                 <input class="govuk-radios__input" id="openGovLicenseTitle" name="license" type="radio" value="Open Government Licence" @(openGovChecked ? "checked" : "")>
 
