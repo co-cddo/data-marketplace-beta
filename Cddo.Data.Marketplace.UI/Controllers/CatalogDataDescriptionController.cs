@@ -203,7 +203,7 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Title")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddTitleSubmit(QuestionTitleRequest questionTitleRequest, string? isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode, SecurityClassificationEnum? securityClassification = null)
+    public async Task<IActionResult> AddTitleSubmit(QuestionTitleRequest questionTitleRequest, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode, SecurityClassificationEnum? securityClassification = null)
     {
 
         if (string.IsNullOrWhiteSpace(questionTitleRequest.Title) && !ModelState.IsValid)
@@ -262,7 +262,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("Add-Description")]
-    public async Task<IActionResult> AddDescription(QuestionDescriptionRequest questionDescriptionRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> AddDescription(QuestionDescriptionRequest questionDescriptionRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -292,7 +292,7 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Description")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddDescriptionSubmit(QuestionDescriptionRequest questionDescriptionRequest, string isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode)
+    public async Task<IActionResult> AddDescriptionSubmit(QuestionDescriptionRequest questionDescriptionRequest, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -326,7 +326,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("Add-Internal-Identifier")]
-    public async Task<IActionResult> AddInternalIdentifier(QuestionSupplierIdentifierRequest questionSupplierIdentifierRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> AddInternalIdentifier(QuestionSupplierIdentifierRequest questionSupplierIdentifierRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -356,7 +356,7 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Internal-Identifier")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddInternalIdentifierSubmit(QuestionSupplierIdentifierRequest questionSupplierIdentifierRequest, string isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode)
+    public async Task<IActionResult> AddInternalIdentifierSubmit(QuestionSupplierIdentifierRequest questionSupplierIdentifierRequest, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -414,7 +414,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("Add-Themes")]
-    public async Task<IActionResult> AddThemes(QuestionThemeRequest questionThemeRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> AddThemes(QuestionThemeRequest questionThemeRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -444,7 +444,7 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Themes")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddThemesSubmit(QuestionThemeRequest questionThemeRequest, string isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode)
+    public async Task<IActionResult> AddThemesSubmit(QuestionThemeRequest questionThemeRequest, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -490,7 +490,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("Add-Keywords")]
-    public async Task<IActionResult> AddKeywords(QuestionKeywordRequest questionKeywordRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> AddKeywords(QuestionKeywordRequest questionKeywordRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -520,7 +520,7 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Keywords")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddKeywordsSubmit(QuestionKeywordRequest questionKeywordRequest, string isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode)
+    public async Task<IActionResult> AddKeywordsSubmit(QuestionKeywordRequest questionKeywordRequest, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
         questionKeywordRequest.Keyword = NormalizeKeywords(questionKeywordRequest.Keyword);
 
@@ -578,7 +578,7 @@ public class CatalogDataDescriptionController(
             .ToList();
     }
 
-    private IActionResult HandleInvalidKeywords(QuestionKeywordRequest questionKeywordRequest, List<string> invalidKeywords, string isEditMode)
+    private IActionResult HandleInvalidKeywords(QuestionKeywordRequest questionKeywordRequest, List<string> invalidKeywords, string? isEditMode)
     {
         ModelState.Clear();
         ViewBag.isEditMode = isEditMode;
@@ -746,7 +746,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("Add-Data-Owner")]
-    public async Task<IActionResult> AddDataOwner(QuestionContactPointRequest questionContactPointRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> AddDataOwner(QuestionContactPointRequest questionContactPointRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -786,7 +786,7 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Data-Owner")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddDataOwnerSubmit(Contact contact, string? identifier, string isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode)
+    public async Task<IActionResult> AddDataOwnerSubmit(Contact contact, string? identifier, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -858,7 +858,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("Add-Published-Date")]
-    public async Task<IActionResult> AddPublishedDate(QuestionIssuedRequestModel questionIssuedRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> AddPublishedDate(QuestionIssuedRequestModel questionIssuedRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -975,7 +975,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("Add-Frequency")]
-    public async Task<IActionResult> AddFrequency(QuestionUpdateFrequencyRequest questionUpdateFrequencyRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> AddFrequency(QuestionUpdateFrequencyRequest questionUpdateFrequencyRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -1005,7 +1005,7 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Frequency")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddFrequencySubmit(QuestionUpdateFrequencyRequest questionUpdateFrequencyRequest, string? otherFrequency, string isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode)
+    public async Task<IActionResult> AddFrequencySubmit(QuestionUpdateFrequencyRequest questionUpdateFrequencyRequest, string? otherFrequency, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
         if (questionUpdateFrequencyRequest.UpdateFrequency == "Other" && !string.IsNullOrEmpty(otherFrequency))
         {
@@ -1461,7 +1461,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("licence")]
-    public async Task<IActionResult> Licence(QuestionLicenceRequest licenceRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> Licence(QuestionLicenceRequest licenceRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!string.IsNullOrEmpty(identifier))
         {
