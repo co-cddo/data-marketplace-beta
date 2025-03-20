@@ -1259,7 +1259,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
             _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
                                                        It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
-            var contact = new Contact { Name = "John Doe", Email = "johndoeexampleom", Role = ContactRoleEnum.Contact };
+            var contact = new Contact { Name = "John Doe", Email = "john.doe@example.com", Role = ContactRoleEnum.Contact };
             var response = new PatchProfiledDataAssetResponse { DataAssetId = Guid.NewGuid() };
 
             var mockDataAsset = new GetCddoDataAssetResponse() 
