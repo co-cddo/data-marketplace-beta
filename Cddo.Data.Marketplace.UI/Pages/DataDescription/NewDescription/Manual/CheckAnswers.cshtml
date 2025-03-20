@@ -594,10 +594,10 @@
                     <div class="govuk-button-group">
                         @if (canPublish)
                         {
-                            <form asp-controller="DataDescription" asp-action="@nameof(DataDescriptionController.DataShareRequestNotificationsSelection)"
-                                  asp-route-identifier="@cddoDataAsset.Id">
+                            <form asp-controller="DataDescription" asp-action="@nameof(DataDescriptionController.PublishDataAssetSubmit)"
+                                  asp-route-dataAssetId="@cddoDataAsset.Id" asp-route-dataAssetType="@cddoDataAsset.DataAssetType">
                                 <button class="govuk-button" data-module="govuk-button">
-                                    Publish listing
+                                    Publish data listing
                                 </button>
                             </form>
                         }

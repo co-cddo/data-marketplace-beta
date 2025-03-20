@@ -165,7 +165,9 @@ public class DataDescriptionController : Controller
         }
     }
 
-    private async Task<IActionResult> PublishDataAssetSubmit(Guid dataAssetId, DataAssetType dataAssetType)
+    [HttpPost("New/Manual/publish-data-asset-submit")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> PublishDataAssetSubmit(Guid dataAssetId, DataAssetType dataAssetType)
     {
         const DataAssetStatus dataAssetStatus = DataAssetStatus.Published;
 
