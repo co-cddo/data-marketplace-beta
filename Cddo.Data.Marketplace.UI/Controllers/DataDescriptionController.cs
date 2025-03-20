@@ -20,7 +20,7 @@ public class DataDescriptionController : Controller
     private readonly ICatalogDataService _catalogDataService;
     private readonly ICatalogQuestionsService _catalogQuestionsService;
     private readonly IUserRoleService _userRoleService;
-    private readonly AppInsightsLogger _appInsightlogger;
+    private readonly IAppInsightsLogger _appInsightlogger;
     private readonly IUserProfilePresenter _userProfilePresenter;
     private readonly IDataShareRequestMailboxAddressValidation _dataShareRequestMailboxAddressValidation;
     private const string ManualViewPath = "~/Pages/DataDescription/NewDescription/Manual/";
@@ -37,7 +37,7 @@ public class DataDescriptionController : Controller
         ICatalogQuestionsService catalogQuestionsService,
         IUserRoleService userRoleService,
         IEnumMemberConverter enumMemberConverter,
-        AppInsightsLogger appInsightlogger,
+        IAppInsightsLogger appInsightlogger,
         IUserProfilePresenter userProfilePresenter,
         IDataShareRequestMailboxAddressValidation dataShareRequestMailboxAddressValidation)
     {        
@@ -156,7 +156,7 @@ public class DataDescriptionController : Controller
                         customAddress, out var validationError))
                 {
                     ModelState.AddModelError(customAddressInputName,
-                        validationError!);
+                        validationError??"");
                     return false;
                 }
             }
@@ -334,7 +334,7 @@ public class DataDescriptionController : Controller
                         customAddress, out var validationError))
                 {
                     ModelState.AddModelError(customAddressInputName,
-                        validationError!);
+                        validationError??"");
                     return false;
                 }
             }

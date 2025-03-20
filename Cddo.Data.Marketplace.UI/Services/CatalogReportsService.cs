@@ -14,7 +14,6 @@ namespace Cddo.Data.Marketplace.UI.Services;
 
 public class CatalogReportsService : ICatalogReportsService
 {
-    private const string dataAssetProfileId = "dcat-ukap-v1.0";
 
     private readonly string _apiUrl;
     private readonly string _usersUrl;
@@ -22,6 +21,7 @@ public class CatalogReportsService : ICatalogReportsService
     private readonly ILogger<CatalogReportsService> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IUserRoleService _userRoleService;
+    private readonly IConfiguration _configuration;
 
     public CatalogReportsService(
         ILogger<CatalogReportsService> logger,
@@ -29,12 +29,15 @@ public class CatalogReportsService : ICatalogReportsService
         IHttpContextAccessor httpContextAccessor,
         IUserRoleService userRoleService)
     {
-        _apiUrl = configuration.GetSection("Api:Main").Value!;
-        _usersUrl = configuration.GetSection("ApiSettings:UsersAPI").Value!;
-        _dsrApiUrl = configuration.GetSection("Api:DataShare").Value!;
-        _logger = logger;
-        _httpContextAccessor = httpContextAccessor;
-        _userRoleService = userRoleService;
+        
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+        _userRoleService = userRoleService ?? throw new ArgumentNullException(nameof(userRoleService));
+        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+
+        _apiUrl = _configuration.GetSection("Api:Main").Value!;
+        _usersUrl = _configuration.GetSection("ApiSettings:UsersAPI").Value!;
+        _dsrApiUrl = _configuration.GetSection("Api:DataShare").Value!;
     }
 
     private async Task<string?> GetTokenAsync()
@@ -51,11 +54,12 @@ public class CatalogReportsService : ICatalogReportsService
     //DownloadCatalogReportsDataAsync
     public async Task<QueryCatalogReportsDataResponse?> DownloadCatalogReportsDataAsync(QueryCatalogReportsDataRequest queryCatalogReportsDataRequest, CancellationToken cancellationToken = default)
     {
-        var token = await GetTokenAsync();
-        if (!string.IsNullOrEmpty(token))
+        try
         {
-            try
+            var token = await GetTokenAsync();
+            if (!string.IsNullOrEmpty(token))
             {
+
                 var url = _apiUrl.AppendPathSegment("download-catalog-reports-data");
                 var mappedFilter = AddOrganisationMapping(queryCatalogReportsDataRequest);
                 var response = await url
@@ -70,26 +74,27 @@ public class CatalogReportsService : ICatalogReportsService
                     .ReceiveJson<QueryCatalogReportsDataResponse>();
                 return response;
             }
-            catch (FlurlHttpException ex)
-            {
-                var responseString = await ex.GetResponseStringAsync();
-                _logger.LogError(ex, FlurlHttpExceptionMessage, responseString);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-            }
+        }
+        catch (FlurlHttpException ex)
+        {
+            var responseString = await ex.GetResponseStringAsync();
+            _logger.LogError(ex, FlurlHttpExceptionMessage, responseString);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
         }
         return null;
     }
 
     public async Task<QueryCatalogReportsDataResponse?> GetCatalogReportsDataAsync(QueryCatalogReportsDataRequest queryCatalogReportsDataRequest, CancellationToken cancellationToken = default)
     {
-        var token = await GetTokenAsync();
-        if (!string.IsNullOrEmpty(token))
+        try
         {
-            try
+            var token = await GetTokenAsync();
+            if (!string.IsNullOrEmpty(token))
             {
+
                 var url = _apiUrl.AppendPathSegment("query-catalog-reports-data");
                 var mappedFilter = AddOrganisationMapping(queryCatalogReportsDataRequest);
                 var response = await url
@@ -104,26 +109,27 @@ public class CatalogReportsService : ICatalogReportsService
                     .ReceiveJson<QueryCatalogReportsDataResponse>();
                 return response;
             }
-            catch (FlurlHttpException ex)
-            {
-                var responseString = await ex.GetResponseStringAsync();
-                _logger.LogError(ex, FlurlHttpExceptionMessage, responseString);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-            }
+        }
+        catch (FlurlHttpException ex)
+        {
+            var responseString = await ex.GetResponseStringAsync();
+            _logger.LogError(ex, FlurlHttpExceptionMessage, responseString);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
         }
         return null;
     }
 
     public async Task<LogsQueryDataResult> GetTelemetryReportsDataAsync(string searchQuery, string timeRange, CancellationToken cancellationToken = default)
     {
-        var token = await GetTokenAsync();
-        if (!string.IsNullOrEmpty(token))
+        try
         {
-            try
+            var token = await GetTokenAsync();
+            if (!string.IsNullOrEmpty(token))
             {
+
                 var url = _usersUrl.AppendPathSegments("User", "GetEventLogs");
 
                 var cleanQuery = searchQuery.Replace("\r", "").Replace("\n", "").Replace("\\", "");
@@ -142,51 +148,46 @@ public class CatalogReportsService : ICatalogReportsService
 
                 return response;
             }
-            catch (FlurlHttpException ex)
-            {
-                var responseString = await ex.GetResponseStringAsync();
-                _logger.LogError(ex, FlurlHttpExceptionMessage, responseString);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-            }
+        }
+        catch (FlurlHttpException ex)
+        {
+            var responseString = await ex.GetResponseStringAsync();
+            _logger.LogError(ex, FlurlHttpExceptionMessage, responseString);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
         }
         return null;
     }
 
     public async Task<QueryDataShareRequestsCountsResponse> GetDSRReportDataAsync(QueryDataShareRequestsCountsRequest queryDataShareRequestsCountsRequest, CancellationToken cancellationToken = default)
     {
-        if (_httpContextAccessor.HttpContext!.User.Identity!.IsAuthenticated)
+
+        try
         {
             var roles = new List<string> { "System Administrator", "Metadata Publisher", "Data Request Approver", "Organisation Administrator" };
             bool isAGMAdministrator = await _userRoleService.IsUserInRoleAsync(roles);
-            if (isAGMAdministrator)
+            var token = await GetTokenAsync();
+            if (isAGMAdministrator && !string.IsNullOrEmpty(token))
             {
-                var token = await GetTokenAsync();
-                if (!string.IsNullOrEmpty(token))
-                {
-                    try
-                    {
-                        var response = await _dsrApiUrl
-                            .AppendPathSegments("Reporting", "QueryDataShareRequestCounts")
-                            .WithOAuthBearerToken(token)
-                            .PostJsonAsync(queryDataShareRequestsCountsRequest, cancellationToken: cancellationToken)
-                            .ReceiveJson<QueryDataShareRequestsCountsResponse>();
+                var response = await _dsrApiUrl
+                    .AppendPathSegments("Reporting", "QueryDataShareRequestCounts")
+                    .WithOAuthBearerToken(token)
+                    .PostJsonAsync(queryDataShareRequestsCountsRequest, cancellationToken: cancellationToken)
+                    .ReceiveJson<QueryDataShareRequestsCountsResponse>();
 
-                        return response;
-                    }
-                    catch (FlurlHttpException ex)
-                    {
-                        var responseString = await ex.GetResponseStringAsync();
-                        _logger.LogError(ex, FlurlHttpExceptionMessage, responseString);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, ex.Message);
-                    }
-                }
+                return response;
             }
+        }
+        catch (FlurlHttpException ex)
+        {
+            var responseString = await ex.GetResponseStringAsync();
+            _logger.LogError(ex, FlurlHttpExceptionMessage, responseString);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
         }
         return null;
     }

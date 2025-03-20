@@ -33,15 +33,15 @@ public class CatalogDataDescriptionController(
     ICatalogDataService catalogDataService,
     ICatalogQuestionsService catalogQuestionsService,
     IUserRoleService userRoleService,
-    AppInsightsLogger insightsLogger,
+    IAppInsightsLogger insightsLogger,
     ICddoEmailAddressValidation emailValidator)
     : Controller
 {
     private readonly ICatalogDataService _catalogDataService = catalogDataService ?? throw new ArgumentNullException(nameof(catalogDataService));
     private readonly ICatalogQuestionsService _catalogQuestionsService = catalogQuestionsService ?? throw new ArgumentNullException(nameof(catalogQuestionsService));
     private readonly IUserRoleService _userRoleService = userRoleService ?? throw new ArgumentNullException(nameof(userRoleService));
-    private readonly AppInsightsLogger _insightsLogger = insightsLogger ?? throw new ArgumentNullException(nameof(insightsLogger));
-    private readonly ICddoEmailAddressValidation _emailValidator = emailValidator;
+    private readonly IAppInsightsLogger _insightsLogger = insightsLogger ?? throw new ArgumentNullException(nameof(insightsLogger));
+    private readonly ICddoEmailAddressValidation _emailValidator = emailValidator ?? throw new ArgumentNullException(nameof(emailValidator));
 
     private static readonly string AccessDeniedPage = "/Error/403";
     private const string LogValidationErrors = "validationErrors";
@@ -76,7 +76,7 @@ public class CatalogDataDescriptionController(
     {
         var userProfile = await _userRoleService.GetUserProfileAsync();
         var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userProfile);
-        _insightsLogger.LogAdminEvent(eventType, pageName, "CDDO", "", summary, "", userEventProperties);
+        _insightsLogger.LogAdminEventBase(eventType, pageName, "CDDO", "", summary, "", userEventProperties);
     }
 
     [Route("Dashboard")]
@@ -1019,10 +1019,10 @@ public class CatalogDataDescriptionController(
             if (validationErrors.Count() > 0)
             {
                 _insightsLogger.LogEvent(EventTypes.MetadataEvent.MetadataEdited, new Dictionary<string, string>
-        {
-            { LogValidationErrors, string.Join(", ", validationErrors) },
-            { "Frequency", questionUpdateFrequencyRequest.UpdateFrequency }
-        });
+                {
+                    { LogValidationErrors, string.Join(", ", validationErrors) },
+                    { "Frequency", questionUpdateFrequencyRequest.UpdateFrequency }
+                });
             }
         }
 
@@ -1380,10 +1380,10 @@ public class CatalogDataDescriptionController(
                                                     .Select(e => e.ErrorMessage)
                                                     .ToList();
             _insightsLogger.LogEvent(EventTypes.MetadataEvent.MetadataAccessDenied, new Dictionary<string, string>
-        {
-            { "ValidationErrors", string.Join(", ", validationErrors) },
-            { "Identifier", identifier ?? "null" }
-        });
+            {
+                { "ValidationErrors", string.Join(", ", validationErrors) },
+                { "Identifier", identifier ?? "null" }
+            });
         }
 
         ArgumentNullException.ThrowIfNull(identifier);

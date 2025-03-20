@@ -14,17 +14,25 @@ using Agm.Catalog.DotNet.Logic.Services.DataAssets.DataAssetConversion;
 
 namespace Cddo.Data.Marketplace.UI.Services;
 
-public class CatalogQuestionsService(
-    ILogger<CatalogQuestionsService> logger,
-    IConfiguration configuration,
-    IHttpContextAccessor httpContextAccessor)
-    : ICatalogQuestionsService
+public class CatalogQuestionsService : ICatalogQuestionsService
 {
     private const string BaseRoute = "DataAsset";
-    private readonly string _apiUrl = configuration.GetSection("Api:Main").Value ?? throw new ArgumentNullException(nameof(configuration));
-    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-    private readonly ILogger<CatalogQuestionsService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly IConfiguration _configuration;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ILogger<CatalogQuestionsService> _logger;
     private readonly string _profileId = "dcat-ukap-v3.1";
+    private readonly string _apiUrl;
+
+    public CatalogQuestionsService(
+        ILogger<CatalogQuestionsService> logger,
+        IConfiguration configuration,
+        IHttpContextAccessor httpContextAccessor)
+    {
+        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _apiUrl = _configuration.GetSection("Api:Main").Value ?? throw new ArgumentNullException(nameof(_apiUrl));
+    }
 
     private Task<string?> GetTokenAsync()
     {
@@ -39,12 +47,13 @@ public class CatalogQuestionsService(
 
     private async Task<T?> MakeApiPostRequestAsync<T>(AddProfiledDataAssetRequest request, CancellationToken cancellationToken = default)
     {
-        var token = await GetTokenAsync();
-
-        if (!string.IsNullOrEmpty(token))
+        try
         {
-            try
+            var token = await GetTokenAsync();
+
+            if (!string.IsNullOrEmpty(token))
             {
+
                 request.ActionSource = DataAssetActionSourceEnum.UserInterface;
 
                 var url = _apiUrl.AppendPathSegments(BaseRoute, "add-profiled-data-asset").WithOAuthBearerToken(token);
@@ -53,29 +62,30 @@ public class CatalogQuestionsService(
 
                 return await response.GetJsonAsync<T>();
             }
-            catch (FlurlHttpException ex)
-            {
-                var statusCode = ex.StatusCode;
-                var exceptionText = ex.Message;
-                var responseText = await ex.GetResponseStringAsync();            
-                throw new InvalidOperationException($"Flurl Exception thrown performing CKAN Catalog lookup action: Status Code: {statusCode}, Text: {responseText}, Exception: {exceptionText}");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-            }
+        }
+        catch (FlurlHttpException ex)
+        {
+            var statusCode = ex.StatusCode;
+            var exceptionText = ex.Message;
+            var responseText = await ex.GetResponseStringAsync();
+            throw new InvalidOperationException($"Flurl Exception thrown performing CKAN Catalog lookup action: Status Code: {statusCode}, Text: {responseText}, Exception: {exceptionText}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
         }
         return default;
     }
 
     private async Task<T?> MakeApiPatchRequestAsync<T>(PatchProfiledDataAssetRequest request, CancellationToken cancellationToken = default)
     {
-        var token = await GetTokenAsync();
-
-        if (!string.IsNullOrEmpty(token))
+        try
         {
-            try
+            var token = await GetTokenAsync();
+
+            if (!string.IsNullOrEmpty(token))
             {
+
                 request.ActionSource = DataAssetActionSourceEnum.UserInterface;
 
                 var url = _apiUrl.AppendPathSegments(BaseRoute, "patch-profiled-data-asset").WithOAuthBearerToken(token);
@@ -84,23 +94,23 @@ public class CatalogQuestionsService(
 
                 return await response.GetJsonAsync<T>();
             }
-            catch (FlurlHttpException ex)
-            {
-                var statusCode = ex.StatusCode;
+        }
+        catch (FlurlHttpException ex)
+        {
+            var statusCode = ex.StatusCode;
 
-                if (statusCode == (int) HttpStatusCode.Forbidden)
-                {
-                    throw new UnauthorizedAccessException();
-                }
-
-                var exceptionText = ex.Message;
-                var responseText = await ex.GetResponseStringAsync();
-                throw new InvalidOperationException($"Flurl Exception thrown performing CKAN Catalog lookup action: Status Code: {statusCode}, Text: {responseText}, Exception: {exceptionText}");
-            }
-            catch (Exception ex)
+            if (statusCode == (int)HttpStatusCode.Forbidden)
             {
-                _logger.LogError(ex, ex.Message);
+                throw new UnauthorizedAccessException();
             }
+
+            var exceptionText = ex.Message;
+            var responseText = await ex.GetResponseStringAsync();
+            throw new InvalidOperationException($"Flurl Exception thrown performing CKAN Catalog lookup action: Status Code: {statusCode}, Text: {responseText}, Exception: {exceptionText}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
         }
         return default;
     }

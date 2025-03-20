@@ -21,7 +21,7 @@ public class CatalogDataController : Controller
 {
     private readonly ILogger<CatalogDataController> _logger;
     private readonly ICatalogDataService _catalogDataService;
-    private readonly AppInsightsLogger _appInsightlogger;
+    private readonly IAppInsightsLogger _appInsightlogger;
     private readonly IUserRoleService _userRoleService;
 
     private sealed class SortOptions
@@ -32,7 +32,7 @@ public class CatalogDataController : Controller
     private static readonly string AccessDeniedPage = "/Error/403";
 
     public CatalogDataController(ILogger<CatalogDataController> logger,
-        ICatalogDataService catalogDataService, AppInsightsLogger appInsightlogger, IUserRoleService userRoleService)
+        ICatalogDataService catalogDataService, IAppInsightsLogger appInsightlogger, IUserRoleService userRoleService)
     {
         ArgumentNullException.ThrowIfNull(appInsightlogger, nameof(appInsightlogger));
 
@@ -312,11 +312,11 @@ public class CatalogDataController : Controller
             if (result != null)
             {
                 var additionalProperties = new Dictionary<string, string>
-            {
-                { "dataAssetId", dataAssetId.ToString() },
-                { "title", result.CddoDataAsset.Title },
-                { "publisher", result.CddoDataAsset.PublisherPrettified },
-            };
+                {
+                    { "dataAssetId", dataAssetId.ToString() },
+                    { "title", result.CddoDataAsset.Title },
+                    { "publisher", result.CddoDataAsset.PublisherPrettified },
+                };
                 _appInsightlogger.LogEvent(MetadataEvent.MetadataViewed, additionalProperties);
 
                 return View("~/Pages/Dataset/DatasetSummary.cshtml", result);
@@ -371,7 +371,7 @@ public class CatalogDataController : Controller
             userEventProperties.Add("datasetId", dataAssetId.ToString());
             userEventProperties.Add("title", title ?? "");
 
-            _appInsightlogger.LogUserEvent(UserEvent.UserPageNavigation, "DataShareRequest", "CDDO", userEventProperties);
+            _appInsightlogger.LogEventMainBase(UserEvent.UserPageNavigation, "DataShareRequest", "CDDO", "", "", "", userEventProperties);
         }
 
         return View("~/Pages/DataShare/DataShareRequest.cshtml", dataShareRequest);
