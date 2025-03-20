@@ -363,7 +363,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             var result = await _controller.SecurityClassification(request);
 
             // Assert
-            Assert.That(request.SecurityClassification.ToString(), Is.EqualTo(SecurityClassificationEnum.TopSecret.ToString()));
+            Assert.That(request.SecurityClassification.ToString(), Is.EqualTo(SecurityClassificationEnum.Secret.ToString()));
             Assert.That(result, Is.InstanceOf<ViewResult>());
         }
 
