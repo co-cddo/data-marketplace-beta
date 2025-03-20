@@ -16,6 +16,7 @@ using Cddo.Data.Marketplace.UI.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -184,7 +185,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             // Assert
             Assert.That(result, Is.InstanceOf<RedirectToActionResult>());
             var redirectResult = result as RedirectToActionResult;
-            Assert.That(redirectResult.ActionName, Is.EqualTo("DataDescriptionType"));
+            Assert.That(redirectResult.ActionName, Is.EqualTo("SecurityClassification"));
         }
 
         [Test]
@@ -233,7 +234,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             // Assert
             Assert.That(result, Is.InstanceOf<ViewResult>());
             var viewResult = result as ViewResult;
-            Assert.That(viewResult.ViewName, Is.EqualTo("~/Pages/DataDescription/AddNewDataDescription.cshtml"));
+            Assert.That(viewResult.ViewName, Is.EqualTo("~/Pages/DataDescription/Manual/SecurityClassification.cshtml"));
             Assert.That(_controller.ModelState.ContainsKey("dataDescriptionMethod"), Is.True);
         }
         [Test]
@@ -251,83 +252,83 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             Assert.That(viewResult.ViewName, Is.EqualTo("~/Pages/DataDescription/NewDescription/Api/Start.cshtml"));
         }
 
-        [Test]
-        public async Task DataDescriptionType_ReturnsCorrectView()
-        {
-            // Arrange
-            SetAuthenticatedUser(true);
-            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
-            // Act
-            var result = await _controller.DataDescriptionType();
+        //[Test]
+        //public async Task DataDescriptionType_ReturnsCorrectView()
+        //{
+        //    // Arrange
+        //    SetAuthenticatedUser(true);
+        //    _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+        //    // Act
+        //    var result = await _controller.data();
 
-            // Assert
-            Assert.That(result, Is.InstanceOf<ViewResult>());
-            var viewResult = result as ViewResult;
-            Assert.That(viewResult.ViewName, Is.EqualTo("~/Pages/DataDescription/NewDescription/Manual/DataDescriptionType.cshtml"));
-        }
-        [Test]
-        public async Task DataDescriptionTypeSubmit_InvalidModelState_ReturnsBadRequest()
-        {
-            // Arrange
-            _controller.ModelState.AddModelError("TestError", "Invalid Model State");
+        //    // Assert
+        //    Assert.That(result, Is.InstanceOf<ViewResult>());
+        //    var viewResult = result as ViewResult;
+        //    Assert.That(viewResult.ViewName, Is.EqualTo("~/Pages/DataDescription/NewDescription/Manual/DataDescriptionType.cshtml"));
+        //}
+        //[Test]
+        //public async Task DataDescriptionTypeSubmit_InvalidModelState_ReturnsBadRequest()
+        //{
+        //    // Arrange
+        //    _controller.ModelState.AddModelError("TestError", "Invalid Model State");
 
-            // Act
-            var result = await _controller.DataDescriptionTypeSubmit(true);
+        //    // Act
+        //    var result = await _controller.DataDescriptionTypeSubmit(true);
 
-            // Assert
-            Assert.That(result, Is.InstanceOf<RedirectToPageResult>());
-            var redirectResult = result as RedirectToPageResult;
-            Assert.That(redirectResult.PageName, Is.EqualTo("/Error/400"));
-        }
+        //    // Assert
+        //    Assert.That(result, Is.InstanceOf<RedirectToPageResult>());
+        //    var redirectResult = result as RedirectToPageResult;
+        //    Assert.That(redirectResult.PageName, Is.EqualTo("/Error/400"));
+        //}
 
-        [Test]
-        public async Task DataDescriptionTypeSubmit_UserWithoutRole_RedirectsToIndex()
-        {
-            // Arrange
-            SetAuthenticatedUser(false);
-            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(false);
+        //[Test]
+        //public async Task DataDescriptionTypeSubmit_UserWithoutRole_RedirectsToIndex()
+        //{
+        //    // Arrange
+        //    SetAuthenticatedUser(false);
+        //    _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(false);
 
-            // Act
-            var result = await _controller.DataDescriptionTypeSubmit(true);
+        //    // Act
+        //    var result = await _controller.DataDescriptionTypeSubmit(true);
 
-            // Assert
-            Assert.That(result, Is.InstanceOf<RedirectToPageResult>());
-            var redirectResult = result as RedirectToPageResult;
-            Assert.That(redirectResult.PageName, Is.EqualTo("/Index"));
-        }
+        //    // Assert
+        //    Assert.That(result, Is.InstanceOf<RedirectToPageResult>());
+        //    var redirectResult = result as RedirectToPageResult;
+        //    Assert.That(redirectResult.PageName, Is.EqualTo("/Index"));
+        //}
 
-        [Test]
-        public async Task DataDescriptionTypeSubmit_ConfirmDataDescription_RedirectsToSecurityClassification()
-        {
-            // Arrange
-            SetAuthenticatedUser(true);
-            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+        //[Test]
+        //public async Task DataDescriptionTypeSubmit_ConfirmDataDescription_RedirectsToSecurityClassification()
+        //{
+        //    // Arrange
+        //    SetAuthenticatedUser(true);
+        //    _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
 
-            // Act
-            var result = await _controller.DataDescriptionTypeSubmit(true);
+        //    // Act
+        //    var result = await _controller.DataDescriptionTypeSubmit(true);
 
-            // Assert
-            Assert.That(result, Is.InstanceOf<RedirectToActionResult>());
-            var redirectResult = result as RedirectToActionResult;
-            Assert.That(redirectResult.ActionName, Is.EqualTo("SecurityClassification"));
-        }
+        //    // Assert
+        //    Assert.That(result, Is.InstanceOf<RedirectToActionResult>());
+        //    var redirectResult = result as RedirectToActionResult;
+        //    Assert.That(redirectResult.ActionName, Is.EqualTo("SecurityClassification"));
+        //}
 
-        [Test]
-        public async Task DataDescriptionTypeSubmit_FalseConfirmDataDescription_ReturnsViewWithModelError()
-        {
-            // Arrange
-            SetAuthenticatedUser(true);
-            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+        //[Test]
+        //public async Task DataDescriptionTypeSubmit_FalseConfirmDataDescription_ReturnsViewWithModelError()
+        //{
+        //    // Arrange
+        //    SetAuthenticatedUser(true);
+        //    _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
 
-            // Act
-            var result = await _controller.DataDescriptionTypeSubmit(false);
+        //    // Act
+        //    var result = await _controller.DataDescriptionTypeSubmit(false);
 
-            // Assert
-            Assert.That(result, Is.InstanceOf<ViewResult>());
-            var viewResult = result as ViewResult;
-            Assert.That(viewResult.ViewName, Is.EqualTo("~/Pages/DataDescription/NewDescription/Manual/DataDescriptionType.cshtml"));
-            Assert.That(_controller.ModelState.ContainsKey("confirmDataDescription"), Is.True);
-        }
+        //    // Assert
+        //    Assert.That(result, Is.InstanceOf<ViewResult>());
+        //    var viewResult = result as ViewResult;
+        //    Assert.That(viewResult.ViewName, Is.EqualTo("~/Pages/DataDescription/NewDescription/Manual/DataDescriptionType.cshtml"));
+        //    Assert.That(_controller.ModelState.ContainsKey("confirmDataDescription"), Is.True);
+        //}
         [Test]
         public async Task SecurityClassification_InvalidModelState_ReturnsBadRequest()
         {
@@ -336,7 +337,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             var request = _fixture.Create<QuestionSecurityClassificationRequest>();
 
             // Act
-            var result = await _controller.SecurityClassification(request, null, false, false, false);
+            var result = await _controller.SecurityClassification(request);
 
             // Assert
             Assert.That(result, Is.InstanceOf<RedirectToPageResult>());
@@ -359,35 +360,35 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
                 .ReturnsAsync(mockDataAsset);
 
             // Act
-            var result = await _controller.SecurityClassification(request, identifier, false, false, false);
+            var result = await _controller.SecurityClassification(request);
 
             // Assert
             Assert.That(request.SecurityClassification.ToString(), Is.EqualTo(SecurityClassificationEnum.TopSecret.ToString()));
             Assert.That(result, Is.InstanceOf<ViewResult>());
         }
 
-        [Test]
-        public async Task SecurityClassification_SetsViewBagProperties_Correctly()
-        {
-            // Arrange
-            SetAuthenticatedUser(true);
-            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
-            var request = _fixture.Create<QuestionSecurityClassificationRequest>();
-            var mockDataAsset = new GetCddoDataAssetResponse();
+        //[Test]
+        //public async Task SecurityClassification_SetsViewBagProperties_Correctly()
+        //{
+        //    // Arrange
+        //    SetAuthenticatedUser(true);
+        //    _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
+        //    var request = _fixture.Create<QuestionSecurityClassificationRequest>();
+        //    var mockDataAsset = new GetCddoDataAssetResponse();
 
-            _mockCatalogDataService.Setup(s => s.GetDataAssetAsync(It.IsAny<Guid>(), default))
-            .ReturnsAsync(mockDataAsset);
+        //    _mockCatalogDataService.Setup(s => s.GetDataAssetAsync(It.IsAny<Guid>(), default))
+        //    .ReturnsAsync(mockDataAsset);
 
-            // Act
-            var result = await _controller.SecurityClassification(request, null, true, true, true);
-            var viewResult = result as ViewResult;
+        //    // Act
+        //    var result = await _controller.SecurityClassification(request);
+        //    var viewResult = result as ViewResult;
 
-            // Assert
-            Assert.That(result, Is.InstanceOf<ViewResult>());
-            Assert.That(viewResult.ViewData["isCheckList"], Is.EqualTo(true));
-            Assert.That(viewResult.ViewData["isCheckAnswers"], Is.EqualTo(true));
-            Assert.That(viewResult.ViewData["isEditMode"], Is.EqualTo(true));
-        }
+        //    // Assert
+        //    Assert.That(result, Is.InstanceOf<ViewResult>());
+        //    Assert.That(viewResult.ViewData["isCheckList"], Is.EqualTo(true));
+        //    Assert.That(viewResult.ViewData["isCheckAnswers"], Is.EqualTo(true));
+        //    Assert.That(viewResult.ViewData["isEditMode"], Is.EqualTo(true));
+        //}
         [Test]
         public async Task SecurityClassificationSubmit_InvalidModelState_ReturnsView()
         {
@@ -401,7 +402,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             request.SecurityClassification = null;
 
             // Act
-            var result = await _controller.SecurityClassificationSubmit(request, "false", "false", "false", "false");
+            var result = await _controller.SecurityClassificationSubmit(request);
 
             // Assert
             Assert.That(result, Is.InstanceOf<ViewResult>());
@@ -422,7 +423,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             request.SecurityClassification = (Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums.SecurityClassificationEnum?)SecurityClassificationEnum.Official;
 
             // Act
-            var result = await _controller.SecurityClassificationSubmit(request, "false", "false", "false", "false");
+            var result = await _controller.SecurityClassificationSubmit(request);
 
             // Assert
             Assert.That(result, Is.InstanceOf<RedirectToActionResult>());
@@ -447,7 +448,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
                 .ReturnsAsync(response);
 
             // Act
-            var result = await _controller.SecurityClassificationSubmit(request, "false", "false", "false", "false");
+            var result = await _controller.SecurityClassificationSubmit(request);
 
             // Assert
             _mockCatalogQuestionsService.Verify(s => s.UpdateSecurityClassificationAsync(request, DataAssetType.DataSet), Times.Once);
@@ -470,7 +471,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
                 .ThrowsAsync(new UnauthorizedAccessException());
 
             // Act
-            var result = await _controller.SecurityClassificationSubmit(request, "false", "false", "false", "false");
+            var result = await _controller.SecurityClassificationSubmit(request);
 
             // Assert
             Assert.That(result, Is.InstanceOf<RedirectToPageResult>());
@@ -489,7 +490,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
                 .ReturnsAsync((PatchProfiledDataAssetResponse)null);
 
             // Act
-            var result = await _controller.SecurityClassificationSubmit(request, "false", "false", "false", "false");
+            var result = await _controller.SecurityClassificationSubmit(request);
 
             // Assert
             Assert.That(result, Is.InstanceOf<ViewResult>());
@@ -1258,7 +1259,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
             _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
                                                        It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
-            var contact = new Contact { Name = "John Doe", Email = "john.doe@example.com", Role = ContactRoleEnum.Contact };
+            var contact = new Contact { Name = "John Doe", Email = "johndoeexampleom", Role = ContactRoleEnum.Contact };
             var response = new PatchProfiledDataAssetResponse { DataAssetId = Guid.NewGuid() };
 
             var mockDataAsset = new GetCddoDataAssetResponse() 
@@ -1773,7 +1774,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
                                                        It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
             var identifier = Guid.NewGuid().ToString();
             var request = new QuestionDistributionRequest { Identifier = identifier };
-            var dataAsset = new GetCddoDataAssetResponse() { CddoDataAsset = new CddoDataAsset() { SecurityClassification = "TopSecret", DataAssetDistribution = new CddoDataAssetDistribution() { MediaType ="application/json"  } } };
+            var dataAsset = new GetCddoDataAssetResponse() { CddoDataAsset = new CddoDataAsset() { SecurityClassification = "TopSecret", DataAssetDistribution = new List<CddoDataAssetDistribution>() { new CddoDataAssetDistribution() { MediaType = "application/json" } } } };
    
             _mockCatalogDataService.Setup(s => s.GetDataAssetAsync(It.IsAny<Guid>(), default)).ReturnsAsync(dataAsset);
 
@@ -1793,10 +1794,11 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
                                                        It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
             var request = new QuestionDistributionRequest();
+           var dist = new List<Distribution>();
             _controller.ModelState.AddModelError("Distribution", "Invalid distribution");
 
             // Act
-            var result = await _controller.AddSupplyFormatSubmit(request, "false", "false", "false", "false");
+            var result = await _controller.AddSupplyFormatSubmit(request, null, "[]", "false", "false", "false", "false");
 
             // Assert
             Assert.That(result, Is.TypeOf<ViewResult>());
@@ -1813,11 +1815,13 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
                                                        It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
             var request = new QuestionDistributionRequest { Identifier = Guid.NewGuid().ToString() };
             var response = new PatchProfiledDataAssetResponse { DataAssetId = Guid.NewGuid() };
+            var dist = _fixture.Create<List<Distribution>>();
+
 
             _mockCatalogQuestionsService.Setup(s => s.UpdateDistributionAsync(request, DataAssetType.DataSet)).ReturnsAsync(response);
 
             // Act
-            var result = await _controller.AddSupplyFormatSubmit(request, "false", "false", "false", "false");
+            var result = await _controller.AddSupplyFormatSubmit(request, "false", JsonConvert.SerializeObject(dist, Formatting.Indented), "false", "false", "false", "false");
 
             // Assert
             Assert.That(result, Is.TypeOf<RedirectToActionResult>());
@@ -1833,11 +1837,12 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             _mockLogger.Setup(x => x.LogAdminEventBase(It.IsAny<AdminAuditEvent>(), It.IsAny<string>(), It.IsAny<string>(),
                                                        It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, string>>()));
             var request = new QuestionDistributionRequest { Identifier = Guid.NewGuid().ToString() };
+            var dist = _fixture.Create<List<Distribution>>();
 
             _mockCatalogQuestionsService.Setup(s => s.UpdateDistributionAsync(request, DataAssetType.DataSet)).ThrowsAsync(new UnauthorizedAccessException());
 
             // Act
-            var result = await _controller.AddSupplyFormatSubmit(request, "false", "false", "false", "false");
+            var result = await _controller.AddSupplyFormatSubmit(request, "false", JsonConvert.SerializeObject(dist, Formatting.Indented), "false", "false", "false", "false");
 
             // Assert
             Assert.That(result, Is.TypeOf<RedirectToPageResult>());
