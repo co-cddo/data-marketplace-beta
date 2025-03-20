@@ -37,6 +37,7 @@ namespace Cddo.Data.Marketplace.Api.Test
             var mockAppInsightLogger = Mock.Get(fixture.Freeze<IAppInsightsLogger>());
             var mockEnumMemberConvertor = Mock.Get(fixture.Freeze<IEnumMemberConverter>());
             var mockValidationService = Mock.Get(fixture.Freeze<IModelValidationService>());
+            var reportsService = Mock.Get(fixture.Freeze<IReportsService>());
 
             var reportsController = new ReportsController(
                 mockLogger.Object,
@@ -55,7 +56,8 @@ namespace Cddo.Data.Marketplace.Api.Test
             var lookupController = new LookupController(
                 mockLookupLogger.Object,
                 mockDataAssetService.Object,
-                mockUserProfilePresenter.Object
+                mockUserProfilePresenter.Object,
+                reportsService.Object
                 );
 
             ConfigureHappyPathTesting();
