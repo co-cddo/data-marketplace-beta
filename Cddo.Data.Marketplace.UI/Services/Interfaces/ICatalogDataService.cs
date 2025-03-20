@@ -1,6 +1,7 @@
 ﻿using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums;
 using Agm.Catalog.DotNet.Dto.Requests.DataAssets;
 using Agm.Catalog.DotNet.Dto.Responses.DataAssets;
+using Cddo.Data.Marketplace.UI.Model;
 
 namespace Cddo.Data.Marketplace.UI.Services.Interfaces;
 
@@ -17,7 +18,12 @@ public interface ICatalogDataService
     Task<GetCddoDataAssetsResponse?> GetDataAssetsAsync(
         GetCddoDataAssetsRequest getCddoDataAssetsRequest,
         CancellationToken cancellationToken = default);
-    
+
+    Task<CatalogueFilterOptions?> GetCatalogueFilterOptionsAsync(
+        GetCddoDataAssetsRequest getCddoDataAssetsRequest,
+        CancellationToken cancellationToken = default);
+
+
     Task<GetCddoDataAssetsResponse?> GetDataAssetsByUserAsync(
         GetCddoDataAssetsRequest getCddoDataAssetsRequest,
         CancellationToken cancellationToken = default);

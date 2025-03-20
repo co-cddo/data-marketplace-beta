@@ -11,6 +11,7 @@ using Flurl.Http.Configuration;
 using Cddo.Data.Marketplace.Logic.Exceptions;
 using Agm.Catalog.DotNet.Dto.Responses.Lookup;
 using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums;
+using Cddo.Data.Marketplace.UI.Model;
 
 namespace Cddo.Data.Marketplace.UI.Services;
 
@@ -289,6 +290,45 @@ public class CatalogDataService : ICatalogDataService
                 .WithOAuthBearerToken(token)
                 .SetQueryParams(getCddoDataAssetsRequest)
                 .GetJsonAsync<GetCddoDataAssetsResponse>(cancellationToken: cancellationToken);
+
+            return response;
+        }
+        catch (FlurlHttpException ex)
+        {
+            var cddoFlurlException = await _cddoFlurlExceptionBuilder.BuildAsync(ex);
+            _logger.LogError(ex, "Failed to Get Data Descriptions. Flurl Response: {FlurlResponseText}", cddoFlurlException.FlurlResponseText);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while getting data descriptions results.");
+            return null;
+        }
+    }
+    public async Task<CatalogueFilterOptions?> GetCatalogueFilterOptionsAsync
+        (GetCddoDataAssetsRequest getCddoDataAssetsRequest, CancellationToken cancellationToken = default)
+    {
+        getCddoDataAssetsRequest.OnlyIncludeRecordsDiscoverableByOrganisationOfCallingUser = false;
+        getCddoDataAssetsRequest.OnlyIncludeRecordsOwnedByOrganisationOfCallingUser = false;
+
+        getCddoDataAssetsRequest.StartRecordIndex = 0;
+
+        try
+        {
+            var token = GetToken();
+            // All responses from the Marketplace Api are serialized so that enums are returned as strings rather than
+            // their integer value, so we have to read them back with the same conversion.
+            var response = await _apiUrl
+                .WithSettings(x =>
+                    x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
+                    {
+                        Converters = { new JsonStringEnumConverter() },
+                        PropertyNameCaseInsensitive = true
+                    }))
+                .AppendPathSegment("FilteredMenuOptions")
+                .WithOAuthBearerToken(token)
+                .SetQueryParams(getCddoDataAssetsRequest)
+                .GetJsonAsync<CatalogueFilterOptions>(cancellationToken: cancellationToken);
 
             return response;
         }

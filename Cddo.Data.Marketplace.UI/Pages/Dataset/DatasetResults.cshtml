@@ -309,18 +309,25 @@
                                                 </h1>
                                             </legend>
                                             <div class="govuk-checkboxes govuk-checkboxes--small filter-list" data-module="govuk-checkboxes">
-                                                <div class="govuk-checkboxes__item">
-                                                    <input class="govuk-checkboxes__input" id="dataSet" name="selectedDataAssetTypes" type="checkbox" value="@DataAssetType.DataSet" @(ViewBag?.DataAssetTypes?.Contains(DataAssetType.DataSet) ? "checked" : "")>
-                                                    <label class="govuk-label govuk-checkboxes__label" for="dataSet">
-                                                        Data set
-                                                    </label>
-                                                </div>
-                                                <div class="govuk-checkboxes__item">
-                                                    <input class="govuk-checkboxes__input" id="dataService" name="selectedDataAssetTypes" type="checkbox" value="@DataAssetType.DataService" @(ViewBag?.DataAssetTypes?.Contains(DataAssetType.DataService) ? "checked" : "")>
-                                                    <label class="govuk-label govuk-checkboxes__label" for="dataService">
-                                                        Data Service
-                                                    </label>
-                                                </div>
+                                                @if (Model.DataAssetTypes.Contains("DataSet"))
+                                                {
+                                                    <div class="govuk-checkboxes__item">
+                                                        <input class="govuk-checkboxes__input" id="dataSet" name="selectedDataAssetTypes" type="checkbox" value="@DataAssetType.DataSet" @(ViewBag?.DataAssetTypes?.Contains(DataAssetType.DataSet) ? "checked" : "")>
+                                                        <label class="govuk-label govuk-checkboxes__label" for="dataSet">
+                                                            Data set
+                                                        </label>
+                                                    </div>
+                                                }
+                                                @if (Model.DataAssetTypes.Contains("DataService"))
+                                                {
+                                                    <div class="govuk-checkboxes__item">
+                                                        <input class="govuk-checkboxes__input" id="dataService" name="selectedDataAssetTypes" type="checkbox" value="@DataAssetType.DataService" @(ViewBag?.DataAssetTypes?.Contains(DataAssetType.DataService) ? "checked" : "")>
+                                                        <label class="govuk-label govuk-checkboxes__label" for="dataService">
+                                                            Data Service
+                                                        </label>
+                                                    </div>
+                                                }
+
                                             </div>
                                         </fieldset>
                                     </div>
