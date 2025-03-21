@@ -6,35 +6,18 @@
 @inject ICatalogDataService _catalogDataService
 @model GetCddoDataAssetResponse
 @{
-    ViewData["Title"] = "Data set Summary";
     var dataAsset = Model.CddoDataAsset;
-    var contactPoint = Model.CddoDataAsset.DataAssetContacts.FirstOrDefault(x => x.Role == DataAssetContactRoleType.Contact);
-    var contactOwner = Model.CddoDataAsset.DataAssetContacts.FirstOrDefault(x => x.Role == DataAssetContactRoleType.Owner);
+    var contactPoint = dataAsset.DataAssetContacts.FirstOrDefault(x => x.Role == DataAssetContactRoleType.Contact);
+    var fileDownloads = dataAsset.DataAssetDistribution?.Where(d => d.MediaType?.ToString() == "File download").ToList();
+    var apis = dataAsset.DataAssetDistribution?.Where(d => d.MediaType?.ToString() == "API").ToList();
+    var webpages = dataAsset.DataAssetDistribution?.Where(d => d.MediaType?.ToString() == "text/html").ToList();
+
+    ViewData["Title"] = dataAsset.Title;
 }
 
 @functions {
-
-    public static string FormatDateTime(DateTime? dateTime)
-    {
-        if (dateTime == null) return "";
-
-        var suffix = new[] { "th", "st", "nd", "rd" };
-        int day = dateTime.Value.Day;
-        int mod100 = day % 100;
-        string formattedDate = dateTime.Value.ToString("dd MMMM yyyy HH:mm");
-        string daySuffix;
-        if (mod100 > 10 && mod100 < 20)
-        {
-            daySuffix = suffix[0];
-        }
-        else
-        {
-            int daySuffixIndex = (day % 10) < 4 ? day % 10 : 0;
-            daySuffix = suffix[daySuffixIndex];
-        }
-
-        return day + daySuffix + " " + formattedDate.Substring(2);
-    }
+    public static string FormatDateTime(DateTime? dateTime) => dateTime?.ToString("d MMMM yyyy") ?? "";
+    public static string FormatAssetType(string assetType) => assetType == "DataSet" ? "Dataset" : assetType.ToUpper();
 }
 
 @section Styles
@@ -49,121 +32,135 @@
 {
     <div class="govuk-main-wrapper">
         <div class="govuk-grid-row">
-            <div class="govuk-grid-column-two-thirds-from-desktop govuk-!-margin-bottom-4">
-                <span class="govuk-caption-xl">@dataAsset.PublisherPrettified</span>
-                <h1 class="govuk-heading-xl govuk-!-margin-bottom-1">@dataAsset.Title</h1>
-                <p class="govuk-caption-m"><strong>@dataAsset.Modified.ToLastUpdatedString()</strong></p>
-                <p class="govuk-body govuk-!-margin-bottom-5">
-                    <strong class="govuk-tag govuk-tag--blue mb-1">@dataAsset.DataAssetType</strong>
-                    @if (dataAsset.ManifestationTypes.Any())
-                    {
-                        <span>|</span>
-                        @foreach (var type in dataAsset.ManifestationTypes!)
-                        {
-                            <strong class="govuk-tag govuk-tag--grey mb-1">@type</strong>
-                        }
-                    }
-                </p>
-                @if (dataAsset?.Description != null)
+            <div class="govuk-grid-column-two-thirds">
+                <span class="govuk-caption-xl">
+                    @FormatAssetType(dataAsset.DataAssetType.ToString())@(apis.Any() ? ", API" : "")
+                </span>
+                <h1 class="govuk-heading-xl">@dataAsset.Title</h1>
+
+                @if (!string.IsNullOrEmpty(dataAsset.Description))
                 {
-                    <p class="govuk-body overflow-wrap" id="dataset-description">
-                        @dataAsset.Description
-                    </p>
+                    <p class="govuk-body overflow-wrap" id="dataset-description">@dataAsset.Description</p>
                 }
-            </div>
-        </div>
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-two-thirds-from-desktop govuk-!-margin-bottom-8">
-                <div class="dataset-additional-details govuk-!-margin-bottom-8">
-                    <h2 class="govuk-heading-l">Request this data set</h2>
 
-                    <p class="govuk-body">This data contains sensitive information (such as personal details) and requires a data share agreement with @dataAsset.PublisherPrettified.</p>
-                    <p class="govuk-body">To request this data, you need to <a class="govuk-link" asp-controller="Support" asp-action="@nameof(SupportController.DataShareQuestions)">answer some questions</a>.</p>
-                    <p class="govuk-body">Your answers will be reviewed by @dataAsset.PublisherPrettified.</p>
+                <dl class="govuk-summary-list govuk-summary-list--no-border">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Organisation
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @dataAsset?.PublisherPrettified
+                        </dd>
+                    </div>
 
-                    @if (Model.CddoDataAsset.AllowDSRRequest.HasValue && Model.CddoDataAsset.AllowDSRRequest.Value)
-                    {
-                        @if (Model.CddoDataAsset.RequiresDSR.HasValue && Model.CddoDataAsset.RequiresDSR.Value)
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            First published
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @FormatDateTime(dataAsset?.Issued)
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Update frequency
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @dataAsset?.UpdateFrequencyString
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Licence
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @(string.IsNullOrEmpty(dataAsset?.LicenseTitle) ? "Not known" : dataAsset.LicenseTitle)
+                        </dd>
+                    </div>
+                </dl>
+                @if (dataAsset?.AccessRights == "RESTRICTED" && Model.CddoDataAsset.AllowDSRRequest == true && Model.CddoDataAsset.RequiresDSR == true)
+                {
+                    <h2 class="govuk-heading-m">Request this data</h2>
+                    <p class="govuk-body">
+                        This data contains sensitive information and requires a data share agreement with @dataAsset?.PublisherPrettified.
+                    </p>
+                    <p class="govuk-body">
+                        <a class="govuk-link" asp-controller="Support" asp-action="@nameof(SupportController.RequestingRestrictedData)">Learn about requesting restricted data</a>
+                    </p>
+                    <form class="form" method="get">
+                        <button type="submit" class="govuk-button" data-module="govuk-button"
+                        asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartDataShareRequestPrompt)"
+                        asp-route-dataAssetId="@dataAsset?.Id">
+                            Start a data request
+                        </button>
+                    </form>
+                }
+
+                @if (webpages.Any() && dataAsset?.AccessRights != "RESTRICTED")
+                {
+                    <h2 class="govuk-heading-m">Data links</h2>
+                    <ul class="govuk-list" id="accessLinks">
+                        @foreach (var webpage in webpages)
                         {
-                            <form class="form" method="get">
-                                <button type="submit" class="govuk-button" data-module="govuk-button"
-                                        asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartDataShareRequestPrompt)"
-                                        asp-route-dataAssetId="@dataAsset.Id">
-                                    Start a data share request
-                                </button>
-                            </form>
+                            <li><a class="govuk-link" href="@webpage.DownloadUrl">@webpage.Title</a></li>
                         }
-                        else
+                    </ul>
+                }
+
+                @if (fileDownloads.Any() && dataAsset?.AccessRights != "RESTRICTED")
+                {
+                    <h2 class="govuk-heading-m">Downloads</h2>
+                    <dl class="govuk-summary-list govuk-summary-list--no-border" id="downloadLinks">
+                        @foreach (var file in fileDownloads)
                         {
-                            <h3 class="govuk-heading-s">This data set can not be requested for a data share yet</h3>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key govuk-!-width-one-half">
+                                    <a class="govuk-link" href="@file.DownloadUrl">@file.Title</a>
+                                </dt>
+                                <dd class="govuk-summary-list__value govuk-!-width-one-half">@file.Format</dd>
+                            </div>
                         }
-                    }
-                    else
+                    </dl>
+                }
+
+                @if (apis.Any())
+                {
+                    <h2 class="govuk-heading-m">API documentation</h2>
+                    @if (dataAsset?.AccessRights == "RESTRICTED")
                     {
-                        <h3 class="govuk-heading-s">This data set does not require a data share</h3>
+                        <p class="govuk-body">This API requires approval before usage.</p>
                     }
-                </div>
-                <h2 class="govuk-heading-l">Further information</h2>
-                <table class="govuk-table govuk-!-margin-bottom-8">
-                    <tbody class="govuk-table__body">                       
-                        <tr class="govuk-table__row">
-                            <th scope="row" class="govuk-table__header govuk-!-width-one-half">Publisher</th>
-                            <td class="govuk-table__cell govuk-!-width-one-half">
-                                @dataAsset.PublisherPrettified
-                            </td>
-                        </tr>                        
-                        <tr class="govuk-table__row">
-                            <th scope="row" class="govuk-table__header govuk-!-width-one-half">Security Classification</th>
-                            <td class="govuk-table__cell govuk-!-width-one-half">@dataAsset.SecurityClassification</td>
-                        </tr>                       
-                        <tr class="govuk-table__row">
-                            <th scope="row" class="govuk-table__header govuk-!-width-one-half">Updated</th>
-                            <td class="govuk-table__cell govuk-!-width-one-half">@dataAsset.Modified.ToGDSHelperString()</td>
-                        </tr>
-                        <tr class="govuk-table__row">
-                            <th scope="row" class="govuk-table__header govuk-!-width-one-half">Contact</th>
-                            <td class="govuk-table__cell govuk-!-width-one-half">
-                                @if (contactPoint is not null)
-                                {
-                                    if (string.IsNullOrEmpty(contactPoint.Email))
-                                    {
-                                        @contactPoint.Name
-                                    }
-                                    else
-                                    {
-                                        <a class="govuk-link" href="mailto:@(contactPoint.Email)">@contactPoint.Name</a>
-                                    }
-                                }
-                            </td>
-                        </tr>
-                        <tr class="govuk-table__row">
-                            <th scope="row" class="govuk-table__header govuk-!-width-one-half">Data Owner</th>
-                            <td class="govuk-table__cell govuk-!-width-one-half">
-                                @if (contactOwner is not null)
-                                {
-                                    if (string.IsNullOrEmpty(contactOwner.Email))
-                                    {
-                                        @contactOwner.Name
-                                    }
-                                    else
-                                    {
-                                        <a class="govuk-link" href="mailto:@(contactOwner.Email)">@contactOwner.Name</a>
-                                    }
-                                }
-                                else
-                                {
-                                    <span>The owner is the point of contact</span>
-                                }
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                    
+                    <p class="govuk-body">You can access this data using an API. </p>
+                    <ul class="govuk-list" id="accessLinks">
+                        @foreach (var api in apis)
+                        {
+                            <li><a class="govuk-link" href="@api.AccessUrl">@api.Title</a></li>
+                        }
+                    </ul>                   
+                }
+
+                @* Contact *@
+                <h2 class="govuk-heading-m">Contact</h2>
+                <p class="govuk-body">
+                    For questions about this data contact:
+                </p>
+                <p class="govuk-body">
+                    <a class="govuk-link" href="mailto:@(contactPoint?.Email)">
+                        @contactPoint?.Email
+                    </a>
+                </p>
+                <p class="govuk-body govuk-!-margin-top-9 govuk-hint">
+                    This page was last updated @FormatDateTime(dataAsset?.Modified).
+                </p>
             </div>
         </div>
     </div>
 }
 <style scoped>
-    .overflow-wrap{
+    .overflow-wrap {
         overflow-wrap: break-word;
     }
 </style>

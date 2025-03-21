@@ -1,7 +1,7 @@
 ﻿.dataset-result .dataset-result__list {
   margin-bottom: 25px;
   padding-top: 10px;
-  border-top: 1px solid #b1b4b6;
+  border-bottom: 1px solid #b1b4b6;
 }
 
 .dataset-result ul {
@@ -64,7 +64,7 @@
   box-shadow: none;
 }
 .accordion-filter .accordion-body {
-  max-height: 400px;
+  max-height: 100px;
   overflow-y: auto;
   scrollbar-width: thin;
 }
