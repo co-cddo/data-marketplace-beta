@@ -91,8 +91,8 @@
                     </p>
                     <form class="form" method="get">
                         <button type="submit" class="govuk-button" data-module="govuk-button"
-                        asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartDataShareRequestPrompt)"
-                        asp-route-dataAssetId="@dataAsset?.Id">
+                                asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartDataShareRequestPrompt)"
+                                asp-route-dataAssetId="@dataAsset?.Id">
                             Start a data request
                         </button>
                     </form>
@@ -130,16 +130,16 @@
                     <h2 class="govuk-heading-m">API documentation</h2>
                     @if (dataAsset?.AccessRights == "RESTRICTED")
                     {
-                        <p class="govuk-body">This API requires approval before usage. <a class="govuk-link" href="https://www.postman.com/what-is-an-api/">Find out more about APIs</a>.</p>
+                        <p class="govuk-body">This API requires approval before usage.</p>
                     }
-                    
-                    <p class="govuk-body">You can access this data using an API. </p>
+
+                    <p class="govuk-body">You can access this data using an API. <a class="govuk-link" href="https://www.postman.com/what-is-an-api/">Find out more about APIs</a>.</p>
                     <ul class="govuk-list" id="accessLinks">
                         @foreach (var api in apis)
                         {
                             <li><a class="govuk-link" href="@api.AccessUrl">@api.Title</a></li>
                         }
-                    </ul>                   
+                    </ul>
                 }
 
                 @* Contact *@
@@ -162,5 +162,9 @@
 <style scoped>
     .overflow-wrap {
         overflow-wrap: break-word;
+    }
+
+    .govuk-summary-list__key a {
+        font-weight: 400;
     }
 </style>
