@@ -7,8 +7,8 @@ namespace Cddo.Data.Marketplace.UI.Services.Interfaces
     public interface IUserRoleClaimService
     {
         Task<UserProfileResponse?> GetUserRoleDetailsAsync(CancellationToken cancellationToken = default);
-        Task<IActionResult?> SetUserEmailNotificationAsync(bool notificationDecision, int userId, CancellationToken cancellationToken = default);
+        Task SetUserEmailNotificationAsync(bool notificationDecision, int userId, CancellationToken cancellationToken = default);
         Task<List<UserRoleApprovalDetailResponse>?> GetUserRoleApprovalListAsync(int userId, CancellationToken cancellationToken = default);
-        Task<IActionResult?> SetUserRoleApprovalAsync(List<SetUserApprovalRequest> setUserApprovalRequest, CancellationToken cancellationToken = default);
+        Task SetUserRoleApprovalAsync(List<SetUserApprovalRequest> setUserApprovalRequest, CancellationToken cancellationToken = default);
     }
 }

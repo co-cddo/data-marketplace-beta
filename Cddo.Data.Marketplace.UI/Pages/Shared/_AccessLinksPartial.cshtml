@@ -26,7 +26,7 @@
             <div class="govuk-error-summary__body">
                 <ul class="govuk-list govuk-error-summary__list">
                    <li>
-                        <a asp-action="@nameof(CatalogDataDescriptionController.AddSupplyFormat)" asp-route-identifier="@identifier">You must add at least one access link before publishing</a>
+                        <a asp-action="@nameof(CatalogDataDescriptionController.AddSupplyFormat)" asp-route-identifier="@identifier">Enter 1 or more links to access the data</a>
                    </li>
                   
                 </ul>
@@ -36,110 +36,100 @@
 }
 @if(Model.Any())
 {
-    <p>
+    <p class="govuk-body">
         These links open in a new tab.
     </p>
 }
 
 @if (fileDownloads.Any())
 {
+    <h2 class="govuk-heading-m">
+        Downloads
+    </h2>
+    <dl class="govuk-summary-list">
+        @foreach (var distribution in fileDownloads)
+        {
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    <a target="_blank" href="@distribution.DownloadUrl">
+                        @distribution.Title
+                    </a>
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    @distribution.Format 
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <ul class="govuk-summary-list__actions-list">
+                        <li class="govuk-summary-list__actions-list-item">
+                            <a class="govuk-link" asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@identifier" asp-route-mediaType="@distribution.MediaType.FirstOrDefault()" asp-route-distributionId="@distribution.Id" asp-route-isEditMode="true">Change</a>
+                        </li>
+                        <li class="govuk-summary-list__actions-list-item">
+                            <a class="govuk-link" asp-action="@nameof(CatalogDataDescriptionController.RemoveDistributionLinkConfirmation)" asp-route-identifier="@identifier" asp-route-distributionId="@distribution.Id" asp-route-title="@distribution.Title">Delete</a>
+                        </li>
+                    </ul>
+                </dd>
+            </div>
+        }
+    </dl>
 
-    <table class="govuk-table">
-        <thead class="govuk-table__head">
-            <tr class="govuk-table__row">
-                <th scope="col" class="govuk-table__header govuk-!-width-one-half">Downloads</th>
-                <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
-                <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
-                <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
-            </tr>
-        </thead>
-        <tbody class="govuk-table__body">
-
-            @foreach (var distribution in fileDownloads)
-            {
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header govuk-!-font-weight-regular">
-                        <a class="govuk-link" href="@distribution.DownloadUrl">
-                            @distribution.Title
-                        </a>
-                    </th>
-                    <td class="govuk-table__cell">
-                        @distribution.Format
-                    </td>
-                    <td class="govuk-table__cell">
-                        <a class="govuk-link" asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@identifier" asp-route-mediaType="@distribution.MediaType.FirstOrDefault()" asp-route-distributionId="@distribution.Id" asp-route-isEditMode="true">Change</a>
-                    </td>
-                    <td class="govuk-table__cell">
-                        <a type="submit" class="govuk-button govuk-button--warning mb-0" asp-action="@nameof(CatalogDataDescriptionController.RemoveDistributionLinkConfirmation)" asp-route-identifier="@identifier" asp-route-distributionId="@distribution.Id" asp-route-title="@distribution.Title">Delete</a>
-                    </td> 
-                </tr>
-            }
-        </tbody>
-    </table>
 }
 @if (apis.Any())
 {
-    <table class="govuk-table">
-        <thead class="govuk-table__head">
-            <tr class="govuk-table__row">
-                <th scope="col" class="govuk-table__header govuk-!-width-three-quarters">
-                    API
-                </th>
-                <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">
-                </th>
-            </tr>
-        </thead>
-        <tbody class="govuk-table__body">
-            @foreach (var distribution in apis)
-            {
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header govuk-!-font-weight-regular">
-                        <a class="govuk-link" href="@distribution.AccessUrl">
-                            @distribution.Title
-                        </a>
-                    </th>
-                    <td class="govuk-table__cell">
-                        <a class="govuk-link" asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@identifier" asp-route-mediaType="@distribution.MediaType.FirstOrDefault()" asp-route-distributionId="@distribution.Id" asp-route-isEditMode="true">Change</a>
-                    </td>
-                    <td class="govuk-table__cell">
-                        <a type="submit" class="govuk-button govuk-button--warning" asp-action="@nameof(CatalogDataDescriptionController.RemoveDistributionLinkConfirmation)" asp-route-identifier="@identifier" asp-route-distributionId="@distribution.Id" asp-route-title="@distribution.Title" style="margin-bottom: auto;">Delete</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <h2 class="govuk-heading-m">
+        API
+    </h2>
+    <dl class="govuk-summary-list">
+        @foreach (var distribution in apis)
+        {
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    <a target="_blank" href="@distribution.AccessUrl">
+                        @distribution.Title
+                    </a>
+                </dt>
+                <dd class="govuk-summary-list__actions">
+                    <ul class="govuk-summary-list__actions-list">
+                        <li class="govuk-summary-list__actions-list-item">
+                            <a class="govuk-link" asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@identifier" asp-route-mediaType="@distribution.MediaType.FirstOrDefault()" asp-route-distributionId="@distribution.Id" asp-route-isEditMode="true">Change</a>
+                        </li>
+                        <li class="govuk-summary-list__actions-list-item">
+                            <a class="govuk-link" asp-action="@nameof(CatalogDataDescriptionController.RemoveDistributionLinkConfirmation)" asp-route-identifier="@identifier" asp-route-distributionId="@distribution.Id" asp-route-title="@distribution.Title">Delete</a>
+                        </li>
+                    </ul>
+                </dd>
+            </div>
+        }
+    </dl>
+
 }
 @if (webpages.Any())
 {
-    <table class="govuk-table">
-        <thead class="govuk-table__head">
-            <tr class="govuk-table__row">
-                <th scope="col" class="govuk-table__header govuk-!-width-three-quarters">
-                    Webpages
-                </th>
-                <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">
-                </th>
-            </tr>
-        </thead>
-        <tbody class="govuk-table__body">
-            @foreach (var distribution in webpages)
-            {
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header govuk-!-font-weight-regular">
-                        <a class="govuk-link" href="@distribution.DownloadUrl">
-                            @distribution.Title
-                        </a>
-                    </th>
-                    <td class="govuk-table__cell">
-                        <a class="govuk-link" asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@identifier" asp-route-mediaType="@distribution.MediaType.FirstOrDefault()" asp-route-distributionId="@distribution.Id" asp-route-isEditMode="true">Change</a>
-                    </td>
-                    <td class="govuk-table__cell">
-                        <a type="submit" class="govuk-button govuk-button--warning" asp-action="@nameof(CatalogDataDescriptionController.RemoveDistributionLinkConfirmation)" asp-route-identifier="@identifier" asp-route-distributionId="@distribution.Id" asp-route-title="@distribution.Title" style="margin-bottom: auto;">Delete</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <h2 class="govuk-heading-m">
+        Webpages
+    </h2>
+    <dl class="govuk-summary-list">
+        @foreach (var distribution in webpages)
+        {
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    <a target="_blank" href="@distribution.DownloadUrl">
+                        @distribution.Title
+                    </a>
+                </dt>
+                <dd class="govuk-summary-list__actions">
+                    <ul class="govuk-summary-list__actions-list">
+                        <li class="govuk-summary-list__actions-list-item">
+                            <a class="govuk-link" asp-action="@nameof(CatalogDataDescriptionController.AddDistributionLinks)" asp-route-identifier="@identifier" asp-route-mediaType="@distribution.MediaType.FirstOrDefault()" asp-route-distributionId="@distribution.Id" asp-route-isEditMode="true">Change</a>
+                        </li>
+                        <li class="govuk-summary-list__actions-list-item">
+                            <a class="govuk-link" asp-action="@nameof(CatalogDataDescriptionController.RemoveDistributionLinkConfirmation)" asp-route-identifier="@identifier" asp-route-distributionId="@distribution.Id" asp-route-title="@distribution.Title">Delete</a>
+                        </li>
+                    </ul>
+                </dd>
+            </div>
+        }
+    </dl>
+
 
 }
 @if (linksTitle != "Links")

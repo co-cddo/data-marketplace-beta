@@ -1422,7 +1422,7 @@ namespace Cddo.Data.Marketplace.Api.Test.Controllers
             };
 
             var mockResult = new Mock<IServiceOperationDataResult<IValidateCataloguedResourceResult>>();
-            mockResult.Setup(r => r.Success).Returns(true);
+            mockResult.Setup(r => r.Success).Returns(false);
 
             var validationResultList = fixture.Create<List<IDataAssetValidationPropertyResult>>();
 

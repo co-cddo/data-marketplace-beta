@@ -20,7 +20,7 @@ namespace Cddo.Data.Marketplace.UI.Controllers;
 [Authorize]
 public class DataRequestController(
     IDataShareRequestService dataShareRequestService,
-    IQuestionDataBuilder questionDataBuilder, AppInsightsLogger logger, IUserRoleService userRoleService) : Controller
+    IQuestionDataBuilder questionDataBuilder, IAppInsightsLogger logger, IUserRoleService userRoleService) : Controller
 {
 
     private const string DataShareRequestEvent = "DataShareRequest";
@@ -49,7 +49,7 @@ public class DataRequestController(
             userEventProperties.Add("esdaId", esdaId.ToString());
             userEventProperties.Add("esdaName", esdaName);
 
-            logger.LogUserEvent(UserEvent.UserPageNavigation, "RequestTasksListQuestions", "CDDO", userEventProperties);
+            logger.LogEventMainBase(UserEvent.UserPageNavigation, "RequestTasksListQuestions", "CDDO", "", "", "", userEventProperties);
         }
 
         return View("~/Pages/DataShare/RequestTasksListQuestions.cshtml", data);
@@ -78,7 +78,7 @@ public class DataRequestController(
                 userEventProperties.Add("questionId", questionId.ToString());
                 userEventProperties.Add("requestId", requestId.ToString());
 
-                logger.LogUserEvent(UserEvent.UserPageNavigation, "Question", "CDDO", userEventProperties);
+                logger.LogEventMainBase(UserEvent.UserPageNavigation, "Question", "CDDO", "", "", "", userEventProperties);
             }
 
             return View("~/Pages/DataShare/Question.cshtml", questionModel);
@@ -198,7 +198,7 @@ public class DataRequestController(
 
                 userEventProperties.Add("requestId", requestId.ToString());
 
-                logger.LogUserEvent(UserEvent.UserPageNavigation, "ReviewAnswers", "CDDO", userEventProperties);
+                logger.LogEventMainBase(UserEvent.UserPageNavigation, "ReviewAnswers", "CDDO", "", "", "", userEventProperties);
             }
 
             var getDataShareRequestAuditLogResponse = await dataShareRequestService.GetDataShareRequestReturnCommentsAuditLog(
@@ -242,7 +242,7 @@ public class DataRequestController(
 
                 userEventProperties.Add("requestId", requestId.ToString());
 
-                logger.LogUserEvent(UserEvent.UserPageNavigation, "ReviewAnswers", "CDDO", userEventProperties);
+                logger.LogEventMainBase(UserEvent.UserPageNavigation, "ReviewAnswers", "CDDO", "", "", "", userEventProperties);
             }
 
             return View("~/Pages/DataShare/ReviewReadOnlyAnswers.cshtml", new ReviewReadOnlyAnswersModel
@@ -314,7 +314,7 @@ public class DataRequestController(
                 var userResponse = await userRoleService.GetUserProfileAsync();
                 var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userResponse);
 
-                logger.LogDataSharingEvent(DataSharingEvent.DataSharingRequestDeleted, DataShareRequestEvent, "CDDO", "RequestDeleteReadOnlySubmit", RequestEvent, requestId.ToString(), userEventProperties);
+                logger.LogEventMainBase(DataSharingEvent.DataSharingRequestDeleted, DataShareRequestEvent, "CDDO", "RequestDeleteReadOnlySubmit", RequestEvent, requestId.ToString(), userEventProperties);
             }
 
             return RedirectToAction(nameof(ManageDataRequestController.GotoManageCreatedDataShare), "ManageDataRequest",
@@ -347,7 +347,7 @@ public class DataRequestController(
         if (!ModelState.IsValid)
         {
             var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-            logger.LogDataSharingEvent(DataSharingEvent.DataSharingSubmissionNotes, "SubmissionValidation", "CDDO", "SubmissionNotes", "Notes", requestId.ToString(), new Dictionary<string, string>
+            logger.LogEventMainBase(DataSharingEvent.DataSharingSubmissionNotes, "SubmissionValidation", "CDDO", "SubmissionNotes", "Notes", requestId.ToString(), new Dictionary<string, string>
         {{ "ValidationErrors", string.Join(", ", validationErrors) },{ "RequestId", requestId.ToString()  }});
         }
 
@@ -360,7 +360,7 @@ public class DataRequestController(
                 var userResponse = await userRoleService.GetUserProfileAsync();
                 var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userResponse);
 
-                logger.LogDataSharingEvent(DataSharingEvent.DataSharingRequestSent, DataShareRequestEvent, "CDDO", "RequestStartSubmit", RequestEvent, requestId.ToString(), userEventProperties);
+                logger.LogEventMainBase(DataSharingEvent.DataSharingRequestSent, DataShareRequestEvent, "CDDO", "RequestStartSubmit", RequestEvent, requestId.ToString(), userEventProperties);
             }
 
             return View("~/Pages/DataShare/SubmissionDeclaration.cshtml", model);
@@ -414,7 +414,7 @@ public class DataRequestController(
             userEventProperties.Add("requestId", requestId.ToString());
             userEventProperties.Add("questionId", questionId.ToString());
 
-            logger.LogUserEvent(UserEvent.UserSetQuestionAnswer, "Question", "CDDO", userEventProperties);
+            logger.LogEventMainBase(UserEvent.UserSetQuestionAnswer, "Question", "CDDO", "", "", "", userEventProperties);
         }
         return await DoSetQuestionAnswer(requestId, true, form, cancellationToken);
     }
@@ -455,7 +455,7 @@ public class DataRequestController(
             userEventProperties.Add("esdaId", esdaId.ToString());
             userEventProperties.Add("esdaName", esdaName);
 
-            logger.LogUserEvent(UserEvent.UserPageNavigation, "DataShareRequestPrevious", "CDDO", userEventProperties);
+            logger.LogEventMainBase(UserEvent.UserPageNavigation, "DataShareRequestPrevious", "CDDO", "", "", "", userEventProperties);
         }
 
         return View("~/Pages/DataShare/DataShareRequestPrevious.cshtml", new DataShareRequestPreviousModel
@@ -485,7 +485,7 @@ public class DataRequestController(
                 var userResponse = await userRoleService.GetUserProfileAsync();
                 var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userResponse);
 
-                logger.LogDataSharingEvent(DataSharingEvent.DataSharingRequestCreated, DataShareRequestEvent, "CDDO", "RequestStartSubmit", RequestEvent, esdaId.ToString(), userEventProperties);
+                logger.LogEventMainBase(DataSharingEvent.DataSharingRequestCreated, DataShareRequestEvent, "CDDO", "RequestStartSubmit", RequestEvent, esdaId.ToString(), userEventProperties);
             }
 
             //logger.LogDataSharingEvent(EventTypes.DataSharingEvent.DataSharingRequestCreated, DataShareRequestEvent, "CDDO", RequestStartSubmit", esdaId.ToString(),)
@@ -520,11 +520,11 @@ public class DataRequestController(
 
                 userEventProperties.Add("requestId", requestId.ToString());
                 userEventProperties.Add("requestRequestId", requestRequestId.ToString());
-                logger.LogUserEvent(UserEvent.UserDataShareRequestEnd, "DataShareRequestComplete", "CDDO", userEventProperties);
+                logger.LogEventMainBase(UserEvent.UserDataShareRequestEnd, "DataShareRequestComplete", "CDDO", "", "", "", userEventProperties);
 
                 var notificationEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userResponse);
                 notificationEventProperties.Add("requestId", requestId.ToString());
-                logger.LogDataSharingEvent(DataSharingEvent.DataSharingRequestNotification, string.Empty, "CDDO", NotificationEvent, "Submitted", submitDataShareRequestResponse.NotificationSuccess.ToString(), notificationEventProperties);
+                logger.LogEventMainBase(DataSharingEvent.DataSharingRequestNotification, string.Empty, "CDDO", NotificationEvent, "Submitted", submitDataShareRequestResponse.NotificationSuccess.ToString(), notificationEventProperties);
             }
             return RedirectToAction("DataShareRequestComplete", new { requestRequestId });
         }
@@ -559,7 +559,7 @@ public class DataRequestController(
         try
         {
 
-            var requests = await dataShareRequestService.GetAcquirerDataShareRequests([], Request.HttpContext.RequestAborted);
+            var requests = await dataShareRequestService.GetAcquirerDataShareRequests(new List<DataShareRequestStatus>(), Request.HttpContext.RequestAborted);
 
             return View("~/Pages/DataRequest/CreatedRequests.cshtml", requests);
         }
@@ -605,11 +605,11 @@ public class DataRequestController(
                 var userResponse = await userRoleService.GetUserProfileAsync();
                 var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userResponse);
 
-                logger.LogDataSharingEvent(DataSharingEvent.DataSharingRequestCancelled, DataShareRequestEvent, "CDDO", "RequestStartSubmit", RequestEvent, requestId.ToString(), userEventProperties);
+                logger.LogEventMainBase(DataSharingEvent.DataSharingRequestCancelled, DataShareRequestEvent, "CDDO", "RequestStartSubmit", RequestEvent, requestId.ToString(), userEventProperties);
 
                 var notificationEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userResponse);
                 notificationEventProperties.Add("requestId", requestId.ToString());
-                logger.LogDataSharingEvent(DataSharingEvent.DataSharingRequestNotification, string.Empty, "CDDO", NotificationEvent, "Cancelled", cancelDataShareRequestResponse.NotificationSuccess.ToString(), notificationEventProperties);
+                logger.LogEventMainBase(DataSharingEvent.DataSharingRequestNotification, string.Empty, "CDDO", NotificationEvent, "Cancelled", cancelDataShareRequestResponse.NotificationSuccess.ToString(), notificationEventProperties);
             }
 
             return RedirectToAction("CreatedRequests");
@@ -656,7 +656,7 @@ public class DataRequestController(
                 var userResponse = await userRoleService.GetUserProfileAsync();
                 var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userResponse);
 
-                logger.LogDataSharingEvent(DataSharingEvent.DataSharingRequestDeleted, DataShareRequestEvent, "CDDO", "RequestDeleteSubmit", RequestEvent, requestId.ToString(), userEventProperties);
+                logger.LogEventMainBase(DataSharingEvent.DataSharingRequestDeleted, DataShareRequestEvent, "CDDO", "RequestDeleteSubmit", RequestEvent, requestId.ToString(), userEventProperties);
             }
 
             return RedirectToAction("CreatedRequests");
@@ -684,6 +684,8 @@ public class DataRequestController(
 
 
     #endregion
+
+    #region privates
 
     private async Task<IActionResult> DoSetQuestionAnswer(
     Guid requestId, bool showNextQuestionIfValidResponsesGiven, IFormCollection form, CancellationToken cancellationToken)
@@ -730,7 +732,7 @@ public class DataRequestController(
     private async Task<IActionResult> HandleInvalidAnswerAsync(Guid requestId, SetDataShareRequestQuestionAnswerResult result)
     {
         var questionModel = questionDataBuilder.BuildQuestionModelFromDataShareRequestQuestion(result.QuestionInformation);
-        await LogUserEventAsync(requestId, questionModel.QuestionId, UserEvent.UserSetQuestionAnswerInvalid);
+        await LogEventMainBaseAsync(requestId, questionModel.QuestionId, UserEvent.UserSetQuestionAnswerInvalid);
 
         return View("~/Pages/DataShare/Question.cshtml", questionModel);
     }
@@ -739,18 +741,18 @@ public class DataRequestController(
     {
         if (result.NextQuestionId.HasValue)
         {
-            await LogUserEventAsync(requestId, result.NextQuestionId.Value, UserEvent.UserSetQuestionAnswerInvalid);
+            await LogEventMainBaseAsync(requestId, result.NextQuestionId.Value, UserEvent.UserSetQuestionAnswerInvalid);
             return RedirectToAction("RequestQuestion", new { requestId, questionId = result.NextQuestionId.Value });
         }
 
-        await LogUserEventAsync(requestId, null, UserEvent.UserSetQuestionAnswerCompleted);
+        await LogEventMainBaseAsync(requestId, null, UserEvent.UserSetQuestionAnswerCompleted);
 
         return result.DataShareRequestQuestionsRemainThatRequireAResponse
             ? RedirectToAction(RequestTasksAction, new { requestId })
             : RedirectToAction("RequestTasksReviewAnswers", new { requestId });
     }
 
-    private async Task LogUserEventAsync(Guid requestId, Guid? questionId, UserEvent userEvent)
+    private async Task LogEventMainBaseAsync(Guid requestId, Guid? questionId, UserEvent userEvent)
     {
         if (User.Identity != null && User.Identity.IsAuthenticated)
         {
@@ -763,9 +765,10 @@ public class DataRequestController(
                 userEventProperties.Add("questionId", questionId.Value.ToString());
             }
 
-            logger.LogUserEvent(userEvent, "Question", "CDDO", userEventProperties);
+            logger.LogEventMainBase(userEvent, "Question", "CDDO", "", "", "", userEventProperties);
         }
     }
+    #endregion
 
     #region Supplier Interface
     [Route("Received")]
@@ -926,7 +929,7 @@ public class DataRequestController(
                 var userResponse = await userRoleService.GetUserProfileAsync();
                 var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userResponse);
 
-                logger.LogDataSharingEvent(DataSharingEvent.DataSharingSubmissionReview, "ReviewInProgressReceivedRequest", "CDDO", "SubmissionReview", "Review", requestId.ToString(), userEventProperties);
+                logger.LogEventMainBase(DataSharingEvent.DataSharingSubmissionReview, "ReviewInProgressReceivedRequest", "CDDO", "SubmissionReview", "Review", requestId.ToString(), userEventProperties);
             }
 
             return RedirectToAction(nameof(ReviewInProgressReceivedRequest), new { requestId = requestId });
@@ -980,7 +983,7 @@ public class DataRequestController(
                 var userResponse = await userRoleService.GetUserProfileAsync();
                 var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userResponse);
 
-                logger.LogDataSharingEvent(DataSharingEvent.DataSharingSubmissionNotes, "SubmissionDecision", "CDDO", "SubmissionNotes", "Notes", requestId.ToString(), userEventProperties);
+                logger.LogEventMainBase(DataSharingEvent.DataSharingSubmissionNotes, "SubmissionDecision", "CDDO", "SubmissionNotes", "Notes", requestId.ToString(), userEventProperties);
             }
 
             await dataShareRequestService.SetSubmissionNotes(requestId, supplierNotes, cancellationToken);
@@ -1051,7 +1054,7 @@ public class DataRequestController(
                 var userResponse = await userRoleService.GetUserProfileAsync();
                 var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userResponse);
 
-                logger.LogDataSharingEvent(DataSharingEvent.DataSharingRequestReceived, "RequestAcceptanceDeclaration", "CDDO", RequestEvent, AcceptEvent, requestId.ToString(), userEventProperties);
+                logger.LogEventMainBase(DataSharingEvent.DataSharingRequestReceived, "RequestAcceptanceDeclaration", "CDDO", RequestEvent, AcceptEvent, requestId.ToString(), userEventProperties);
             }
 
             return View("~/Pages/DataRequest/RequestAcceptanceDeclaration.cshtml", requestAcceptanceDeclarationModel);
@@ -1084,11 +1087,11 @@ public class DataRequestController(
             {
                 var userResponse = await userRoleService.GetUserProfileAsync();
                 var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userResponse);
-                logger.LogDataSharingEvent(DataSharingEvent.DataSharingRequestAccepted, "RequestAccepted", "CDDO", RequestEvent, AcceptEvent, requestId.ToString(), userEventProperties);
+                logger.LogEventMainBase(DataSharingEvent.DataSharingRequestAccepted, "RequestAccepted", "CDDO", RequestEvent, AcceptEvent, requestId.ToString(), userEventProperties);
 
                 var notificationEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userResponse);
                 notificationEventProperties.Add("requestId", requestId.ToString());
-                logger.LogDataSharingEvent(DataSharingEvent.DataSharingRequestNotification, string.Empty, "CDDO", NotificationEvent, "Approved", acceptSubmissionResponse.NotificationSuccess.ToString(), notificationEventProperties);
+                logger.LogEventMainBase(DataSharingEvent.DataSharingRequestNotification, string.Empty, "CDDO", NotificationEvent, "Approved", acceptSubmissionResponse.NotificationSuccess.ToString(), notificationEventProperties);
             }
 
             return View("~/Pages/DataRequest/RequestAccepted.cshtml", acceptSubmissionResponse.AcceptedDecisionSummary);
@@ -1125,11 +1128,11 @@ public class DataRequestController(
             {
                 var userResponse = await userRoleService.GetUserProfileAsync();
                 var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userResponse);
-                logger.LogDataSharingEvent(DataSharingEvent.DataSharingRequestRejected, "RequestRejected", "CDDO", RequestEvent, AcceptEvent, requestId.ToString(), userEventProperties);
+                logger.LogEventMainBase(DataSharingEvent.DataSharingRequestRejected, "RequestRejected", "CDDO", RequestEvent, AcceptEvent, requestId.ToString(), userEventProperties);
 
                 var notificationEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userResponse);
                 notificationEventProperties.Add("requestId", requestId.ToString());
-                logger.LogDataSharingEvent(DataSharingEvent.DataSharingRequestNotification, string.Empty, "CDDO", NotificationEvent, "Rejected", rejectSubmissionResponse.NotificationSuccess.ToString(), notificationEventProperties);
+                logger.LogEventMainBase(DataSharingEvent.DataSharingRequestNotification, string.Empty, "CDDO", NotificationEvent, "Rejected", rejectSubmissionResponse.NotificationSuccess.ToString(), notificationEventProperties);
             }
             return View("~/Pages/DataRequest/RequestRejected.cshtml", rejectSubmissionResponse.RejectedDecisionSummary);
         }
@@ -1176,11 +1179,11 @@ public class DataRequestController(
             {
                 var userResponse = await userRoleService.GetUserProfileAsync();
                 var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userResponse);
-                logger.LogDataSharingEvent(DataSharingEvent.DataSharingRequestReturned, "RequestReturned", "CDDO", RequestEvent, AcceptEvent, requestId.ToString(), userEventProperties);
+                logger.LogEventMainBase(DataSharingEvent.DataSharingRequestReturned, "RequestReturned", "CDDO", RequestEvent, AcceptEvent, requestId.ToString(), userEventProperties);
 
                 var notificationEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userResponse);
                 notificationEventProperties.Add("requestId", requestId.ToString());
-                logger.LogDataSharingEvent(DataSharingEvent.DataSharingRequestNotification, string.Empty, "CDDO", NotificationEvent, "ReturnedWithComments", returnSubmissionResponse.NotificationSuccess.ToString(), notificationEventProperties);
+                logger.LogEventMainBase(DataSharingEvent.DataSharingRequestNotification, string.Empty, "CDDO", NotificationEvent, "ReturnedWithComments", returnSubmissionResponse.NotificationSuccess.ToString(), notificationEventProperties);
             }
 
             return View("~/Pages/DataRequest/RequestReturned.cshtml", returnSubmissionResponse.ReturnedDecisionSummary);
@@ -1249,7 +1252,7 @@ public class DataRequestController(
                 var userResponse = await userRoleService.GetUserProfileAsync();
                 var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userResponse);
 
-                logger.LogDataSharingEvent(DataSharingEvent.DataSharingRequestAccepted, "RequestReturned", "CDDO", RequestEvent, AcceptEvent, requestId.ToString(), userEventProperties);
+                logger.LogEventMainBase(DataSharingEvent.DataSharingRequestAccepted, "RequestReturned", "CDDO", RequestEvent, AcceptEvent, requestId.ToString(), userEventProperties);
             }
 
             return File(content, "application/pdf", $"{requestRequestId}.pdf");

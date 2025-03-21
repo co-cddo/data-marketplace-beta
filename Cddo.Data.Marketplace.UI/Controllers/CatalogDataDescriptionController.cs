@@ -33,15 +33,15 @@ public class CatalogDataDescriptionController(
     ICatalogDataService catalogDataService,
     ICatalogQuestionsService catalogQuestionsService,
     IUserRoleService userRoleService,
-    AppInsightsLogger insightsLogger,
+    IAppInsightsLogger insightsLogger,
     ICddoEmailAddressValidation emailValidator)
     : Controller
 {
     private readonly ICatalogDataService _catalogDataService = catalogDataService ?? throw new ArgumentNullException(nameof(catalogDataService));
     private readonly ICatalogQuestionsService _catalogQuestionsService = catalogQuestionsService ?? throw new ArgumentNullException(nameof(catalogQuestionsService));
     private readonly IUserRoleService _userRoleService = userRoleService ?? throw new ArgumentNullException(nameof(userRoleService));
-    private readonly AppInsightsLogger _insightsLogger = insightsLogger ?? throw new ArgumentNullException(nameof(insightsLogger));
-    private readonly ICddoEmailAddressValidation _emailValidator = emailValidator;
+    private readonly IAppInsightsLogger _insightsLogger = insightsLogger ?? throw new ArgumentNullException(nameof(insightsLogger));
+    private readonly ICddoEmailAddressValidation _emailValidator = emailValidator ?? throw new ArgumentNullException(nameof(emailValidator));
 
     private static readonly string AccessDeniedPage = "/Error/403";
     private const string LogValidationErrors = "validationErrors";
@@ -76,7 +76,7 @@ public class CatalogDataDescriptionController(
     {
         var userProfile = await _userRoleService.GetUserProfileAsync();
         var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userProfile);
-        _insightsLogger.LogAdminEvent(eventType, pageName, "CDDO", "", summary, "", userEventProperties);
+        _insightsLogger.LogAdminEventBase(eventType, pageName, "CDDO", "", summary, "", userEventProperties);
     }
 
     [Route("Dashboard")]
@@ -203,13 +203,13 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Title")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddTitleSubmit(QuestionTitleRequest questionTitleRequest, string? isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode, SecurityClassificationEnum? securityClassification = null)
+    public async Task<IActionResult> AddTitleSubmit(QuestionTitleRequest questionTitleRequest, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode, SecurityClassificationEnum? securityClassification = null)
     {
 
         if (string.IsNullOrWhiteSpace(questionTitleRequest.Title) && !ModelState.IsValid)
         {
             ModelState.Clear();
-            ModelState.AddModelError("Title", "Enter the title of the data set");
+            ModelState.AddModelError("Title", "Enter the title of the listing");
             ViewBag.isEditMode = isEditMode;
             if (securityClassification is not null) ViewBag.securityClassification = securityClassification;
             return ViewOrRedirect(TitleViewPath, questionTitleRequest);
@@ -262,7 +262,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("Add-Description")]
-    public async Task<IActionResult> AddDescription(QuestionDescriptionRequest questionDescriptionRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> AddDescription(QuestionDescriptionRequest questionDescriptionRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -292,7 +292,7 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Description")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddDescriptionSubmit(QuestionDescriptionRequest questionDescriptionRequest, string isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode)
+    public async Task<IActionResult> AddDescriptionSubmit(QuestionDescriptionRequest questionDescriptionRequest, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -326,7 +326,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("Add-Internal-Identifier")]
-    public async Task<IActionResult> AddInternalIdentifier(QuestionSupplierIdentifierRequest questionSupplierIdentifierRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> AddInternalIdentifier(QuestionSupplierIdentifierRequest questionSupplierIdentifierRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -356,7 +356,7 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Internal-Identifier")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddInternalIdentifierSubmit(QuestionSupplierIdentifierRequest questionSupplierIdentifierRequest, string isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode)
+    public async Task<IActionResult> AddInternalIdentifierSubmit(QuestionSupplierIdentifierRequest questionSupplierIdentifierRequest, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -414,7 +414,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("Add-Themes")]
-    public async Task<IActionResult> AddThemes(QuestionThemeRequest questionThemeRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> AddThemes(QuestionThemeRequest questionThemeRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -444,7 +444,7 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Themes")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddThemesSubmit(QuestionThemeRequest questionThemeRequest, string isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode)
+    public async Task<IActionResult> AddThemesSubmit(QuestionThemeRequest questionThemeRequest, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -490,7 +490,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("Add-Keywords")]
-    public async Task<IActionResult> AddKeywords(QuestionKeywordRequest questionKeywordRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> AddKeywords(QuestionKeywordRequest questionKeywordRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -520,7 +520,7 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Keywords")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddKeywordsSubmit(QuestionKeywordRequest questionKeywordRequest, string isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode)
+    public async Task<IActionResult> AddKeywordsSubmit(QuestionKeywordRequest questionKeywordRequest, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
         questionKeywordRequest.Keyword = NormalizeKeywords(questionKeywordRequest.Keyword);
 
@@ -578,7 +578,7 @@ public class CatalogDataDescriptionController(
             .ToList();
     }
 
-    private IActionResult HandleInvalidKeywords(QuestionKeywordRequest questionKeywordRequest, List<string> invalidKeywords, string isEditMode)
+    private IActionResult HandleInvalidKeywords(QuestionKeywordRequest questionKeywordRequest, List<string> invalidKeywords, string? isEditMode)
     {
         ModelState.Clear();
         ViewBag.isEditMode = isEditMode;
@@ -647,7 +647,7 @@ public class CatalogDataDescriptionController(
     {
         QuestionContactPointRequest questionContactPoint = new() { Identifier = identifier, ContactPoint = new List<Contact> { contact } };
 
-        if (!string.IsNullOrEmpty(contact.Email) && !_emailValidator.IsEmailAddressValid(contact.Email))
+        if (!string.IsNullOrEmpty(contact.Email) && !Regex.IsMatch(contact.Email, _emailValidator.CddoEmailAddressRegex.ToString()))
         {
             ModelState.AddModelError(nameof(contact.Email), "Email is invalid");
         }
@@ -746,7 +746,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("Add-Data-Owner")]
-    public async Task<IActionResult> AddDataOwner(QuestionContactPointRequest questionContactPointRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> AddDataOwner(QuestionContactPointRequest questionContactPointRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -786,7 +786,7 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Data-Owner")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddDataOwnerSubmit(Contact contact, string? identifier, string isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode)
+    public async Task<IActionResult> AddDataOwnerSubmit(Contact contact, string? identifier, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -858,7 +858,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("Add-Published-Date")]
-    public async Task<IActionResult> AddPublishedDate(QuestionIssuedRequestModel questionIssuedRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> AddPublishedDate(QuestionIssuedRequestModel questionIssuedRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -955,7 +955,7 @@ public class CatalogDataDescriptionController(
     {
         ModelState.Clear();
 
-        ModelState.AddModelError("metadataIssuedDate", "Provide a valid date");
+        ModelState.AddModelError("metadataIssuedDate", "Enter a date in DD/MM/YYYY format");
 
 
         if (!questionIssuedRequest.metadataIssuedDay.IsNullOrEmpty() && !int.TryParse(questionIssuedRequest.metadataIssuedDay, out int dayResult))
@@ -975,7 +975,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("Add-Frequency")]
-    public async Task<IActionResult> AddFrequency(QuestionUpdateFrequencyRequest questionUpdateFrequencyRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> AddFrequency(QuestionUpdateFrequencyRequest questionUpdateFrequencyRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -1005,7 +1005,7 @@ public class CatalogDataDescriptionController(
 
     [HttpPost("Add-Frequency")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddFrequencySubmit(QuestionUpdateFrequencyRequest questionUpdateFrequencyRequest, string? otherFrequency, string isCheckList, string isCheckAnswers, string showNextQuestion, string isEditMode)
+    public async Task<IActionResult> AddFrequencySubmit(QuestionUpdateFrequencyRequest questionUpdateFrequencyRequest, string? otherFrequency, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
         if (questionUpdateFrequencyRequest.UpdateFrequency == "Other" && !string.IsNullOrEmpty(otherFrequency))
         {
@@ -1019,10 +1019,10 @@ public class CatalogDataDescriptionController(
             if (validationErrors.Count() > 0)
             {
                 _insightsLogger.LogEvent(EventTypes.MetadataEvent.MetadataEdited, new Dictionary<string, string>
-        {
-            { LogValidationErrors, string.Join(", ", validationErrors) },
-            { "Frequency", questionUpdateFrequencyRequest.UpdateFrequency }
-        });
+                {
+                    { LogValidationErrors, string.Join(", ", validationErrors) },
+                    { "Frequency", questionUpdateFrequencyRequest.UpdateFrequency }
+                });
             }
         }
 
@@ -1138,7 +1138,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("Add-Supply-Format")]
-    public async Task<IActionResult> AddSupplyFormat(QuestionDistributionRequest questionKeywordRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> AddSupplyFormat(QuestionDistributionRequest questionKeywordRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -1183,6 +1183,9 @@ public class CatalogDataDescriptionController(
         
         if(distribution != null)
         {
+            ViewBag.isCheckList = isCheckList;
+            ViewBag.isCheckAnswers = isCheckAnswers;
+            ViewBag.isEditMode = isEditMode;
             var distributionList = JsonConvert.DeserializeObject<List<Distribution>>(distribution);
             questionDistributionRequest.Distribution = distributionList;
         }
@@ -1195,7 +1198,15 @@ public class CatalogDataDescriptionController(
             string summary = $"Validation failed for Add-Supply-Format. Errors: {string.Join(", ", validationErrors)}";
             await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", summary);
         }
+        if(mediaType == null && (distribution == "[]" || string.IsNullOrEmpty(distribution)))
+        {
+            ViewBag.isCheckList = isCheckList;
+            ViewBag.isCheckAnswers = isCheckAnswers;
+            ViewBag.isEditMode = isEditMode;
+            ModelState.AddModelError("access-rights-selection", "Select how users could access the data");
+            return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/SupplyFormat.cshtml", questionDistributionRequest);
 
+        }
         PatchProfiledDataAssetResponse? response;
 
         try
@@ -1226,6 +1237,14 @@ public class CatalogDataDescriptionController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddRestrictedSupplyFormatSubmit(QuestionDistributionRequest questionDistributionRequest, List<string>? supplyFormat, string? distribution, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
+        if(supplyFormat?.Count <= 0 && (distribution == "[]" || string.IsNullOrEmpty(distribution)))
+        {
+            ViewBag.isCheckList = isCheckList;
+            ViewBag.isCheckAnswers = isCheckAnswers;
+            ViewBag.isEditMode = isEditMode;
+            ModelState.AddModelError("access-rights-selection", "Select how users could access the data");
+            return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/AccessRightsRestricted.cshtml", questionDistributionRequest);
+        }
 
         if (distribution != null)
         {
@@ -1361,10 +1380,10 @@ public class CatalogDataDescriptionController(
                                                     .Select(e => e.ErrorMessage)
                                                     .ToList();
             _insightsLogger.LogEvent(EventTypes.MetadataEvent.MetadataAccessDenied, new Dictionary<string, string>
-        {
-            { "ValidationErrors", string.Join(", ", validationErrors) },
-            { "Identifier", identifier ?? "null" }
-        });
+            {
+                { "ValidationErrors", string.Join(", ", validationErrors) },
+                { "Identifier", identifier ?? "null" }
+            });
         }
 
         ArgumentNullException.ThrowIfNull(identifier);
@@ -1442,7 +1461,7 @@ public class CatalogDataDescriptionController(
     }
 
     [Route("licence")]
-    public async Task<IActionResult> Licence(QuestionLicenceRequest licenceRequest, string? identifier, string isCheckList, string isCheckAnswers, string isEditMode)
+    public async Task<IActionResult> Licence(QuestionLicenceRequest licenceRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!string.IsNullOrEmpty(identifier))
         {
@@ -1471,7 +1490,16 @@ public class CatalogDataDescriptionController(
         //{
         //    questionLicenceRequest.Licence = accessRightsSelection.Value ? "OPEN" : "RESTRICTED";
         //}
-        if(!string.IsNullOrEmpty(license) && license != "Other")
+        if (string.IsNullOrEmpty(license))
+        {
+            ViewBag.isCheckList = isCheckList;
+            ViewBag.isCheckAnswers = isCheckAnswers;
+            ViewBag.isEditMode = isEditMode;
+            ModelState.AddModelError("licence-selection", "Select a licence for the data");
+            return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/Licence.cshtml", questionLicenceRequest);
+
+        }
+        if (!string.IsNullOrEmpty(license) && license != "Other")
         {
             questionLicenceRequest.License.Title = license;
 
@@ -1777,17 +1805,17 @@ public class CatalogDataDescriptionController(
         {
             if (distribution.Title.IsNullOrEmpty())
             {
-                ModelState.AddModelError("title", "Enter a Title");
+                ModelState.AddModelError("title", "Enter the title of the file");
             }
 
             if (distribution.DownloadUrl.IsNullOrEmpty())
             {
-                ModelState.AddModelError("url", "Enter a Link URL");
+                ModelState.AddModelError("url", "Enter a link to download the file");
             }
 
             if (distribution.Format.IsNullOrEmpty())
             {
-                ModelState.AddModelError("link-download-format", "Enter a File Format");
+                ModelState.AddModelError("link-download-format", "Enter the file format");
             }
 
         }
@@ -1795,24 +1823,24 @@ public class CatalogDataDescriptionController(
         {
             if (distribution.Title.IsNullOrEmpty())
             {
-                ModelState.AddModelError("title", "Enter a Title");
+                ModelState.AddModelError("title", "Enter the title of the API");
             }
 
             if (distribution.AccessUrl.IsNullOrEmpty())
             {
-                ModelState.AddModelError("url", "Enter  Documentation URL");
+                ModelState.AddModelError("url", "Enter a link to the API documentation");
             }
         }
         if (distribution?.MediaType?.FirstOrDefault() == "text/html")
         {
             if (distribution.Title.IsNullOrEmpty())
             {
-                ModelState.AddModelError("title", "Enter a Title");
+                ModelState.AddModelError("title", "Enter the title of the webpage");
             }
 
             if (distribution.DownloadUrl.IsNullOrEmpty())
             {
-                ModelState.AddModelError("url", "Enter a Link URL");
+                ModelState.AddModelError("url", "Enter a link to the webpage");
             }
         }
 

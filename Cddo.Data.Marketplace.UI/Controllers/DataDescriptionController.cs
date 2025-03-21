@@ -20,7 +20,7 @@ public class DataDescriptionController : Controller
     private readonly ICatalogDataService _catalogDataService;
     private readonly ICatalogQuestionsService _catalogQuestionsService;
     private readonly IUserRoleService _userRoleService;
-    private readonly AppInsightsLogger _appInsightlogger;
+    private readonly IAppInsightsLogger _appInsightlogger;
     private readonly IUserProfilePresenter _userProfilePresenter;
     private readonly IDataShareRequestMailboxAddressValidation _dataShareRequestMailboxAddressValidation;
     private const string ManualViewPath = "~/Pages/DataDescription/NewDescription/Manual/";
@@ -37,7 +37,7 @@ public class DataDescriptionController : Controller
         ICatalogQuestionsService catalogQuestionsService,
         IUserRoleService userRoleService,
         IEnumMemberConverter enumMemberConverter,
-        AppInsightsLogger appInsightlogger,
+        IAppInsightsLogger appInsightlogger,
         IUserProfilePresenter userProfilePresenter,
         IDataShareRequestMailboxAddressValidation dataShareRequestMailboxAddressValidation)
     {        
@@ -77,7 +77,7 @@ public class DataDescriptionController : Controller
             SelectedRecipientType = selectedRecipientType,
             EnteredCustomAddress = enteredCustomAddress,
             MaintainerEmailAddress = contactPoint?.Email,
-            DomainDsrNotificationMailboxAddress = userDomainInformation!.DataShareRequestMailboxAddress
+            DomainDsrNotificationMailboxAddress = userDomainInformation?.DataShareRequestMailboxAddress
         });
     }
 
@@ -156,7 +156,7 @@ public class DataDescriptionController : Controller
                         customAddress, out var validationError))
                 {
                     ModelState.AddModelError(customAddressInputName,
-                        validationError!);
+                        validationError??"");
                     return false;
                 }
             }
@@ -165,7 +165,9 @@ public class DataDescriptionController : Controller
         }
     }
 
-    private async Task<IActionResult> PublishDataAssetSubmit(Guid dataAssetId, DataAssetType dataAssetType)
+    [HttpPost("New/Manual/publish-data-asset-submit")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> PublishDataAssetSubmit(Guid dataAssetId, DataAssetType dataAssetType)
     {
         const DataAssetStatus dataAssetStatus = DataAssetStatus.Published;
 
@@ -334,7 +336,7 @@ public class DataDescriptionController : Controller
                         customAddress, out var validationError))
                 {
                     ModelState.AddModelError(customAddressInputName,
-                        validationError!);
+                        validationError??"");
                     return false;
                 }
             }

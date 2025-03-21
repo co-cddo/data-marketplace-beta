@@ -37,8 +37,10 @@
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddSupplyFormatSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
                 <input type="hidden" name="@nameof(QuestionDistributionRequest.Identifier)" value="@Model?.Identifier" />
                 <input type="hidden" name="@nameof(QuestionDistributionRequest.Distribution)" value="@JsonConvert.SerializeObject(Model?.Distribution)" />
+                @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
 
-                <div class="govuk-form-group">
+                <div class="govuk-form-group @(ViewData.ModelState.ErrorCount > 0 == true ? "govuk-form-group--error" : "")">
+                    
                     <fieldset class="govuk-fieldset" aria-describedby="mediaType-hint">
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                             <span class="govuk-caption-l">
@@ -51,7 +53,13 @@
                         <div id="mediaType-hint" class="govuk-hint">
                             You’ll be able to add more access methods if needed.
                         </div>
-                        <div class="govuk-radios" data-module="govuk-radios">
+                        @if (ViewData.ModelState["access-rights-selection"]?.Errors.Any() == true)
+                        {
+                            <p id="metadataTitle-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span> Select how users could access the data
+                            </p>
+                        }
+                        <div id="access-rights-selection" class="govuk-radios" data-module="govuk-radios">
                                 <div class="govuk-radios__item">
                                     <input class="govuk-radios__input" id="filedownload" name="MediaType" type="radio" value="File download" >
                                 <label class="govuk-label govuk-radios__label" for="filedownload">
@@ -92,18 +100,12 @@
                     </fieldset>
                 </div>
                 <div class="govuk-button-group">
-                    @if (!isEditMode)
-                    {
-                        <button type="submit" name="showNextQuestion" value="true" class="govuk-button" data-module="govuk-button">
+                     <button type="submit" name="showNextQuestion" value="true" class="govuk-button" data-module="govuk-button">
                             Continue
-                        </button>
-                    }
-                    <button type="submit" name="@saveButtonName" value="true" class="govuk-button govuk-button--secondary" data-module="govuk-button">
-                        Save and return
-                    </button>
+                    </button>                    
                 </div>
             </form>
-            @if(Model.Distribution.Count() > 0)
+            @if(Model?.Distribution.Count() > 0)
             {
                 @await Html.PartialAsync("_AccessLinksPartial", Model.Distribution, ViewData)
 

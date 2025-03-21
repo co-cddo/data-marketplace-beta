@@ -12,6 +12,7 @@ namespace Cddo.Data.Marketplace.UI.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserRoleClaimService _userRoleClaimService;
         private readonly ILogger<DeveloperService> _logger;
+        private readonly IConfiguration _configuration;
 
         public DeveloperService(
             IHttpContextAccessor httpContextAccessor,
@@ -22,8 +23,9 @@ namespace Cddo.Data.Marketplace.UI.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _userRoleClaimService = userRoleClaimService ?? throw new ArgumentNullException(nameof(userRoleClaimService));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
-            _userApiUrl = configuration.GetSection("ApiSettings:UsersAPI").Value
+            _userApiUrl = _configuration.GetSection("ApiSettings:UsersAPI").Value
                           ?? throw new ArgumentException("API URL not found in configuration.");
         }
 
@@ -32,7 +34,6 @@ namespace Cddo.Data.Marketplace.UI.Services
             return _httpContextAccessor.HttpContext?.Request.Cookies["CO-Datamarketplace"];
         }
 
-        private const string FlurlHttpExceptionMessage = "Flurl HTTP Exception: {ResponseString}";
         private const string ClientAuthPath = "ClientAuth";
 
         private bool ValidateToken(string? token)
@@ -43,8 +44,12 @@ namespace Cddo.Data.Marketplace.UI.Services
                 return false;
             }
 
-            var handler = new JwtSecurityTokenHandler();
-            if (handler.ReadToken(token) is not JwtSecurityToken)
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                handler.ReadToken(token);
+            }
+            catch (Exception ex)
             {
                 _logger.LogWarning("Invalid JWT token.");
                 return false;
@@ -66,12 +71,12 @@ namespace Cddo.Data.Marketplace.UI.Services
 
                 throw new InvalidOperationException($"Error during API request. Response: {responseString}", ex);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An unexpected error occurred during the API request.");
+            //catch (Exception ex)
+            //{
+            //    _logger.LogError(ex, "An unexpected error occurred during the API request.");
 
-                throw new InvalidOperationException("An unexpected error occurred during the API request.", ex);
-            }
+            //    throw new InvalidOperationException("An unexpected error occurred during the API request.", ex);
+            //}
         }
 
         public async Task<ClientAuthCredentialsResponse?> CreateClientAuthCredentialAsync(ClientAuthCredentialsRequest request, CancellationToken cancellationToken = default)
