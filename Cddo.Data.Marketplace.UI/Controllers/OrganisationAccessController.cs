@@ -1,10 +1,12 @@
 ﻿using Cddo.Data.Marketplace.Api.Dto.Requests.RequestAccess;
 using Cddo.Data.Marketplace.UI.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace Cddo.Data.Marketplace.UI.Controllers;
 
+[Authorize]
 [Route("OrganisationAccess")]
 public class OrganisationAccessController : Controller
 {
