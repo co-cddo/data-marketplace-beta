@@ -59,42 +59,6 @@ public class CatalogDataController : Controller
         return Ok(suggestions.ToList());
     }
 
-    [Route("StartCddoDataAssetsSearch")]
-    public async Task<IActionResult> StartCddoDataAssetsSearch(
-        string? searchText,
-        List<string> selectedTopics,
-        List<string> selectedOrganisations,
-        List<DataAssetType> selectedDataAssetTypes,
-        int? selectedNumberOfRecordsToShow,
-        int? selectedPageNumber)
-    {
-        if (!ModelState.IsValid)
-        {
-            _logger.LogWarning("Model state is invalid for StartCddoDataAssetsSearch.");
-        }
-
-        if (!User.Identity!.IsAuthenticated) return RedirectToPage(AccessDeniedPage);
-
-        // This is a search triggered by entering search text, i.e. not due to changing
-        // filters, pagination etc.
-        // The sort order for a new search is forced to be either:
-        // - By Relevancy, if a search term has been entered
-        // - By Date Modified, if no search term has been entered
-        var searchSortOption = !string.IsNullOrWhiteSpace(searchText)
-            ? $"{DataAssetsSortField.Relevance}|{DataAssetsSortDirection.Descending}"
-            : $"{DataAssetsSortField.UpdatedOn}|{DataAssetsSortDirection.Descending}";
-
-        return RedirectToAction(nameof(GetCddoDataAssets), new
-        {
-            searchText = searchText,
-            selectedTopics = selectedTopics,
-            selectedOrganisations = selectedOrganisations,
-            selectedDataAssetTypes = selectedDataAssetTypes,
-            selectedNumberOfRecordsToShow = selectedNumberOfRecordsToShow,
-            selectedPageNumber = selectedPageNumber,
-            sortOption = searchSortOption
-        });
-    }
 
     [Route("GetCddoDataAssets")]
     public async Task<IActionResult> GetCddoDataAssets(
@@ -112,6 +76,13 @@ public class CatalogDataController : Controller
         }
 
         if (!User.Identity!.IsAuthenticated) return RedirectToPage(AccessDeniedPage);
+
+        if (string.IsNullOrWhiteSpace(sortOption))
+        {
+            sortOption = string.IsNullOrWhiteSpace(searchText)
+                ? $"{DataAssetsSortField.UpdatedOn}|{DataAssetsSortDirection.Descending}"
+            : $"{DataAssetsSortField.Relevance}|{DataAssetsSortDirection.Descending}";
+        }
 
         var sortOptions = DetermineSortOptions();
 
@@ -132,7 +103,7 @@ public class CatalogDataController : Controller
             SortField = sortOptions.SortField,
             SortDirection = sortOptions.SortDirection,
             StartRecordIndex = 0,
-            NumberOfRecords = selectedNumberOfRecordsToShow ?? 10,
+            NumberOfRecords =20,
             PageNumber = selectedPageNumber ?? 1
         };
 

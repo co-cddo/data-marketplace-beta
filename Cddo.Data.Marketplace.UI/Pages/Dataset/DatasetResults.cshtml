@@ -54,7 +54,7 @@
 
 @section Styles
 {
-    <link rel="stylesheet" href="~/css/dataset-results.min.css" />
+    <link rel="stylesheet" href="~/css/dataset-results.css" />
     <style>
         .suggestions {
             list-style-type: none;
@@ -80,70 +80,72 @@
                 .suggestions li:hover {
                     background-color: #f0f0f0;
                 }
+
+        .govuk-tag--grey {
+            text-transform: inherit !important;
+        }
     </style>
 }
-
-
 
 @section Scripts
 {
     <script asp-add-nonce="true">
         document.addEventListener("DOMContentLoaded", function () {
-            const searchInput = document.getElementById('catalogDataSearchInput');
-            const searchList = document.getElementById('catalogDataSearchList');
+        const searchInput = document.getElementById('catalogDataSearchInput');
+        const searchList = document.getElementById('catalogDataSearchList');
 
-            searchInput.addEventListener('input', function (e) {
-                const searchTerm = e.target.value.trim().toLowerCase();
-                if (searchTerm.length === 0) {
-                    searchList.innerHTML = '';
-                    searchList.style.display = 'none';
-                    return;
-                }
+        searchInput.addEventListener('input', function (e) {
+        const searchTerm = e.target.value.trim().toLowerCase();
+        if (searchTerm.length === 0) {
+        searchList.innerHTML = '';
+        searchList.style.display = 'none';
+        return;
+        }
 
-                fetch(`/catalogData/GetSearchSuggestionsForPublishedDataAssets?searchText=${encodeURIComponent(searchTerm)}`, {
-                    credentials: 'include'
-                })
-                    .then(response => {
-                        if (response.redirected) {
-                            window.location.href = response.url;
-                            return;
-                        }
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Fetched data:', data); // Log the response data
-                        if (data.length === 0) {
-                            searchList.innerHTML = '';
-                            searchList.style.display = 'none';
-                            return;
-                        }
-                        const optionsHTML = data.map(item => `<li>${item}</li>`).join('');
-                        searchList.innerHTML = optionsHTML;
-                        searchList.style.display = 'block';
-                    })
-                    .catch(error => {
-                        console.error('Error fetching data:', error);
-                        searchList.innerHTML = '';
-                        searchList.style.display = 'none';
-                    });
-            });
+        fetch(`/catalogData/GetSearchSuggestionsForPublishedDataAssets?searchText=${encodeURIComponent(searchTerm)}`, {
+        credentials: 'include'
+        })
+        .then(response => {
+        if (response.redirected) {
+        window.location.href = response.url;
+        return;
+        }
+        if (!response.ok) {
+        throw new Error('Network response was not ok');
+        }
+        return response.json();
+        })
+        .then(data => {
+        console.log('Fetched data:', data); // Log the response data
+        if (data.length === 0) {
+        searchList.innerHTML = '';
+        searchList.style.display = 'none';
+        return;
+        }
+        const optionsHTML = data.map(item => `<li>${item}</li>`).join('');
+        searchList.innerHTML = optionsHTML;
+        searchList.style.display = 'block';
+        })
+        .catch(error => {
+        console.error('Error fetching data:', error);
+        searchList.innerHTML = '';
+        searchList.style.display = 'none';
+        });
+        });
 
-            searchList.addEventListener('click', function (e) {
-                if (e.target.tagName === 'LI') {
-                    searchInput.value = e.target.textContent;
-                    searchList.innerHTML = '';
-                    searchList.style.display = 'none';
-                }
-            });
+        searchList.addEventListener('click', function (e) {
+        if (e.target.tagName === 'LI') {
+        searchInput.value = e.target.textContent;
+        searchList.innerHTML = '';
+        searchList.style.display = 'none';
+        }
+        });
 
-            document.addEventListener('click', function (e) {
-                if (!searchInput.contains(e.target) && !searchList.contains(e.target)) {
-                    searchList.style.display = 'none';
-                }
-            });
+        document.addEventListener('click', function (e) {
+        if (!searchInput.contains(e.target) && !searchList.contains(e.target)) {
+        searchList.style.display = 'none';
+        }
+        });
         });
     </script>
 }
@@ -154,7 +156,7 @@
     {
         if (string.IsNullOrWhiteSpace(input)) return string.Empty;
 
-        char[] delimiters = {'-', ' '};
+        char[] delimiters = { '-', ' ' };
 
         var inputTokens = input.Split(separator: delimiters,
             StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -189,6 +191,8 @@
             return description ?? string.Empty;
         }
     }
+
+    public static string FormatAssetType(string assetType) => assetType == "DataSet" ? "Dataset" : assetType.ToUpper();
 }
 
 <div class="govuk-width-container">
@@ -197,13 +201,13 @@
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
             Find government data
         </h1>
-        <form asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartCddoDataAssetsSearch)" method="get">
+        <form asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssets)" method="get">
             <div class="govuk-grid-row mb-5">
                 <div class="govuk-grid-column-two-thirds">
                     <div class="govuk-form-group mb-2 search-input">
                         <div class="govuk-input__wrapper" style="position: relative;">
                             <input aria-label="Search data description" class="govuk-input govuk-input--width-30" id="catalogDataSearchInput" name="searchText" type="text" list="catalogDataSearchList" autocomplete="off" value="@ViewBag.SearchText">
-                            
+
                             <script>
                                 document.getElementById('catalogDataSearchInput').addEventListener('keydown', function (e) {
                                     console.log("key pressed");
@@ -228,16 +232,16 @@
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="flush-topics">
                                 <button class="accordion-button collapsed govuk-link" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTopics" aria-controls="flush-collapseTopics">
-                                    Topics
+                                    Topic
                                 </button>
                             </h2>
-                            <div id="flush-collapseTopics" class="accordion-collapse collapse" aria-labelledby="flush-topics" data-bs-parent="#accordionFlushExample">
+                            <div id="flush-collapseTopics" class="accordion-collapse collapse show" aria-labelledby="flush-topics" data-bs-parent="#accordionFlushExample">
                                 <div class="accordion-body">
                                     <div class="govuk-form-group">
                                         <fieldset class="govuk-fieldset">
                                             <legend class="govuk-fieldset__legend govuk-fieldset__legend--m visually-hidden">
                                                 <h1 class="govuk-fieldset__heading">
-                                                    Topics
+                                                    Topic
                                                 </h1>
                                             </legend>
                                             <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
@@ -246,8 +250,8 @@
                                                     @foreach (var topic in topics.OrderBy(x => x))
                                                     {
                                                         <div class="govuk-checkboxes__item">
-                                                            <input class="govuk-checkboxes__input" id="@topic" name="selectedTopics" type="checkbox" value="@topic" @(ViewBag?.Themes?.Contains(@topic) ? "checked" : "")>
-                                                            <label class="govuk-label govuk-checkboxes__label" for="@topic">
+                                                            <input class="govuk-checkboxes__input" id="@topic" name="selectedTopics" type="checkbox" value="@topic" @(ViewBag?.Themes?.Contains(@topic) ? "checked" : "") onchange="this.form.submit()">
+                                                            <label class="govuk-label govuk-checkboxes__label govuk-!-font-size-16" for="@topic">
                                                                 @topic
                                                             </label>
                                                         </div>
@@ -262,16 +266,16 @@
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="flush-organisations">
                                 <button class="accordion-button collapsed govuk-link" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOrganisations" aria-controls="flush-collapseOrganisations">
-                                    Organisations
+                                    Organisation
                                 </button>
                             </h2>
-                            <div id="flush-collapseOrganisations" class="accordion-collapse collapse" aria-labelledby="flush-organisations" data-bs-parent="#accordionFlushExample">
+                            <div id="flush-collapseOrganisations" class="accordion-collapse collapse show" aria-labelledby="flush-organisations" data-bs-parent="#accordionFlushExample">
                                 <div class="accordion-body">
                                     <div class="govuk-form-group">
                                         <fieldset class="govuk-fieldset">
                                             <legend class="govuk-fieldset__legend govuk-fieldset__legend--m visually-hidden">
                                                 <h1 class="govuk-fieldset__heading">
-                                                    Organisations
+                                                    Organisation
                                                 </h1>
                                             </legend>
                                             <div class="govuk-checkboxes govuk-checkboxes--small filter-list" data-module="govuk-checkboxes">
@@ -280,8 +284,8 @@
                                                     @foreach (var organisation in organisations.OrderBy(x => x))
                                                     {
                                                         <div class="govuk-checkboxes__item">
-                                                            <input class="govuk-checkboxes__input" id="@organisation" name="selectedOrganisations" type="checkbox" value="@organisation" @(ViewBag?.Creator?.Contains(@organisation) ? "checked" : "")>
-                                                            <label class="govuk-label govuk-checkboxes__label" for="@organisation">
+                                                            <input class="govuk-checkboxes__input" id="@organisation" name="selectedOrganisations" type="checkbox" value="@organisation" @(ViewBag?.Creator?.Contains(@organisation) ? "checked" : "") onchange="this.form.submit()">
+                                                            <label class="govuk-label govuk-checkboxes__label govuk-!-font-size-16" for="@organisation">
                                                                 @PrettifyString(@organisation)
                                                             </label>
                                                         </div>
@@ -296,29 +300,63 @@
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="flush-asset">
                                 <button class="accordion-button collapsed govuk-link " type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseAsset" aria-controls="flush-collapseAsset">
-                                    Asset Types
+                                    Type
                                 </button>
                             </h2>
-                            <div id="flush-collapseAsset" class="accordion-collapse collapse" aria-labelledby="flush-asset" data-bs-parent="#accordionFlushExample">
+                            <div id="flush-collapseAsset" class="accordion-collapse collapse show" aria-labelledby="flush-asset" data-bs-parent="#accordionFlushExample">
                                 <div class="accordion-body">
                                     <div class="govuk-form-group">
                                         <fieldset class="govuk-fieldset">
                                             <legend class="govuk-fieldset__legend govuk-fieldset__legend--m visually-hidden">
                                                 <h1 class="govuk-fieldset__heading">
-                                                    Asset Types
+                                                    Type
                                                 </h1>
                                             </legend>
                                             <div class="govuk-checkboxes govuk-checkboxes--small filter-list" data-module="govuk-checkboxes">
                                                 <div class="govuk-checkboxes__item">
-                                                    <input class="govuk-checkboxes__input" id="dataSet" name="selectedDataAssetTypes" type="checkbox" value="@DataAssetType.DataSet" @(ViewBag?.DataAssetTypes?.Contains(DataAssetType.DataSet) ? "checked" : "")>
-                                                    <label class="govuk-label govuk-checkboxes__label" for="dataSet">
-                                                        Data set
+                                                    <input class="govuk-checkboxes__input" id="dataSet" name="selectedDataAssetTypes" type="checkbox" value="@DataAssetType.DataSet" @(ViewBag?.DataAssetTypes?.Contains(DataAssetType.DataSet) ? "checked" : "") onchange="this.form.submit()">
+                                                    <label class="govuk-label govuk-checkboxes__label govuk-!-font-size-16" for="dataSet">
+                                                        Dataset
                                                     </label>
                                                 </div>
                                                 <div class="govuk-checkboxes__item">
-                                                    <input class="govuk-checkboxes__input" id="dataService" name="selectedDataAssetTypes" type="checkbox" value="@DataAssetType.DataService" @(ViewBag?.DataAssetTypes?.Contains(DataAssetType.DataService) ? "checked" : "")>
-                                                    <label class="govuk-label govuk-checkboxes__label" for="dataService">
-                                                        Data Service
+                                                    <input class="govuk-checkboxes__input" id="dataService" name="selectedDataAssetTypes" type="checkbox" onchange="this.form.submit()">
+                                                    <label class="govuk-label govuk-checkboxes__label govuk-!-font-size-16" for="dataService">
+                                                        API
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="flush-access">
+                                <button class="accordion-button collapsed govuk-link " type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseAccess" aria-controls="flush-collapseAccess">
+                                    Access
+                                </button>
+                            </h2>
+                            <div id="flush-collapseAccess" class="accordion-collapse collapse show" aria-labelledby="flush-access" data-bs-parent="#accordionFlushExample">
+                                <div class="accordion-body">
+                                    <div class="govuk-form-group">
+                                        <fieldset class="govuk-fieldset">
+                                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m visually-hidden">
+                                                <h1 class="govuk-fieldset__heading">
+                                                    Access
+                                                </h1>
+                                            </legend>
+                                            <div class="govuk-checkboxes govuk-checkboxes--small filter-list" data-module="govuk-checkboxes">
+                                                <div class="govuk-checkboxes__item">
+                                                    <input class="govuk-checkboxes__input" id="dataSet" name="selectedAccess" type="checkbox" onchange="this.form.submit()">
+                                                    <label class="govuk-label govuk-checkboxes__label govuk-!-font-size-16" for="open">
+                                                        Open
+                                                    </label>
+                                                </div>
+                                                <div class="govuk-checkboxes__item">
+                                                    <input class="govuk-checkboxes__input" id="onrequest" name="selectedAccess" type="checkbox" onchange="this.form.submit()">
+                                                    <label class="govuk-label govuk-checkboxes__label govuk-!-font-size-16" for="onrequest">
+                                                        On request
                                                     </label>
                                                 </div>
                                             </div>
@@ -328,142 +366,106 @@
                             </div>
                         </div>
                     </div>
-                    <div class="govuk-button-group">
-                        <button type="submit" class="govuk-button" data-module="govuk-button"
-                                asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssets)">
-                            Apply filter
-                        </button>
-                        <a class="govuk-link"
-                           asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartCddoDataAssetsSearch)"
-                           asp-route-SearchText="@ViewBag?.SearchText">Clear all</a>
-                    </div>
                 </div>
                 <div class="govuk-grid-column-two-thirds">
-                    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">@totalNumberOfResults results</h2>
-                    <hr />
-                    <div class="govuk-grid-row">
-                        <div class="govuk-grid-column-one-half">
-                            <div class="govuk-form-group mb-0 d-inline-flex">
-                                <label class="govuk-label" hidden for="pageSize">Sort by</label>
-                                <div class="govuk-input__wrapper">
-                                    <select class="govuk-select" name="sortOption" id="sortOption" aria-label="Sort by">
-                                        <option value="@DataAssetsSortField.Title|@DataAssetsSortDirection.Ascending"
-                                                selected="@(Convert.ToString(ViewData["SortField"]) == DataAssetsSortField.Title.ToString() &&
-                        Convert.ToString(ViewData["SortDirection"]) == DataAssetsSortDirection.Ascending.ToString())">
-                                            Alphabetical A-Z
-                                        </option>
-                                        <option value="@DataAssetsSortField.Title|@DataAssetsSortDirection.Descending"
-                                                selected="@(Convert.ToString(ViewData["SortField"]) == DataAssetsSortField.Title.ToString() &&
-                        Convert.ToString(ViewData["SortDirection"]) == DataAssetsSortDirection.Descending.ToString())">
-                                            Alphabetical Z-A
-                                        </option>
-                                        <option value="@DataAssetsSortField.UpdatedOn|@DataAssetsSortDirection.Descending"
-                                                selected="@(Convert.ToString(ViewData["SortField"]) == DataAssetsSortField.UpdatedOn.ToString() &&
-                        Convert.ToString(ViewData["SortDirection"]) == DataAssetsSortDirection.Descending.ToString())">
-                                            Modified (newest)
-                                        </option>
-                                        <option value="@DataAssetsSortField.UpdatedOn|@DataAssetsSortDirection.Ascending"
-                                                selected="@(Convert.ToString(ViewData["SortField"]) == DataAssetsSortField.UpdatedOn.ToString() &&
-                        Convert.ToString(ViewData["SortDirection"]) == DataAssetsSortDirection.Ascending.ToString())">
-                                            Modified (oldest)
-                                        </option>
-                                        <option value="@DataAssetsSortField.Relevance|@DataAssetsSortDirection.Descending"
-                                                selected="@(Convert.ToString(ViewData["SortField"]) == DataAssetsSortField.Relevance.ToString() &&
-                        Convert.ToString(ViewData["SortDirection"]) == DataAssetsSortDirection.Descending.ToString())">
-                                            Relevance
-                                        </option>
-                                    </select>
-                                    <button class="govuk-button govuk-button--secondary govuk-input__suffix"
-                                            asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssets)">Sort</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="govuk-grid-column-one-half">
-                            <div class="govuk-form-group mb-0 d-inline-flex float-end">
-                                <label class="govuk-label"  for="pageSize" style="padding-right: 10px;padding-top: 7px;">
-                                        Results Per Page
-                                    </label>
-                                <div class="govuk-input__wrapper">
-                                    <select class="govuk-input" id="pageSize" aria-label="Select results per page" name="selectedNumberOfRecordsToShow" style="min-width:2.6em;">
-                                        @foreach (var pageSizeOption in new[] { 10, 20, 50, 100 })
-                                        {
-                                            if (Convert.ToInt32(ViewData["NumberOfRecords"]) == pageSizeOption)
-                                            {
-                                                <option value="@pageSizeOption" selected>@pageSizeOption</option>
-                                            }
-                                            else
-                                            {
-                                                <option value="@pageSizeOption">@pageSizeOption</option>
-                                            }
-                                        }
-                                        "(Results Per Page)"
-                                    </select>
-                                    <button class="govuk-button govuk-button--secondary govuk-input__suffix" style="max-width:5em"
-                                            asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssets)">
-                                        Apply
-                                         <span class="govuk-visually-hidden">
-                                         results per page
-                                         </span>
-                                    </button>
-                                </div>
-                            </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <p class="govuk-hint">@totalNumberOfResults results</p>
+
+                        <div class="govuk-form-group d-flex gap-2 align-items-center">
+                            <label class="govuk-label" for="sortOption">
+                                Sort by
+                            </label>
+                            <select class="govuk-select" name="sortOption" id="sortOption" aria-label="Sort by" onchange="this.form.submit()">
+                                <option value="@DataAssetsSortField.Title|@DataAssetsSortDirection.Ascending"
+                                        selected="@(Convert.ToString(ViewData["SortField"]) == DataAssetsSortField.Title.ToString() &&
+                                            Convert.ToString(ViewData["SortDirection"]) == DataAssetsSortDirection.Ascending.ToString())">
+                                    Alphabetical A-Z
+                                </option>
+                                <option value="@DataAssetsSortField.Title|@DataAssetsSortDirection.Descending"
+                                        selected="@(Convert.ToString(ViewData["SortField"]) == DataAssetsSortField.Title.ToString() &&
+                                            Convert.ToString(ViewData["SortDirection"]) == DataAssetsSortDirection.Descending.ToString())">
+                                    Alphabetical Z-A
+                                </option>
+                                <option value="@DataAssetsSortField.UpdatedOn|@DataAssetsSortDirection.Descending"
+                                        selected="@(Convert.ToString(ViewData["SortField"]) == DataAssetsSortField.UpdatedOn.ToString() &&
+                                            Convert.ToString(ViewData["SortDirection"]) == DataAssetsSortDirection.Descending.ToString())">
+                                    Modified (newest)
+                                </option>
+                                <option value="@DataAssetsSortField.UpdatedOn|@DataAssetsSortDirection.Ascending"
+                                        selected="@(Convert.ToString(ViewData["SortField"]) == DataAssetsSortField.UpdatedOn.ToString() &&
+                                            Convert.ToString(ViewData["SortDirection"]) == DataAssetsSortDirection.Ascending.ToString())">
+                                    Modified (oldest)
+                                </option>
+                                <option value="@DataAssetsSortField.Relevance|@DataAssetsSortDirection.Descending"
+                                        selected="@(Convert.ToString(ViewData["SortField"]) == DataAssetsSortField.Relevance.ToString() &&
+                                            Convert.ToString(ViewData["SortDirection"]) == DataAssetsSortDirection.Descending.ToString())">
+                                    Relevance
+                                </option>
+                            </select>
                         </div>
                     </div>
-                    <div class="dataset-result">
-                        <ul class="govuk-!-margin-bottom-5">
+                    <div class="">
+                        <div class="govuk-!-margin-bottom-5">
                             @if (@dataAssets.Any())
                             {
                                 @foreach (var dataAsset in dataAssets)
                                 {
-                                    <li class="dataset-result__list">
-                                        <div class="d-flex justify-content-between align-items-center mb-0">
-                                            <h3 class="dataset-title govuk-heading-s mb-0">
-                                                <a class="govuk-link" asp-controller="CatalogData"
-                                                   asp-action="@nameof(CatalogDataController.GetCddoDataAsset)"
-                                                   asp-route-dataAssetId="@dataAsset.Id">@dataAsset.Title</a>
-                                            </h3>
-                                            @if (dataAsset?.DataAssetStatus != null)
-                                            {
-                                                <strong class="govuk-tag govuk-tag--blue">@dataAsset?.DataAssetStatus</strong>
+                                    <div class="govuk-!-margin-bottom-7">
+                                        <p class="govuk-body govuk-!-margin-bottom-3">
+                                            <a asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAsset)"
+                                               asp-route-dataAssetId="@dataAsset.Id" class="govuk-!-font-weight-bold govuk-link">
+                                                @dataAsset?.Title
+                                            </a>
+                                        </p>
+
+                                        <p class="govuk-body govuk-!-margin-bottom-3 govuk-hint">
+                                            @dataAsset?.PublisherPrettified
+                                        </p>
+
+                                        <div class="govuk-!-margin-bottom-4">
+                                            <strong class="govuk-tag govuk-tag--grey">
+                                                @FormatAssetType(dataAsset.DataAssetType.ToString())
+                                            </strong>
+
+
+                                            @{
+                                                var apis = dataAsset.DataAssetDistribution?.Where(d => d.MediaType?.ToString() == "API").ToList();
                                             }
+                                            @if (apis.Any())
+                                            {
+                                                <strong class="govuk-tag govuk-tag--grey">
+                                                    API
+                                                </strong>
+                                            }
+
+                                            @if (dataAsset.AccessRights == "RESTRICTED")
+                                            {
+                                                <strong class="govuk-tag govuk-tag--grey">
+                                                    Access on request
+                                                </strong>
+                                            }
+
                                         </div>
 
-                                        <p class="govuk-!-font-weight-bold govuk-hint govuk-!-font-size-16">
-                                            <span class="govuk-visually-hidden">Organisation: </span>@dataAsset?.PublisherPrettified
-                                        </p>
-                                        <div>
-                                            <strong class="govuk-tag govuk-tag--grey">@dataAsset?.DataAssetType</strong>
-                                            @if (dataAsset!.ManifestationTypes.Any())
-                                            {
-                                                <span>|</span>
-                                                foreach (var type in dataAsset.ManifestationTypes)
-                                                {
-                                                    <strong class="govuk-tag govuk-tag--grey">@type</strong>
-                                                }
-                                            }
-                                        </div>
-                                        <div class="govuk-!-margin-bottom-2 govuk-!-margin-top-2">
-                                            <p class="govuk-body-s">
+                                        <div class="govuk-!-margin-bottom-0 govuk-!-margin-top-1">
+                                            <p class="govuk-body govuk-!-font-size-16">
                                                 @RenderDescription(dataAsset?.Description)
                                             </p>
-                                            <p class="govuk-hint govuk-!-font-size-16">@dataAsset?.Modified.ToLastUpdatedString()</p>
                                         </div>
-                                    </li>
+                                    </div>
                                 }
                             }
                             else
                             {
-                                <li class="dataset-result__list">
-                                    <p class="govuk-body">No results found.</p>
-                                </li>
+                                <p class="govuk-body">No results found.</p>
                             }
-                        </ul>
+                        </div>
                     </div>
 
                     @if (@dataAssets.Any())
                     {
                         <nav class="govuk-pagination" role="navigation" aria-label="Pagination">
-                           
+
                             @if (currentPageNumber != 1)
                             {
                                 <div class="govuk-pagination__prev">
@@ -487,7 +489,9 @@
 
                                         <button type="submit" class="govuk-link govuk-pagination__link"
                                                 asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssets)"
-                                                name="selectedPageNumber" value="1">1</button>
+                                                name="selectedPageNumber" value="1">
+                                            1
+                                        </button>
                                     </li>
                                     @if (middleStart > 2)
                                     {
@@ -502,7 +506,9 @@
 
                                         <button type="submit" class="govuk-link govuk-pagination__link"
                                                 asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssets)"
-                                                name="selectedPageNumber" value="@i">@i</button>
+                                                name="selectedPageNumber" value="@i">
+                                            @i
+                                        </button>
                                     </li>
                                 }
 
@@ -515,7 +521,7 @@
                                     <li class="govuk-pagination__item">
                                         <span class="govuk-visually-hidden">Page</span>
 
-                                        <button type="submit" class="govuk-link govuk-pagination__link" 
+                                        <button type="submit" class="govuk-link govuk-pagination__link"
                                                 asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssets)"
                                                 name="selectedPageNumber" value="@totalNumberOfPages">
                                             @totalNumberOfPages

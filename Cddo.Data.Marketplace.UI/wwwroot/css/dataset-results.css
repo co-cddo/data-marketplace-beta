@@ -64,7 +64,7 @@
   box-shadow: none;
 }
 .accordion-filter .accordion-body {
-  max-height: 400px;
+  max-height: 210px;
   overflow-y: auto;
   scrollbar-width: thin;
 }
