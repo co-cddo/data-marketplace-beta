@@ -148,7 +148,7 @@ public class CatalogDataController : Controller
         SetViewBagPropertiesForCddoDataAssetViewing(
             getCddoDataAssetsRequest.SearchText,
             getCddoDataAssetsRequest.Themes,
-            selectedOrganisations,
+            GetSelectedOrganisationValues().ToList(),
             getCddoDataAssetsRequest.DataAssetTypes,
             getCddoDataAssetsRequest.DataAssetStatuses,
             getCddoDataAssetsRequest.NumberOfRecords,
@@ -156,7 +156,6 @@ public class CatalogDataController : Controller
             getCddoDataAssetsRequest.SortField,
             getCddoDataAssetsRequest.SortDirection);
 
-        var topics = (await _catalogDataService.GetCddoTopicsAsync()).ToList();
         var organisationNames = organisationsGroupedByPrettifiedName.Select(x => x.Key).ToList();
 
         var datasetResultsModel = new DatasetResultsModel
