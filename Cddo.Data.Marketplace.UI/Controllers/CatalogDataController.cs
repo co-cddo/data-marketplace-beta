@@ -144,11 +144,14 @@ public class CatalogDataController : Controller
 
         var organisationsGroupedByPrettifiedName = GroupOrganisationsByPrettifiedName(getCatalogueFilterOptions?.Organisations);
 
+        var organisationNames = organisationsGroupedByPrettifiedName.Select(x => x.Key).ToList();
+
+
 
         SetViewBagPropertiesForCddoDataAssetViewing(
             getCddoDataAssetsRequest.SearchText,
             getCddoDataAssetsRequest.Themes,
-            GetSelectedOrganisationValues().ToList(),
+            selectedOrganisations.Count <= 0 ? [] : organisationNames,
             getCddoDataAssetsRequest.DataAssetTypes,
             getCddoDataAssetsRequest.DataAssetStatuses,
             getCddoDataAssetsRequest.NumberOfRecords,
@@ -156,7 +159,6 @@ public class CatalogDataController : Controller
             getCddoDataAssetsRequest.SortField,
             getCddoDataAssetsRequest.SortDirection);
 
-        var organisationNames = organisationsGroupedByPrettifiedName.Select(x => x.Key).ToList();
 
         var datasetResultsModel = new DatasetResultsModel
         {
