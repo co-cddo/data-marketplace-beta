@@ -89,9 +89,9 @@ public class CatalogDataController : Controller
         var organisations = await _catalogDataService.GetCddoOrganisationsAsync(
             dataAssetStatuses: [DataAssetStatus.Published]);
 
-        var organisationsGroupedByPrettifiedName = GroupOrganisationsByPrettifiedName();
-
+        var prettifiedInputOrgs = GroupOrganisationsByPrettifiedName(organisations.ToList());
         var selectedOrganisationValues = GetSelectedOrganisationValues().ToList();
+
 
         var getCddoDataAssetsRequest = new GetCddoDataAssetsRequest
         {
@@ -111,10 +111,18 @@ public class CatalogDataController : Controller
 
         var getCddoDataAssetsResponse = await _catalogDataService.GetDataAssetsAsync(getCddoDataAssetsRequest);
 
+        var getCatalogueFilterOptions = await _catalogDataService.GetCatalogueFilterOptionsAsync(getCddoDataAssetsRequest);
+
+        var organisationsGroupedByPrettifiedName = GroupOrganisationsByPrettifiedName(getCatalogueFilterOptions?.Organisations);
+
+        var organisationNames = organisationsGroupedByPrettifiedName.Select(x => x.Key).ToList();
+
+
+
         SetViewBagPropertiesForCddoDataAssetViewing(
             getCddoDataAssetsRequest.SearchText,
-            getCddoDataAssetsRequest.Themes,
-            selectedOrganisations,
+            selectedTopics,
+            selectedOrganisations.Count <= 0 ? [] : organisationNames,
             getCddoDataAssetsRequest.DataAssetTypes,
             getCddoDataAssetsRequest.DataAssetStatuses,
             getCddoDataAssetsRequest.NumberOfRecords,
@@ -122,23 +130,22 @@ public class CatalogDataController : Controller
             getCddoDataAssetsRequest.SortField,
             getCddoDataAssetsRequest.SortDirection);
 
-        var topics = (await _catalogDataService.GetCddoTopicsAsync()).ToList();
-        var organisationNames = organisationsGroupedByPrettifiedName.Select(x => x.Key).ToList();
 
         var datasetResultsModel = new DatasetResultsModel
         {
             DataAssets = getCddoDataAssetsResponse!.CddoDataAssets,
             TotalNumberOfResults = getCddoDataAssetsResponse.TotalNumberOfMatchingCddoDataAssets,
-            Topics = topics,
-            Organisations = organisationNames
+            Topics = getCatalogueFilterOptions?.Topics,
+            Organisations = organisationNames,
+            DataAssetTypes = getCatalogueFilterOptions?.DataAssetTypes
         };
 
         return View("~/Pages/Dataset/DatasetResults.cshtml", datasetResultsModel);
 
-        IDictionary<string, List<string>> GroupOrganisationsByPrettifiedName()
+        IDictionary<string, List<string>> GroupOrganisationsByPrettifiedName(List<string>? organisations)
         {
-            var organisationsGroupedByName = organisations.GroupBy(CreateOrganisationNameView);
-
+            var organisationsGroupedByName = organisations?.GroupBy(CreateOrganisationNameView);
+            if (organisationsGroupedByName == null) return new Dictionary<string, List<string>>();
             return organisationsGroupedByName.ToDictionary(
                 x => x.Key,
                 x => x.ToList());
@@ -177,7 +184,7 @@ public class CatalogDataController : Controller
         {
             foreach (var selectedOrganisation in selectedOrganisations)
             {
-                if (!organisationsGroupedByPrettifiedName.TryGetValue(selectedOrganisation, out var organisationGroupValues))
+                if (!prettifiedInputOrgs.TryGetValue(selectedOrganisation, out var organisationGroupValues))
                     continue;
 
                 foreach (var organisationValue in organisationGroupValues)

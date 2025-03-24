@@ -39,9 +39,10 @@ internal class ReportFieldFilterConverter(
                 // If the property is an enum then the given value will be the enum value name (e.g. "CrimeAndJusticeEnum"), and the
                 // filter value needs to be the enum member value (e.g. "Crime and justice")
 
-                var enumValue = (Enum)Enum.Parse(fieldTypeInformation.ItemDataType, value, true);
+                //var enumValue = (Enum)Enum.Parse(fieldTypeInformation.ItemDataType, value, true);
 
-                return enumMemberConverter.GetEnumMemberValue(enumValue);
+                return value;
+                //return enumMemberConverter.GetEnumMemberValue(enumValue);
             }
 
             string EscapeValue(string value) =>
