@@ -436,7 +436,7 @@ public class DataAssetService(
             var catalogEntriesOrganisationFilter = BuildCatalogEntriesOrganisationFilter(
                 initiatingUserDetails,
                 onlyIncludeRecordsDiscoverableByOrganisationOfCallingUser == true,
-                onlyIncludeRecordsOwnedByOrganisationOfCallingUser == true);
+                onlyIncludeRecordsOwnedByOrganisationOfCallingUser == true);    
 
             var ckanCatalogEntrySet = await ckanConnection.GetCatalogEntriesAsync(
                  dataAssetTypes,

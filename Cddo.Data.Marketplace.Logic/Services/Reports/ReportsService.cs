@@ -20,7 +20,8 @@ public class ReportsService(
         IEnumerable<CatalogAssetField> requiredFields,
         ICatalogReportsFilter? catalogReportsFilter,
         int startRecordIndex,
-        int numberOfRecords)
+        int numberOfRecords,
+         string? searchText)
     {
         ArgumentNullException.ThrowIfNull(requiredFields);
         ArgumentOutOfRangeException.ThrowIfNegative(startRecordIndex);
@@ -44,7 +45,8 @@ public class ReportsService(
             var filteredCatalogEntriesResultSet = await ckanConnection.GetFilteredCatalogEntriesAsync(
                 catalogEntriesOrganisationFilter,
                 catalogAssetFieldFilters,
-                resultPagination);
+                resultPagination,
+                searchText);
 
             var catalogReportsDataItems = catalogReportsDataItemsBuilder.BuildCatalogReportsDataItems(
                 requiredFields,

@@ -33,7 +33,8 @@ namespace Cddo.Data.Marketplace.Api.Controllers
                     queryCatalogReportsDataRequest.RequiredFields,
                     queryCatalogReportsDataRequest.Filter,
                     queryCatalogReportsDataRequest.StartRecordIndex,
-                    queryCatalogReportsDataRequest.NumberOfRecords);
+                    queryCatalogReportsDataRequest.NumberOfRecords,
+                    null);
 
                 if (!getCatalogReportsDataResult.Success)
                 {
@@ -69,7 +70,8 @@ namespace Cddo.Data.Marketplace.Api.Controllers
                     queryCatalogReportsDataRequest.RequiredFields,
                     queryCatalogReportsDataRequest.Filter,
                     queryCatalogReportsDataRequest.StartRecordIndex,
-                    queryCatalogReportsDataRequest.NumberOfRecords);
+                    queryCatalogReportsDataRequest.NumberOfRecords,
+                    null);
 
                 if (!getCatalogReportsDataResult.Success)
                 {
