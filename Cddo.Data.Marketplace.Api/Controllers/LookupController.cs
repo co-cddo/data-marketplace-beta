@@ -130,7 +130,7 @@ public class LookupController(
             {
                 request.SearchText = getCddoDataAssetsRequest.SearchText;
             }
-            request.Filter.FilterByInitiatingUserPermissions = true;
+            request.Filter.FilterByInitiatingUserPermissions = false;
             var initiatingUserDetails = await userProfilePresenter.GetInitiatingUserDetailsAsync();
 
             var organisations = new List<string>();
@@ -180,7 +180,7 @@ public class LookupController(
 
         if (getCddoDataAssetsRequest.Creator != null)
         {
-            filter.FieldFilters.Add(new CatalogReportFieldFilter() { Field = CatalogAssetField.Creator, Values = getCddoDataAssetsRequest.Creator.Select(type => type.ToString()).ToList() });
+            filter.FieldFilters.Add(new CatalogReportFieldFilter() { Field = CatalogAssetField.Publisher, Values = getCddoDataAssetsRequest.Creator.Select(type => type.ToString()).ToList() });
         }
         if (getCddoDataAssetsRequest.Themes != null)
         {
