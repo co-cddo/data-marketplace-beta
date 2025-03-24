@@ -423,28 +423,32 @@
                                         </p>
 
                                         <div class="govuk-!-margin-bottom-4">
-                                            <strong class="govuk-tag govuk-tag--grey">
-                                                @FormatAssetType(dataAsset.DataAssetType.ToString())
-                                            </strong>
-
-
                                             @{
-                                                var apis = dataAsset.DataAssetDistribution?.Where(d => d.MediaType?.ToString() == "API").ToList();
-                                            }
-                                            @if (apis.Any())
-                                            {
-                                                <strong class="govuk-tag govuk-tag--grey">
-                                                    API
-                                                </strong>
+                                                var mediaTypes = dataAsset.DataAssetDistribution?.Select(d => d.MediaType?.ToString()).ToList() ?? new List<string>();
+                                                var tags = new List<string>();
+
+                                                if (mediaTypes.Contains("API"))
+                                                {
+                                                    tags.Add("API");
+                                                }
+
+                                                if (mediaTypes.Contains("File download") || mediaTypes.Contains("text/html"))
+                                                {
+                                                    tags.Add("Dataset");
+                                                }
+
+                                                if (dataAsset.AccessRights == "RESTRICTED")
+                                                {
+                                                    tags.Add("Access on request");
+                                                }
                                             }
 
-                                            @if (dataAsset.AccessRights == "RESTRICTED")
+                                            @foreach (var tag in tags)
                                             {
                                                 <strong class="govuk-tag govuk-tag--grey">
-                                                    Access on request
+                                                    @tag
                                                 </strong>
                                             }
-
                                         </div>
 
                                         <div class="govuk-!-margin-bottom-0 govuk-!-margin-top-1">

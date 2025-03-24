@@ -95,7 +95,7 @@
                 </span>
             }
       
-            <h1 class="govuk-heading-xl">
+            <h1 class="govuk-heading-l">
                 @dataAsset.Title
             </h1>
 
@@ -309,11 +309,6 @@
                    asp-route-identifier="@dataAsset.Id"
                    asp-route-isEditMode="@isEditMode.ToString().ToLower()">
                     Review and submit
-                </a>
-                <a class="govuk-button govuk-button--secondary"
-                   asp-controller="CatalogDataDescription"
-                   asp-action="@nameof(CatalogDataDescriptionController.DataDescriptionDashboard)">
-                    Cancel
                 </a>
             </div>
             <p class="govuk-body">

@@ -97,6 +97,9 @@
                             case "API":
                                 <input type="hidden" name="Distribution[@distribution.index].MediaType" value="@mediaType" />
                                 <input type="hidden" name="Distribution[@distribution.index].Id" value="@Model.Distribution[@distribution.index].Id" />
+                                <div class="govuk-caption-l">
+                                    @Model.Title
+                                </div>
                                 <h1 class="govuk-heading-l">
                                     API Details
                                 </h1>
@@ -140,7 +143,7 @@
                                         Link title
                                     </label>
                                     <div id="link-title-hint" class="govuk-hint">
-                                        If there is only one Link, the title can be the same as your listing.
+                                        If there is only one link, the title can be the same as your listing.
                                     </div>
                                     @if (ViewData.ModelState["title"]?.Errors.Any() == true)
                                     {
