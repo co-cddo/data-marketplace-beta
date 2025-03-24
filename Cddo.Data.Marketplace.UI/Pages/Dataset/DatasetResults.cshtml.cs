@@ -1,4 +1,5 @@
 using Agm.Catalog.DotNet.Dto.Models.DataAssets;
+using Cddo.Data.Marketplace.UI.Model;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Cddo.Data.Marketplace.UI.Pages.Dataset;
@@ -9,7 +10,8 @@ public class DatasetResultsModel : PageModel
 
     public required int TotalNumberOfResults { get; init; }
 
-    public required List<string> Topics { get; init; }
+    public required List<string>? Topics { get; init; }
 
     public required List<string> Organisations { get; init; }
+    public required List<string>? DataAssetTypes { get; init; }
 }
