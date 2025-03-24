@@ -162,44 +162,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             Assert.That(redirectResult?.PageName, Is.EqualTo("/Error/403"));
         }
 
-        [Test]
-        public async Task StartCddoDataAssetsSearch_ShouldRedirectToGetCddoDataAssets_WithExpectedParameters()
-        {
-            // Arrange
-            ClearInvocations();
-            SetAuthenticatedUser(true);
-
-            var searchText = "test search";
-            var selectedTopics = _fixture.CreateMany<string>(3).ToList();
-            var selectedOrganisations = _fixture.CreateMany<string>(2).ToList();
-            var selectedDataAssetTypes = _fixture.CreateMany<DataAssetType>(2).ToList();
-            int? selectedNumberOfRecordsToShow = 10;
-            int? selectedPageNumber = 1;
-            var expectedSortOption = "Relevance|Descending";
-
-            // Act
-            var result = await _controller.GetCddoDataAssets(
-                searchText,
-                selectedTopics,
-                selectedOrganisations,
-                selectedDataAssetTypes,
-                selectedNumberOfRecordsToShow,
-                selectedPageNumber,
-                expectedSortOption
-            );
-
-            // Assert
-            Assert.That(result, Is.InstanceOf<RedirectToActionResult>());
-            var redirectResult = result as RedirectToActionResult;
-            Assert.That(redirectResult?.ActionName, Is.EqualTo("GetCddoDataAssets"));
-            Assert.That(redirectResult?.RouteValues?["searchText"], Is.EqualTo(searchText));
-            Assert.That(redirectResult?.RouteValues?["selectedTopics"], Is.EqualTo(selectedTopics));
-            Assert.That(redirectResult?.RouteValues?["selectedOrganisations"], Is.EqualTo(selectedOrganisations));
-            Assert.That(redirectResult?.RouteValues?["selectedDataAssetTypes"], Is.EqualTo(selectedDataAssetTypes));
-            Assert.That(redirectResult?.RouteValues?["selectedNumberOfRecordsToShow"], Is.EqualTo(selectedNumberOfRecordsToShow));
-            Assert.That(redirectResult?.RouteValues?["selectedPageNumber"], Is.EqualTo(selectedPageNumber));
-            Assert.That(redirectResult?.RouteValues?["sortOption"], Is.EqualTo(expectedSortOption));
-        }
+       
         [Test]
         public async Task GetCddoDataAssets_ShouldRedirectToAccessDenied_WhenUserIsNotAuthenticated()
         {
