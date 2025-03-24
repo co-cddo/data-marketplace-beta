@@ -141,7 +141,7 @@
         {
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
-                    <h2 class="govuk-heading-xl">Check your answers before submitting your data</h2>
+                    <h2 class="govuk-heading-l">Check your answers before submitting your data</h2>
 
                     @Html.AntiForgeryToken()
                     @if (propertyValidationErrors.Any() || hasErrors)
@@ -415,7 +415,7 @@
                                 @if (cddoDataAsset.DataAssetContacts is not null)
                                 {
                                     var ownerContact = cddoDataAsset.DataAssetContacts.FirstOrDefault(x => x.Role == DataAssetContactRoleType.Owner);
-                                    
+
                                     if (ownerContact is not null)
                                     {
                                         <span id="@($"{nameof(CataloguedResource.ContactPoint)}.{nameof(Contact.Name)}")">
@@ -471,7 +471,7 @@
                                 <ul class="govuk-list">
                                     @if (cddoDataAsset.UpdateFrequencyString != null)
                                     {
-                                        @cddoDataAsset.UpdateFrequencyString
+                                        @(cddoDataAsset?.UpdateFrequencyString == "DontKnow" ? "Not known" : cddoDataAsset?.UpdateFrequencyString)
                                     }
                                 </ul>
                             </dd>
@@ -486,24 +486,31 @@
                         @* Access Rights *@
                         <div id="@nameof(DataSet.AccessRights)" class="govuk-summary-list__row @(accessRightsInvalid ? "govuk-form-group--error" : "")">
                             <dt class="govuk-summary-list__key">
-                                Access Rights
+                                Public or restricted data
                             </dt>
                             <dd class="govuk-summary-list__value">
                                 @if (accessRightsInvalid)
                                 {
                                     <p class="govuk-error-message">You must select if the data is Open or Restricted </p>
                                 }
-                                <ul class="govuk-list">
-                                    @cddoDataAsset.AccessRights
-                                </ul>
+                                @{
+                                    var accessRights = cddoDataAsset?.AccessRights switch
+                                    {
+                                        "OPEN" => "Public",
+                                        "RESTRICTED" => "Restricted",
+                                        _ => cddoDataAsset?.AccessRights
+                                    };
+                                }
+
+                                @accessRights
                             </dd>
                             <dd class="govuk-summary-list__actions">
                                 <a class="govuk-link" asp-controller="CatalogDataDescription" asp-route-identifier="@cddoDataAsset.Id"
-                                    asp-action="@(nameof(CatalogDataDescriptionController.AccessRights))" asp-route-isCheckAnswers="true">
+                                   asp-action="@(nameof(CatalogDataDescriptionController.AccessRights))" asp-route-isCheckAnswers="true">
                                     Change
                                     <span class="govuk-visually-hidden">Data set - Access rights</span>
                                 </a>
-                               
+
                             </dd>
                         </div>
                         @if (cddoDataAsset.AccessRights == "RESTRICTED")
@@ -527,15 +534,15 @@
                                             }
                                         </ul>
                                     }
-                            
+
                                 </dd>
-                                <dd class="govuk-summary-list__actions">                                
+                                <dd class="govuk-summary-list__actions">
                                     <a class="govuk-link" asp-controller="CatalogDataDescription" asp-route-identifier="@cddoDataAsset.Id"
-                                            asp-action="@(nameof(CatalogDataDescriptionController.AddRestrictedSupplyFormatSubmit))" asp-route-isCheckAnswers="true">
+                                       asp-action="@(nameof(CatalogDataDescriptionController.AddRestrictedSupplyFormatSubmit))" asp-route-isCheckAnswers="true">
                                         Change
                                         <span class="govuk-visually-hidden">Data set - Delivery mechanism</span>
-                                    </a>                                
-                                
+                                    </a>
+
                                 </dd>
                             </div>
                         }
@@ -544,7 +551,7 @@
                             @* Licence *@
                             <div id="@($"{nameof(DataSet.License)}")" class="govuk-summary-list__row @(licenceInvalid ? "govuk-form-group--error" : "")">
                                 <dt class="govuk-summary-list__key">
-                                    License
+                                    Licence
                                 </dt>
                                 <dd class="govuk-summary-list__value">
                                     @if (licenceInvalid)
@@ -557,31 +564,20 @@
                                             @cddoDataAsset.License.Title
                                         }
                                     </ul>
-                                    
-                            
+
+
                                 </dd>
-                                <dd class="govuk-summary-list__actions">                                
+                                <dd class="govuk-summary-list__actions">
                                     <a class="govuk-link" asp-controller="CatalogDataDescription" asp-route-identifier="@cddoDataAsset.Id"
-                                            asp-action="@(nameof(CatalogDataDescriptionController.Licence))" asp-route-isCheckAnswers="true">
+                                       asp-action="@(nameof(CatalogDataDescriptionController.Licence))" asp-route-isCheckAnswers="true">
                                         Change
                                         <span class="govuk-visually-hidden">Data set - License</span>
-                                    </a>                                
-                                
+                                    </a>
+
                                 </dd>
                             </div>
                         }
 
-                        @* Date Modified *@
-                        <div id="@nameof(CataloguedResource.Modified)" class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">
-                                Last modified
-                            </dt>
-                            <dd class="govuk-summary-list__value">
-                                @cddoDataAsset.Modified.ToGDSHelperString()
-                            </dd>
-                            <dd class="govuk-summary-list__actions">
-                            </dd>
-                        </div>
                     </dl>
                     @if (Model.CddoDataAsset?.AccessRights == "OPEN")
                     {

@@ -42,10 +42,10 @@
                 Contact details
             </h1>
             <div id="contact-hint" class="govuk-hint">
-                <p class="govuk-hint">
+                <p class="govuk-body">
                     Provide details of the team or individual that will respond to queries or requests for this listing.
                 </p>
-                <p class="govuk-hint">These details will be visible to users on the Data Marketplace.</p>
+                <p class="govuk-body">These details will be visible to users on the Data Marketplace.</p>
             </div>
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddContactPointSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
                 <input type="hidden" name="identifier" value="@Model.Identifier" />

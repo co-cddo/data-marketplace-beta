@@ -10,7 +10,7 @@
     var fileDownloads = Model.Where(d => d.MediaType?.FirstOrDefault() == "File download").ToList();
     var apis = Model.Where(d => d.MediaType?.FirstOrDefault() == "API").ToList();
     var webpages = Model.Where(d => d.MediaType?.FirstOrDefault() == "text/html").ToList();
-    var linksTitle = ViewData["LinksTitle"] ?? "Access Links";
+    var linksTitle = ViewData["LinksTitle"] ?? "Access link";
     var accessRights = ViewData["AccessRights"] ?? "";
 }
 <h1 class="govuk-heading-l">
@@ -25,16 +25,16 @@
         <div role="alert">
             <div class="govuk-error-summary__body">
                 <ul class="govuk-list govuk-error-summary__list">
-                   <li>
+                    <li>
                         <a asp-action="@nameof(CatalogDataDescriptionController.AddSupplyFormat)" asp-route-identifier="@identifier">Enter 1 or more links to access the data</a>
-                   </li>
-                  
+                    </li>
+
                 </ul>
             </div>
         </div>
     </div>
 }
-@if(Model.Any())
+@if (Model.Any())
 {
     <p class="govuk-body">
         These links open in a new tab.
@@ -51,12 +51,12 @@
         {
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
-                    <a target="_blank" href="@distribution.DownloadUrl">
+                    <a target="_blank" href="@distribution.DownloadUrl" class="govuk-link">
                         @distribution.Title
                     </a>
                 </dt>
                 <dd class="govuk-summary-list__value">
-                    @distribution.Format 
+                    @distribution.Format
                 </dd>
                 <dd class="govuk-summary-list__actions">
                     <ul class="govuk-summary-list__actions-list">
@@ -83,7 +83,7 @@
         {
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
-                    <a target="_blank" href="@distribution.AccessUrl">
+                    <a target="_blank" href="@distribution.AccessUrl" class="govuk-link">
                         @distribution.Title
                     </a>
                 </dt>
@@ -112,7 +112,7 @@
         {
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
-                    <a target="_blank" href="@distribution.DownloadUrl">
+                    <a target="_blank" href="@distribution.DownloadUrl" class="govuk-link">
                         @distribution.Title
                     </a>
                 </dt>
@@ -141,3 +141,9 @@
 
     </div>
 }
+
+<style scoped>
+    .govuk-summary-list__key {
+        font-weight: 400;
+    }
+</style>

@@ -7,7 +7,7 @@
     ViewData["Title"] = "Add Data Description";
 }
 
-<a class="govuk-back-link" href="@Url.Page("/Index")">Back</a>
+<a class="govuk-back-link" asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.DataDescriptionDashboard)">Back</a>
 
 <div class="govuk-main-wrapper">
     <div class="govuk-grid-row">
@@ -73,7 +73,7 @@
                     </fieldset>
                 </div>
 
-                <button class="govuk-button" data-module="govuk-button">Start now</button>
+                <button class="govuk-button" data-module="govuk-button">Continue</button>
             </form>
         </div>
         <div class="govuk-grid-column-one-third">

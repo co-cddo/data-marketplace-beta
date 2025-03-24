@@ -14,24 +14,28 @@ namespace Cddo.Data.Marketplace.UI.Model.Enum
         [Description("Daily")]
         Daily = 1,
 
+        [EnumMember(Value = "Weekly")]
+        [Description("Weekly")]
+        Weekly = 2,
+
         [EnumMember(Value = "Monthly")]
         [Description("Monthly")]
-        Monthly = 2,
+        Monthly = 3,
 
         [EnumMember(Value = "Quarterly")]
         [Description("Quarterly")]
-        Quarterly = 3,
+        Quarterly = 4,
 
         [EnumMember(Value = "Annually")]
         [Description("Annually")]
-        Annually = 4,
+        Annually = 5,
 
         [EnumMember(Value = "DontKnow")]
         [Description("I don’t know")]
-        DontKnow = 5,
+        DontKnow = 6,
 
         [EnumMember(Value = "Other")]
-        [Description("Other - I'll enter a different time period")]
-        Other = 6,
+        [Description("Other – I'll enter a different time period")]
+        Other = 7,
     }
 }

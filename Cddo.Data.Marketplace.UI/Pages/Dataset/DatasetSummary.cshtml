@@ -17,7 +17,6 @@
 
 @functions {
     public static string FormatDateTime(DateTime? dateTime) => dateTime?.ToString("d MMMM yyyy") ?? "";
-    public static string FormatAssetType(string assetType) => assetType == "DataSet" ? "Dataset" : assetType.ToUpper();
 }
 
 @section Styles
@@ -33,8 +32,13 @@
     <div class="govuk-main-wrapper">
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
+                @{
+                    var labels = new List<string>();
+                    if (webpages.Any() || fileDownloads.Any()) labels.Add("Dataset");
+                    if (apis.Any()) labels.Add("API");
+                }
                 <span class="govuk-caption-xl">
-                    @FormatAssetType(dataAsset.DataAssetType.ToString())@(apis.Any() ? ", API" : "")
+                    @string.Join(", ", labels)
                 </span>
                 <h1 class="govuk-heading-xl">@dataAsset.Title</h1>
 
@@ -67,7 +71,7 @@
                             Update frequency
                         </dt>
                         <dd class="govuk-summary-list__value">
-                            @dataAsset?.UpdateFrequencyString
+                            @(dataAsset?.UpdateFrequencyString == "DontKnow" ? "Not known" : dataAsset?.UpdateFrequencyString)
                         </dd>
                     </div>
 
@@ -76,7 +80,18 @@
                             Licence
                         </dt>
                         <dd class="govuk-summary-list__value">
-                            @(string.IsNullOrEmpty(dataAsset?.LicenseTitle) ? "Not known" : dataAsset.LicenseTitle)
+                            @if (string.IsNullOrEmpty(dataAsset?.License?.Title))
+                            {
+                                <span>Not known</span>
+                            }
+                            else if (string.IsNullOrEmpty(dataAsset.License.LicenseUrl))
+                            {
+                                <span>@dataAsset.License.Title</span>
+                            }
+                            else
+                            {
+                                <a class="govuk-link" href="@dataAsset.License.LicenseUrl">@dataAsset.License.Title</a>
+                            }
                         </dd>
                     </div>
                 </dl>
