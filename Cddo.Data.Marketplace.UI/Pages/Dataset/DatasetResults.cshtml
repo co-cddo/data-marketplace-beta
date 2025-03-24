@@ -241,7 +241,7 @@
                                                 </h1>
                                             </legend>
                                             <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
-                                                @if (topics.Any())
+                                                @if (topics != null && topics.Any())
                                                 {
                                                     @foreach (var topic in topics.OrderBy(x => x))
                                                     {
