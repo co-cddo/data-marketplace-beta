@@ -146,7 +146,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
 
 
             // Act
-            var result = await _controller.StartCddoDataAssetsSearch(null, new List<string>(), new List<string>(), new List<DataAssetType>(), null, null);
+            var result = await _controller.GetCddoDataAssets(null, new List<string>(), new List<string>(), new List<DataAssetType>(), null, null, null);
 
             // Assert
             _mockLogger.Verify(
@@ -178,13 +178,14 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             var expectedSortOption = "Relevance|Descending";
 
             // Act
-            var result = await _controller.StartCddoDataAssetsSearch(
+            var result = await _controller.GetCddoDataAssets(
                 searchText,
                 selectedTopics,
                 selectedOrganisations,
                 selectedDataAssetTypes,
                 selectedNumberOfRecordsToShow,
-                selectedPageNumber
+                selectedPageNumber,
+                expectedSortOption
             );
 
             // Assert
