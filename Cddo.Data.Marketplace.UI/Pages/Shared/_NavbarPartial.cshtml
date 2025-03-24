@@ -17,7 +17,7 @@
             @if (User.Identity!.IsAuthenticated)
             {
                 <li class="app-navigation__list-item ">
-                    <a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.StartCddoDataAssetsSearch)">
+                    <a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline app-navigation__link js-app-navigation__link" asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssets)">
                         Find data
                     </a>
                 </li>
