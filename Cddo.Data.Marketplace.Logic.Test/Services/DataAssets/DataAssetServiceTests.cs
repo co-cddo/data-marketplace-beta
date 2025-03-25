@@ -1041,6 +1041,7 @@ namespace Cddo.Data.Marketplace.Api.Test.Services
             var publishers = testItems.Fixture.Create<List<string>>();
             var themes = testItems.Fixture.Create<List<string>>();
             var entryTypes = testItems.Fixture.Create<List<string>>();
+            var accessRights = testItems.Fixture.Create<List<string>>();
 
             var ckanCatalogEntrySet = testItems.Fixture.Create<CkanPackageSearchResponseResultSet>();
             var cddoDataAssets = testItems.Fixture.Create<List<ICddoDataAsset>>();
@@ -1075,7 +1076,8 @@ namespace Cddo.Data.Marketplace.Api.Test.Services
                 searchText,
                 publishers,
                 themes,
-                entryTypes
+                entryTypes,
+                accessRights
             );
 
             // Assert
@@ -1111,7 +1113,8 @@ namespace Cddo.Data.Marketplace.Api.Test.Services
                     searchText: null,
                     publishers: null,
                     themes: null,
-                    entryTypes: null));
+                    entryTypes: null,
+                    accessRights: null));
         }
         [Test]
         public void GetCddoDataAssetsAsync_ShouldThrowArgumentOutOfRangeException_WhenNumberOfAssetsIsZeroOrNegative()
@@ -1139,7 +1142,8 @@ namespace Cddo.Data.Marketplace.Api.Test.Services
                     searchText: null,
                     publishers: null,
                     themes: null,
-                    entryTypes: null));
+                    entryTypes: null,
+                    accessRights: null));
         }
         [Test]
         public void GetCddoDataAssetsAsync_ShouldThrowInvalidEnumArgumentException_WhenSortDirectionIsInvalid()
@@ -1167,7 +1171,8 @@ namespace Cddo.Data.Marketplace.Api.Test.Services
                     searchText: null,
                     publishers: null,
                     themes: null,
-                    entryTypes: null));
+                    entryTypes: null,
+                    accessRights: null));
         }
         [Test]
         public async Task GetCddoDataAssetsAsync_ShouldReturnFailedResult_WhenExceptionOccurs()
@@ -1206,7 +1211,8 @@ namespace Cddo.Data.Marketplace.Api.Test.Services
                 searchText: null,
                 publishers: null,
                 themes: null,
-                entryTypes: null);
+                entryTypes: null,
+                accessRights: null);
 
             // Assert
             Assert.That(result, Is.Not.Null);

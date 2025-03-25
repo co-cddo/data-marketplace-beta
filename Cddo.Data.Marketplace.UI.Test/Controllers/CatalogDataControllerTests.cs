@@ -146,7 +146,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
 
 
             // Act
-            var result = await _controller.GetCddoDataAssets(null, new List<string>(), new List<string>(), new List<DataAssetType>(), null, null, null);
+            var result = await _controller.GetCddoDataAssets(null, new List<string>(), new List<string>(), null, new List<DataAssetType>(), null, null, null);
 
             // Assert
             _mockLogger.Verify(
@@ -182,7 +182,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
 
 
             // Act
-            var result = await _controller.GetCddoDataAssets(null, new List<string>(), new List<string>(), new List<DataAssetType>(), null, null, null);
+            var result = await _controller.GetCddoDataAssets(null, new List<string>(), new List<string>(), null, new List<DataAssetType>(), null, null, null);
 
             // Assert
             _mockLogger.Verify(
@@ -236,7 +236,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
 
 
             // Act
-            var result = await _controller.GetCddoDataAssets("test", new List<string>() { "test "}, new List<string>() {  "test" }, new List<DataAssetType>(), 10, 1, "Relevance|Descending");
+            var result = await _controller.GetCddoDataAssets("test", new List<string>() { "test "}, new List<string>() {  "test" }, null, new List<DataAssetType>(), 10, 1, "Relevance|Descending");
 
 
             // Assert
