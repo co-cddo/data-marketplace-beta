@@ -52,7 +52,7 @@
                 @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
 
                 <div class="govuk-form-group">
-                    <label class="govuk-label govuk-label--m" for="metadataContact">
+                    <label class="govuk-label fw-bold" for="metadataContact">
                         Name
                     </label>
                     @if (ViewData.ModelState[nameof(Contact.Name)]?.Errors.Any() == true)
@@ -64,7 +64,7 @@
                     <input class="govuk-input  @(ViewData.ModelState[nameof(Contact.Name)]?.Errors.Any() == true ? "govuk-input--error" : "")" id="metadataContact" name="@nameof(Contact.Name)" type="text" value="@dataAssetContactPoint?.Name">
                 </div>
                 <div class="govuk-form-group">
-                    <label class="govuk-label govuk-label--m" for="metadataContactEmail">
+                    <label class="govuk-label fw-bold" for="metadataContactEmail">
                         Email address
                     </label>
                     @if (ViewData.ModelState[nameof(Contact.Email)]?.Errors.Any() == true)

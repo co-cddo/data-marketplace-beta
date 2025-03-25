@@ -41,7 +41,9 @@
                 {
 
                     <input type="hidden" name="mediaType" value="@distribution?.MediaType?.FirstOrDefault()" />
-                    
+                    <div class="govuk-caption-l">
+                        @Model.Title
+                    </div>
                     <h1 class="govuk-heading-l">
                         API details (optional)
                     </h1>
