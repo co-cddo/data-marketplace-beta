@@ -14,6 +14,7 @@
 
     var topics = Model.Topics;
     var organisations = Model.Organisations;
+    var accessRights = Model.AccessRights;
 
     var sortOption = Context.Request.Query["sortOption"].ToString();
     if (!string.IsNullOrEmpty(sortOption) && sortOption.Contains('|'))
@@ -179,6 +180,8 @@
 
         return string.Join(" ", prettyTokens);
     }
+
+    public static string PrettifyAccessRightsString(string? input) => input == "OPEN" ? "Open" : "On request";
 
     public static string RenderDescription(string? description)
     {
@@ -354,7 +357,19 @@
                                                 </h1>
                                             </legend>
                                             <div class="govuk-checkboxes govuk-checkboxes--small filter-list" data-module="govuk-checkboxes">
-                                                <div class="govuk-checkboxes__item">
+                                                @if (accessRights != null && accessRights.Any())
+                                                {
+                                                    @foreach (var accessRight in accessRights.OrderBy(x => x))
+                                                    {
+                                                        <div class="govuk-checkboxes__item">
+                                                            <input class="govuk-checkboxes__input" id="@accessRight" name="selectedAccessRights" type="checkbox" value="@accessRight" @(ViewBag?.AccessRights?.Contains(@accessRight) ? "checked" : "") onchange="this.form.submit()">
+                                                            <label class="govuk-label govuk-checkboxes__label govuk-!-font-size-16" for="@accessRight">
+                                                                @PrettifyAccessRightsString(@accessRight)
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                }
+                                              @*   <div class="govuk-checkboxes__item">
                                                     <input class="govuk-checkboxes__input" id="dataSet" name="selectedAccess" type="checkbox" onchange="this.form.submit()">
                                                     <label class="govuk-label govuk-checkboxes__label govuk-!-font-size-16" for="open">
                                                         Open
@@ -365,7 +380,7 @@
                                                     <label class="govuk-label govuk-checkboxes__label govuk-!-font-size-16" for="onrequest">
                                                         On request
                                                     </label>
-                                                </div>
+                                                </div> *@
                                             </div>
                                         </fieldset>
                                     </div>

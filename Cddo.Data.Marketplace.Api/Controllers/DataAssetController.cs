@@ -281,7 +281,8 @@ namespace Cddo.Data.Marketplace.Api.Controllers
                     getCddoDataAssetsRequest.SearchText,
                     getCddoDataAssetsRequest.Creator,
                     getCddoDataAssetsRequest.Themes,
-                    getCddoDataAssetsRequest.EntryTypes);
+                    getCddoDataAssetsRequest.EntryTypes,
+                    getCddoDataAssetsRequest.AccessRights);
 
                 if (!getCddoDataAssetsResult.Success)
                 {

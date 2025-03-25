@@ -404,7 +404,8 @@ public class DataAssetService(
         string? searchText,
         IEnumerable<string>? publishers,
         IEnumerable<string>? themes,
-        IEnumerable<string>? entryTypes)
+        IEnumerable<string>? entryTypes,
+        IEnumerable<string>? accessRights)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(startIndex);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(numberOfAssets);
@@ -430,7 +431,8 @@ public class DataAssetService(
                 SearchText = searchText,
                 Publishers = publishers,
                 Themes = themes,
-                EntryTypes = entryTypes
+                EntryTypes = entryTypes,
+                AccessRights = accessRights
             };
 
             var catalogEntriesOrganisationFilter = BuildCatalogEntriesOrganisationFilter(
