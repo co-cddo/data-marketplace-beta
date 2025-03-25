@@ -25,6 +25,7 @@ using Moq;
 using NUnit.Framework;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Numeric;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -707,7 +708,7 @@ namespace Cddo.Data.Marketplace.Api.Test.Controllers
 
             _mockDataAssetService
                 .Setup(service => service.GetCddoDataAssetsAsync(It.IsAny<IUserDetails>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<IEnumerable<DataAssetType>>() , It.IsAny<List<DataAssetStatus>>()
-                , It.IsAny<int>(), It.IsAny<int>(), It.IsAny<DataAssetsSortField>(), It.IsAny<DataAssetsSortDirection>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>()))
+                , It.IsAny<int>(), It.IsAny<int>(), It.IsAny<DataAssetsSortField>(), It.IsAny<DataAssetsSortDirection>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>()))
                 .ReturnsAsync(mockResult.Object);
 
             var response = new GetCddoDataAssetsResponse()
@@ -747,7 +748,7 @@ namespace Cddo.Data.Marketplace.Api.Test.Controllers
 
             _mockDataAssetService
                 .Setup(service => service.GetCddoDataAssetsAsync(It.IsAny<IUserDetails>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<IEnumerable<DataAssetType>>(), It.IsAny<List<DataAssetStatus>>()
-                , It.IsAny<int>(), It.IsAny<int>(), It.IsAny<DataAssetsSortField>(), It.IsAny<DataAssetsSortDirection>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>()))
+                , It.IsAny<int>(), It.IsAny<int>(), It.IsAny<DataAssetsSortField>(), It.IsAny<DataAssetsSortDirection>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>()))
                 .ReturnsAsync(mockResult.Object);
 
             // Act
@@ -769,7 +770,7 @@ namespace Cddo.Data.Marketplace.Api.Test.Controllers
 
             _mockDataAssetService
                 .Setup(service => service.GetCddoDataAssetsAsync(It.IsAny<IUserDetails>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<IEnumerable<DataAssetType>>(), It.IsAny<List<DataAssetStatus>>()
-                , It.IsAny<int>(), It.IsAny<int>(), It.IsAny<DataAssetsSortField>(), It.IsAny<DataAssetsSortDirection>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>()))
+                , It.IsAny<int>(), It.IsAny<int>(), It.IsAny<DataAssetsSortField>(), It.IsAny<DataAssetsSortDirection>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>()))
                 .ThrowsAsync(exception);
 
             // Act

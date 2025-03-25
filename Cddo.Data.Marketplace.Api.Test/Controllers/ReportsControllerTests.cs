@@ -45,7 +45,8 @@ public class ReportsControllerTests
                 testQueryCatalogReportsDataRequest.RequiredFields,
                 testQueryCatalogReportsDataRequest.Filter,
                 It.IsAny<int>(),
-                It.IsAny<int>()))
+                It.IsAny<int>(),
+                It.IsAny<string>()))
             .ReturnsAsync(() => CreateTestServiceOperationDataResult(success: true, data: testGetCatalogReportsDataResult));
 
         var testQueryCatalogReportsDataResponse = testItems.Fixture.Create<QueryCatalogReportsDataResponse>();
@@ -78,7 +79,8 @@ public class ReportsControllerTests
                 It.IsAny<IEnumerable<CatalogAssetField>>(),
                 It.IsAny<ICatalogReportsFilter>(),
                 It.IsAny<int>(),
-                It.IsAny<int>()))
+                It.IsAny<int>(), 
+                It.IsAny<string>()))
             .ReturnsAsync(() => CreateTestServiceOperationDataResult<IGetCatalogReportsDataResult>(success: false, error: "test error message"));
 
         var result = await testItems.ReportsController.QueryCatalogReportsData(testQueryCatalogReportsDataRequest);
@@ -106,7 +108,8 @@ public class ReportsControllerTests
                 It.IsAny<IEnumerable<CatalogAssetField>>(),
                 It.IsAny<ICatalogReportsFilter>(),
                 It.IsAny<int>(),
-                It.IsAny<int>()))
+                It.IsAny<int>(), 
+                It.IsAny<string>()))
             .ReturnsAsync(() => CreateTestServiceOperationDataResult<IGetCatalogReportsDataResult>(success: false, error: "test error message"));
 
         var result = await testItems.ReportsController.QueryCatalogReportsData(testQueryCatalogReportsDataRequest);
@@ -127,7 +130,8 @@ public class ReportsControllerTests
                 It.IsAny<IEnumerable<CatalogAssetField>>(),
                 It.IsAny<ICatalogReportsFilter>(),
                 It.IsAny<int>(),
-                It.IsAny<int>()))
+                It.IsAny<int>(), 
+                It.IsAny<string>()))
             .Throws(new Exception("test exception error message"));
 
         var result = await testItems.ReportsController.QueryCatalogReportsData(testQueryCatalogReportsDataRequest);
@@ -156,7 +160,7 @@ public class ReportsControllerTests
                 It.IsAny<IEnumerable<CatalogAssetField>>(),
                 It.IsAny<ICatalogReportsFilter>(),
                 It.IsAny<int>(),
-                It.IsAny<int>()))
+                It.IsAny<int>(), It.IsAny<string>()))
             .Throws(testException);
 
         await testItems.ReportsController.QueryCatalogReportsData(testQueryCatalogReportsDataRequest);
@@ -182,7 +186,7 @@ public class ReportsControllerTests
 
         testItems.MockReportsService
             .Setup(service => service.GetCatalogReportsDataAsync(It.IsAny<IUserDetails>(), It.IsAny<List<CatalogAssetField>>(),
-                It.IsAny<ICatalogReportsFilter>(), It.IsAny<int>(), It.IsAny<int>()))
+                It.IsAny<ICatalogReportsFilter>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
             .ReturnsAsync(mockResult.Object);
 
         var response = testItems.Fixture.Create<QueryCatalogReportsDataResponse>();
@@ -216,7 +220,7 @@ public class ReportsControllerTests
 
         testItems.MockReportsService
             .Setup(service => service.GetCatalogReportsDataAsync(It.IsAny<IUserDetails>(), It.IsAny<List<CatalogAssetField>>(),
-                It.IsAny<ICatalogReportsFilter>(), It.IsAny<int>(), It.IsAny<int>()))
+                It.IsAny<ICatalogReportsFilter>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
             .ReturnsAsync(mockResult.Object);
 
         // Act
@@ -240,7 +244,7 @@ public class ReportsControllerTests
 
         testItems.MockReportsService
             .Setup(service => service.GetCatalogReportsDataAsync(It.IsAny<IUserDetails>(), It.IsAny<List<CatalogAssetField>>(),
-                It.IsAny<ICatalogReportsFilter>(), It.IsAny<int>(), It.IsAny<int>()))
+                It.IsAny<ICatalogReportsFilter>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
             .ThrowsAsync(new Exception("Unexpected error"));
 
         // Act

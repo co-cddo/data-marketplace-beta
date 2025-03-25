@@ -25,7 +25,8 @@ public class ReportsServiceTests
                 CreateTestUserDetails(),
             null!,
             It.IsAny<ICatalogReportsFilter?>(), It.IsAny<int>(),
-            It.IsAny<int>()),
+            It.IsAny<int>(),
+            It.IsAny<string>()),
             Throws.ArgumentNullException.With.Property("ParamName").EqualTo("requiredFields"));
     }
 
@@ -39,7 +40,8 @@ public class ReportsServiceTests
             testItems.Fixture.CreateMany<CatalogAssetField>(),
             null,
             It.IsAny<int>(),
-            It.IsAny<int>()
+            It.IsAny<int>(),
+            It.IsAny<string>()
             );
 
         testItems.MockReportFieldFilterConverter.VerifyNoOtherCalls();
@@ -60,7 +62,8 @@ public class ReportsServiceTests
             testItems.Fixture.CreateMany<CatalogAssetField>(),
             mockCatalogReportsFilter.Object,
             It.IsAny<int>(),
-            It.IsAny<int>());
+            It.IsAny<int>(),
+            It.IsAny<string>());
 
         Assert.Multiple(() =>
         {
@@ -91,13 +94,16 @@ public class ReportsServiceTests
             testItems.Fixture.CreateMany<CatalogAssetField>(),
             mockCatalogReportsFilter.Object,
             It.IsAny<int>(),
-            It.IsAny<int>());
+            It.IsAny<int>(),
+            It.IsAny<string>());
 
         testItems.MockCkanConnection.Verify(x => x.GetFilteredCatalogEntriesAsync(
                 It.Is<ICatalogEntriesOrganisationFilter>(o =>
                     o.OrganisationId == "123" &&
                     o.FilterByOrganisationDiscoverability == true),
-                It.IsAny<IEnumerable<ICatalogAssetFieldFilter>>(), It.IsAny<ICatalogEntriesResultPagination>()),
+                It.IsAny<IEnumerable<ICatalogAssetFieldFilter>>(), 
+                It.IsAny<ICatalogEntriesResultPagination>(),
+            It.IsAny<string>()),
             Times.Once);
     }
 
@@ -120,12 +126,15 @@ public class ReportsServiceTests
             testItems.Fixture.CreateMany<CatalogAssetField>(),
             mockCatalogReportsFilter.Object,
             It.IsAny<int>(),
-            It.IsAny<int>());
+            It.IsAny<int>(),
+            It.IsAny<string>());
 
         testItems.MockCkanConnection.Verify(x => x.GetFilteredCatalogEntriesAsync(
                 It.Is<ICatalogEntriesOrganisationFilter>(o =>
                     o.FilterByOrganisationDiscoverability == false),
-                It.IsAny<IEnumerable<ICatalogAssetFieldFilter>>(), It.IsAny<ICatalogEntriesResultPagination>()),
+                It.IsAny<IEnumerable<ICatalogAssetFieldFilter>>(), 
+                It.IsAny<ICatalogEntriesResultPagination>(),
+            It.IsAny<string>()),
             Times.Once);
     }
     #endregion
