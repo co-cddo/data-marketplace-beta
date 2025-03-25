@@ -13,7 +13,8 @@ public interface IReportsService
         IEnumerable<CatalogAssetField> requiredFields,
         ICatalogReportsFilter? catalogReportsFilter,
         int startRecordIndex,
-        int numberOfRecords);
+        int numberOfRecords,
+         string? searchText);
 
     Task<IServiceOperationDataResult<IPerformCatalogReportsQueryResult>> PerformCatalogReportsQueryAsync(
         IUserDetails initiatingUserDetails);

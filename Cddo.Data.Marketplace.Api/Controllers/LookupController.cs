@@ -134,7 +134,7 @@ public class LookupController(
             var initiatingUserDetails = await userProfilePresenter.GetInitiatingUserDetailsAsync();
 
             var organisations = new List<string>();
-            var result = await reportsService.GetCatalogReportsDataAsync(initiatingUserDetails, request.RequiredFields, request.Filter, request.StartRecordIndex, request.NumberOfRecords);
+            var result = await reportsService.GetCatalogReportsDataAsync(initiatingUserDetails, request.RequiredFields, request.Filter, request.StartRecordIndex, request.NumberOfRecords, request.SearchText);
             //var response = result.Data.CatalogReportsDataItems.ToList();
 
 

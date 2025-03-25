@@ -436,7 +436,7 @@ public class DataAssetService(
             var catalogEntriesOrganisationFilter = BuildCatalogEntriesOrganisationFilter(
                 initiatingUserDetails,
                 onlyIncludeRecordsDiscoverableByOrganisationOfCallingUser == true,
-                onlyIncludeRecordsOwnedByOrganisationOfCallingUser == true);
+                onlyIncludeRecordsOwnedByOrganisationOfCallingUser == true);    
 
             var ckanCatalogEntrySet = await ckanConnection.GetCatalogEntriesAsync(
                  dataAssetTypes,
@@ -894,7 +894,7 @@ public class DataAssetService(
                 if (validatedProfiledDataAssetsWithRemainingErrors.Any())
                 {
                     var existingErrors = validatedProfiledDataAssetsWithRemainingErrors.SelectMany(x => x.ValidationErrors.Values).ToList();
-                    return CreateFailedResult([$"Unable to Publish as there are {validatedProfiledDataAssetsWithRemainingErrors.Count} records with {existingErrors.Count} validation errors remaining in the spreadsheet data set for the user"]);
+                    return CreateFailedResult([$"Unable to Publish as there are {validatedProfiledDataAssetsWithRemainingErrors.Count} records with {existingErrors.Count} validation errors remaining in the spreadsheet dataset for the user"]);
                 }
 
                 var publishedValidatedProfiledDataAssetsSpreadsheetContentItems = new List<PublishedValidatedProfiledDataAssetsSpreadsheetContentItem>();
