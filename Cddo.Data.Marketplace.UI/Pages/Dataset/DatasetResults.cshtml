@@ -51,6 +51,9 @@
     {
         currentPageNumber = middleEnd;
     }
+
+    int startIndex = ((currentPageNumber - 1) * 20) + 1;
+    int endIndex = Math.Min(currentPageNumber * 20, totalNumberOfResults);
 }
 
 @section Styles
@@ -391,7 +394,13 @@
                 </div>
                 <div class="govuk-grid-column-two-thirds">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <p class="govuk-hint">@totalNumberOfResults results</p>
+                        @if(currentPageNumber > 1)
+                        {
+                            <p class="govuk-hint">@startIndex to @endIndex of @totalNumberOfResults results</p>
+                            
+                        }else{
+                            <p class="govuk-hint">@totalNumberOfResults results</p>
+                        }
 
                         <div class="govuk-form-group d-flex gap-2 align-items-center">
                             <label class="govuk-label" for="sortOption">
