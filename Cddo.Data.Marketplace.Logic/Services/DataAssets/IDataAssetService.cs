@@ -67,7 +67,8 @@ namespace Cddo.Data.Marketplace.Logic.Services.DataAssets
             string? searchText,
             IEnumerable<string>? publishers,
             IEnumerable<string>? themes,
-            IEnumerable<string>? entryTypes);
+            IEnumerable<string>? entryTypes,
+            IEnumerable<string>? accessRights);
 
         Task<IServiceOperationDataResult<IGetCddoDataAssetResult>> GetCddoDataAssetAsync(
             IUserDetails initiatingUserDetails,

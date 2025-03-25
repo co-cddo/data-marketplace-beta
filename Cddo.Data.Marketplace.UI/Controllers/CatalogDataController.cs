@@ -65,6 +65,7 @@ public class CatalogDataController : Controller
         string? searchText,
         List<string> selectedTopics,
         List<string> selectedOrganisations,
+        List<string>? selectedAccessRights,
         List<DataAssetType> selectedDataAssetTypes,
         int? selectedNumberOfRecordsToShow,
         int? selectedPageNumber,
@@ -99,6 +100,7 @@ public class CatalogDataController : Controller
             Themes = selectedTopics,
             Creator = selectedOrganisationValues,
             DataAssetTypes = selectedDataAssetTypes,
+            AccessRights = selectedAccessRights,
             DataAssetStatuses = [DataAssetStatus.Published],
             SortField = sortOptions.SortField,
             SortDirection = sortOptions.SortDirection,
@@ -128,7 +130,8 @@ public class CatalogDataController : Controller
             getCddoDataAssetsRequest.NumberOfRecords,
             getCddoDataAssetsRequest.PageNumber,
             getCddoDataAssetsRequest.SortField,
-            getCddoDataAssetsRequest.SortDirection);
+            getCddoDataAssetsRequest.SortDirection,
+            getCddoDataAssetsRequest.AccessRights);
 
 
         var datasetResultsModel = new DatasetResultsModel
@@ -137,7 +140,9 @@ public class CatalogDataController : Controller
             TotalNumberOfResults = getCddoDataAssetsResponse.TotalNumberOfMatchingCddoDataAssets,
             Topics = getCatalogueFilterOptions?.Topics,
             Organisations = organisationNames,
-            DataAssetTypes = getCatalogueFilterOptions?.DataAssetTypes
+            DataAssetTypes = getCatalogueFilterOptions?.DataAssetTypes,
+            AccessRights = getCatalogueFilterOptions?.AccessRights
+
         };
 
         return View("~/Pages/Dataset/DatasetResults.cshtml", datasetResultsModel);
@@ -271,7 +276,8 @@ public class CatalogDataController : Controller
             getCddoDataAssetsRequest.NumberOfRecords,
             getCddoDataAssetsRequest.PageNumber,
             getCddoDataAssetsRequest.SortField,
-            getCddoDataAssetsRequest.SortDirection);
+            getCddoDataAssetsRequest.SortDirection,
+            getCddoDataAssetsRequest.AccessRights);
 
         return View("~/Pages/DataDescription/ViewDatasetDescriptions.cshtml", result);
     }
@@ -484,7 +490,8 @@ public class CatalogDataController : Controller
         int selectedNumberOfRecords,
         int selectedPageNumber,
         DataAssetsSortField selectedSortField,
-        DataAssetsSortDirection selectedSortDirection)
+        DataAssetsSortDirection selectedSortDirection,
+        List<string>? accessRights)
     {
         ViewBag.SearchText = searchText ?? string.Empty;
         ViewBag.Themes = selectedTopics ?? [];
@@ -495,5 +502,6 @@ public class CatalogDataController : Controller
         ViewBag.PageNumber = selectedPageNumber;
         ViewBag.SortField = selectedSortField;
         ViewBag.SortDirection = selectedSortDirection;
+        ViewBag.AccessRights = accessRights;
     }
 }

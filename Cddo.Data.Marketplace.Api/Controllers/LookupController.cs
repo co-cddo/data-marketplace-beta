@@ -120,7 +120,7 @@ public class LookupController(
         {
             StartRecordIndex = 0,
             NumberOfRecords = 1000,
-            RequiredFields = new List<CatalogAssetField>() { CatalogAssetField.DataAssetType, CatalogAssetField.Publisher, CatalogAssetField.Themes},
+            RequiredFields = new List<CatalogAssetField>() { CatalogAssetField.DataAssetType, CatalogAssetField.Publisher, CatalogAssetField.Themes, CatalogAssetField.AccessRights},
         };
 
         if (getCddoDataAssetsRequest != null)
@@ -152,11 +152,13 @@ public class LookupController(
             List<string> publishers = fieldValues.ContainsKey(CatalogAssetField.Publisher) ? fieldValues[CatalogAssetField.Publisher] : new List<string>();
             List<string> dataAssetTypeValues = fieldValues.ContainsKey(CatalogAssetField.DataAssetType) ? fieldValues[CatalogAssetField.DataAssetType] : new List<string>();
             List<string> toipics = fieldValues.ContainsKey(CatalogAssetField.Themes) ? fieldValues[CatalogAssetField.Themes] : new List<string>();
+            List<string> accessRights = fieldValues.ContainsKey(CatalogAssetField.AccessRights) ? fieldValues[CatalogAssetField.AccessRights] : new List<string>();
             var response = new CatalogueFilterOptions()
             {
                 DataAssetTypes = dataAssetTypeValues,
                 Organisations = publishers,
-                Topics = toipics
+                Topics = toipics,
+                AccessRights = accessRights
             };
             return Ok(response);
         }
@@ -186,6 +188,10 @@ public class LookupController(
         {
             filter.FieldFilters.Add(new CatalogReportFieldFilter() { Field = CatalogAssetField.Themes, Values = getCddoDataAssetsRequest.Themes.Select(type => type.ToString()).ToList() });
         }
+        if (getCddoDataAssetsRequest.AccessRights != null)
+        {
+            filter.FieldFilters.Add(new CatalogReportFieldFilter() { Field = CatalogAssetField.AccessRights, Values = getCddoDataAssetsRequest.AccessRights.Select(type => type.ToString()).ToList() });
+        }
 
         return filter;
     }
@@ -195,5 +201,6 @@ public class LookupController(
         public List<string>? Organisations { get; set; }
         public List<string>? Topics { get; set; }
         public List<string>? DataAssetTypes { get; set; }
+        public List<string>? AccessRights { get; set; }
     }
 }

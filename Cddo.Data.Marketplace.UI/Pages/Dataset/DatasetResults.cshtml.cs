@@ -14,4 +14,6 @@ public class DatasetResultsModel : PageModel
 
     public required List<string> Organisations { get; init; }
     public required List<string>? DataAssetTypes { get; init; }
+    public required List<string>? AccessRights { get; init; }
+    
 }
