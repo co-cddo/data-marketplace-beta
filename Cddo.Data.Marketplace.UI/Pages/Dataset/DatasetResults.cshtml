@@ -89,6 +89,10 @@
         .govuk-tag--grey {
             text-transform: inherit !important;
         }
+
+        .accordion-button:not(.collapsed) {
+            background-color: #fff;
+        }
     </style>
 }
 
@@ -238,7 +242,7 @@
                     <div class="accordion accordion-flush accordion-filter" id="accordionFlushExample">
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="flush-topics">
-                                <button class="accordion-button collapsed govuk-link" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTopics" aria-controls="flush-collapseTopics">
+                                <button class="accordion-button govuk-link" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTopics" aria-expanded="true" aria-controls="flush-collapseTopics">
                                     Topic
                                 </button>
                             </h2>
@@ -272,7 +276,7 @@
                         </div>
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="flush-organisations">
-                                <button class="accordion-button collapsed govuk-link" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOrganisations" aria-controls="flush-collapseOrganisations">
+                                <button class="accordion-button govuk-link" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOrganisations" aria-expanded="true" aria-controls="flush-collapseOrganisations">
                                     Organisation
                                 </button>
                             </h2>
@@ -306,7 +310,7 @@
                         </div>
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="flush-asset">
-                                <button class="accordion-button collapsed govuk-link " type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseAsset" aria-controls="flush-collapseAsset">
+                                <button class="accordion-button govuk-link " type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseAsset" aria-expanded="true" aria-controls="flush-collapseAsset">
                                     Type
                                 </button>
                             </h2>
@@ -347,7 +351,7 @@
                         </div>
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="flush-access">
-                                <button class="accordion-button collapsed govuk-link " type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseAccess" aria-controls="flush-collapseAccess">
+                                <button class="accordion-button govuk-link " type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseAccess" aria-expanded="true" aria-controls="flush-collapseAccess">
                                     Access
                                 </button>
                             </h2>
@@ -373,18 +377,6 @@
                                                         </div>
                                                     }
                                                 }
-                                                @*   <div class="govuk-checkboxes__item">
-                                                    <input class="govuk-checkboxes__input" id="dataSet" name="selectedAccess" type="checkbox" onchange="this.form.submit()">
-                                                    <label class="govuk-label govuk-checkboxes__label govuk-!-font-size-16" for="open">
-                                                        Open
-                                                    </label>
-                                                </div>
-                                                <div class="govuk-checkboxes__item">
-                                                    <input class="govuk-checkboxes__input" id="onrequest" name="selectedAccess" type="checkbox" onchange="this.form.submit()">
-                                                    <label class="govuk-label govuk-checkboxes__label govuk-!-font-size-16" for="onrequest">
-                                                        On request
-                                                    </label>
-                                                </div> *@
                                             </div>
                                         </fieldset>
                                     </div>
@@ -404,11 +396,13 @@
                 </div>
                 <div class="govuk-grid-column-two-thirds">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        @if(currentPageNumber > 1)
+                        @if (currentPageNumber > 1)
                         {
                             <p class="govuk-hint">@startIndex to @endIndex of @totalNumberOfResults results</p>
-                            
-                        }else{
+
+                        }
+                        else
+                        {
                             <p class="govuk-hint">@totalNumberOfResults results</p>
                         }
 
