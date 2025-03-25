@@ -286,7 +286,7 @@ public class CatalogDataDescriptionController(
         ViewBag.isCheckList = isCheckList;
         ViewBag.isCheckAnswers = isCheckAnswers;
         ViewBag.isEditMode = isEditMode;
-        
+
         return await SecureActionAsync(DescriptionViewPath, questionDescriptionRequest);
     }
 
@@ -430,7 +430,7 @@ public class CatalogDataDescriptionController(
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             questionThemeRequest.Title = dataAsset.CddoDataAsset.Title;
             if (dataAsset is not null && dataAsset.CddoDataAsset.Themes.Any())
-            {               
+            {
                 questionThemeRequest.Theme = dataAsset.CddoDataAsset.Themes.ToList();
             }
         }
@@ -871,11 +871,11 @@ public class CatalogDataDescriptionController(
         if (!string.IsNullOrEmpty(identifier))
         {
             questionIssuedRequest.Identifier = identifier;
-            
+
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
             questionIssuedRequest.Title = dataAsset.CddoDataAsset.Title;
             if (dataAsset!.CddoDataAsset.Issued.HasValue)
-            {               
+            {
                 questionIssuedRequest.metadataIssuedDay = dataAsset.CddoDataAsset.Issued.Value.Day.ToString();
                 questionIssuedRequest.metadataIssuedMonth = dataAsset.CddoDataAsset.Issued.Value.Month.ToString();
                 questionIssuedRequest.metadataIssuedYear = dataAsset.CddoDataAsset.Issued.Value.Year.ToString();
@@ -1077,10 +1077,10 @@ public class CatalogDataDescriptionController(
         {
             accessRightsRequest.AccessRights = accessRightsSelection.Value ? "OPEN" : "RESTRICTED";
         }
-       
+
         var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(accessRightsRequest.Identifier));
 
-        
+
 
         if (!ModelState.IsValid)
         {
@@ -1119,11 +1119,12 @@ public class CatalogDataDescriptionController(
         if (response is not null)
         {
             await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddFrequency, "Access-Rights", $"Updated the access rights of data set {response.DataAssetId}");
-            if(accessRightsSelection != null && accessRightsSelection.Value)
+            if (accessRightsSelection != null && accessRightsSelection.Value)
             {
                 return RedirectBasedOnFlags(showNextQuestion, isCheckAnswers, isCheckList, response.DataAssetId.ToString(), nameof(Licence), isEditMode)
                    ?? RedirectToAction(nameof(Licence), new { identifier = response.DataAssetId.ToString() });
-            }else if(showNextQuestion != null && ParseBoolean(showNextQuestion) && accessRightsSelection == null)
+            }
+            else if (showNextQuestion != null && ParseBoolean(showNextQuestion) && accessRightsSelection == null)
             {
                 ModelState.AddModelError("access-rights-radio", "You must select an option.");
 
@@ -1180,8 +1181,8 @@ public class CatalogDataDescriptionController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddSupplyFormatSubmit(QuestionDistributionRequest questionDistributionRequest, string? mediaType, string? distribution, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
-        
-        if(distribution != null)
+
+        if (distribution != null)
         {
             ViewBag.isCheckList = isCheckList;
             ViewBag.isCheckAnswers = isCheckAnswers;
@@ -1190,7 +1191,7 @@ public class CatalogDataDescriptionController(
             questionDistributionRequest.Distribution = distributionList;
         }
         var distributionId = SetDistributionId(questionDistributionRequest.Distribution);
-       
+
         if (!ModelState.IsValid)
         {
             var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
@@ -1198,7 +1199,7 @@ public class CatalogDataDescriptionController(
             string summary = $"Validation failed for Add-Supply-Format. Errors: {string.Join(", ", validationErrors)}";
             await LogUserActionAsync(EventTypes.AdminAuditEvent.AdminAddSupplyFormat, "Add-Supply-Format", summary);
         }
-        if(mediaType == null && (distribution == "[]" || string.IsNullOrEmpty(distribution)))
+        if (mediaType == null && (distribution == "[]" || string.IsNullOrEmpty(distribution)))
         {
             ViewBag.isCheckList = isCheckList;
             ViewBag.isCheckAnswers = isCheckAnswers;
@@ -1237,7 +1238,7 @@ public class CatalogDataDescriptionController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddRestrictedSupplyFormatSubmit(QuestionDistributionRequest questionDistributionRequest, List<string>? supplyFormat, string? distribution, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
-        if(supplyFormat?.Count <= 0 && (distribution == "[]" || string.IsNullOrEmpty(distribution)))
+        if (supplyFormat?.Count <= 0 && (distribution == "[]" || string.IsNullOrEmpty(distribution)))
         {
             ViewBag.isCheckList = isCheckList;
             ViewBag.isCheckAnswers = isCheckAnswers;
@@ -1256,26 +1257,26 @@ public class CatalogDataDescriptionController(
             questionDistributionRequest.Distribution = new List<Distribution>();
             foreach (var mediaType in supplyFormat)
             {
-                questionDistributionRequest.Distribution.Add(new Distribution() {Id = SetDistributionId(questionDistributionRequest.Distribution), MediaType = new List<string>() { mediaType } });
+                questionDistributionRequest.Distribution.Add(new Distribution() { Id = SetDistributionId(questionDistributionRequest.Distribution), MediaType = new List<string>() { mediaType } });
             }
 
         }
-        else if(supplyFormat != null)
+        else if (supplyFormat != null)
         {
-           
+
             var currentMediaTypes = questionDistributionRequest?.Distribution?.Select(x => x?.MediaType?.FirstOrDefault()).ToList();
 
             var unCommonElements = supplyFormat?.Where(item => !currentMediaTypes.Contains(item)).ToList();
             foreach (var item in unCommonElements)
             {
-                questionDistributionRequest?.Distribution?.Add(new Distribution() { Id= SetDistributionId(questionDistributionRequest?.Distribution), MediaType = new List<string>() { item } });
+                questionDistributionRequest?.Distribution?.Add(new Distribution() { Id = SetDistributionId(questionDistributionRequest?.Distribution), MediaType = new List<string>() { item } });
             }
 
-            if(supplyFormat?.Count() != questionDistributionRequest?.Distribution?.Count())
+            if (supplyFormat?.Count() != questionDistributionRequest?.Distribution?.Count())
             {
                 questionDistributionRequest?.Distribution?.RemoveAll(item => !supplyFormat.Contains(item?.MediaType?.FirstOrDefault()));
             }
-           
+
         }
         //else if (mediaType != null)
         //{
@@ -1313,6 +1314,11 @@ public class CatalogDataDescriptionController(
 
             if (questionDistributionRequest.Distribution.Where(t => t.MediaType?.FirstOrDefault() == "API").Any() && showNext)
             {
+                var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(response.DataAssetId.ToString()));
+                if (dataAsset is not null)
+                {
+                    questionDistributionRequest.Title = dataAsset.CddoDataAsset.Title;
+                }
                 return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/DistributionApiRestricted.cshtml", questionDistributionRequest);
             }
 
@@ -1325,9 +1331,9 @@ public class CatalogDataDescriptionController(
 
     private int? SetDistributionId(List<Distribution>? distributions)
     {
-        if(distributions == null || !distributions.Any()) {return 1;}
+        if (distributions == null || !distributions.Any()) { return 1; }
 
-        return distributions.Max(d=>d.Id) + 1;
+        return distributions.Max(d => d.Id) + 1;
     }
 
     [Route("access-method-restricted")]
@@ -1471,7 +1477,7 @@ public class CatalogDataDescriptionController(
             if (dataAsset is not null)
             {
                 ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
-                licenceRequest.License = new License() {Title = dataAsset.CddoDataAsset?.License?.Title, LicenseUrl = dataAsset.CddoDataAsset?.License?.LicenseUrl };
+                licenceRequest.License = new License() { Title = dataAsset.CddoDataAsset?.License?.Title, LicenseUrl = dataAsset.CddoDataAsset?.License?.LicenseUrl };
             }
         }
 
@@ -1504,7 +1510,7 @@ public class CatalogDataDescriptionController(
             questionLicenceRequest.License.Title = license;
 
         }
-        if(license == "Open Government Licence")
+        if (license == "Open Government Licence")
         {
             questionLicenceRequest.License.LicenseUrl = "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/";
         }
@@ -1597,7 +1603,7 @@ public class CatalogDataDescriptionController(
         {
             questionDistributionRequest.Distribution = new List<Distribution>() { new Distribution() { Id = distributionId, MediaType = new List<string>() { mediaType } } };
         }
-       
+
         return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/DistributionLink.cshtml", questionDistributionRequest);
     }
     [HttpPost("distribution-links")]
@@ -1695,13 +1701,13 @@ public class CatalogDataDescriptionController(
         {
             Identifier = identifier,
             DistributionId = distributionId,
-            Title = title??""
+            Title = title ?? ""
         };
         return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/DeleteDistributionConfirmation.cshtml", model);
 
     }
     [Route("remove-distribution-links")]
-    public async Task<IActionResult> RemoveDistributionLinks(QuestionDistributionRequest questionDistributionRequest, string? identifier,  int? distributionId, string? isCheckList, string? isCheckAnswers, string? isEditMode)
+    public async Task<IActionResult> RemoveDistributionLinks(QuestionDistributionRequest questionDistributionRequest, string? identifier, int? distributionId, string? isCheckList, string? isCheckAnswers, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -1775,14 +1781,14 @@ public class CatalogDataDescriptionController(
 
     private bool isDistributionValid(Distribution? distribution)
     {
-        if(distribution?.MediaType?.FirstOrDefault() == "File download")
+        if (distribution?.MediaType?.FirstOrDefault() == "File download")
         {
-            if (distribution.Title.IsNullOrEmpty() || distribution.DownloadUrl.IsNullOrEmpty() || distribution.Format.IsNullOrEmpty()) 
+            if (distribution.Title.IsNullOrEmpty() || distribution.DownloadUrl.IsNullOrEmpty() || distribution.Format.IsNullOrEmpty())
             {
                 return false;
             }
         }
-        if(distribution?.MediaType?.FirstOrDefault() == "API")
+        if (distribution?.MediaType?.FirstOrDefault() == "API")
         {
             if (distribution.Title.IsNullOrEmpty() || distribution.AccessUrl.IsNullOrEmpty())
             {
@@ -1801,7 +1807,7 @@ public class CatalogDataDescriptionController(
     }
     private void addDistributionModelErrors(Distribution? distribution)
     {
-        if(distribution?.MediaType?.FirstOrDefault() == "File download")
+        if (distribution?.MediaType?.FirstOrDefault() == "File download")
         {
             if (distribution.Title.IsNullOrEmpty())
             {
@@ -1883,6 +1889,7 @@ public class CatalogDataDescriptionController(
         {
             questionKeywordRequest.Identifier = identifier;
             var dataAsset = await _catalogDataService.GetDataAssetAsync(new Guid(identifier));
+
             if (dataAsset is not null)
             {
                 ViewBag.DataDescriptionTitle = dataAsset.CddoDataAsset.Title;
@@ -1905,7 +1912,7 @@ public class CatalogDataDescriptionController(
         ViewBag.isCheckList = isCheckList;
         ViewBag.isCheckAnswers = isCheckAnswers;
         ViewBag.isEditMode = isEditMode;
-        if(questionKeywordRequest.Distribution.Where(t => t.MediaType?.FirstOrDefault() == "API").Any())
+        if (questionKeywordRequest.Distribution.Where(t => t.MediaType?.FirstOrDefault() == "API").Any())
         {
             return await SecureActionAsync("~/Pages/DataDescription/NewDescription/Manual/DistributionApiRestricted.cshtml", questionKeywordRequest);
         }
@@ -1917,7 +1924,7 @@ public class CatalogDataDescriptionController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddDistributionLinksRestricted(QuestionDistributionRequest questionDistributionRequest, string? distributionTitle, string? accessUrl, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
-       if(questionDistributionRequest.Identifier == null)
+        if (questionDistributionRequest.Identifier == null)
         {
             return ViewOrRedirect("~/Pages/DataDescription/NewDescription/Manual/DistributionApiRestricted.cshtml", questionDistributionRequest);
         }
@@ -2020,7 +2027,7 @@ public class CatalogDataDescriptionController(
 
     }
     [Route("formats")]
-    public async Task<IActionResult> AddFormatsSubmit(QuestionDistributionRequest questionFormatsRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? showNextQuestion,  string? isEditMode)
+    public async Task<IActionResult> AddFormatsSubmit(QuestionDistributionRequest questionFormatsRequest, string? identifier, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
     {
         if (!ModelState.IsValid)
         {
@@ -2071,9 +2078,9 @@ public class CatalogDataDescriptionController(
             questionFormatsRequest.Distribution = distributionList;
         }
 
-        if(formats != null && formats.Any()) 
+        if (formats != null && formats.Any())
         {
-            questionFormatsRequest.Distribution.Where(f=>f.MediaType.FirstOrDefault() == "File download").FirstOrDefault().Format = String.Join(",", formats);
+            questionFormatsRequest.Distribution.Where(f => f.MediaType.FirstOrDefault() == "File download").FirstOrDefault().Format = String.Join(",", formats);
         }
 
         if (!ModelState.IsValid)

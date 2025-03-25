@@ -38,23 +38,23 @@
                 Data owner
             </h1>
             <div id="contact-hint" class="govuk-hint">
-                <p class="govuk-hint">
+                <p class="govuk-body">
                     The data you're listing must have an owner that can make decisions. This must be an individual.
                 </p>
-                <p class="govuk-hint">These details will not be visible to users outside your organisation.</p>
+                <p class="govuk-body">These details will not be visible to users outside your organisation.</p>
             </div>
 
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddDataOwnerSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
                 <input type="hidden" name="identifier" value="@Model.Identifier" />
                 <input hidden name="@nameof(Contact.Role)" value="@nameof(ContactRoleEnum.Owner)" />
                 <div class="govuk-form-group">
-                    <label class="govuk-label" for="ContactName">
+                    <label class="govuk-label fw-bold" for="ContactName">
                         Name
                     </label>
                     <input class="govuk-input" id="ContactName" name="@nameof(Contact.Name)" type="text" autocomplete="name" value="@dataOwner?.FirstOrDefault()?.Name">
                 </div>
                 <div class="govuk-form-group">
-                    <label class="govuk-label" for="ContactEmail">
+                    <label class="govuk-label fw-bold" for="ContactEmail">
                         Email address
                     </label>
                     <input class="govuk-input" id="ContactEmail" name="@nameof(Contact.Email)" type="email" autocomplete="email" value="@dataOwner?.FirstOrDefault()?.Email">

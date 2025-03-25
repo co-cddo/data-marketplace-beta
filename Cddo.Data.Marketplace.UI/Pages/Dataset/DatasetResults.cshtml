@@ -369,7 +369,7 @@
                                                         </div>
                                                     }
                                                 }
-                                              @*   <div class="govuk-checkboxes__item">
+                                                @*   <div class="govuk-checkboxes__item">
                                                     <input class="govuk-checkboxes__input" id="dataSet" name="selectedAccess" type="checkbox" onchange="this.form.submit()">
                                                     <label class="govuk-label govuk-checkboxes__label govuk-!-font-size-16" for="open">
                                                         Open
@@ -387,14 +387,15 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="govuk-button-group">
-                            <noscript>
-                                <button type="submit" class="govuk-button" data-module="govuk-button"
-                                        asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssets)">
-                                    Apply filter
-                                </button>
-                            </noscript>
-                        </div>
+
+                    </div>
+                    <div class="govuk-button-group">
+                        <noscript>
+                            <button type="submit" class="govuk-button" data-module="govuk-button"
+                                    asp-controller="CatalogData" asp-action="@nameof(CatalogDataController.GetCddoDataAssets)">
+                                Apply filter
+                            </button>
+                        </noscript>
                     </div>
                 </div>
                 <div class="govuk-grid-column-two-thirds">
