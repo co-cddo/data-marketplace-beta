@@ -33,10 +33,28 @@
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 @{
-                    var labels = new List<string>();
-                    if (webpages.Any() || fileDownloads.Any()) labels.Add("Dataset");
-                    if (apis.Any()) labels.Add("API");
+                    var labels = new HashSet<string>();
+
+                    if (webpages.Any() || fileDownloads.Any())
+                    {
+                        labels.Add("Dataset");
+                    }
+
+                    if (apis.Any())
+                    {
+                        labels.Add("API");
+                    }
+
+                    if (!dataAsset.DataAssetDistribution.Any() && dataAsset.DataAssetType == DataAssetType.DataService)
+                    {
+                        labels.Add("Data Service");
+                    }
+                    else if (!labels.Contains("Dataset"))
+                    {
+                        labels.Add("Dataset");
+                    }
                 }
+
                 <span class="govuk-caption-xl">
                     @string.Join(", ", labels)
                 </span>
