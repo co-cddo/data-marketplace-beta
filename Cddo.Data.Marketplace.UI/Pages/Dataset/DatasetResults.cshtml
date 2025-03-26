@@ -12,7 +12,7 @@
     var dataAssets = Model.DataAssets;
     var totalNumberOfResults = Model.TotalNumberOfResults;
 
-    var topics = Model.Topics;
+    var themes = Model.Topics;
     var organisations = Model.Organisations;
     var accessRights = Model.AccessRights;
 
@@ -88,6 +88,7 @@
 
         .govuk-tag--grey {
             text-transform: inherit !important;
+            color: #282d30 !important;
         }
 
         .accordion-button:not(.collapsed) {
@@ -225,7 +226,7 @@
                                 });
                             </script>
 
-                            <button title="datasetSearchResultsBtn" class="search-button" type="submit" enterkeyhint="search">
+                            <button class="search-button" type="submit" enterkeyhint="search">
                                 <svg class="search-button__icon" width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
                                     <circle cx="12.0161" cy="11.0161" r="8.51613" stroke="currentColor" stroke-width="3"></circle>
                                     <line x1="17.8668" y1="17.3587" x2="26.4475" y2="25.9393" stroke="currentColor" stroke-width="3"></line>
@@ -241,27 +242,27 @@
                 <div class="govuk-grid-column-one-third">
                     <div class="accordion accordion-flush accordion-filter" id="accordionFlushExample">
                         <div class="accordion-item">
-                            <h2 class="accordion-header" id="flush-topics">
-                                <button class="accordion-button govuk-link" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTopics" aria-expanded="true" aria-controls="flush-collapseTopics">
-                                    Topic
+                            <h2 class="accordion-header" id="flush-themes">
+                                <button class="accordion-button govuk-link" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThemes" aria-expanded="true" aria-controls="flush-collapseThemes">
+                                    Theme
                                 </button>
                             </h2>
-                            <div id="flush-collapseTopics" class="accordion-collapse collapse show" aria-labelledby="flush-topics" data-bs-parent="#accordionFlushExample">
+                            <div id="flush-collapseThemes" class="accordion-collapse collapse show" aria-labelledby="flush-themes">
                                 <div class="accordion-body">
                                     <div class="govuk-form-group">
                                         <fieldset class="govuk-fieldset">
                                             <legend class="govuk-fieldset__legend govuk-fieldset__legend--m visually-hidden">
                                                 <h1 class="govuk-fieldset__heading">
-                                                    Topic
+                                                    Theme
                                                 </h1>
                                             </legend>
                                             <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
-                                                @if (topics != null && topics.Any())
+                                                @if (themes != null && themes.Any())
                                                 {
-                                                    @foreach (var topic in topics.OrderBy(x => x))
+                                                    @foreach (var topic in themes.OrderBy(x => x))
                                                     {
                                                         <div class="govuk-checkboxes__item">
-                                                            <input class="govuk-checkboxes__input" id="@topic" name="selectedTopics" type="checkbox" value="@topic" @(ViewBag?.Themes?.Contains(@topic) ? "checked" : "") onchange="this.form.submit()">
+                                                            <input class="govuk-checkboxes__input" id="@topic" name="selectedThemes" type="checkbox" value="@topic" @(ViewBag?.Themes?.Contains(@topic) ? "checked" : "") onchange="this.form.submit()">
                                                             <label class="govuk-label govuk-checkboxes__label govuk-!-font-size-16" for="@topic">
                                                                 @topic
                                                             </label>
@@ -280,7 +281,7 @@
                                     Organisation
                                 </button>
                             </h2>
-                            <div id="flush-collapseOrganisations" class="accordion-collapse collapse show" aria-labelledby="flush-organisations" data-bs-parent="#accordionFlushExample">
+                            <div id="flush-collapseOrganisations" class="accordion-collapse collapse show" aria-labelledby="flush-organisations">
                                 <div class="accordion-body">
                                     <div class="govuk-form-group">
                                         <fieldset class="govuk-fieldset">
@@ -308,54 +309,13 @@
                                 </div>
                             </div>
                         </div>
-                        @* <div class="accordion-item">
-                            <h2 class="accordion-header" id="flush-asset">
-                                <button class="accordion-button govuk-link " type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseAsset" aria-expanded="true" aria-controls="flush-collapseAsset">
-                                    Type
-                                </button>
-                            </h2>
-                            <div id="flush-collapseAsset" class="accordion-collapse collapse show" aria-labelledby="flush-asset" data-bs-parent="#accordionFlushExample">
-                                <div class="accordion-body">
-                                    <div class="govuk-form-group">
-                                        <fieldset class="govuk-fieldset">
-                                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m visually-hidden">
-                                                <h1 class="govuk-fieldset__heading">
-                                                    Type
-                                                </h1>
-                                            </legend>
-                                            <div class="govuk-checkboxes govuk-checkboxes--small filter-list" data-module="govuk-checkboxes">
-                                                @if (Model.DataAssetTypes.Contains("DataSet"))
-                                                {
-                                                    <div class="govuk-checkboxes__item">
-                                                        <input class="govuk-checkboxes__input" id="dataSet" name="selectedDataAssetTypes" type="checkbox" value="@DataAssetType.DataSet" @(ViewBag?.DataAssetTypes?.Contains(DataAssetType.DataSet) ? "checked" : "")>
-                                                        <label class="govuk-label govuk-checkboxes__label govuk-!-font-size-16" for="dataSet">
-                                                            Data set
-                                                        </label>
-                                                    </div>
-                                                }
-                                                @if (Model.DataAssetTypes.Contains("DataService"))
-                                                {
-                                                    <div class="govuk-checkboxes__item">
-                                                        <input class="govuk-checkboxes__input" id="dataService" name="selectedDataAssetTypes" type="checkbox" value="@DataAssetType.DataService" @(ViewBag?.DataAssetTypes?.Contains(DataAssetType.DataService) ? "checked" : "")>
-                                                        <label class="govuk-label govuk-checkboxes__label govuk-!-font-size-16" for="dataService">
-                                                            Data Service
-                                                        </label>
-                                                    </div>
-                                                }
-
-                                            </div>
-                                        </fieldset>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> *@
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="flush-access">
                                 <button class="accordion-button govuk-link " type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseAccess" aria-expanded="true" aria-controls="flush-collapseAccess">
                                     Access
                                 </button>
                             </h2>
-                            <div id="flush-collapseAccess" class="accordion-collapse collapse show" aria-labelledby="flush-access" data-bs-parent="#accordionFlushExample">
+                            <div id="flush-collapseAccess" class="accordion-collapse collapse show" aria-labelledby="flush-access">
                                 <div class="accordion-body">
                                     <div class="govuk-form-group">
                                         <fieldset class="govuk-fieldset">
@@ -467,7 +427,15 @@
                                                     tags.Add("API");
                                                 }
 
-                                                if (mediaTypes.Contains("File download") || mediaTypes.Contains("text/html"))
+                                                if (mediaTypes.Any(mt => mt == "File download" || mt == "text/html"))
+                                                {
+                                                    tags.Add("Dataset");
+                                                }
+                                                if (!mediaTypes.Any() && dataAsset.DataAssetType == DataAssetType.DataService)
+                                                {
+                                                    tags.Add("Data Service");
+                                                }
+                                                else if (!mediaTypes.Any() && dataAsset.DataAssetType == DataAssetType.DataSet && !tags.Contains("Dataset"))
                                                 {
                                                     tags.Add("Dataset");
                                                 }
@@ -496,14 +464,16 @@
                             }
                             else
                             {
-                                <p class="govuk-body"><strong>There are no matching results.</strong> </p>
-                                <p class="govuk-body">Improve your search results by:  </p>
-                                <ul class="govuk-list govuk-list--bullet">
-                                    <li>removing filters</li>
-                                    <li>double-checking your spelling</li>
-                                    <li>using fewer keywords </li>
-                                    <li>searching for something less specific </li>
-                                </ul>
+                                <div class="no-results govuk-!-font-size-19">
+                                    <p class="govuk-body govuk-!-font-weight-bold">There are no matching results.</p>
+                                    <p class="govuk-body">Improve your search results by:</p>
+                                    <ul class="govuk-list govuk-list--bullet">
+                                        <li>removing filters</li>
+                                        <li>checking your spelling</li>
+                                        <li>using fewer keywords</li>
+                                        <li>searching for something less specific</li>
+                                    </ul>
+                                </div>
                             }
                         </div>
                     </div>
