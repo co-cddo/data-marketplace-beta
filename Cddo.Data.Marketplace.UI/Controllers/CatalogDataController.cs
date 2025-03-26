@@ -119,7 +119,8 @@ public class CatalogDataController : Controller
 
         var organisationNames = organisationsGroupedByPrettifiedName.Select(x => x.Key).ToList();
 
-
+        //remove none of the above from topic list
+        getCatalogueFilterOptions?.Topics.RemoveAll(x => x == "None of the above");
 
         SetViewBagPropertiesForCddoDataAssetViewing(
             getCddoDataAssetsRequest.SearchText,
