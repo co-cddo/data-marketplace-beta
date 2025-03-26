@@ -88,6 +88,7 @@
 
         .govuk-tag--grey {
             text-transform: inherit !important;
+            color: #282d30!important;
         }
 
         .accordion-button:not(.collapsed) {
@@ -246,7 +247,7 @@
                                     Topic
                                 </button>
                             </h2>
-                            <div id="flush-collapseTopics" class="accordion-collapse collapse show" aria-labelledby="flush-topics" data-bs-parent="#accordionFlushExample">
+                            <div id="flush-collapseTopics" class="accordion-collapse collapse show" aria-labelledby="flush-topics">
                                 <div class="accordion-body">
                                     <div class="govuk-form-group">
                                         <fieldset class="govuk-fieldset">
@@ -280,7 +281,7 @@
                                     Organisation
                                 </button>
                             </h2>
-                            <div id="flush-collapseOrganisations" class="accordion-collapse collapse show" aria-labelledby="flush-organisations" data-bs-parent="#accordionFlushExample">
+                            <div id="flush-collapseOrganisations" class="accordion-collapse collapse show" aria-labelledby="flush-organisations">
                                 <div class="accordion-body">
                                     <div class="govuk-form-group">
                                         <fieldset class="govuk-fieldset">
@@ -314,7 +315,7 @@
                                     Type
                                 </button>
                             </h2>
-                            <div id="flush-collapseAsset" class="accordion-collapse collapse show" aria-labelledby="flush-asset" data-bs-parent="#accordionFlushExample">
+                            <div id="flush-collapseAsset" class="accordion-collapse collapse show" aria-labelledby="flush-asset">
                                 <div class="accordion-body">
                                     <div class="govuk-form-group">
                                         <fieldset class="govuk-fieldset">
@@ -355,7 +356,7 @@
                                     Access
                                 </button>
                             </h2>
-                            <div id="flush-collapseAccess" class="accordion-collapse collapse show" aria-labelledby="flush-access" data-bs-parent="#accordionFlushExample">
+                            <div id="flush-collapseAccess" class="accordion-collapse collapse show" aria-labelledby="flush-access">
                                 <div class="accordion-body">
                                     <div class="govuk-form-group">
                                         <fieldset class="govuk-fieldset">
@@ -467,7 +468,15 @@
                                                     tags.Add("API");
                                                 }
 
-                                                if (mediaTypes.Contains("File download") || mediaTypes.Contains("text/html"))
+                                                if (mediaTypes.Any(mt => mt == "File download" || mt == "text/html"))
+                                                {
+                                                    tags.Add("Dataset");
+                                                }
+                                                if (!mediaTypes.Any() && dataAsset.DataAssetType == DataAssetType.DataService)
+                                                {
+                                                    tags.Add("Data Service");
+                                                }
+                                                else if (!tags.Contains("Dataset"))
                                                 {
                                                     tags.Add("Dataset");
                                                 }
@@ -496,7 +505,16 @@
                             }
                             else
                             {
-                                <p class="govuk-body">No results found.</p>
+                                <div class="no-results govuk-!-font-size-19">
+                                    <p class="govuk-body govuk-!-font-weight-bold">There are no matching results.</p>
+                                    <p class="govuk-body">Improve your search results by:</p>
+                                    <ul class="govuk-list govuk-list--bullet">
+                                        <li>removing filters</li>
+                                        <li>double-checking your spelling</li>
+                                        <li>using fewer keywords</li>
+                                        <li>searching for something less specific</li>
+                                    </ul>
+                                </div>
                             }
                         </div>
                     </div>
