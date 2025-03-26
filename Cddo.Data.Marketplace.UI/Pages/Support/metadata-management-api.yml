@@ -98,55 +98,39 @@ paths:
                         "contactPoint": [
                           {
                             "name": "Rob Nichols",
-                            "email": "robert.nichols@digital.cabinet-office.gov.uk"
+                            "email": "robert.nichols@digital.cabinet-office.gov.uk",
+                            "role": "contact"
                           }
                         ],
+                        "license": {
+                          "title": "Creative Commons",
+                          "licenseURL": "https://creativecommons.org/licenses/by/4.0"
+                        },
                         "publisher": "academy-for-social-justice",
                         "securityClassification": "OFFICIAL",
                         "accessRights": "OPEN",
                         "distribution": [
                           {
+                            "title": "CSV download",
+                            "description": "Complete dataset provided as a downloadable file",
                             "accessService": ["8d085327-21b6-4d8b-9705-88faad231d23"],
                             "downloadURL": "http://example.com/path/to/file.csv",
+                            "format": "CSV file",
                             "mediaType":["text/csv"]
-                          }
-                        ]
-                      }
-                      ,
-                      {
-                        "identifier": "8d085327-21b6-4d8b-9705-88faad231d23",
-                        "supplierIdentifier": "acme-123",
-                        "modified": "2023-12-09T16:09:53+00:00",
-                        "status": "Published",
-                        "title": "Advance Passenger Information",
-                        "description": "Travel data and personal data given to airlines by passenger. API covers  both inbound and outbound air passengers. API includes the passenger’s full name, nationality, date of birth, gender and travel document number, type and country of issue.The data does not include those arriving by sea or rail routes, by private aircraft or via the Common Travel Area (CTA).",
-                        "type": "Data Service",
-                        "apiType": "REST",
-                        "serviceType": "Transactional",
-                        "theme": [
-                          "Transport and infrastructure",
-                          "Population and society"
-                        ],
-                        "keyword": [
-                          "Air travel",
-                          "Passport",
-                          "Airports",
-                          "leaving UK",
-                          "entering UK"
-                        ],
-                        "contactPoint": [
+                          },
                           {
-                            "name": "Rob Nichols",
-                            "email": "robert.nichols@digital.cabinet-office.gov.uk"
+                            "title": "Rest API",
+                            "accessURL": "http://example.com/api/",
+                            "description": "A fully queryable REST API with JSON and XML output",
+                            "format": "API"
+                          },
+                          {
+                            "title": "Web Page",
+                            "description": "A web page that provides the data, links to downloads, or documentation.",
+                            "downloadURL": "http://example.com/path/to/page",
+                            "format": "Web page",
+                            "mediaType":["text/html"]
                           }
-                        ],
-                        "publisher": "academy-for-social-justice",
-                        "securityClassification": "OFFICIAL",
-                        "accessRights": "OPEN",
-                        "endpointDescription": "http://example.com/path/to/swagger",
-                        "endpointURL": "http://example.com/api/v1",
-                        "servesDataset": [
-                          "8d085327-21b6-4d8b-9705-88faad231d22"
                         ]
                       }
                     ]
@@ -178,10 +162,9 @@ paths:
                 summary: Creates a resource that describes a dataset with a CSV file distribution.
                 value: 
                   {
-                    "identifier": "8d085327-21b6-4d8b-9705-88faad231d22",
                     "supplierIdentifier": "acme-123",
                     "modified": "2023-12-09T16:09:53+00:00",
-                    "status": "Draft",
+                    "status": "Published",
                     "title": "Advance Passenger Information",
                     "description": "Travel data and personal data given to airlines by passenger. API covers  both inbound and outbound air passengers. API includes the passenger’s full name, nationality, date of birth, gender and travel document number, type and country of issue.The data does not include those arriving by sea or rail routes, by private aircraft or via the Common Travel Area (CTA).",
                     "type": "Data Set",
@@ -199,20 +182,42 @@ paths:
                     "contactPoint": [
                       {
                         "name": "Rob Nichols",
-                        "email": "robert.nichols@digital.cabinet-office.gov.uk"
+                        "email": "robert.nichols@digital.cabinet-office.gov.uk",
+                        "role": "contact"
                       }
                     ],
+                    "license": {
+                      "title": "Creative Commons",
+                      "licenseURL": "https://creativecommons.org/licenses/by/4.0"
+                    },
                     "publisher": "academy-for-social-justice",
                     "securityClassification": "OFFICIAL",
                     "accessRights": "OPEN",
                     "distribution": [
                       {
+                        "title": "CSV download",
+                        "description": "Complete dataset provided as a downloadable file",
                         "accessService": ["8d085327-21b6-4d8b-9705-88faad231d23"],
                         "downloadURL": "http://example.com/path/to/file.csv",
+                        "format": "CSV file",
                         "mediaType":["text/csv"]
+                      },
+                      {
+                        "title": "Rest API",
+                        "accessURL": "http://example.com/api/",
+                        "description": "A fully queryable REST API with JSON and XML output",
+                        "format": "API"
+                      },
+                      {
+                        "title": "Web Page",
+                        "description": "A web page that provides the data, links to downloads, or documentation.",
+                        "downloadURL": "http://example.com/path/to/page",
+                        "format": "Web page",
+                        "mediaType":["text/html"]
                       }
                     ]
                   }
+
       responses:
         '201':
           description: Created
@@ -275,7 +280,6 @@ paths:
                   summary: Gets a resource that describes a dataset with a CSV file distribution.
                   value: 
                     {
-                      "identifier": "8d085327-21b6-4d8b-9705-88faad231d22",
                       "supplierIdentifier": "acme-123",
                       "modified": "2023-12-09T16:09:53+00:00",
                       "status": "Published",
@@ -296,17 +300,38 @@ paths:
                       "contactPoint": [
                         {
                           "name": "Rob Nichols",
-                          "email": "robert.nichols@digital.cabinet-office.gov.uk"
+                          "email": "robert.nichols@digital.cabinet-office.gov.uk",
+                          "role": "contact"
                         }
                       ],
+                      "license": {
+                        "title": "Creative Commons",
+                        "licenseURL": "https://creativecommons.org/licenses/by/4.0"
+                      },
                       "publisher": "academy-for-social-justice",
                       "securityClassification": "OFFICIAL",
                       "accessRights": "OPEN",
                       "distribution": [
                         {
+                          "title": "CSV download",
+                          "description": "Complete dataset provided as a downloadable file",
                           "accessService": ["8d085327-21b6-4d8b-9705-88faad231d23"],
                           "downloadURL": "http://example.com/path/to/file.csv",
+                          "format": "CSV file",
                           "mediaType":["text/csv"]
+                        },
+                        {
+                          "title": "Rest API",
+                          "accessURL": "http://example.com/api/",
+                          "description": "A fully queryable REST API with JSON and XML output",
+                          "format": "API"
+                        },
+                        {
+                          "title": "Web Page",
+                          "description": "A web page that provides the data, links to downloads, or documentation.",
+                          "downloadURL": "http://example.com/path/to/page",
+                          "format": "Web page",
+                          "mediaType":["text/html"]
                         }
                       ]
                     }
@@ -353,7 +378,8 @@ paths:
                     "contactPoint": [
                       {
                         "name": "Tom Redfern",
-                        "email": "tom.redfern@digital.cabinet-office.gov.uk"
+                        "email": "tom.redfern@digital.cabinet-office.gov.uk",
+                        "role": "contact"
                       }
                     ]
                   }
@@ -369,7 +395,6 @@ paths:
                   summary: Keyword added
                   value: 
                     {
-                      "identifier": "8d085327-21b6-4d8b-9705-88faad231d22",
                       "supplierIdentifier": "acme-123",
                       "modified": "2023-12-09T16:09:53+00:00",
                       "status": "Published",
@@ -391,17 +416,38 @@ paths:
                       "contactPoint": [
                         {
                           "name": "Rob Nichols",
-                          "email": "robert.nichols@digital.cabinet-office.gov.uk"
+                          "email": "robert.nichols@digital.cabinet-office.gov.uk",
+                          "role": "contact"
                         }
                       ],
+                      "license": {
+                        "title": "Creative Commons",
+                        "licenseURL": "https://creativecommons.org/licenses/by/4.0"
+                      },
                       "publisher": "academy-for-social-justice",
                       "securityClassification": "OFFICIAL",
                       "accessRights": "OPEN",
                       "distribution": [
                         {
+                          "title": "CSV download",
+                          "description": "Complete dataset provided as a downloadable file",
                           "accessService": ["8d085327-21b6-4d8b-9705-88faad231d23"],
                           "downloadURL": "http://example.com/path/to/file.csv",
+                          "format": "CSV file",
                           "mediaType":["text/csv"]
+                        },
+                        {
+                          "title": "Rest API",
+                          "accessURL": "http://example.com/api/",
+                          "description": "A fully queryable REST API with JSON and XML output",
+                          "format": "API"
+                        },
+                        {
+                          "title": "Web Page",
+                          "description": "A web page that provides the data, links to downloads, or documentation.",
+                          "downloadURL": "http://example.com/path/to/page",
+                          "format": "Web page",
+                          "mediaType":["text/html"]
                         }
                       ]
                     }
@@ -409,7 +455,6 @@ paths:
                   summary: Contact point name changed
                   value: 
                     {
-                      "identifier": "8d085327-21b6-4d8b-9705-88faad231d22",
                       "supplierIdentifier": "acme-123",
                       "modified": "2023-12-09T16:09:53+00:00",
                       "status": "Published",
@@ -430,17 +475,38 @@ paths:
                       "contactPoint": [
                         {
                           "name": "Tom Redfern",
-                          "email": "tom.redfern@digital.cabinet-office.gov.uk"
+                          "email": "tom.redfern@digital.cabinet-office.gov.uk",
+                          "role": "contact"
                         }
                       ],
+                      "license": {
+                        "title": "Creative Commons",
+                        "licenseURL": "https://creativecommons.org/licenses/by/4.0"
+                      },
                       "publisher": "academy-for-social-justice",
                       "securityClassification": "OFFICIAL",
                       "accessRights": "OPEN",
                       "distribution": [
                         {
+                          "title": "CSV download",
+                          "description": "Complete dataset provided as a downloadable file",
                           "accessService": ["8d085327-21b6-4d8b-9705-88faad231d23"],
                           "downloadURL": "http://example.com/path/to/file.csv",
+                          "format": "CSV file",
                           "mediaType":["text/csv"]
+                        },
+                        {
+                          "title": "Rest API",
+                          "accessURL": "http://example.com/api/",
+                          "description": "A fully queryable REST API with JSON and XML output",
+                          "format": "API"
+                        },
+                        {
+                          "title": "Web Page",
+                          "description": "A web page that provides the data, links to downloads, or documentation.",
+                          "downloadURL": "http://example.com/path/to/page",
+                          "format": "Web page",
+                          "mediaType":["text/html"]
                         }
                       ]
                     }
