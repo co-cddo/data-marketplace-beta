@@ -49,7 +49,7 @@
                     {
                         labels.Add("Data Service");
                     }
-                    else if (!labels.Contains("Dataset"))
+                    else if (dataAsset.DataAssetDistribution == null && !labels.Contains("Dataset"))
                     {
                         labels.Add("Dataset");
                     }
