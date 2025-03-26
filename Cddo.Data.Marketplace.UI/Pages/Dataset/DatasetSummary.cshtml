@@ -35,21 +35,21 @@
                 @{
                     var labels = new HashSet<string>();
 
-                    if (webpages.Any() || fileDownloads.Any())
+                    if ((webpages != null && webpages.Any()) || (fileDownloads != null && fileDownloads.Any()))
                     {
                         labels.Add("Dataset");
                     }
 
-                    if (apis.Any())
+                    if (apis != null && apis.Any())
                     {
                         labels.Add("API");
                     }
 
-                    if (!dataAsset.DataAssetDistribution.Any() && dataAsset.DataAssetType == DataAssetType.DataService)
+                    if (dataAsset.DataAssetDistribution == null && dataAsset.DataAssetType == DataAssetType.DataService)
                     {
                         labels.Add("Data Service");
                     }
-                    else if (!labels.Contains("Dataset"))
+                    else if (dataAsset.DataAssetDistribution == null && !labels.Contains("Dataset"))
                     {
                         labels.Add("Dataset");
                     }
@@ -131,7 +131,7 @@
                     </form>
                 }
 
-                @if (webpages.Any() && dataAsset?.AccessRights != "RESTRICTED")
+                @if (webpages != null && webpages.Any() && dataAsset?.AccessRights != "RESTRICTED")
                 {
                     <h2 class="govuk-heading-m">Data links</h2>
                     <ul class="govuk-list" id="accessLinks">
@@ -142,7 +142,7 @@
                     </ul>
                 }
 
-                @if (fileDownloads.Any() && dataAsset?.AccessRights != "RESTRICTED")
+                @if (fileDownloads != null && fileDownloads.Any() && dataAsset?.AccessRights != "RESTRICTED")
                 {
                     <h2 class="govuk-heading-m">Downloads</h2>
                     <dl class="govuk-summary-list govuk-summary-list--no-border" id="downloadLinks">
@@ -158,7 +158,7 @@
                     </dl>
                 }
 
-                @if (apis.Any())
+                @if (apis != null && apis.Any())
                 {
                     <h2 class="govuk-heading-m">API documentation</h2>
                     @if (dataAsset?.AccessRights == "RESTRICTED")

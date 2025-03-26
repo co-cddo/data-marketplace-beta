@@ -63,7 +63,7 @@ public class CatalogDataController : Controller
     [Route("GetCddoDataAssets")]
     public async Task<IActionResult> GetCddoDataAssets(
         string? searchText,
-        List<string> selectedTopics,
+        List<string> selectedThemes,
         List<string> selectedOrganisations,
         List<string>? selectedAccessRights,
         List<DataAssetType> selectedDataAssetTypes,
@@ -97,7 +97,7 @@ public class CatalogDataController : Controller
         var getCddoDataAssetsRequest = new GetCddoDataAssetsRequest
         {
             SearchText = searchText,
-            Themes = selectedTopics,
+            Themes = selectedThemes,
             Creator = selectedOrganisationValues,
             DataAssetTypes = selectedDataAssetTypes,
             AccessRights = selectedAccessRights,
@@ -123,7 +123,7 @@ public class CatalogDataController : Controller
 
         SetViewBagPropertiesForCddoDataAssetViewing(
             getCddoDataAssetsRequest.SearchText,
-            selectedTopics,
+            selectedThemes,
             selectedOrganisations.Count <= 0 ? [] : organisationNames,
             getCddoDataAssetsRequest.DataAssetTypes,
             getCddoDataAssetsRequest.DataAssetStatuses,
