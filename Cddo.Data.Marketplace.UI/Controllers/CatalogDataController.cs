@@ -133,6 +133,11 @@ public class CatalogDataController : Controller
             getCddoDataAssetsRequest.SortDirection,
             getCddoDataAssetsRequest.AccessRights);
 
+        //Remove the None of the above filter option
+        if (getCatalogueFilterOptions?.Topics != null)
+        {
+            getCatalogueFilterOptions?.Topics.Remove("None of the above");
+        }
 
         var datasetResultsModel = new DatasetResultsModel
         {
