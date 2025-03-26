@@ -79,7 +79,7 @@ public class SupportController : Controller
 
     private async Task<List<TagLinks>> SetEndpointLinks()
     {
-        OpenApiDocument document = await ApiCallGetSchemaDocumentAsync();
+        OpenApiDocument document = LocalGetSchemaDocumentAsync();
 
         var tags = new List<TagLinks>();
         if (document != null)
@@ -148,7 +148,7 @@ public class SupportController : Controller
         List<TagLinks> tags = await SetEndpointLinks();
         ViewData["Tags"] = tags;
 
-        OpenApiDocument document = await ApiCallGetSchemaDocumentAsync();
+        OpenApiDocument document = LocalGetSchemaDocumentAsync();
 
         // Read JSON content from the file
         //string jsonContent = System.IO.File.ReadAllText(pathToJson);
@@ -167,6 +167,11 @@ public class SupportController : Controller
     private async Task<OpenApiDocument> ApiCallGetSchemaDocumentAsync()
     {
         return await ReadOpenApiDocumentFromUrlAsync(); ;
+    }
+
+    private OpenApiDocument LocalGetSchemaDocumentAsync()
+    {
+        return ReadLocalApiDocument(); ;
     }
 
     private IActionResult SetDetails(OpenApiPathItem pathItem, string apiPath, string OperationId)
@@ -200,5 +205,19 @@ public class SupportController : Controller
         }
 
         return openApiDocument;
+    }
+
+    private static OpenApiDocument ReadLocalApiDocument()
+    {
+        var pathToJson = Directory.GetCurrentDirectory() + "/Pages/Support/metadata-management-api.yml";
+        using var streamReader = new StreamReader(pathToJson);
+        var reader = new OpenApiStreamReader();
+        var document = reader.Read(streamReader.BaseStream, out var diagnostic);
+        if (diagnostic.Errors.Count > 0)
+        {
+            throw new InvalidOperationException($"Parsing errors: {string.Join(", ", diagnostic.Errors)}");
+        }
+
+        return document;
     }
 }
