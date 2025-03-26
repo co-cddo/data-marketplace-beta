@@ -14,20 +14,7 @@
 
     var themes = Model.Topics;
     var organisations = Model.Organisations;
-    var accessRights = Model.AccessRights;
-
-    var sortOption = Context.Request.Query["sortOption"].ToString();
-    if (!string.IsNullOrEmpty(sortOption) && sortOption.Contains('|'))
-    {
-        var sortParts = sortOption.Split('|');
-        ViewData["SortField"] = Enum.Parse(typeof(DataAssetsSortField), sortParts[0]);
-        ViewData["SortDirection"] = Enum.Parse(typeof(DataAssetsSortDirection), sortParts[1]);
-    }
-    else
-    {
-        ViewData["SortField"] = DataAssetsSortField.Relevance;
-        ViewData["SortDirection"] = DataAssetsSortDirection.Descending;
-    }
+    var accessRights = Model.AccessRights;    
 
     var totalNumberOfPages = (int)Math.Ceiling((double)totalNumberOfResults / ViewBag.NumberOfRecords);
     var currentPageNumber = Math.Max(1, Math.Min(ViewBag.PageNumber, totalNumberOfPages));

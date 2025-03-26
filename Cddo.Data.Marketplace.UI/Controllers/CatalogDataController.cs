@@ -78,13 +78,6 @@ public class CatalogDataController : Controller
 
         if (!User.Identity!.IsAuthenticated) return RedirectToPage(AccessDeniedPage);
 
-        if (string.IsNullOrWhiteSpace(sortOption))
-        {
-            sortOption = string.IsNullOrWhiteSpace(searchText)
-                ? $"{DataAssetsSortField.UpdatedOn}|{DataAssetsSortDirection.Descending}"
-            : $"{DataAssetsSortField.Relevance}|{DataAssetsSortDirection.Descending}";
-        }
-
         var sortOptions = DetermineSortOptions();
 
         var organisations = await _catalogDataService.GetCddoOrganisationsAsync(
@@ -105,7 +98,7 @@ public class CatalogDataController : Controller
             SortField = sortOptions.SortField,
             SortDirection = sortOptions.SortDirection,
             StartRecordIndex = 0,
-            NumberOfRecords =20,
+            NumberOfRecords = 20,
             PageNumber = selectedPageNumber ?? 1
         };
 
@@ -201,14 +194,21 @@ public class CatalogDataController : Controller
 
         SortOptions DetermineSortOptions()
         {
-            // If sort options have been provided then use them
-            if (!string.IsNullOrWhiteSpace(sortOption)) return ExtractSortOptions(sortOption);
-
-            // No sort options have been provided.  If a search term has been entered then sort by the relevancy to that search term
             if (!string.IsNullOrWhiteSpace(searchText))
-                return new SortOptions { SortField = DataAssetsSortField.Relevance, SortDirection = DataAssetsSortDirection.Descending };
+            {
+                if (string.IsNullOrWhiteSpace(sortOption))
+                {
+                    return new SortOptions { SortField = DataAssetsSortField.Relevance, SortDirection = DataAssetsSortDirection.Descending };
+                }
 
-            // No sort options have been provided, and no search term has been entered.  Sort by modification date, newest first
+                return ExtractSortOptions(sortOption);
+            }
+
+            if (!string.IsNullOrWhiteSpace(sortOption))
+            {
+                return ExtractSortOptions(sortOption);
+            }
+
             return new SortOptions { SortField = DataAssetsSortField.UpdatedOn, SortDirection = DataAssetsSortDirection.Descending };
         }
     }
