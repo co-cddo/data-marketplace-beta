@@ -35,7 +35,7 @@
                 @{
                     var labels = new HashSet<string>();
 
-                    if ((webpages != null && webpages.Any()) || (fileDownloads != null && fileDownloads.Any()))
+                    if (webpages != null && webpages.Any() || fileDownloads != null && fileDownloads.Any())
                     {
                         labels.Add("Dataset");
                     }
@@ -45,7 +45,7 @@
                         labels.Add("API");
                     }
 
-                    if (dataAsset.DataAssetDistribution == null && dataAsset.DataAssetType == DataAssetType.DataService)
+                    if ((dataAsset.DataAssetDistribution == null || !dataAsset.DataAssetDistribution.Any()) && dataAsset.DataAssetType == DataAssetType.DataService)
                     {
                         labels.Add("Data Service");
                     }
