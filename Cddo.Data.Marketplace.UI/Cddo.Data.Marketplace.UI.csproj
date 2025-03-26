@@ -78,4 +78,10 @@
 	<ItemGroup>
 	  <_ContentIncludedByDefault Remove="Pages\Manage\RequestAccess\OrganisationConfirmation.cshtml" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Pages\Support\metadata-management-api.yml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 </Project>
