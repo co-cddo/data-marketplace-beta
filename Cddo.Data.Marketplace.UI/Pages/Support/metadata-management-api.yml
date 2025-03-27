@@ -51,9 +51,11 @@ paths:
           in: query
           description: >-
               This is your search term. The system will look for matches against these fields:
-            
+
               - title
+  
               - keywords
+              
               - supplier identifier
 
           required: false
