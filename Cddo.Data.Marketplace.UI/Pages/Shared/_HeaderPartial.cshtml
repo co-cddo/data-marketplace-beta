@@ -3,7 +3,7 @@
 @inject IOptions<HotjarSettings> HotjarConfig
 @model HeaderPartialModel
 @{
-    var rootUrl = Context.Request.Scheme + "://" + Context.Request.Host.Value;
+    var rootUrl = Model.BaseUrl;
 }
 <header class="govuk-header govuk-header--full-width-border" data-module="govuk-header" data-govuk-header-init="">
     <div class="govuk-header__container govuk-width-container">

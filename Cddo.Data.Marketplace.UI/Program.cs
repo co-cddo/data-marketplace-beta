@@ -233,6 +233,7 @@ builder.Services.AddAuthentication(options =>
                     var eventProperties = await AuditUtility.ParseResponseToDictionary(signedin);
                     _logger.LogUserEvent(UserEvent.UserLogin, "Login", "CDDO", eventProperties);
                 }
+
             }
         },
         OnAuthenticationFailed = context =>
@@ -325,7 +326,18 @@ app.UseForwardedHeaders();
 var appLifetimeService = app.Services.GetRequiredService<AppLifeTimeService>();
 
 appLifetimeService.StartupTime = DateTime.UtcNow;
+var baseUrl = builder.Configuration["BaseUrl"].TrimEnd('/');
+app.Use(async (context, next) =>
+{
+    context.Response.Cookies.Append("BaseUrl", baseUrl, new CookieOptions
+    {
+        Expires = DateTimeOffset.UtcNow.AddDays(1),
+        HttpOnly = true,
+        Secure = context.Request.IsHttps
+    });
 
+    await next();
+});
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -476,6 +488,17 @@ app.Use(async (context, next) =>
         ".AspNet.ApplicationCookie", 
         ".AspNet.Cookies"         
     };
+
+
+    //Append the base url cookie
+    var baseUrl = builder.Configuration["BaseUrl"].TrimEnd('/'); // Remove any trailing slash from BaseUrl
+    context.Response.Cookies.Append("BaseUrl", baseUrl, new CookieOptions
+    {
+        Expires = DateTimeOffset.UtcNow.AddDays(1), // Set the cookie expiration date
+        HttpOnly = true, // Prevents client-side JavaScript from accessing the cookie
+        Secure = context.Request.IsHttps // Ensures the cookie is sent only over HTTPS
+    });
+    await next();
 
     var customCookie = context.Request.Cookies["CO-Datamarketplace"];
     bool customCookieExists = !string.IsNullOrEmpty(customCookie);
