@@ -3,6 +3,7 @@
 @using Cddo.Data.Marketplace.UI.Pages.Shared
 @{
     var pageTitle = ViewData["Title"]?.ToString() ?? "Support";
+    var baseUrl = Context.Request.Cookies["BaseUrl"];
 }
 
 <!DOCTYPE html>
@@ -13,7 +14,7 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    @await Html.PartialAsync("_HeaderPartial", new HeaderPartialModel())
+    @await Html.PartialAsync("_HeaderPartial", new HeaderPartialModel(baseUrl))
     @await Html.PartialAsync("_NavbarPartial", new NavbarPartialModel())
 
     <main role="main" id="main-content">

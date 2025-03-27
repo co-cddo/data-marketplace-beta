@@ -3,7 +3,8 @@
 @using Microsoft.Extensions.Options
 @inject IOptions<HotjarSettings> HotjarConfig
 @{
-    var pageTitle = ViewData["Title"]?.ToString() ?? "Main";   
+    var pageTitle = ViewData["Title"]?.ToString() ?? "Main";
+    var baseUrl = Context.Request.Cookies["BaseUrl"];
 }
 
 @{
@@ -35,7 +36,7 @@
         </noscript>
         <!-- End Google Tag Manager (noscript) -->
     }
-    @await Html.PartialAsync("_HeaderPartial", new HeaderPartialModel())
+    @await Html.PartialAsync("_HeaderPartial", new HeaderPartialModel(baseUrl))
     @await Html.PartialAsync("_NavbarPartial", new NavbarPartialModel())
 
     <main role="main" id="main-content">
