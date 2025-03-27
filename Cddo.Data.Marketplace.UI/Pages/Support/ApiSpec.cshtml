@@ -179,10 +179,10 @@
     </h1>
     <div class="govuk-body">@Html.Raw(Markdown.ToHtml(Model.Operation.Value.Description))</div>
     <p class="govuk-body">
-        <strong class="govuk-tag">
-            @Model.Operation.Key
+        <strong class="govuk-tag govuk-tag--blue">
+            @Model.Operation.Key.ToString().ToUpper()
         </strong>
-        <code>
+        <code class="govuk-body">
             @Model.OperationPath
         </code>
     </p>
@@ -476,7 +476,10 @@
     .govuk-tag {
         text-transform: none !important;
         font-size: 1.1875rem !important;
-        line-height: 1.3157894737 !important;
+    }
+
+    a {
+        color: #1d70b8;
     }
 </style>
 
