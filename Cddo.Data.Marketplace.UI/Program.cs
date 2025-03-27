@@ -24,8 +24,6 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Cddo.Data.Marketplace.UI.Controllers;
 using static Cddo.Data.Marketplace.Audit.EventTypes;
 using Cddo.Data.Marketplace.UI.Model;
-using IdentityModel;
-using NPOI.OpenXmlFormats.Spreadsheet;
 
 var builder = WebApplication.CreateBuilder(args);
 
