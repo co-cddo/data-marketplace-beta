@@ -24,8 +24,7 @@
     <link rel="stylesheet" href="~/css/dataset-detail.min.css" />
 }
 
-<a class="govuk-back-link" asp-controller="CatalogData"
-   asp-action="@nameof(CatalogDataController.GetCddoDataAssets)">Back</a>
+<a class="govuk-back-link" href="javascript:window.history.back()">Back</a>
 
 @if (dataAsset != null)
 {
@@ -49,7 +48,7 @@
                     {
                         labels.Add("Data Service");
                     }
-                    else if (dataAsset.DataAssetDistribution == null && !labels.Contains("Dataset"))
+                    else if ((dataAsset.DataAssetDistribution == null || !dataAsset.DataAssetDistribution.Any()) && !labels.Contains("Dataset") && dataAsset.DataAssetType == DataAssetType.DataSet)
                     {
                         labels.Add("Dataset");
                     }
