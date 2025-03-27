@@ -177,7 +177,7 @@
     <h1 class="govuk-heading-xl">
         @Model.Title
     </h1>
-    <p class="govuk-body">@Html.Raw(Markdown.ToHtml(Model.Operation.Value.Description))</p>
+    <div class="govuk-body">@Html.Raw(Markdown.ToHtml(Model.Operation.Value.Description))</div>
     <p class="govuk-body">
         <strong class="govuk-tag">
             @Model.Operation.Key
@@ -206,7 +206,7 @@
                             @param.Schema.Type.ToLower()
                         </strong>
                         <div class="govuk-body">
-                            <p class="govuk-body">@Html.Raw(Markdown.ToHtml(param.Description))</p>
+                            <div class="govuk-body">@Html.Raw(Markdown.ToHtml(param.Description))</div>
                         </div>
                     </dd>
                 </div>
@@ -220,7 +220,7 @@
         </h2>
         var schema = Model.Operation.Value.RequestBody.Content["application/json"].Schema;
 
-        var properties = schema.Properties; 
+        var properties = schema.Properties;
 
         <dl class="govuk-summary-list">
 
@@ -236,9 +236,9 @@
 
                             @if (schema.Required != null && schema.Required.Contains(name.Key))
                             {
-                                    <strong class="govuk-tag govuk-tag--green govuk-!-margin-top-1">
-                                        required
-                                    </strong>
+                                <strong class="govuk-tag govuk-tag--green govuk-!-margin-top-1">
+                                    required
+                                </strong>
                             }
                         </dt>
 
@@ -282,7 +282,7 @@
                                     </p>
                                 }
 
-                                <p class="govuk-body">@Html.Raw(Markdown.ToHtml(property.Description ?? ""))</p>
+                                <div class="govuk-body">@Html.Raw(Markdown.ToHtml(property.Description ?? ""))</div>
 
                                 if (property.Items != null && property.Items.Type == "object")
                                 {
@@ -327,7 +327,7 @@
                                         }
                                     </p>
 
-                                    <p class="govuk-body">@Html.Raw(Markdown.ToHtml(subProperty.Description ?? ""))</p>
+                                    <div class="govuk-body">@Html.Raw(Markdown.ToHtml(subProperty.Description ?? ""))</div>
                                 }
                             }
                         </dd>
@@ -355,10 +355,10 @@
 
             @foreach (var exampleName in examples)
             {
-                <p class="govuk-body">@Html.Raw(Markdown.ToHtml(exampleName.Value.Summary))</p>
+                <div class="govuk-body">@Html.Raw(Markdown.ToHtml(exampleName.Value.Summary))</div>
                 <pre style="max-width:100%; overflow: auto; border: 10px solid #eee; padding: 10px; font-size: 1rem;">
                 <code>@Safe(Dump(exampleName.Value, 2));</code>
-                                                                        </pre>
+                                                                                                </pre>
             }
         }
     }
@@ -373,7 +373,7 @@
             @response.Key
         </h3>
 
-        <p class="govuk-body">@Html.Raw(Markdown.ToHtml(response.Value.Description))</p>
+        <div class="govuk-body">@Html.Raw(Markdown.ToHtml(response.Value.Description))</div>
 
         if (response.Value.Content.Any())
         {
@@ -417,7 +417,7 @@
                                         <strong class="govuk-tag govuk-tag--yellow govuk-!-margin-bottom-2">
                                             array of strings
                                         </strong>
-                                    }                                    
+                                    }
                                     else if (type == null && property.AnyOf != null)
                                     {
                                         <strong class="govuk-tag govuk-tag--yellow govuk-!-margin-bottom-2">
@@ -431,9 +431,9 @@
                                         </strong>
                                     }
 
-                                    <p class="govuk-body">
+                                    <div class="govuk-body">
                                         @Html.Raw(Markdown.ToHtml(property.Description ?? ""))
-                                    </p>
+                                    </div>
                                 }
 
                             </dd>
@@ -463,13 +463,20 @@
 
                 @foreach (var exampleName in examples)
                 {
-                    <p class="govuk-body">@Html.Raw(Markdown.ToHtml(exampleName.Value.Summary))</p>
+                    <div class="govuk-body">@Html.Raw(Markdown.ToHtml(exampleName.Value.Summary))</div>
 
-                        <pre style="max-width:100%; overflow: auto; border: 10px solid #eee; padding: 10px; font-size: 1rem;">
-                        <code>@Safe(Dump(exampleName.Value.Value, 2));</code></pre>
+                    <pre style="max-width:100%; overflow: auto; border: 10px solid #eee; padding: 10px; font-size: 1rem;">
+                    <code>@Safe(Dump(exampleName.Value.Value, 2));</code></pre>
                 }
             }
         }
     }
 </div>
+<style scoped>
+    .govuk-tag {
+        text-transform: none !important;
+        font-size: 1.1875rem !important;
+        line-height: 1.3157894737 !important;
+    }
+</style>
 
