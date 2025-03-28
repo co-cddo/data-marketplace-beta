@@ -175,7 +175,7 @@ public class DataDescriptionController : Controller
 
         try
         {
-            response = await _catalogQuestionsService.UpdateDataAssetStatusAsync(dataAssetId.ToString(), dataAssetStatus, dataAssetType);
+            response = await _catalogQuestionsService.UpdateDataAssetStatusPublishAsync(dataAssetId.ToString(), dataAssetStatus, dataAssetType);
         }
         catch (UnauthorizedAccessException)
         {
