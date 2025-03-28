@@ -27,10 +27,25 @@ namespace Cddo.Data.Marketplace.UI.Controllers
         {
             return View("~/Pages/Manage/RequestAccess/ManageOrganisationAccess.cshtml");
         }
-
+        public void validateOrgAccessResponse(OrganisationAccessResponse response)
+        {
+            if (response.OrganisationName == null)
+            {
+                ModelState.AddModelError(nameof(OrganisationAccessResponse.OrganisationName), "The OrganisationName field is required. ");
+            }           
+            if (response.DomainName == null)
+            {
+                ModelState.AddModelError(nameof(OrganisationAccessResponse.DomainName), "The DomainName field is required. ");
+            }            
+            if (response.OrganisationType == null)
+            {
+                ModelState.AddModelError(nameof(OrganisationAccessResponse.OrganisationType), "The OrganisationType field is required. ");
+            }
+        }
         [Route("UpdateRequest")]
         public async Task<IActionResult> UpdateOrganisationRequest(OrganisationAccessResponse organisationAccessResponse)
         {
+            validateOrgAccessResponse(organisationAccessResponse);
             if (!ModelState.IsValid)
             {
                 var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
