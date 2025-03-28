@@ -28,19 +28,13 @@
                 </div>
             </div>
             <div class="govuk-button-group">
-                <form asp-controller="Cookie" asp-action="@nameof(CookieController.ApplyCookiesAcceptanceDecisionFromBanner)" method="post" asp-route-AcceptAllCookiesDecision="True">
-                    <button type="submit" class="govuk-button" data-module="govuk-button">
-                        Accept cookies
-                    </button>
-                </form>
-
-                <form asp-controller="Cookie" asp-action="@nameof(CookieController.ApplyCookiesAcceptanceDecisionFromBanner)" method="post" asp-route-AcceptAllCookiesDecision="False">
-                    <button type="submit" class="govuk-button" data-module="govuk-button">
-                        Reject cookies
-                    </button>
-                </form>
-
-                <a class="govuk-link" asp-controller="About" asp-action="Cookies">View cookies</a>
+                <a asp-controller="Cookie" asp-action="@nameof(CookieController.ApplyCookiesAcceptanceDecisionFromBanner)" method="post" asp-route-AcceptAllCookiesDecision="True" class="govuk-button" data-module="govuk-button">
+                    Accept cookies
+                </a>
+                <a class="govuk-button" asp-controller="Cookie" asp-action="@nameof(CookieController.ApplyCookiesAcceptanceDecisionFromBanner)" method="post" asp-route-AcceptAllCookiesDecision="False" data-module="govuk-button">
+                    Reject cookies
+                </a>
+                <a class="govuk-link" asp-controller="Link" asp-action="@nameof(LinkController.Cookies)">View cookies</a>
             </div>
         </div>
     </div>
@@ -48,7 +42,7 @@
 
 @if (cookiesWereAccepted)
 {
-   <section class="govuk-cookie-banner" data-nosnippet aria-live="polite">
+    <section class="govuk-cookie-banner" data-nosnippet aria-live="polite">
         <div class="govuk-cookie-banner__message govuk-width-container" id="accept-cookie-confirmation">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
@@ -69,7 +63,7 @@
 }
 else if (cookiesWereRejected)
 {
-   <section class="govuk-cookie-banner" data-nosnippet aria-live="polite">
+    <section class="govuk-cookie-banner" data-nosnippet aria-live="polite">
         <div class="govuk-cookie-banner__message govuk-width-container" id="reject-cookie-confirmation">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
