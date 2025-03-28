@@ -95,11 +95,6 @@ public class CatalogDataDescriptionController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddDataDescriptionMethodSubmit(NewDataDescriptionMethod? method)
     {
-        if (!ModelState.IsValid)
-        {
-            return RedirectToPage("/Error/400");
-        }
-
         if (!await UserHasRequiredRoleAsync()) return RedirectToPage("/Index");
 
         if (method is not null)
@@ -112,8 +107,7 @@ public class CatalogDataDescriptionController(
                 _ => ViewOrRedirect("~/Pages/DataDescription/AddNewDataDescription.cshtml")
             };
         ModelState.AddModelError("dataDescriptionMethod", "Select how you want to add your data description");
-        return ViewOrRedirect("~/Pages/DataDescription/Manual/SecurityClassification.cshtml");
-
+        return await SecureActionAsync("~/Pages/DataDescription/AddNewDataDescription.cshtml");
     }
 
     [Route("api/start")]
