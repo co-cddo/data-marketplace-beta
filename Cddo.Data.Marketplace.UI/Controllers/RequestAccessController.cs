@@ -2,6 +2,7 @@
 using Cddo.Data.Marketplace.Logic.Services.Interfaces;
 using Cddo.Data.Marketplace.UI.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace Cddo.Data.Marketplace.UI.Controllers
 {
@@ -27,21 +28,32 @@ namespace Cddo.Data.Marketplace.UI.Controllers
         {
             return View("~/Pages/Manage/RequestAccess/ManageOrganisationAccess.cshtml");
         }
+        static bool IsValidDomain(string domain)
+        {
+            string pattern = @"^(?!:\/\/)([a-zA-Z0-9-_]+\.)+[a-zA-Z]{2,}$";
+            return Regex.IsMatch(domain, pattern);
+        }
+
         public void validateOrgAccessResponse(OrganisationAccessResponse response)
         {
             if (response.OrganisationName == null)
             {
                 ModelState.AddModelError(nameof(OrganisationAccessResponse.OrganisationName), "The OrganisationName field is required. ");
-            }           
+            }
             if (response.DomainName == null)
             {
                 ModelState.AddModelError(nameof(OrganisationAccessResponse.DomainName), "The DomainName field is required. ");
-            }            
+            }
+            else if (!IsValidDomain(response.DomainName))
+            {
+                ModelState.AddModelError(nameof(OrganisationAccessResponse.DomainName), "Enter a Valid Domain. ");
+            }
             if (response.OrganisationType == null)
             {
                 ModelState.AddModelError(nameof(OrganisationAccessResponse.OrganisationType), "The OrganisationType field is required. ");
             }
         }
+
         [Route("UpdateRequest")]
         public async Task<IActionResult> UpdateOrganisationRequest(OrganisationAccessResponse organisationAccessResponse)
         {
