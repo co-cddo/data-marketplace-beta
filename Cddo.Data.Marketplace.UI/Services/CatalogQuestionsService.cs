@@ -85,7 +85,48 @@ public class CatalogQuestionsService : ICatalogQuestionsService
 
             if (!string.IsNullOrEmpty(token))
             {
+                request.ManagementMetadata = new ManagementMetadataDcatUkApV3_1
+                {
+                    DataAssetStatus = DataAssetStatus.Draft,
+                };
 
+                request.ActionSource = DataAssetActionSourceEnum.UserInterface;
+
+                var url = _apiUrl.AppendPathSegments(BaseRoute, "patch-profiled-data-asset").WithOAuthBearerToken(token);
+
+                var response = await url.PatchJsonAsync(request, cancellationToken: cancellationToken);
+
+                return await response.GetJsonAsync<T>();
+            }
+        }
+        catch (FlurlHttpException ex)
+        {
+            var statusCode = ex.StatusCode;
+
+            if (statusCode == (int)HttpStatusCode.Forbidden)
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            var exceptionText = ex.Message;
+            var responseText = await ex.GetResponseStringAsync();
+            throw new InvalidOperationException($"Flurl Exception thrown performing CKAN Catalog lookup action: Status Code: {statusCode}, Text: {responseText}, Exception: {exceptionText}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+        }
+        return default;
+    }
+    
+    private async Task<T?> MakeApiPatchRequestPublishAsync<T>(PatchProfiledDataAssetRequest request, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var token = await GetTokenAsync();
+
+            if (!string.IsNullOrEmpty(token))
+            {
                 request.ActionSource = DataAssetActionSourceEnum.UserInterface;
 
                 var url = _apiUrl.AppendPathSegments(BaseRoute, "patch-profiled-data-asset").WithOAuthBearerToken(token);
@@ -186,6 +227,7 @@ public class CatalogQuestionsService : ICatalogQuestionsService
     {
         var request = new PatchProfiledDataAssetRequest
         {
+
             ProfileId = _profileId,
             DataAssetType = dataAssetType,
             Payload = JsonSerializer.Serialize(questionKeywordRequest)
@@ -321,6 +363,20 @@ public class CatalogQuestionsService : ICatalogQuestionsService
             Payload = JsonSerializer.Serialize(new { Identifier = identifier })
         };
         return await MakeApiPatchRequestAsync<PatchProfiledDataAssetResponse>(request);
+    }
+    public async Task<PatchProfiledDataAssetResponse?> UpdateDataAssetStatusPublishAsync(string identifier, DataAssetStatus dataAssetStatus, DataAssetType dataAssetType)
+    {
+        var request = new PatchProfiledDataAssetRequest
+        {
+            ProfileId = _profileId,
+            DataAssetType = dataAssetType,
+            ManagementMetadata = new ManagementMetadataDcatUkApV3_1
+            {
+                DataAssetStatus = dataAssetStatus
+            },
+            Payload = JsonSerializer.Serialize(new { Identifier = identifier })
+        };
+        return await MakeApiPatchRequestPublishAsync<PatchProfiledDataAssetResponse>(request);
     }
 
     public async Task<PatchProfiledDataAssetResponse?> UpdateLicenceAsync(QuestionLicenceRequest questionLicenceRequest, DataAssetType dataSet)
