@@ -95,11 +95,6 @@ public class CatalogDataDescriptionController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddDataDescriptionMethodSubmit(NewDataDescriptionMethod? method)
     {
-        if (!ModelState.IsValid)
-        {
-            return RedirectToPage("/Error/400");
-        }
-
         if (!await UserHasRequiredRoleAsync()) return RedirectToPage("/Index");
 
         if (method is not null)
@@ -112,8 +107,7 @@ public class CatalogDataDescriptionController(
                 _ => ViewOrRedirect("~/Pages/DataDescription/AddNewDataDescription.cshtml")
             };
         ModelState.AddModelError("dataDescriptionMethod", "Select how you want to add your data description");
-        return ViewOrRedirect("~/Pages/DataDescription/Manual/SecurityClassification.cshtml");
-
+        return await SecureActionAsync("~/Pages/DataDescription/AddNewDataDescription.cshtml");
     }
 
     [Route("api/start")]
@@ -787,19 +781,24 @@ public class CatalogDataDescriptionController(
     [HttpPost("Add-Data-Owner")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddDataOwnerSubmit(Contact contact, string? identifier, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
-    {
+    {      
+        QuestionContactPointRequest questionContactPoint = new() { Identifier = identifier, ContactPoint = new List<Contact> { contact } };
+
+        if (!string.IsNullOrEmpty(contact.Email) && !Regex.IsMatch(contact.Email, _emailValidator.CddoEmailAddressRegex.ToString()))
+        {
+            ModelState.AddModelError(nameof(contact.Email), "Email is invalid");
+        }
+        if (string.IsNullOrEmpty(contact.Name) && !string.IsNullOrEmpty(contact.Email))
+        {
+            ModelState.AddModelError(nameof(contact.Name), "Please enter a name to continue");
+        }
+
         if (!ModelState.IsValid)
         {
-            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            ViewBag.isEditMode = isEditMode;
 
-            if (validationErrors.Count() > 0)
-            {
-                _insightsLogger.LogEvent(EventTypes.MetadataEvent.MetadataEdited, new Dictionary<string, string>
-                {
-                    { LogValidationErrors, string.Join(", ", validationErrors) },
-                    { "contact", contact.Email }
-                });
-            }
+            insightsLogger.LogWarning("Model state is invalid for AddDataOwnerSubmit.");
+            return ViewOrRedirect(DataOwnerViewPath, questionContactPoint);
         }
 
         var questionContactPointRequest = new QuestionContactPointRequest
