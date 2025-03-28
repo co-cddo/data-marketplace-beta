@@ -29,10 +29,10 @@
             </div>
             <div class="govuk-button-group">
                 <a asp-controller="Cookie" asp-action="@nameof(CookieController.ApplyCookiesAcceptanceDecisionFromBanner)" method="post" asp-route-AcceptAllCookiesDecision="True" class="govuk-button" data-module="govuk-button">
-                    Accept cookies
+                    Accept analytics cookies
                 </a>
                 <a class="govuk-button" asp-controller="Cookie" asp-action="@nameof(CookieController.ApplyCookiesAcceptanceDecisionFromBanner)" method="post" asp-route-AcceptAllCookiesDecision="False" data-module="govuk-button">
-                    Reject cookies
+                    Reject analytics cookies
                 </a>
                 <a class="govuk-link" asp-controller="Link" asp-action="@nameof(LinkController.Cookies)">View cookies</a>
             </div>
