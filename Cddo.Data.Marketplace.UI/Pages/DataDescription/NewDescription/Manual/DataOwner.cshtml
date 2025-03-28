@@ -5,6 +5,9 @@
 @model Cddo.Data.Marketplace.Api.Dto.Requests.Catalog.Questions.QuestionContactPointRequest
 @{
     ViewData["Title"] = "Data Owner";
+    var errorMessage = ViewData.ModelState[nameof(Contact.Email)]?.Errors?.FirstOrDefault()?.ErrorMessage;
+    var errorMessageName = ViewData.ModelState[nameof(Contact.Name)]?.Errors?.FirstOrDefault()?.ErrorMessage;
+
     bool isCheckList = Convert.ToBoolean(ViewBag.isCheckList ?? false);
     bool isCheckAnswers = Convert.ToBoolean(ViewBag.isCheckAnswers ?? false);
     bool isEditMode = string.Equals(ViewBag.isEditMode?.ToString(), "true", StringComparison.OrdinalIgnoreCase);
@@ -46,18 +49,31 @@
 
             <form asp-controller="CatalogDataDescription" asp-action="@nameof(CatalogDataDescriptionController.AddDataOwnerSubmit)" asp-route-isEditMode="@isEditMode.ToString().ToLower()">
                 <input type="hidden" name="identifier" value="@Model.Identifier" />
+                @await Html.PartialAsync("_ErrorSummaryPartial", ViewData.ModelState)
                 <input hidden name="@nameof(Contact.Role)" value="@nameof(ContactRoleEnum.Owner)" />
-                <div class="govuk-form-group">
+                <div class="govuk-form-group @(ViewData.ModelState[nameof(Contact.Name)]?.Errors.Any() == true ? "govuk-form-group--error" : "")">
                     <label class="govuk-label fw-bold" for="ContactName">
                         Name
                     </label>
-                    <input class="govuk-input" id="ContactName" name="@nameof(Contact.Name)" type="text" autocomplete="name" value="@dataOwner?.FirstOrDefault()?.Name">
+                    @if (ViewData.ModelState[nameof(Contact.Name)]?.Errors.Any() == true)
+                    {
+                        <p id="metadataTitle-error" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> @errorMessageName
+                        </p>
+                    }
+                    <input class="govuk-input @(ViewData.ModelState[nameof(Contact.Name)]?.Errors.Any() == true ? "govuk-input--error" : "")" id="ContactName" name="@nameof(Contact.Name)" type="text" autocomplete="name" value="@dataOwner?.FirstOrDefault()?.Name">
                 </div>
-                <div class="govuk-form-group">
+                <div class="govuk-form-group @(ViewData.ModelState[nameof(Contact.Email)]?.Errors.Any() == true ? "govuk-form-group--error" : "")">
                     <label class="govuk-label fw-bold" for="ContactEmail">
                         Email address
                     </label>
-                    <input class="govuk-input" id="ContactEmail" name="@nameof(Contact.Email)" type="email" autocomplete="email" value="@dataOwner?.FirstOrDefault()?.Email">
+                    @if (ViewData.ModelState[nameof(Contact.Email)]?.Errors.Any() == true)
+                    {
+                        <p id="metadataTitle-error" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> @errorMessage
+                        </p>
+                    }
+                    <input class="govuk-input @(ViewData.ModelState[nameof(Contact.Email)]?.Errors.Any() == true ? "govuk-input--error" : "")" id="ContactEmail" name="@nameof(Contact.Email)" type="email" autocomplete="email" value="@dataOwner?.FirstOrDefault()?.Email">
                 </div>
 
                 <div class="govuk-button-group">
