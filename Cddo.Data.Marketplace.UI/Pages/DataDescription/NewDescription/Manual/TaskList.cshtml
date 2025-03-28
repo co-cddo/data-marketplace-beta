@@ -94,10 +94,25 @@
                     Draft listing
                 </span>
             }
-      
+
             <h1 class="govuk-heading-l">
                 @dataAsset.Title
             </h1>
+            @if (dataAsset.DataAssetStatus == DataAssetStatus.Published)
+            {
+                <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                    <div class="govuk-notification-banner__header">
+                    <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                        Important
+                    </h2>
+                </div>
+                <div class="govuk-notification-banner__content">
+                    <p class="govuk-notification-banner__heading">
+                            This record is currently published. If you edit any field it will be changed to a draft until republished.
+                    </p>
+                </div>
+            </div>
+            }
 
             @* General Section *@
             <h3 class="govuk-heading-m">General</h3>
