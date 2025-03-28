@@ -167,6 +167,20 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             var result = await _controller.UpdateOrganisationRequest(mockResult);
 
             // Assert
+            Assert.That(result, Is.InstanceOf<ViewResult>());
+        }
+        [Test]
+        public async Task UpdateOrganisationRequest_UserNotAuthenticated()
+        {
+            //Arrange
+            SetAuthenticatedUser(false);
+
+            var mockResult = _fixture.Create<OrganisationAccessResponse>();
+
+            // Act
+            var result = await _controller.UpdateOrganisationRequest(mockResult);
+
+            // Assert
             Assert.That(result, Is.InstanceOf<RedirectToPageResult>());
         }
 
