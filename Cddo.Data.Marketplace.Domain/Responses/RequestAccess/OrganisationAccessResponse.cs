@@ -3,10 +3,10 @@
     public class OrganisationAccessResponse
     {
         public int? OrganisationRequestID { get; set; }
-        public string? OrganisationName { get; set; }
-        public OrganisationType? OrganisationType { get; set; }
+        public string OrganisationName { get; set; }
+        public OrganisationType OrganisationType { get; set; }
         public string? OrganisationFormat { get; set; }
-        public string? DomainName { get; set; }
+        public string DomainName { get; set; }
         public string? UserName { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
