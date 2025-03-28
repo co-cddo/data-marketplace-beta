@@ -99,11 +99,11 @@
             }
 
             <div class="govuk-grid-column-two-thirds">
-                <span class="govuk-caption-l">Request ID: @answersSummary.RequestId</span>
+                <span class="govuk-caption-l">Draft data request</span>
 
                 @if (@requestCanBeModified)
                 {
-                    <h1 class="govuk-heading-l">Check your answers before sending your application</h1>
+                    <h1 class="govuk-heading-l">Check your answers before submitting your request</h1>
                 }
             </div>
 
@@ -204,12 +204,12 @@
                             <form method="post" novalidate>
                                 @if (@requestCanBeModified)
                                 {
-                                    <h2 class="govuk-heading-m">Now send your application</h2>
+                                   @*  <h2 class="govuk-heading-m">Now send your application</h2>
                                     <p class="govuk-body">By submitting this application you are confirming that, to the best of your knowledge, the details you are providing are correct.</p>
-
+ *@
                                     <input type="hidden" name="answers-checked" value="true">
                                     <button type="submit" class="govuk-button" data-module="govuk-button" asp-controller="DataRequest" asp-action="RequestSubmitDataShareRequest" asp-route-requestId="@dataShareRequestId">
-                                        Accept and send
+                                        Submit data request
                                     </button>
                                 }
 
@@ -220,10 +220,10 @@
                                     </button>
                                 }
 
-                                @if (@requestCanBeModified)
+                              @*   @if (@requestCanBeModified)
                                 {
                                     <a class="govuk-link" asp-controller="DataRequest" asp-action="RequestTasks" asp-route-requestId="@dataShareRequestId">Return to summary</a>
-                                }
+                                } *@
 
                             </form>
                         </div>
