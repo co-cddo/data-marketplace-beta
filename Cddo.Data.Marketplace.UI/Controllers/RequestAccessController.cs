@@ -39,6 +39,7 @@ namespace Cddo.Data.Marketplace.UI.Controllers
                 {
                     _logger.LogError("UpdateRequest validation errors: {ValidationErrors}", string.Join("; ", validationErrors));
                 }
+                return View("~/Pages/Manage/RequestAccess/EditOrganisation.cshtml", organisationAccessResponse);
             }
 
             if (User.Identity!.IsAuthenticated)
