@@ -11,6 +11,7 @@
 
     // Check if all necessary cookies are accepted
     var allCookiesAccepted = analyticsCookiesAreAccepted && siteSettingsCookiesAreAccepted;
+    var baseUrl = Context.Request.Cookies["BaseUrl"];
 }
 
 <!DOCTYPE html>
@@ -34,7 +35,7 @@
     {
         @await Html.PartialAsync("_CookieBannerPartial.cshtml", new CookieBannerPartialModel())
     }
-    @await Html.PartialAsync("_HeaderPartial", new HeaderPartialModel())
+    @await Html.PartialAsync("_HeaderPartial", new HeaderPartialModel(baseUrl))
     @await Html.PartialAsync("_NavbarPartial", new NavbarPartialModel())
 
     <main role="main" id="main-content">
