@@ -787,19 +787,24 @@ public class CatalogDataDescriptionController(
     [HttpPost("Add-Data-Owner")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddDataOwnerSubmit(Contact contact, string? identifier, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode)
-    {
+    {      
+        QuestionContactPointRequest questionContactPoint = new() { Identifier = identifier, ContactPoint = new List<Contact> { contact } };
+
+        if (!string.IsNullOrEmpty(contact.Email) && !Regex.IsMatch(contact.Email, _emailValidator.CddoEmailAddressRegex.ToString()))
+        {
+            ModelState.AddModelError(nameof(contact.Email), "Email is invalid");
+        }
+        if (string.IsNullOrEmpty(contact.Name) && !string.IsNullOrEmpty(contact.Email))
+        {
+            ModelState.AddModelError(nameof(contact.Name), "Please enter a name to continue");
+        }
+
         if (!ModelState.IsValid)
         {
-            var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            ViewBag.isEditMode = isEditMode;
 
-            if (validationErrors.Count() > 0)
-            {
-                _insightsLogger.LogEvent(EventTypes.MetadataEvent.MetadataEdited, new Dictionary<string, string>
-                {
-                    { LogValidationErrors, string.Join(", ", validationErrors) },
-                    { "contact", contact.Email }
-                });
-            }
+            insightsLogger.LogWarning("Model state is invalid for AddDataOwnerSubmit.");
+            return ViewOrRedirect(DataOwnerViewPath, questionContactPoint);
         }
 
         var questionContactPointRequest = new QuestionContactPointRequest
