@@ -349,6 +349,7 @@ public class DataRequestController(
             var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
             logger.LogEventMainBase(DataSharingEvent.DataSharingSubmissionNotes, "SubmissionValidation", "CDDO", "SubmissionNotes", "Notes", requestId.ToString(), new Dictionary<string, string>
         {{ "ValidationErrors", string.Join(", ", validationErrors) },{ "RequestId", requestId.ToString()  }});
+            return RedirectToAction("DataShareRequestComplete", new { requestId });
         }
 
         try

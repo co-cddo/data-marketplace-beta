@@ -948,16 +948,19 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             SetAuthenticatedUser(true);
             var requestId = _fixture.Create<Guid>();
             var userProfile = new UserProfile();
+            var response = _fixture.Create<SubmitDataShareRequestResponse>();
             _mockUserRoleService.Setup(u => u.GetUserProfileAsync()).ReturnsAsync(userProfile);
 
+            _mockDataShareRequestService.Setup(x => x.SubmitDataShareRequest(It.IsAny<Guid>(), default))
+                .ReturnsAsync(response);
+
             // Act
-            var result = await _controller.RequestSubmitDataShareRequest(requestId, CancellationToken.None) as ViewResult;
+            var result = await _controller.RequestSubmitDataShareRequest(requestId, CancellationToken.None) as RedirectToActionResult;
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.ViewName, Is.EqualTo("~/Pages/DataShare/SubmissionDeclaration.cshtml"));
-            Assert.That(result.Model, Is.InstanceOf<SubmissionDeclarationModel>());
-            Assert.That(((SubmissionDeclarationModel)result.Model).DataShareRequestId, Is.EqualTo(requestId));
+            Assert.That(result.ActionName, Is.EqualTo("DataShareRequestComplete"));
+           
         }
         [Test]
         public async Task RequestSubmitDataShareRequest_ValidModelState_ThrowsException()
@@ -968,6 +971,11 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             var requestId = _fixture.Create<Guid>();
             var userProfile = new UserProfile();
             _mockUserRoleService.Setup(u => u.GetUserProfileAsync()).Throws(new DataShareRequestException() { DsrExceptionText = "test", DsrResponseText = "test", DsrStatusCode = 401 });
+
+            var response = _fixture.Create<SubmitDataShareRequestResponse>();
+            _mockDataShareRequestService.Setup(x => x.SubmitDataShareRequest(It.IsAny<Guid>(), default))
+                .ReturnsAsync(response);
+
 
             // Act
             var result = await _controller.RequestSubmitDataShareRequest(requestId, CancellationToken.None) as ViewResult;

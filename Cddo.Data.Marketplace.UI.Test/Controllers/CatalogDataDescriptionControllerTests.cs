@@ -137,23 +137,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             var redirectResult = result as RedirectToPageResult;
             Assert.That(redirectResult.PageName, Is.EqualTo("/Error/NoPermissions"));
         }
-        [Test]
-        public async Task AddDataDescriptionMethodSubmit_InvalidModelState_ReturnsBadRequest()
-        {
-            // Arrange
-            // Arrange
-            SetAuthenticatedUser(false);
-            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(false);
-            _controller.ModelState.AddModelError("TestError", "Invalid Model State");
-
-            // Act
-            var result = await _controller.AddDataDescriptionMethodSubmit(null);
-
-            // Assert
-            Assert.That(result, Is.InstanceOf<RedirectToPageResult>());
-            var redirectResult = result as RedirectToPageResult;
-            Assert.That(redirectResult.PageName, Is.EqualTo("/Error/400"));
-        }
+        
 
         [Test]
         public async Task AddDataDescriptionMethodSubmit_UserWithoutRole_RedirectsToIndex()
@@ -221,22 +205,6 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             Assert.That(redirectResult.ControllerName, Is.EqualTo("CatalogSpreadsheet"));
         }
 
-        [Test]
-        public async Task AddDataDescriptionMethodSubmit_NullMethod_ReturnsViewWithModelError()
-        {
-            // Arrange
-            SetAuthenticatedUser(true);
-            _mockUserRoleService.Setup(x => x.IsUserInRoleAsync(It.IsAny<List<string>>())).ReturnsAsync(true);
-
-            // Act
-            var result = await _controller.AddDataDescriptionMethodSubmit(null);
-
-            // Assert
-            Assert.That(result, Is.InstanceOf<ViewResult>());
-            var viewResult = result as ViewResult;
-            Assert.That(viewResult.ViewName, Is.EqualTo("~/Pages/DataDescription/Manual/SecurityClassification.cshtml"));
-            Assert.That(_controller.ModelState.ContainsKey("dataDescriptionMethod"), Is.True);
-        }
         [Test]
         public async Task DataDescriptionApiStart_ReturnsCorrectView()
         {

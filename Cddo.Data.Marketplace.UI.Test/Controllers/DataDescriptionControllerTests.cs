@@ -232,7 +232,7 @@ namespace Cddo.Data.Marketplace.UI.Test.Controllers
             _mockCatalogQuestionsService.Setup(s => s.UpdateDataShareRequestNotificationsSelectionAsync(request, dataAssetType))
                 .ReturnsAsync(mockResponse);
 
-            _mockCatalogQuestionsService.Setup(s => s.UpdateDataAssetStatusAsync(It.IsAny<string>(), It.IsAny<DataAssetStatus>(), It.IsAny<DataAssetType>()))
+            _mockCatalogQuestionsService.Setup(s => s.UpdateDataAssetStatusPublishAsync(It.IsAny<string>(), It.IsAny<DataAssetStatus>(), It.IsAny<DataAssetType>()))
                 .ReturnsAsync(mockResponse);
 
             _mockUserRoleService.Setup(s => s.GetUserProfileAsync()).ReturnsAsync(_fixture.Create<UserProfile>());
