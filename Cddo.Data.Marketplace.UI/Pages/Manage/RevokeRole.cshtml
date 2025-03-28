@@ -11,7 +11,7 @@
 
 
 <div class="govuk-width-container">
-    <a href="@HttpContext.Request.Headers["Referer"]" class="govuk-back-link">Back</a>
+    <a href="/manage/user?userId=@Model.Subject.User!.UserId" class="govuk-back-link">Back</a>
 
     <div class="govuk-main-wrapper">
         
