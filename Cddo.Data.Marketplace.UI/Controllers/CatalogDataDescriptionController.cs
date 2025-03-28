@@ -206,7 +206,7 @@ public class CatalogDataDescriptionController(
     public async Task<IActionResult> AddTitleSubmit(QuestionTitleRequest questionTitleRequest, string? isCheckList, string? isCheckAnswers, string? showNextQuestion, string? isEditMode, SecurityClassificationEnum? securityClassification = null)
     {
 
-        if (string.IsNullOrWhiteSpace(questionTitleRequest.Title) && !ModelState.IsValid)
+        if (string.IsNullOrWhiteSpace(questionTitleRequest.Title))
         {
             ModelState.Clear();
             ModelState.AddModelError("Title", "Enter the title of the listing");
