@@ -122,7 +122,7 @@
                             @foreach (var answerGroup in @submissionSection.AnswerGroups.OrderBy(x => x.OrderWithinSubmission))
                             {
                                 <tr class="govuk-table__row">
-                                    <td class="govuk-table__cell">
+                                    <td class="govuk-table__cell" colspan="4">
                                         <h2 class="govuk-heading-m">@answerGroup.MainQuestionHeader</h2>
 
                                         @foreach (var mainEntryPart in answerGroup.MainEntry.EntryParts.OrderBy(x => x.OrderWithinGroupEntry))
