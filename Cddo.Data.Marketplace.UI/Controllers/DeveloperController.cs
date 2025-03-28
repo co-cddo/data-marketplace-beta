@@ -1,4 +1,5 @@
 ﻿using Cddo.Data.Marketplace.Api.Dto.Requests.ClientAuth;
+using Cddo.Data.Marketplace.Api.Dto.Responses.ClientAuth;
 using Cddo.Data.Marketplace.Audit;
 using Cddo.Data.Marketplace.Logic.Services.Interfaces;
 using Cddo.Data.Marketplace.Logic.Services.Users;
@@ -203,6 +204,14 @@ public class DeveloperController : Controller
     [HttpPost("update-api-name")]
     public async Task<IActionResult> UpdateApiName(string id, string appName, CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrWhiteSpace(appName))
+        {
+            ModelState.Clear();
+            ModelState.AddModelError("AppName", "Enter the API name");            
+
+            return View("~/Pages/Developer/EditCredentialName.cshtml", new ClientAuthCredentialsResponse());
+        }
+
         if (!await _userRoleService.IsUserRolePublisher() && !await _userRoleService.IsUserRoleAdmin())
         {
             return View(apiLandingPageLink);
