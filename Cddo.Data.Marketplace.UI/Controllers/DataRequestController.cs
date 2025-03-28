@@ -353,17 +353,26 @@ public class DataRequestController(
 
         try
         {
-            var model = new SubmissionDeclarationModel { DataShareRequestId = requestId };
+            //Log Questions get
+            var submitDataShareRequestResponse = await dataShareRequestService.SubmitDataShareRequest(requestId, cancellationToken);
+
+            var requestRequestId = submitDataShareRequestResponse.DataShareRequestRequestId;
             //Log Questions get
             if (User.Identity != null && User.Identity.IsAuthenticated)
             {
                 var userResponse = await userRoleService.GetUserProfileAsync();
                 var userEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userResponse);
 
-                logger.LogEventMainBase(DataSharingEvent.DataSharingRequestSent, DataShareRequestEvent, "CDDO", "RequestStartSubmit", RequestEvent, requestId.ToString(), userEventProperties);
-            }
+                userEventProperties.Add("requestId", requestId.ToString());
+                userEventProperties.Add("requestRequestId", requestRequestId.ToString());
+                logger.LogEventMainBase(UserEvent.UserDataShareRequestEnd, "DataShareRequestComplete", "CDDO", "", "", "", userEventProperties);
 
-            return View("~/Pages/DataShare/SubmissionDeclaration.cshtml", model);
+                var notificationEventProperties = AuditUtility.ConvertUserProfileToJSONDictionary(userResponse);
+                notificationEventProperties.Add("requestId", requestId.ToString());
+                logger.LogEventMainBase(DataSharingEvent.DataSharingRequestNotification, string.Empty, "CDDO", NotificationEvent, "Submitted", submitDataShareRequestResponse.NotificationSuccess.ToString(), notificationEventProperties);
+            }
+            return RedirectToAction("DataShareRequestComplete", new { requestRequestId });
+
         }
         catch (DataShareRequestException ex)
         {
