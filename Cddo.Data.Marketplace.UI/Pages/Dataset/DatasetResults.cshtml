@@ -418,11 +418,11 @@
                                                 {
                                                     tags.Add("Dataset");
                                                 }
-                                                if (!mediaTypes.Any() && dataAsset.DataAssetType == DataAssetType.DataService)
+                                                if ((!mediaTypes.Any() || mediaTypes.First() == "") && dataAsset.DataAssetType == DataAssetType.DataService)
                                                 {
                                                     tags.Add("Data Service");
                                                 }
-                                                else if (!mediaTypes.Any() && dataAsset.DataAssetType == DataAssetType.DataSet && !tags.Contains("Dataset"))
+                                                else if ((!mediaTypes.Any() || mediaTypes.First() == "") && dataAsset.DataAssetType == DataAssetType.DataSet && !tags.Contains("Dataset"))
                                                 {
                                                     tags.Add("Dataset");
                                                 }
