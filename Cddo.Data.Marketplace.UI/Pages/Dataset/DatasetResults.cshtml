@@ -422,7 +422,7 @@
                                                 {
                                                     tags.Add("Data Service");
                                                 }
-                                                else if ((!mediaTypes.Any() || mediaTypes.FirstOrDefault() == "") && dataAsset.DataAssetType == DataAssetType.DataSet && !tags.Contains("Dataset"))
+                                                else if ((!mediaTypes.Any() || String.IsNullOrEmpty(mediaTypes.FirstOrDefault())) && dataAsset.DataAssetType == DataAssetType.DataSet && !tags.Contains("Dataset"))
                                                 {
                                                     tags.Add("Dataset");
                                                 }
