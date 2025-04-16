@@ -427,6 +427,15 @@
                                                     tags.Add("Dataset");
                                                 }
 
+                                                if (tags.Count <= 0 && dataAsset.DataAssetType == DataAssetType.DataService)
+												{
+                                                    tags.Add("Data Service");
+												}
+                                                else if (tags.Count <= 0 && dataAsset.DataAssetType == DataAssetType.DataSet)
+                                                {
+                                                    tags.Add("Dataset");
+                                                }
+
                                                 if (dataAsset.AccessRights == "RESTRICTED")
                                                 {
                                                     tags.Add("Access on request");
