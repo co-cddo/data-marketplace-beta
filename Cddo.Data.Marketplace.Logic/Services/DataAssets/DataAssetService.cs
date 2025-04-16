@@ -359,15 +359,66 @@ public class DataAssetService(
             var catalogEntriesOrganisationFilter = BuildCatalogEntriesOrganisationFilter(
                 initiatingUserDetails, false, false);
 
-            var ckanCatalogEntry = await ckanConnection.GetCatalogEntryWithProfileAsync(
-                profileId,
-                dataAssetId,
-                catalogEntriesOrganisationFilter);
+            // TODO: IMPLEMENT: Stubbed out the call to CkanConnection.GetCatalogEntryWithProfileAsync
+            //var ckanCatalogEntry = await ckanConnection.GetCatalogEntryWithProfileAsync(
+            //    profileId,
+            //    dataAssetId,
+            //    catalogEntriesOrganisationFilter);
+
+            var ckanCatalogEntryReadStub = new Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryRead
+            {
+                Id = Guid.Parse("8d085327-21b6-4d8b-9705-88faad231d23"),
+                Title = "Sample Data Asset",
+          
+                Extras = new List<Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryExtraRead>
+                {
+                    new Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryExtraRead
+                    {
+                        Key = "profileId",
+                        Value = "dcat-ukap-v3.1"
+                    },
+                    new Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryExtraRead
+                    {
+                        Key = "apiType",
+                        Value = "REST"
+                    },
+                    new Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryExtraRead
+                    {
+                        Key = "serviceType",
+                        Value = "Transactional"
+                    }
+                },
+                Tags = new List<Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryTagRead>
+                {
+                    new Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryTagRead
+                    {
+                        Name = "Sample",
+                        DisplayName = "Sample Tag",
+                        State = "active"
+                    },
+                    new Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryTagRead
+                    {
+                        Name = "Data",
+                        DisplayName = "Data Tag",
+                        State = "active"
+                    },
+                    new Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryTagRead
+                    {
+                        Name = "Asset",
+                        DisplayName = "Asset Tag",
+                        State = "active"
+                    }
+                }
+                  
+           
+            };
+            var ckanCatalogEntry = ckanCatalogEntryReadStub;
+            // END Stub
 
             var profileDataAssetConverter = profiledDataAssetConverterPresenter.GetProfiledDataAssetConverterForProfileId(profileId);
 
             var profiledDataAsset = profileDataAssetConverter.ConvertCkanCatalogEntryReadToProfiledDataAsset(ckanCatalogEntry);
-
+            
             return serviceOperationResultFactory.CreateSuccessfulDataResult(new GetProfiledDataAssetResult
             {
                 ProfiledDataAsset = (ProfiledDataAsset)profiledDataAsset
@@ -438,14 +489,49 @@ public class DataAssetService(
             var catalogEntriesOrganisationFilter = BuildCatalogEntriesOrganisationFilter(
                 initiatingUserDetails,
                 onlyIncludeRecordsDiscoverableByOrganisationOfCallingUser == true,
-                onlyIncludeRecordsOwnedByOrganisationOfCallingUser == true);    
+                onlyIncludeRecordsOwnedByOrganisationOfCallingUser == true);
 
-            var ckanCatalogEntrySet = await ckanConnection.GetCatalogEntriesAsync(
-                 dataAssetTypes,
-                 dataAssetStatuses,
-                 resultPagination,
-                 catalogEntriesOrganisationFilter,
-                 lookupTokens);
+            // TODO: IMPLEMENT: Stubbed out the call to CkanConnection.GetCatalogEntriesAsync
+
+            //var ckanCatalogEntrySet = await ckanConnection.GetCatalogEntriesAsync(
+            //     dataAssetTypes,
+            //     dataAssetStatuses,
+            //     resultPagination,
+            //     catalogEntriesOrganisationFilter,
+            //     lookupTokens);
+
+            var ckanCatalogEntrySet = new Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanPackageSearchResponseResultSet();
+            var ckanPackageSearchResponseResultSetStub = new Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanPackageSearchResponseResultSet
+            {
+                Results = new List<Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryRead>
+                {
+                    new Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryRead
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "Sample Title",
+                        Extras = new List<Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryExtraRead>
+                        {
+                            new Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryExtraRead
+                            {
+                                Key = "SampleKey",
+                                Value = "SampleValue"
+                            }
+                        },
+                        Tags = new List<Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryTagRead>
+                        {
+                            new Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryTagRead
+                            {
+                                Name = "SampleTag",
+                                DisplayName = "Sample Tag Display",
+                                State = "active"
+                            }
+                        }
+                    }
+                },
+                Count = 1
+            };
+            ckanCatalogEntrySet = ckanPackageSearchResponseResultSetStub;
+            // END Stub
 
             var cddoDataAssets =
                 cddoDataAssetConverter.ConvertCkanCatalogEntryReadsToCddoDataAssets(ckanCatalogEntrySet.Results);
@@ -478,11 +564,83 @@ public class DataAssetService(
             var catalogEntriesOrganisationFilter = BuildCatalogEntriesOrganisationFilter(
                 initiatingUserDetails, false, false);
 
-            var ckanCatalogEntry = await ckanConnection.GetCatalogEntryAsync(
-                dataAssetId,
-                catalogEntriesOrganisationFilter);
+            // TODO: IMPLEMENT: Stubbed out the call to CkanConnection.GetCatalogEntryAsync
+            //var ckanCatalogEntry = await ckanConnection.GetCatalogEntryAsync(
+            //    dataAssetId,
+            //    catalogEntriesOrganisationFilter);
 
-            var cddoDataAsset = cddoDataAssetConverter.ConvertCkanCatalogEntryReadToCddoDataAsset(ckanCatalogEntry);
+            var ckanCatalogEntryReadStub = new Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryRead
+            {
+                Id = Guid.Parse("8d085327-21b6-4d8b-9705-88faad231d23"),
+                Title = "Sample Data Asset",
+
+                Extras = new List<Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryExtraRead>
+                {
+                    new Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryExtraRead
+                    {
+                        Key = "profileId",
+                        Value = "dcat-ukap-v3.1"
+                    },
+                    new Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryExtraRead
+                    {
+                        Key = "apiType",
+                        Value = "REST"
+                    },
+                    new Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryExtraRead
+                    {
+                        Key = "serviceType",
+                        Value = "Transactional"
+                    }
+                },
+                Tags = new List<Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryTagRead>
+                {
+                    new Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryTagRead
+                    {
+                        Name = "Sample",
+                        DisplayName = "Sample Tag",
+                        State = "active"
+                    },
+                    new Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryTagRead
+                    {
+                        Name = "Data",
+                        DisplayName = "Data Tag",
+                        State = "active"
+                    },
+                    new Agm.Catalog.DotNet.Logic.Services.Ckan.Model.PackageSearch.CkanCatalogEntryTagRead
+                    {
+                        Name = "Asset",
+                        DisplayName = "Asset Tag",
+                        State = "active"
+                    }
+                }
+
+
+            };
+
+            var ckanCatalogEntry = ckanCatalogEntryReadStub;
+
+           // var cddoDataAsset = cddoDataAssetConverter.ConvertCkanCatalogEntryReadToCddoDataAsset(ckanCatalogEntry);
+
+            var cddoDataAsset = new CddoDataAsset
+            {
+                Id = Guid.NewGuid(),
+                Title = "Sample Data Asset",
+                OrganisationId = 1,
+                DomainId = 1,
+                DataAssetType = DataAssetType.DataSet,
+                DataAssetContacts = new List< CddoDataAssetContact>
+                {
+                    new CddoDataAssetContact
+                    {
+                        Name = "Sample Contact",
+                        Email = "contact@example.com",
+                        Role = DataAssetContactRoleType.Contact
+                    }
+                },
+                DataShareRequestNotificationRecipientType = DataShareRequestNotificationRecipientType.EsdaContactPointEmailAddress,
+                CustomDsrNotificationAddress = "notification@example.com"
+            };
+            // END stub
 
             return serviceOperationResultFactory.CreateSuccessfulDataResult(new GetCddoDataAssetResult
             {
