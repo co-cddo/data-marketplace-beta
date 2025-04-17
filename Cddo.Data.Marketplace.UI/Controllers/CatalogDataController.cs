@@ -13,6 +13,8 @@ using Cddo.Data.Marketplace.UI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
+using System.Web;
 using static Cddo.Data.Marketplace.Audit.EventTypes;
 
 namespace Cddo.Data.Marketplace.UI.Controllers;
@@ -61,6 +63,16 @@ public class CatalogDataController : Controller
         return Ok(suggestions.ToList());
     }
 
+    public static DataAssetType ConvertToDataAssetType(string dataAssetTypeString)
+    {
+        if (Enum.TryParse<DataAssetType>(dataAssetTypeString, ignoreCase: true, out var dataAssetType))
+        {
+            return dataAssetType;
+        }
+
+        throw new ArgumentException($"Invalid DataAssetType value: {dataAssetTypeString}");
+    }
+
 
     [Route("GetCddoDataAssets")]
     public async Task<IActionResult> GetCddoDataAssets(
@@ -100,7 +112,7 @@ public class CatalogDataController : Controller
             SortField = sortOptions.SortField,
             SortDirection = sortOptions.SortDirection,
             StartRecordIndex = 0,
-            NumberOfRecords = 20,
+            NumberOfRecords = 2,// 20,
             PageNumber = selectedPageNumber ?? 1
         };
 
@@ -108,280 +120,119 @@ public class CatalogDataController : Controller
         // TODO: IMPLEMENT: Stubbed out the call to the catalog data service
         //    var getCddoDataAssetsResponse = await _catalogDataService.GetDataAssetsAsync(getCddoDataAssetsRequest);
 
-        var myList = new List<CddoDataAsset>
+
+        using var httpClient = new HttpClient();
+
+        var baseUrl = "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1/DataAsset/get-cddo-data-assets";
+        var queryParams = HttpUtility.ParseQueryString(string.Empty);
+
+        if (!string.IsNullOrEmpty(getCddoDataAssetsRequest.SearchText))
+            queryParams["SearchText"] = getCddoDataAssetsRequest.SearchText;
+
+        if (getCddoDataAssetsRequest.Themes != null && getCddoDataAssetsRequest.Themes.Any())
+            queryParams["Themes"] = string.Join(",", getCddoDataAssetsRequest.Themes);
+
+        if (getCddoDataAssetsRequest.Creator != null && getCddoDataAssetsRequest.Creator.Any())
+            queryParams["Creator"] = string.Join(",", getCddoDataAssetsRequest.Creator);
+
+        if (getCddoDataAssetsRequest.DataAssetTypes != null && getCddoDataAssetsRequest.DataAssetTypes.Any())
+            queryParams["DataAssetTypes"] = string.Join(",", getCddoDataAssetsRequest.DataAssetTypes);
+
+        if (getCddoDataAssetsRequest.AccessRights != null && getCddoDataAssetsRequest.AccessRights.Any())
+            queryParams["AccessRights"] = string.Join(",", getCddoDataAssetsRequest.AccessRights);
+
+        if (getCddoDataAssetsRequest.DataAssetStatuses != null && getCddoDataAssetsRequest.DataAssetStatuses.Any())
+            queryParams["DataAssetStatuses"] = string.Join(",", getCddoDataAssetsRequest.DataAssetStatuses);
+
+        queryParams["SortField"] = getCddoDataAssetsRequest.SortField.ToString();
+        queryParams["SortDirection"] = getCddoDataAssetsRequest.SortDirection.ToString();
+        queryParams["StartRecordIndex"] = getCddoDataAssetsRequest.StartRecordIndex.ToString();
+        queryParams["NumberOfRecords"] = getCddoDataAssetsRequest.NumberOfRecords.ToString();
+        queryParams["PageNumber"] = getCddoDataAssetsRequest.PageNumber.ToString();
+
+        var apiUrl = $"{baseUrl}?{queryParams}";
+
+
+        GetCddoDataAssetsResponse? dataAssetsResponse = null;
+        try
         {
-            new CddoDataAsset
-             {
-                        Id = Guid.Parse("8d085327-21b6-4d8b-9705-88faad231d22"),
-                        InternalIdentifier = "acme-123",
-                        Modified = DateTime.Parse("2023-12-09T16:09:53+00:00"),
-                        DataAssetStatus = DataAssetStatus.Published,
-                        Title = "Advance Passenger Information II",
-                        Description = "Travel data and personal data given to airlines by passenger. API covers both inbound and outbound air passengers. API includes the passenger’s full name, nationality, date of birth, gender and travel document number, type and country of issue. The data does not include those arriving by sea or rail routes, by private aircraft or via the Common Travel Area (CTA).",
-                        DataAssetType = DataAssetType.DataSet,
-                        Themes = new List<string>
-                {
-                    "Transport and infrastructure",
-                    "Population and society"
-                },
-                        Keywords = new List<string>
-                {
-                    "Air travel",
-                    "Passport",
-                    "Airports",
-                    "leaving UK",
-                    "entering UK"
-                },
-                        DataAssetContacts = new List<CddoDataAssetContact>
-                {
-                    new CddoDataAssetContact
-                    {
-                        Name = "Rob Nichols",
-                        Email = "robert.nichols@digital.cabinet-office.gov.uk",
-                        Role = DataAssetContactRoleType.Contact
-                    }
-                },
-                        License = new Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.License
-                        {
-                            Title = "Creative Commons",
-                            LicenseUrl = "https://creativecommons.org/licenses/by/4.0"
-                        },
-                        Publisher = "academy-for-social-justice",
-                        SecurityClassification = "OFFICIAL",
-                        AccessRights = "RESTRICTED",
-                        DataAssetDistribution = new List<CddoDataAssetDistribution>
-                {
-                    new CddoDataAssetDistribution
-                    {
-                        Title = "CSV download",
-                        Description = "Complete dataset provided as a downloadable file",
-                        AccessService = "8d085327-21b6-4d8b-9705-88faad231d23",
-                        AccessUrl = "http://example.com/path/to/file.csv",
-                        Format = "CSV file",
-                        MediaType =  "text/csv"
-                    },
-                    new CddoDataAssetDistribution
-                    {
-                        Title = "Rest API",
-                        AccessUrl = "http://example.com/api/",
-                        Description = "A fully queryable REST API with JSON and XML output",
-                        Format = "API"
-                    },
-                    new CddoDataAssetDistribution
-                    {
-                        Title = "Web Page",
-                        Description = "A web page that provides the data, links to downloads, or documentation.",
-                        AccessUrl = "http://example.com/path/to/page",
-                        Format = "Web page",
-                        MediaType = "text/html"
-                    }
-                }
-             },
-            new CddoDataAsset
+            var response = await httpClient.GetAsync(apiUrl);
+            var dataAssets = new List<CddoDataAsset>();
+
+           
+
+            if (response.IsSuccessStatusCode)
             {
-                Id = Guid.Parse("8d085327-21b6-4d8b-9705-88faad231d23"),
-                InternalIdentifier = "acme-123",
-                Modified = DateTime.Parse("2023-12-09T16:09:53+00:00"),
-                DataAssetStatus = DataAssetStatus.Published,
-                Title = "Advance Passenger Information",
-                Description = "Travel data and personal data given to airlines by passenger. API covers both inbound and outbound air passengers. API includes the passenger’s full name, nationality, date of birth, gender and travel document number, type and country of issue. The data does not include those arriving by sea or rail routes, by private aircraft or via the Common Travel Area (CTA).",
-                DataAssetType = DataAssetType.DataService,
-                DataAssetServiceType = DataAssetServiceType.Rest,
-                Themes = new List<string>
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                _logger.LogInformation("API Response: {ResponseContent}", responseContent);
+
+                dataAssetsResponse = JsonSerializer.Deserialize<GetCddoDataAssetsResponse>(responseContent, new JsonSerializerOptions
                 {
-                    "Transport and infrastructure",
-                    "Population and society"
-                },
-                Keywords = new List<string>
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (dataAssetsResponse?.CddoDataAssets != null)
                 {
-                    "Air travel",
-                    "Passport",
-                    "Airports",
-                    "leaving UK",
-                    "entering UK"
-                },
-                DataAssetContacts = new List<CddoDataAssetContact>
-                {
-                    new CddoDataAssetContact
-                    {
-                        Name = "Rob Nichols",
-                        Email = "robert.nichols@digital.cabinet-office.gov.uk",
-                        Role = DataAssetContactRoleType.Contact
-                    }
-                },
-                Publisher = "academy-for-social-justice",
-                SecurityClassification = "OFFICIAL",
-                AccessRights = "RESTRICTED",
-                EndpointDescription = "http://example.com/path/to/swagger",
-                EndpointUrl = "http://example.com/api/v1",
-                RelatedResources = new List<string>
-                {
-                    "8d085327-21b6-4d8b-9705-88faad231d22"
+                    _logger.LogInformation("Successfully deserialized data assets from API.");
                 }
-            },
-            new CddoDataAsset
-            {
-                Id = Guid.NewGuid(),
-                OrganisationId = 1,
-                DomainId = 101,
-                ProfileId = "Profile-001",
-                DataAssetType = DataAssetType.DataSet,
-                Title = "Sample Data Asset 1",
-                AlternativeTitles = new List<string> { "Alt Title 1", "Alt Title 2" },
-                Summary = "This is a summary of the first data asset.",
-                Description = "Detailed description of the first data asset.",
-                ManifestationTypes = new List<string> { "Type1", "Type2" },
-                InternalIdentifier = "INT-001",
-                Publisher = "Sample Publisher",
-                Author = "Author Name",
-                AuthorEmail = "author1@example.com",
-                DataAssetContacts = new List<CddoDataAssetContact>
+                else
                 {
-                    new CddoDataAssetContact
-                    {
-                        Name = "Contact Name 1",
-                        Email = "contact1@example.com",
-                        Role =  Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums.DataAssetContactRoleType.Contact
-                    }
-                },
-                SecurityClassification = "Public",
-                Version = "1.0",
-                LicenseId = "LIC-001",
-                LicenseTitle = "Open License",
-                Issued = DateTime.UtcNow.AddDays(-30),
-                Modified = DateTime.UtcNow.AddDays(-10),
-                Created = DateTime.UtcNow.AddDays(-60),
-                DraftStatus = "Draft",
-                PublishStatus = "Published",
-                DataAssetStatus = DataAssetStatus.Published,
-                UpdateFrequencyString = "Monthly",
-                AccessRights = "Open",
-                EndpointUrl = "https://example.com/api/dataasset1",
-                EntryType = "Dataset",
-                Keywords = new List<string> { "Keyword1", "Keyword2" },
-                Themes = new List<string> { "Theme1", "Theme2" },
-                RelatedResources = new List<string> { "Resource1", "Resource2" },
-                RequiresDSR = true,
-                AllowDSRRequest = false,
-                EndpointDescription = "API endpoint for the first data asset.",
-                DataShareRequestNotificationRecipientType = DataShareRequestNotificationRecipientType.EsdaContactPointEmailAddress,
-                CustomDsrNotificationAddress = "dsr@example.com",
-                CatalogResourceCreated = DateTime.UtcNow.AddDays(-90),
-                CatalogResourceCreator = "Catalog Creator",
-                License = new Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.License
-                {
-                    LicenseUrl = "LIC-001",
-                    Title = "Open License"
+                    _logger.LogWarning("No data assets found in the API response.");
                 }
-            },
-            new CddoDataAsset
-            {
-                Id = Guid.NewGuid(),
-                OrganisationId = 2,
-                DomainId = 102,
-                ProfileId = "Profile-002",
-                DataAssetType = DataAssetType.DataSet,
-                Title = "Sample Data Asset 2",
-                AlternativeTitles = new List<string> { "Alt Title A", "Alt Title B" },
-                Summary = "This is a summary of the second data asset.",
-                Description = "Detailed description of the second data asset.",
-                ManifestationTypes = new List<string> { "TypeA", "TypeB" },
-                InternalIdentifier = "INT-002",
-                Publisher = "Another Publisher",
-                Author = "Another Author",
-                AuthorEmail = "author2@example.com",
-                DataAssetContacts = new List<CddoDataAssetContact>
-                {
-                    new CddoDataAssetContact
-                    {
-                        Name = "Contact Name 2",
-                        Email = "contact2@example.com",
-                        Role =  DataAssetContactRoleType.Owner
-                    }
-                },
-                SecurityClassification = "Restricted",
-                Version = "2.0",
-                LicenseId = "LIC-002",
-                LicenseTitle = "Restricted License",
-                Issued = DateTime.UtcNow.AddDays(-20),
-                Modified = DateTime.UtcNow.AddDays(-5),
-                Created = DateTime.UtcNow.AddDays(-40),
-                DraftStatus = "Final",
-                PublishStatus = "Unpublished",
-                DataAssetStatus = DataAssetStatus.Published,
-                UpdateFrequencyString = "Weekly",
-                AccessRights = "Restricted",
-                EndpointUrl = "https://example.com/api/dataasset2",
-                EntryType = "Service",
-                Keywords = new List<string> { "KeywordA", "KeywordB" },
-                Themes = new List<string> { "ThemeA", "ThemeB" },
-                RelatedResources = new List<string> { "ResourceA", "ResourceB" },
-                RequiresDSR = false,
-                AllowDSRRequest = true,
-                DataAssetServiceType = DataAssetServiceType.Event,
-                DataAssetDistribution = new List<CddoDataAssetDistribution>
-                {
-                    new CddoDataAssetDistribution
-                    {
-                        Format = "CSV",
-                        AccessUrl = "https://example.com/api/dataasset2/distribution"
-                    }
-                },
-                ServiceStatus = ServiceStatusEnum.Beta,
-                EndpointDescription = "API endpoint for the second data asset.",
-                DataShareRequestNotificationRecipientType = DataShareRequestNotificationRecipientType.EsdaContactPointEmailAddress,
-                CustomDsrNotificationAddress = null,
-                CatalogResourceCreated = DateTime.UtcNow.AddDays(-80),
-                CatalogResourceCreator = "Another Catalog Creator",
-                License = new Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.License
-                {
-                    LicenseUrl = "LIC-002",
-                    Title = "Open License"
-                }
+
+                _logger.LogInformation("Successfully fetched data assets from external API.");
             }
-        };
-
-        Agm.Catalog.DotNet.Dto.Responses.DataAssets.GetCddoDataAssetsResponse test = new Agm.Catalog.DotNet.Dto.Responses.DataAssets.GetCddoDataAssetsResponse();
-        test.TotalNumberOfMatchingCddoDataAssets = 2;
-
-        test.CddoDataAssets = myList;
-
-        var getCddoDataAssetsResponse = test;
-
-   //     var getCatalogueFilterOptions = await _catalogDataService.GetCatalogueFilterOptionsAsync(getCddoDataAssetsRequest)
-        var sampleCatalogueFilterOptions = new CatalogueFilterOptions
+            else
             {
-                Organisations = new List<string> {
+                _logger.LogError("Failed to fetch data assets. Status Code: {StatusCode}", response.StatusCode);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while calling the external API.");
+        }
+  
 
-                    "Department For Business And Trade",
-        "Department For Education",
-        "Department For Energy Security And Net Zero",
-        "Department For Environment Food & Rural Affairs",
-        "Driver And Vehicle Standards Agency",
-        "Government Property Agency",
-        "HM Revenue & Customs",
-        "HM Treasury",
-        "Home Office",
-        "Ministry Of Housing Communities Local Government",
-        "Ministry Of Justice",
-        "Office For National Statistics",
-        "Ordnance Survey"
+
+        var getCddoDataAssetsResponse = dataAssetsResponse;
+        
+
+        //     var getCatalogueFilterOptions = await _catalogDataService.GetCatalogueFilterOptionsAsync(getCddoDataAssetsRequest)
+        var sampleCatalogueFilterOptions = new CatalogueFilterOptions
+        {
+            Organisations = new List<string> {
+                "Department For Business And Trade",
+                "Department For Education",
+                "Department For Energy Security And Net Zero",
+                "Department For Environment Food & Rural Affairs",
+                "Driver And Vehicle Standards Agency",
+                "Government Property Agency",
+                "HM Revenue & Customs",
+                "HM Treasury",
+                "Home Office",
+                "Ministry Of Housing Communities Local Government",
+                "Ministry Of Justice",
+                "Office For National Statistics",
+                "Ordnance Survey"
+            },
+                Topics = new List<string> {         
+                "Business, economics and finance",
+                "Crime and justice",
+                "Culture, leisure and sport",
+                "Education",
+                "Energy",
+                "Environment and nature",
+                "Geography",
+                "Government and public sector",
+                "Health and care",
+                "Population and society",
+                "Transport and infrastructure" 
                 },
-                Topics = new List<string> {         "Business, economics and finance",
-        "Crime and justice",
-        "Culture, leisure and sport",
-        "Education",
-        "Energy",
-        "Environment and nature",
-        "Geography",
-        "Government and public sector",
-        "Health and care",
-        "Population and society",
-        "Transport and infrastructure" },
                 DataAssetTypes = new List<string> { "Dataset", "Service", "API" },
                 AccessRights = new List<string> { "OPEN", "SOMETHING_ELSE" }
             };
-        var getCatalogueFilterOptions = sampleCatalogueFilterOptions;
+            var getCatalogueFilterOptions = sampleCatalogueFilterOptions;
         //END Stub
 
         var organisationsGroupedByPrettifiedName = GroupOrganisationsByPrettifiedName(getCatalogueFilterOptions?.Organisations);
@@ -576,129 +427,48 @@ public class CatalogDataController : Controller
             // TODO: IMPLEMENT: Stubbed out the call to the catalog data service
             // var result = await _catalogDataService.GetDataAssetAsync(dataAssetId);
 
-            var result = new GetCddoDataAssetResponse();
-            if (dataAssetId == Guid.Parse("8d085327-21b6-4d8b-9705-88faad231d23") )
+            using var httpClient = new HttpClient();
+            var apiUrl = "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1/DataAsset/get-cddo-data-asset?DataAssetId=" + dataAssetId.ToString();
+            GetCddoDataAssetResponse? dataAssetResponse = null;
+            try
             {
-                result.CddoDataAsset =
-                new CddoDataAsset
-                {
-                    AllowDSRRequest = true,
-                    RequiresDSR = true,
-                    Id = Guid.Parse("8d085327-21b6-4d8b-9705-88faad231d23"),
-                    InternalIdentifier = "acme-123",
-                    Modified = DateTime.Parse("2023-12-09T16:09:53+00:00"),
-                    DataAssetStatus = DataAssetStatus.Published,
-                    Title = "Advance Passenger Information",
-                    Description = "Travel data and personal data given to airlines by passenger. API covers both inbound and outbound air passengers. API includes the passenger’s full name, nationality, date of birth, gender and travel document number, type and country of issue. The data does not include those arriving by sea or rail routes, by private aircraft or via the Common Travel Area (CTA).",
-                    DataAssetType = DataAssetType.DataService,
-                    DataAssetServiceType = DataAssetServiceType.Rest,
-                    Themes = new List<string>
-                    {
-                        "Transport and infrastructure",
-                        "Population and society"
-                    },
-                    Keywords = new List<string>
-                    {
-                        "Air travel",
-                        "Passport",
-                        "Airports",
-                        "leaving UK",
-                        "entering UK"
-                    },
-                    DataAssetContacts = new List<CddoDataAssetContact>
-                    {
-                        new CddoDataAssetContact
-                        {
-                            Name = "Rob Nichols",
-                            Email = "robert.nichols@digital.cabinet-office.gov.uk",
-                            Role = DataAssetContactRoleType.Contact
-                        }
-                    },
-                    Publisher = "academy-for-social-justice",
-                    SecurityClassification = "OFFICIAL",
-                    AccessRights = "RESTRICTED",
-                    EndpointDescription = "http://example.com/path/to/swagger",
-                    EndpointUrl = "http://example.com/api/v1",
-                    RelatedResources = new List<string>
-                    {
-                        "8d085327-21b6-4d8b-9705-88faad231d23"
-                    }
-                };
-            }
-            else
-            {
-                result.CddoDataAsset =
-                new CddoDataAsset
-                {
-                    AllowDSRRequest = true,
-                    RequiresDSR = true,
-                    Id = Guid.Parse("8d085327-21b6-4d8b-9705-88faad231d22"),
-                    InternalIdentifier = "acme-123",
-                    Modified = DateTime.Parse("2023-12-09T16:09:53+00:00"),
-                    DataAssetStatus = DataAssetStatus.Published,
+                var response = await httpClient.GetAsync(apiUrl);
+                var dataAssets = new List<CddoDataAsset>();
 
-                    Title = "Advance Passenger Information II",
-                    Description = "Travel data and personal data given to airlines by passenger. API covers both inbound and outbound air passengers. API includes the passenger’s full name, nationality, date of birth, gender and travel document number, type and country of issue. The data does not include those arriving by sea or rail routes, by private aircraft or via the Common Travel Area (CTA).",
-                    DataAssetType = DataAssetType.DataSet,
-                    Themes = new List<string>
+                if (response.IsSuccessStatusCode)
                 {
-                "Transport and infrastructure",
-                "Population and society"
-                },
-                    Keywords = new List<string>
-                {
-                "Air travel",
-                "Passport",
-                "Airports",
-                "leaving UK",
-                "entering UK"
-                },
-                    DataAssetContacts = new List<CddoDataAssetContact>
-                {
-                new CddoDataAssetContact
-                {
-                    Name = "Rob Nichols",
-                    Email = "robert.nichols@digital.cabinet-office.gov.uk",
-                    Role = DataAssetContactRoleType.Contact
-                }
-                },
-                    License = new Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.License
+                    var responseContent = await response.Content.ReadAsStringAsync();
+
+                    dataAssetResponse = JsonSerializer.Deserialize<GetCddoDataAssetResponse>(responseContent, new JsonSerializerOptions
                     {
-                        Title = "Creative Commons",
-                        LicenseUrl = "https://creativecommons.org/licenses/by/4.0"
-                    },
-                    Publisher = "academy-for-social-justice",
-                    SecurityClassification = "OFFICIAL",
-                    AccessRights = "RESTRICTED",
-                    DataAssetDistribution = new List<CddoDataAssetDistribution>
-                {
-                new CddoDataAssetDistribution
-                {
-                    Title = "CSV download",
-                    Description = "Complete dataset provided as a downloadable file",
-                    AccessService = "8d085327-21b6-4d8b-9705-88faad231d23",
-                    AccessUrl = "http://example.com/path/to/file.csv",
-                    Format = "CSV file",
-                    MediaType =  "text/csv"
-                },
-                new CddoDataAssetDistribution
-                {
-                    Title = "Rest API",
-                    AccessUrl = "http://example.com/api/",
-                    Description = "A fully queryable REST API with JSON and XML output",
-                    Format = "API"
-                },
-                new CddoDataAssetDistribution
-                {
-                    Title = "Web Page",
-                    Description = "A web page that provides the data, links to downloads, or documentation.",
-                    AccessUrl = "http://example.com/path/to/page",
-                    Format = "Web page",
-                    MediaType = "text/html"
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    if (dataAssetResponse?.CddoDataAsset != null)
+                    {
+                        _logger.LogInformation("Successfully deserialized data asset  from API.");
+                    }
+                    else
+                    {
+                        _logger.LogWarning("No data asset  found in the API response.");
+                    }
+
+                  
+                    _logger.LogInformation("Successfully fetched data asset from external API.");
                 }
+                else
+                {
+                    _logger.LogError("Failed to fetch data assets. Status Code: {StatusCode}", response.StatusCode);
                 }
-                };
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while calling the external API.");
+            }
+
+            var result = new GetCddoDataAssetResponse();
+            result = dataAssetResponse;
+
             //END Stub
 
             if (result != null)
