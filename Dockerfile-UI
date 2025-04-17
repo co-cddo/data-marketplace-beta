@@ -1,0 +1,72 @@
+# Use the official .NET SDK image to build the application
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy AGM nuget package
+COPY nuget-packages/. ./nuget-packages/
+ 
+# COPY dev-cddo-2.pfx /app/dev-cddo-2.pfx
+
+
+
+
+# Copy the prerequisite project files and restore dependencies
+COPY Cddo.Data.Marketplace.Api.Gateway/*.csproj ./Cddo.Data.Marketplace.Api.Gateway/
+COPY Cddo.Data.Marketplace.Domain/*.csproj ./Cddo.Data.Marketplace.Domain/
+COPY Cddo.Data.Marketplace.Logic/*.csproj ./Cddo.Data.Marketplace.Logic/
+COPY Cddo.Data.Marketplace.Api/*.csproj ./Cddo.Data.Marketplace.Api/
+COPY Cddo.Data.Marketplace.UI/*.csproj ./Cddo.Data.Marketplace.UI/
+
+COPY Cddo.Data.Marketplace.Api/nuget.config ./Cddo.Data.Marketplace.Api
+COPY Cddo.Data.Marketplace.Domain/nuget.config ./Cddo.Data.Marketplace.Domain
+COPY Cddo.Data.Marketplace.Logic/nuget.config ./Cddo.Data.Marketplace.Logic
+COPY Cddo.Data.Marketplace.UI/nuget.config ./Cddo.Data.Marketplace.UI 
+
+# Restore all project dependencies
+RUN dotnet restore ./Cddo.Data.Marketplace.Api.Gateway/*.csproj
+RUN dotnet restore ./Cddo.Data.Marketplace.Domain/*.csproj --configfile ./Cddo.Data.Marketplace.Domain/nuget.config
+RUN dotnet restore ./Cddo.Data.Marketplace.Logic/*.csproj
+RUN dotnet restore ./Cddo.Data.Marketplace.Api/*.csproj
+RUN dotnet restore ./Cddo.Data.Marketplace.UI/*.csproj
+
+# Copy the entire source code of the prerequisite projects
+COPY Cddo.Data.Marketplace.Api.Gateway/. ./Cddo.Data.Marketplace.Api.Gateway/
+COPY Cddo.Data.Marketplace.Domain/. ./Cddo.Data.Marketplace.Domain/
+COPY Cddo.Data.Marketplace.Logic/. ./Cddo.Data.Marketplace.Logic/
+COPY Cddo.Data.Marketplace.Api/. ./Cddo.Data.Marketplace.Api/
+COPY Cddo.Data.Marketplace.UI/. ./Cddo.Data.Marketplace.UI/
+
+
+# Build and publish the prerequisite projects
+RUN dotnet publish ./Cddo.Data.Marketplace.Api.Gateway/*.csproj -c Release -o /app/publish/Cddo.Data.Marketplace.Api.Gateway
+RUN dotnet publish ./Cddo.Data.Marketplace.Domain/*.csproj -c Release -o /app/publish/Cddo.Data.Marketplace.Domain
+RUN dotnet publish ./Cddo.Data.Marketplace.Logic/*.csproj -c Release -o /app/publish/Cddo.Data.Marketplace.Logic 
+
+
+
+# Build and publish the main project
+RUN dotnet publish ./Cddo.Data.Marketplace.UI/*.csproj -c Release -o /app/publish/Cddo.Data.Marketplace.UI
+
+# Use the official .NET runtime image to run the application
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the build output from the build stage
+COPY --from=build /app/publish/Cddo.Data.Marketplace.Api.Gateway ./
+COPY --from=build /app/publish/Cddo.Data.Marketplace.Domain ./
+COPY --from=build /app/publish/Cddo.Data.Marketplace.Logic ./ 
+COPY --from=build /app/publish/Cddo.Data.Marketplace.UI ./
+
+# COPY --from=build /app/dev-cddo-2.pfx ./
+
+
+# Expose the port that your application will run on
+EXPOSE 8080 
+
+# Set the entry point to run your application
+ENTRYPOINT ["dotnet", "Cddo.Data.Marketplace.UI.dll"]
