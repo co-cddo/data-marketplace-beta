@@ -12,6 +12,8 @@ using Cddo.Data.Marketplace.Logic.Exceptions;
 using Agm.Catalog.DotNet.Dto.Responses.Lookup;
 using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums;
 using Cddo.Data.Marketplace.UI.Model;
+using Agm.Catalog.DotNet.Dto.Models.DataAssets;
+using System.Web;
 
 namespace Cddo.Data.Marketplace.UI.Services;
 
@@ -269,39 +271,114 @@ public class CatalogDataService : ICatalogDataService
     public async Task<GetCddoDataAssetsResponse?> GetDataAssetsAsync
         (GetCddoDataAssetsRequest getCddoDataAssetsRequest, CancellationToken cancellationToken = default)
     {
-        getCddoDataAssetsRequest.OnlyIncludeRecordsDiscoverableByOrganisationOfCallingUser = false;
-        getCddoDataAssetsRequest.OnlyIncludeRecordsOwnedByOrganisationOfCallingUser = false;
+        // getCddoDataAssetsRequest.OnlyIncludeRecordsDiscoverableByOrganisationOfCallingUser = false;
+        // getCddoDataAssetsRequest.OnlyIncludeRecordsOwnedByOrganisationOfCallingUser = false;
 
-        getCddoDataAssetsRequest.StartRecordIndex = (getCddoDataAssetsRequest.PageNumber - 1) * getCddoDataAssetsRequest.NumberOfRecords;
+        // getCddoDataAssetsRequest.StartRecordIndex = (getCddoDataAssetsRequest.PageNumber - 1) * getCddoDataAssetsRequest.NumberOfRecords;
 
+        //try
+        //{
+        //    var token = GetToken();
+        //    // All responses from the Marketplace Api are serialized so that enums are returned as strings rather than
+        //    // their integer value, so we have to read them back with the same conversion.
+        //    var response = await _apiUrl
+        //        .WithSettings(x =>
+        //            x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
+        //            {
+        //                Converters = { new JsonStringEnumConverter() },
+        //                PropertyNameCaseInsensitive = true
+        //            }))
+        //        .AppendPathSegment("DataAsset/get-cddo-data-assets")
+        //        .WithOAuthBearerToken(token)
+        //        .SetQueryParams(getCddoDataAssetsRequest)
+        //        .GetJsonAsync<GetCddoDataAssetsResponse>(cancellationToken: cancellationToken);
+
+        //    return response;
+        //}
+        //catch (FlurlHttpException ex)
+        //{
+        //    var cddoFlurlException = await _cddoFlurlExceptionBuilder.BuildAsync(ex);
+        //    _logger.LogError(ex, "Failed to Get Data Descriptions. Flurl Response: {FlurlResponseText}", cddoFlurlException.FlurlResponseText);
+        //    return null;
+        //}
+        //catch (Exception ex)
+        //{
+        //    _logger.LogError(ex, "An error occurred while getting data descriptions results.");
+        //    return null;
+        //}
+
+
+        using var httpClient = new HttpClient();
+
+        var baseUrl = "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1/DataAsset/get-cddo-data-assets";
+        var queryParams = HttpUtility.ParseQueryString(string.Empty);
+
+        if (!string.IsNullOrEmpty(getCddoDataAssetsRequest.SearchText))
+            queryParams["SearchText"] = getCddoDataAssetsRequest.SearchText;
+
+        if (getCddoDataAssetsRequest.Themes != null && getCddoDataAssetsRequest.Themes.Any())
+            queryParams["Themes"] = string.Join(",", getCddoDataAssetsRequest.Themes);
+
+        if (getCddoDataAssetsRequest.Creator != null && getCddoDataAssetsRequest.Creator.Any())
+            queryParams["Creator"] = string.Join(",", getCddoDataAssetsRequest.Creator);
+
+        if (getCddoDataAssetsRequest.DataAssetTypes != null && getCddoDataAssetsRequest.DataAssetTypes.Any())
+            queryParams["DataAssetTypes"] = string.Join(",", getCddoDataAssetsRequest.DataAssetTypes);
+
+        if (getCddoDataAssetsRequest.AccessRights != null && getCddoDataAssetsRequest.AccessRights.Any())
+            queryParams["AccessRights"] = string.Join(",", getCddoDataAssetsRequest.AccessRights);
+
+        if (getCddoDataAssetsRequest.DataAssetStatuses != null && getCddoDataAssetsRequest.DataAssetStatuses.Any())
+            queryParams["DataAssetStatuses"] = string.Join(",", getCddoDataAssetsRequest.DataAssetStatuses);
+
+        queryParams["SortField"] = getCddoDataAssetsRequest.SortField.ToString();
+        queryParams["SortDirection"] = getCddoDataAssetsRequest.SortDirection.ToString();
+        queryParams["StartRecordIndex"] = getCddoDataAssetsRequest.StartRecordIndex.ToString();
+        queryParams["NumberOfRecords"] = getCddoDataAssetsRequest.NumberOfRecords.ToString();
+        queryParams["PageNumber"] = getCddoDataAssetsRequest.PageNumber.ToString();
+
+        var apiUrl = $"{baseUrl}?{queryParams}";
+
+
+        GetCddoDataAssetsResponse? dataAssetsResponse = null;
         try
         {
-            var token = GetToken();
-            // All responses from the Marketplace Api are serialized so that enums are returned as strings rather than
-            // their integer value, so we have to read them back with the same conversion.
-            var response = await _apiUrl
-                .WithSettings(x =>
-                    x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
-                    {
-                        Converters = { new JsonStringEnumConverter() },
-                        PropertyNameCaseInsensitive = true
-                    }))
-                .AppendPathSegment("DataAsset/get-cddo-data-assets")
-                .WithOAuthBearerToken(token)
-                .SetQueryParams(getCddoDataAssetsRequest)
-                .GetJsonAsync<GetCddoDataAssetsResponse>(cancellationToken: cancellationToken);
+            var response = await httpClient.GetAsync(apiUrl);
+            var dataAssets = new List<CddoDataAsset>();
 
-            return response;
-        }
-        catch (FlurlHttpException ex)
-        {
-            var cddoFlurlException = await _cddoFlurlExceptionBuilder.BuildAsync(ex);
-            _logger.LogError(ex, "Failed to Get Data Descriptions. Flurl Response: {FlurlResponseText}", cddoFlurlException.FlurlResponseText);
-            return null;
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                _logger.LogInformation("API Response: {ResponseContent}", responseContent);
+
+                dataAssetsResponse = JsonSerializer.Deserialize<GetCddoDataAssetsResponse>(responseContent, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (dataAssetsResponse?.CddoDataAssets != null)
+                {
+                    _logger.LogInformation("Successfully deserialized data assets from API.");
+                }
+                else
+                {
+                    _logger.LogWarning("No data assets found in the API response.");
+                }
+
+                _logger.LogInformation("Successfully fetched data assets from external API.");
+
+                return dataAssetsResponse;
+            }
+            else
+            {
+                _logger.LogError("Failed to fetch data assets. Status Code: {StatusCode}", response.StatusCode);
+                return null;
+            }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occurred while getting data descriptions results.");
+            _logger.LogError(ex, "An error occurred while calling the external API.");
             return null;
         }
     }

@@ -38,6 +38,7 @@ builder.Services.AddTransient<IAuthorizationHandler, CustomAuthorizationHandler>
 
 builder.Services.Configure<HotjarSettings>(builder.Configuration.GetSection("HotjarSettings"));
 builder.Services.AddAuthorization();
+builder.Logging.AddDebug();
 
 
 //builder.WebHost.ConfigureKestrel(serverOptions =>
@@ -120,6 +121,7 @@ builder.Services.AddAuthentication(options =>
     {
         OnRedirectToLogin = context =>
         {
+
             context.Response.Redirect("/auth/signin");
             return Task.CompletedTask;
         },
@@ -155,7 +157,8 @@ builder.Services.AddAuthentication(options =>
             // Ensure the RedirectUri uses the correct custom domain
             var baseUrl = builder.Configuration["BaseUrl"].TrimEnd('/'); // Remove any trailing slash from BaseUrl
             context.ProtocolMessage.RedirectUri = $"{baseUrl}{options.CallbackPath}";
-            return Task.CompletedTask;
+            var result = Task.CompletedTask;
+            return result;
         },
         OnTokenValidated = async ctx =>
         {

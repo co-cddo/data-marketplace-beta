@@ -13,6 +13,9 @@ using Cddo.Data.Marketplace.UI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using System.Collections.Specialized;
+using System.Collections;
 using System.Text.Json;
 using System.Web;
 using static Cddo.Data.Marketplace.Audit.EventTypes;
@@ -118,84 +121,9 @@ public class CatalogDataController : Controller
 
         LogSearch(getCddoDataAssetsRequest);
         // TODO: IMPLEMENT: Stubbed out the call to the catalog data service
-        //    var getCddoDataAssetsResponse = await _catalogDataService.GetDataAssetsAsync(getCddoDataAssetsRequest);
+         var getCddoDataAssetsResponse = await _catalogDataService.GetDataAssetsAsync(getCddoDataAssetsRequest);
 
 
-        using var httpClient = new HttpClient();
-
-        var baseUrl = "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1/DataAsset/get-cddo-data-assets";
-        var queryParams = HttpUtility.ParseQueryString(string.Empty);
-
-        if (!string.IsNullOrEmpty(getCddoDataAssetsRequest.SearchText))
-            queryParams["SearchText"] = getCddoDataAssetsRequest.SearchText;
-
-        if (getCddoDataAssetsRequest.Themes != null && getCddoDataAssetsRequest.Themes.Any())
-            queryParams["Themes"] = string.Join(",", getCddoDataAssetsRequest.Themes);
-
-        if (getCddoDataAssetsRequest.Creator != null && getCddoDataAssetsRequest.Creator.Any())
-            queryParams["Creator"] = string.Join(",", getCddoDataAssetsRequest.Creator);
-
-        if (getCddoDataAssetsRequest.DataAssetTypes != null && getCddoDataAssetsRequest.DataAssetTypes.Any())
-            queryParams["DataAssetTypes"] = string.Join(",", getCddoDataAssetsRequest.DataAssetTypes);
-
-        if (getCddoDataAssetsRequest.AccessRights != null && getCddoDataAssetsRequest.AccessRights.Any())
-            queryParams["AccessRights"] = string.Join(",", getCddoDataAssetsRequest.AccessRights);
-
-        if (getCddoDataAssetsRequest.DataAssetStatuses != null && getCddoDataAssetsRequest.DataAssetStatuses.Any())
-            queryParams["DataAssetStatuses"] = string.Join(",", getCddoDataAssetsRequest.DataAssetStatuses);
-
-        queryParams["SortField"] = getCddoDataAssetsRequest.SortField.ToString();
-        queryParams["SortDirection"] = getCddoDataAssetsRequest.SortDirection.ToString();
-        queryParams["StartRecordIndex"] = getCddoDataAssetsRequest.StartRecordIndex.ToString();
-        queryParams["NumberOfRecords"] = getCddoDataAssetsRequest.NumberOfRecords.ToString();
-        queryParams["PageNumber"] = getCddoDataAssetsRequest.PageNumber.ToString();
-
-        var apiUrl = $"{baseUrl}?{queryParams}";
-
-
-        GetCddoDataAssetsResponse? dataAssetsResponse = null;
-        try
-        {
-            var response = await httpClient.GetAsync(apiUrl);
-            var dataAssets = new List<CddoDataAsset>();
-
-           
-
-            if (response.IsSuccessStatusCode)
-            {
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                _logger.LogInformation("API Response: {ResponseContent}", responseContent);
-
-                dataAssetsResponse = JsonSerializer.Deserialize<GetCddoDataAssetsResponse>(responseContent, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-
-                if (dataAssetsResponse?.CddoDataAssets != null)
-                {
-                    _logger.LogInformation("Successfully deserialized data assets from API.");
-                }
-                else
-                {
-                    _logger.LogWarning("No data assets found in the API response.");
-                }
-
-                _logger.LogInformation("Successfully fetched data assets from external API.");
-            }
-            else
-            {
-                _logger.LogError("Failed to fetch data assets. Status Code: {StatusCode}", response.StatusCode);
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An error occurred while calling the external API.");
-        }
-  
-
-
-        var getCddoDataAssetsResponse = dataAssetsResponse;
         
 
         //     var getCatalogueFilterOptions = await _catalogDataService.GetCatalogueFilterOptionsAsync(getCddoDataAssetsRequest)
