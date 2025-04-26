@@ -12,6 +12,8 @@ using Cddo.Data.Marketplace.Logic.Exceptions;
 using Agm.Catalog.DotNet.Dto.Responses.Lookup;
 using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums;
 using Cddo.Data.Marketplace.UI.Model;
+using Agm.Catalog.DotNet.Dto.Models.DataAssets;
+using System.Web;
 
 namespace Cddo.Data.Marketplace.UI.Services;
 
@@ -235,9 +237,11 @@ public class CatalogDataService : ICatalogDataService
 
             if (string.IsNullOrWhiteSpace(token)) return null;
 
-
-            var url = _apiUrl
-                .AppendPathSegments("DataAsset/check-for-potential-duplicates-to-data-asset");
+            // TODO: IMPLEMENT: Stubbed out the call CheckForPotentialDuplicatesToDataAssetRequest
+            //var url = _apiUrl
+            //    .AppendPathSegments("DataAsset/check-for-potential-duplicates-to-data-asset");
+            var url = "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1/DataAsset/check-for-potential-duplicates-to-data-asset";
+            // END STUB
 
             var input = new CheckForPotentialDuplicatesToDataAssetRequest
             {
@@ -279,7 +283,21 @@ public class CatalogDataService : ICatalogDataService
             var token = GetToken();
             // All responses from the Marketplace Api are serialized so that enums are returned as strings rather than
             // their integer value, so we have to read them back with the same conversion.
-            var response = await _apiUrl
+            //var response = await _apiUrl
+            //    .WithSettings(x =>
+            //        x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
+            //        {
+            //            Converters = { new JsonStringEnumConverter() },
+            //            PropertyNameCaseInsensitive = true
+            //        }))
+            //    .AppendPathSegment("DataAsset/get-cddo-data-assets")
+            //    .WithOAuthBearerToken(token)
+            //    .SetQueryParams(getCddoDataAssetsRequest)
+            //    .GetJsonAsync<GetCddoDataAssetsResponse>(cancellationToken: cancellationToken);
+
+            // TODO: IMPLEMENT: Stubbed out the call to the catalog data service
+            var baseUrl = "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1/";
+            var response = await baseUrl
                 .WithSettings(x =>
                     x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
                     {
@@ -290,6 +308,10 @@ public class CatalogDataService : ICatalogDataService
                 .WithOAuthBearerToken(token)
                 .SetQueryParams(getCddoDataAssetsRequest)
                 .GetJsonAsync<GetCddoDataAssetsResponse>(cancellationToken: cancellationToken);
+
+        
+            //END Stub
+
 
             return response;
         }
@@ -318,17 +340,59 @@ public class CatalogDataService : ICatalogDataService
             var token = GetToken();
             // All responses from the Marketplace Api are serialized so that enums are returned as strings rather than
             // their integer value, so we have to read them back with the same conversion.
-            var response = await _apiUrl
-                .WithSettings(x =>
-                    x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
-                    {
-                        Converters = { new JsonStringEnumConverter() },
-                        PropertyNameCaseInsensitive = true
-                    }))
-                .AppendPathSegment("FilteredMenuOptions")
-                .WithOAuthBearerToken(token)
-                .SetQueryParams(getCddoDataAssetsRequest)
-                .GetJsonAsync<CatalogueFilterOptions>(cancellationToken: cancellationToken);
+
+            //TODO: IMPELEMENT: Stubbed out the call GetCatalogueFilterOptionsRequest
+            //var response = await _apiUrl
+            //    .WithSettings(x =>
+            //        x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
+            //        {
+            //            Converters = { new JsonStringEnumConverter() },
+            //            PropertyNameCaseInsensitive = true
+            //        }))
+            //    .AppendPathSegment("FilteredMenuOptions")
+            //    .WithOAuthBearerToken(token)
+            //    .SetQueryParams(getCddoDataAssetsRequest)
+            //    .GetJsonAsync<CatalogueFilterOptions>(cancellationToken: cancellationToken);
+
+            // TODO: CALL ROB's API to RETRIEVE THESE VALUES !!
+            var sampleCatalogueFilterOptions = new CatalogueFilterOptions
+            {
+                Organisations = new List<string> {
+                    "Department For Business And Trade",
+                    "Department For Education",
+                    "Department For Energy Security And Net Zero",
+                    "Department For Environment Food & Rural Affairs",
+                    "Driver And Vehicle Standards Agency",
+                    "Government Property Agency",
+                    "HM Revenue & Customs",
+                    "HM Treasury",
+                    "Home Office",
+                    "Ministry Of Housing Communities Local Government",
+                    "Ministry Of Justice",
+                    "Office For National Statistics",
+                    "Ordnance Survey"
+                },
+                Topics = new List<string> {
+                    "Business, economics and finance",
+                    "Crime and justice",
+                    "Culture, leisure and sport",
+                    "Education",
+                    "Energy",
+                    "Environment and nature",
+                    "Geography",
+                    "Government and public sector",
+                    "Health and care",
+                    "Population and society",
+                    "Transport and infrastructure"
+                    },
+                DataAssetTypes = new List<string> { "Dataset", "Service", "API" },
+                AccessRights = new List<string> { "OPEN", "SOMETHING_ELSE" }
+            };
+ 
+            var response = sampleCatalogueFilterOptions;
+            //END Stub
+
+
 
             return response;
         }
@@ -361,7 +425,20 @@ public class CatalogDataService : ICatalogDataService
 
                 // All responses from the Marketplace Api are serialized so that enums are returned as strings rather than
                 // their integer value, so we have to read them back with the same conversion.
-                var response = await _apiUrl
+                //var response = await _apiUrl
+                //    .WithSettings(x =>
+                //        x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
+                //        {
+                //            Converters = { new JsonStringEnumConverter() },
+                //            PropertyNameCaseInsensitive = true
+                //        }))
+                //    .AppendPathSegment("DataAsset/get-cddo-data-assets")
+                //    .WithOAuthBearerToken(token)
+                //    .SetQueryParams(getCddoDataAssetsRequest)
+                //    .GetJsonAsync<GetCddoDataAssetsResponse?>(cancellationToken: cancellationToken);
+
+                var baseUrl = "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1/";
+                var response = await baseUrl
                     .WithSettings(x =>
                         x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
                         {
@@ -372,6 +449,18 @@ public class CatalogDataService : ICatalogDataService
                     .WithOAuthBearerToken(token)
                     .SetQueryParams(getCddoDataAssetsRequest)
                     .GetJsonAsync<GetCddoDataAssetsResponse?>(cancellationToken: cancellationToken);
+                   
+                    if (response?.CddoDataAssets != null)
+                    {
+                        foreach (var dataAsset in response.CddoDataAssets)
+                        {
+                            dataAsset.Issued = DateTime.UtcNow;
+                            dataAsset.Created = DateTime.UtcNow;
+                            dataAsset.Modified = DateTime.UtcNow;
+
+                        }
+                    }
+
 
                 return response;
             }
