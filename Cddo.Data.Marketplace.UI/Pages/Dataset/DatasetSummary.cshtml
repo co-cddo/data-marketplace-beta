@@ -52,6 +52,14 @@
                     {
                         labels.Add("Dataset");
                     }
+                    if (labels.Count <= 0 && dataAsset.DataAssetType == DataAssetType.DataService)
+                    {
+                        labels.Add("Data Service");
+                    }
+                    else if (labels.Count <= 0 && dataAsset.DataAssetType == DataAssetType.DataSet)
+                    {
+                        labels.Add("Dataset");
+                    }
                 }
 
                 <span class="govuk-caption-xl">
