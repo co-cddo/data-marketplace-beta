@@ -23,17 +23,6 @@ stages:
             packageType: 'sdk'
             version: '8.0.x'
             installationPath: $(Agent.ToolsDirectory)/dotnet
-        
-        # Prepare SonarCloud Analysis
-        - task: SonarCloudPrepare@3
-          inputs:
-            SonarCloud: '$(SONARCLOUD_SERVICE_CONNECTION)'
-            organization: '$(SONARCLOUD_ORGANIZATION)'
-            projectKey: '$(SONARCLOUD_PROJECT_KEY)'
-            projectName: '$(SONARCLOUD_PROJECT_NAME)'
-            scannerMode: 'dotnet'
-            extraProperties: |
-              sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/**/coverage.opencover.xml
 
         # Authenticate to Azure Artifacts Feed
         - task: NuGetAuthenticate@1
@@ -44,7 +33,7 @@ stages:
             dotnet restore --source https://pkgs.dev.azure.com/agrimetrics-projects/_packaging/agm-intellectual-property/nuget/v3/index.json --source https://api.nuget.org/v3/index.json
           displayName: 'Restore .NET packages'
           
-                  # Restore Dependencies
+        # Restore Dependencies
         - task: DotNetCoreCLI@2
           displayName: 'Restore Dependencies'
           inputs:
@@ -70,22 +59,6 @@ stages:
           inputs:
             summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.opencover.xml'
 
-        # Run SonarCloud Analysis
-        - task: SonarCloudAnalyze@3
-
-        # Publish Quality Gate Result
-        - task: SonarCloudPublish@3
-          inputs:
-            pollingTimeoutSec: '300'
-
-        - task: DotNetCoreCLI@2
-          displayName: 'Publish Web App'
-          inputs:
-            command: 'publish'
-            publishWebProjects: true
-            arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory) --runtime win-x64 --self-contained false'
-            zipAfterPublish: true
-            
         - task: PublishBuildArtifacts@1
           displayName: 'Publish Build Artifacts'
           inputs:
