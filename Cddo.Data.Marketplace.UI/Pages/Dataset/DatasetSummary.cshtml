@@ -12,11 +12,24 @@
     var apis = dataAsset.DataAssetDistribution?.Where(d => d.MediaType?.ToString() == "API").ToList();
     var webpages = dataAsset.DataAssetDistribution?.Where(d => d.MediaType?.ToString() == "text/html").ToList();
 
+    var hasWebPages = webpages?.Any() == true;
+    var hasFileDownloads = fileDownloads?.Any() == true;
+    var hasApis = apis?.Any() == true;
+    var hasDistributions = dataAsset.DataAssetDistribution?.Any() == true;
+
     ViewData["Title"] = dataAsset.Title;
 }
 
 @functions {
     public static string FormatDateTime(DateTime? dateTime) => dateTime?.ToString("d MMMM yyyy") ?? "";
+
+    void AddLabelIfNotPresent(HashSet<string> targetLabels, string label)
+    {
+        if (!targetLabels.Contains(label))
+        {
+            targetLabels.Add(label);
+        }
+    }
 }
 
 @section Styles
@@ -34,31 +47,28 @@
                 @{
                     var labels = new HashSet<string>();
 
-                    if (webpages != null && webpages.Any() || fileDownloads != null && fileDownloads.Any())
+                    // Add labels based on available data
+                    if (hasWebPages || hasFileDownloads)
                     {
-                        labels.Add("Dataset");
+                        AddLabelIfNotPresent(labels, "Dataset");
                     }
 
-                    if (apis != null && apis.Any())
+                    if (hasApis)
                     {
-                        labels.Add("API");
+                        AddLabelIfNotPresent(labels, "API");
                     }
 
-                    if ((dataAsset.DataAssetDistribution == null || !dataAsset.DataAssetDistribution.Any()) && dataAsset.DataAssetType == DataAssetType.DataService)
+                    // Handle missing distributions or no labels assigned
+                    if (!hasDistributions || labels.Count == 0)
                     {
-                        labels.Add("Data Service");
-                    }
-                    else if ((dataAsset.DataAssetDistribution == null || !dataAsset.DataAssetDistribution.Any()) && !labels.Contains("Dataset") && dataAsset.DataAssetType == DataAssetType.DataSet)
-                    {
-                        labels.Add("Dataset");
-                    }
-                    if (labels.Count <= 0 && dataAsset.DataAssetType == DataAssetType.DataService)
-                    {
-                        labels.Add("Data Service");
-                    }
-                    else if (labels.Count <= 0 && dataAsset.DataAssetType == DataAssetType.DataSet)
-                    {
-                        labels.Add("Dataset");
+                        if (dataAsset.DataAssetType == DataAssetType.DataService)
+                        {
+                            AddLabelIfNotPresent(labels, "Data Service");
+                        }
+                        else if (dataAsset.DataAssetType == DataAssetType.DataSet)
+                        {
+                            AddLabelIfNotPresent(labels, "Dataset");
+                        }
                     }
                 }
 
