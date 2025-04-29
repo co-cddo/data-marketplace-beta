@@ -58,6 +58,14 @@ stages:
           displayName: 'Publish Code Coverage Results'
           inputs:
             summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.opencover.xml'
+            
+        - task: DotNetCoreCLI@2
+          displayName: 'Publish Web App'
+          inputs:
+            command: 'publish'
+            publishWebProjects: true
+            arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory) --runtime win-x64 --self-contained false'
+            zipAfterPublish: true
 
         - task: PublishBuildArtifacts@1
           displayName: 'Publish Build Artifacts'
