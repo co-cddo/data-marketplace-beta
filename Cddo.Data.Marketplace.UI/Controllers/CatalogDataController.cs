@@ -28,6 +28,17 @@ public class CatalogDataController : Controller
     private readonly IAppInsightsLogger _appInsightlogger;
     private readonly IUserRoleService _userRoleService;
 
+
+    // Lazy-loaded static property for the API base URL
+    // CatalogueDataService structure can get the base URL from the appsettings!
+    // You can use that pattern!
+    private static readonly Lazy<string> _apiBaseUrl = new(() =>
+        Environment.GetEnvironmentVariable("DM_CATALOGUE_BASE_URL")
+        ?? "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1" // Default value
+    );
+    // Getter for the API base URL
+    private static string ApiBaseUrl => _apiBaseUrl.Value;
+
     private sealed class SortOptions
     {
         public required DataAssetsSortField SortField { get; init; }
@@ -315,7 +326,7 @@ public class CatalogDataController : Controller
             // var result = await _catalogDataService.GetDataAssetAsync(dataAssetId);
 
             using var httpClient = new HttpClient();
-            var apiUrl = "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1/DataAsset/get-cddo-data-asset?DataAssetId=" + dataAssetId.ToString();
+            var apiUrl = $"{ApiBaseUrl}/DataAsset/get-cddo-data-asset?DataAssetId={dataAssetId}";
             GetCddoDataAssetResponse? dataAssetResponse = null;
             try
             {

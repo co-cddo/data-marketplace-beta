@@ -53,6 +53,15 @@ public class DataAssetService(
     IAgmUserInformationBuilder agmUserInformationBuilder)
     : IDataAssetService
 {
+    // Lazy-loaded static property for the API base URL
+    // CatalogueDataService structure can get the base URL from the appsettings!
+    // You can use that pattern!
+    private static readonly Lazy<string> _apiBaseUrl = new(() =>
+        Environment.GetEnvironmentVariable("DM_CATALOGUE_BASE_URL")
+        ?? "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1" // Default value
+    );
+    // Getter for the API base URL
+    private static string ApiBaseUrl => _apiBaseUrl.Value;
     async Task<IServiceOperationDataResult<IAddDataAssetResult>> IDataAssetService.AddProfiledDataAssetAsync(
         IUserDetails initiatingUserDetails,
         string profileId,
@@ -97,7 +106,7 @@ public class DataAssetService(
             var createdDataAssetId = new Guid();
 
             var httpClient = new HttpClient();
-            var apiUrl = "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1/DataAsset/add-profiled-data-asset";
+            var apiUrl = $"{ApiBaseUrl}/DataAsset/add-profiled-data-asset";
 
             // Create the request payload
             var requestPayload = new
@@ -239,7 +248,7 @@ public class DataAssetService(
             }
 
             using var httpClient2 = new HttpClient();
-            var apiUrl2 = "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1/DataAsset/get-cddo-data-asset?DataAssetId=" + dataAssetId.ToString();
+            var apiUrl2 = $"{ApiBaseUrl}/DataAsset/get-cddo-data-asset?DataAssetId={dataAssetId}";
 
             var response2 = await httpClient2.GetAsync(apiUrl2);
             GetCddoDataAssetResponse? existingCddoDataAsset2 = null;
@@ -263,7 +272,7 @@ public class DataAssetService(
 
             // PATCH DATA 
             var httpClient = new HttpClient();
-            var apiUrl = "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1/DataAsset/patch-profiled-data-asset";
+            var apiUrl = $"{ApiBaseUrl}/DataAsset/patch-profiled-data-asset";
 
             // Create the request payload
             var requestPayload = new
@@ -437,7 +446,7 @@ public class DataAssetService(
             //catalogEntriesOrganisationFilter);
 
             using var httpClient = new HttpClient();
-            var apiUrl = "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1/DataAsset/get-cddo-data-asset?DataAssetId=" + dataAssetId.ToString();
+            var apiUrl = $"{ApiBaseUrl}/DataAsset/get-cddo-data-asset?DataAssetId={dataAssetId}";
             GetCddoDataAssetResponse? existingCddoDataAsset = null;
             var cddoDataAsset = new CddoDataAsset();
   
@@ -481,8 +490,7 @@ public class DataAssetService(
             //await ckanConnection.DeleteCatalogEntryAsync(dataAssetId);
 
             
-            apiUrl = $"https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1/DataAsset/delete-profiled-data-asset?DataAssetId={dataAssetId}&ProfileId={profileId}";
-
+            apiUrl = $"{ApiBaseUrl}/DataAsset/delete-profiled-data-asset?DataAssetId={dataAssetId}&ProfileId={profileId}";
             var httpRequest = new HttpRequestMessage(HttpMethod.Delete, apiUrl);
             httpRequest.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("text/plain"));
 
@@ -755,7 +763,7 @@ public class DataAssetService(
             //    catalogEntriesOrganisationFilter);
 
             using var httpClient = new HttpClient();
-            var apiUrl = "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1/DataAsset/get-cddo-data-asset?DataAssetId=" + dataAssetId.ToString();
+            var apiUrl = $"{ApiBaseUrl}/DataAsset/get-cddo-data-asset?DataAssetId={dataAssetId}";
             GetCddoDataAssetResponse? dataAssetResponse = null;
             var cddoDataAsset = new CddoDataAsset();
             try

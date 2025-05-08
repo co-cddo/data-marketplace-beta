@@ -37,6 +37,13 @@ public class CatalogDataService : ICatalogDataService
         _httpContextAccessor = httpContextAccessor;
         _cddoFlurlExceptionBuilder = cddoFlurlExceptionBuilder;
     }
+    // in this class, there is a better pattern for getting the base url (from appsettings)
+    private static readonly Lazy<string> _apiBaseUrl = new(() =>
+    Environment.GetEnvironmentVariable("DM_CATALOGUE_BASE_URL")
+    ?? "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1" // Default value
+);
+    // Getter for the API base URL
+    private static string ApiBaseUrl => _apiBaseUrl.Value;
 
     private string? GetToken()
     {
@@ -240,7 +247,7 @@ public class CatalogDataService : ICatalogDataService
             // TODO: IMPLEMENT: Stubbed out the call CheckForPotentialDuplicatesToDataAssetRequest
             //var url = _apiUrl
             //    .AppendPathSegments("DataAsset/check-for-potential-duplicates-to-data-asset");
-            var url = "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1/DataAsset/check-for-potential-duplicates-to-data-asset";
+            var url = $"{ApiBaseUrl}/DataAsset/check-for-potential-duplicates-to-data-asset";
             // END STUB
 
             var input = new CheckForPotentialDuplicatesToDataAssetRequest
@@ -296,7 +303,7 @@ public class CatalogDataService : ICatalogDataService
             //    .GetJsonAsync<GetCddoDataAssetsResponse>(cancellationToken: cancellationToken);
 
             // TODO: IMPLEMENT: Stubbed out the call to the catalog data service
-            var baseUrl = "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1/";
+            var baseUrl = $"{ApiBaseUrl}/";
             var response = await baseUrl
                 .WithSettings(x =>
                     x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
@@ -437,7 +444,8 @@ public class CatalogDataService : ICatalogDataService
                 //    .SetQueryParams(getCddoDataAssetsRequest)
                 //    .GetJsonAsync<GetCddoDataAssetsResponse?>(cancellationToken: cancellationToken);
 
-                var baseUrl = "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1/";
+                var baseUrl = $"{ApiBaseUrl}/";
+
                 var response = await baseUrl
                     .WithSettings(x =>
                         x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
@@ -449,18 +457,6 @@ public class CatalogDataService : ICatalogDataService
                     .WithOAuthBearerToken(token)
                     .SetQueryParams(getCddoDataAssetsRequest)
                     .GetJsonAsync<GetCddoDataAssetsResponse?>(cancellationToken: cancellationToken);
-                   
-                    if (response?.CddoDataAssets != null)
-                    {
-                        foreach (var dataAsset in response.CddoDataAssets)
-                        {
-                            dataAsset.Issued = DateTime.UtcNow;
-                            dataAsset.Created = DateTime.UtcNow;
-                            dataAsset.Modified = DateTime.UtcNow;
-
-                        }
-                    }
-
 
                 return response;
             }
