@@ -14,6 +14,8 @@ using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums;
 using Cddo.Data.Marketplace.UI.Model;
 using Agm.Catalog.DotNet.Dto.Models.DataAssets;
 using System.Web;
+using Cddo.Data.Marketplace.Logic.Services.Users;
+using Microsoft.Extensions.Logging;
 
 namespace Cddo.Data.Marketplace.UI.Services;
 
@@ -23,6 +25,7 @@ public class CatalogDataService : ICatalogDataService
     private readonly ILogger<CatalogDataService> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ICddoFlurlExceptionBuilder _cddoFlurlExceptionBuilder;
+    private readonly IUserProfilePresenter _userProfilePresenter;
 
     private readonly string _profileId = "dcat-ukap-v3.1";
 
@@ -30,12 +33,15 @@ public class CatalogDataService : ICatalogDataService
         ILogger<CatalogDataService> logger,
         IConfiguration configuration,
         IHttpContextAccessor httpContextAccessor,
-        ICddoFlurlExceptionBuilder cddoFlurlExceptionBuilder)
+        ICddoFlurlExceptionBuilder cddoFlurlExceptionBuilder,
+        IUserProfilePresenter userProfilePresenter
+        )
     {
         _apiUrl = configuration.GetSection("Api:Main").Value!;
         _logger = logger;
         _httpContextAccessor = httpContextAccessor;
         _cddoFlurlExceptionBuilder = cddoFlurlExceptionBuilder;
+        _userProfilePresenter = userProfilePresenter;
     }
     // in this class, there is a better pattern for getting the base url (from appsettings)
     private static readonly Lazy<string> _apiBaseUrl = new(() =>
@@ -446,6 +452,12 @@ public class CatalogDataService : ICatalogDataService
 
                 var baseUrl = $"{ApiBaseUrl}/";
 
+                var initiatingUserDetails = await _userProfilePresenter.GetInitiatingUserDetailsAsync();
+                if (initiatingUserDetails == null)
+                {
+                    _logger.LogError("Unable to get user details for initiating user");
+                }
+
                 var response = await baseUrl
                     .WithSettings(x =>
                         x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
@@ -456,6 +468,7 @@ public class CatalogDataService : ICatalogDataService
                     .AppendPathSegment("DataAsset/get-cddo-data-assets")
                     .WithOAuthBearerToken(token)
                     .SetQueryParams(getCddoDataAssetsRequest)
+                    .SetQueryParam("OrganisationId", initiatingUserDetails?.OrganisationInformation.OrganisationId)
                     .GetJsonAsync<GetCddoDataAssetsResponse?>(cancellationToken: cancellationToken);
 
                 return response;
