@@ -123,7 +123,7 @@ public class CatalogDataController : Controller
             SortField = sortOptions.SortField,
             SortDirection = sortOptions.SortDirection,
             StartRecordIndex = 0,
-            NumberOfRecords = 2,// 20,
+            NumberOfRecords = 20,
             PageNumber = selectedPageNumber ?? 1
         };
 
