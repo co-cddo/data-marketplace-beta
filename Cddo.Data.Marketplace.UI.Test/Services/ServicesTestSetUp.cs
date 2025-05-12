@@ -48,7 +48,8 @@ namespace Cddo.Data.Marketplace.UI.Test.Services
                 mockCataloguServiceLogger.Object,
                 mockConfiguration.Object,
                 mockHttpContextAccessor.Object,
-                mockCddoFlurlExceptionBuilder.Object);
+                mockCddoFlurlExceptionBuilder.Object,
+                null); // I added null for the last parameter in order to pass build. That logicadded for adhoc basis in the original code.
 
             var catalogQuestionsService = new CatalogQuestionsService(
                 mockCataloguQuestionServiceLogger.Object,
