@@ -418,11 +418,20 @@
                                                 {
                                                     tags.Add("Dataset");
                                                 }
-                                                if (!mediaTypes.Any() && dataAsset.DataAssetType == DataAssetType.DataService)
+                                                if ((!mediaTypes.Any() || string.IsNullOrEmpty(mediaTypes.FirstOrDefault())) && dataAsset.DataAssetType == DataAssetType.DataService)
                                                 {
                                                     tags.Add("Data Service");
                                                 }
-                                                else if (!mediaTypes.Any() && dataAsset.DataAssetType == DataAssetType.DataSet && !tags.Contains("Dataset"))
+                                                else if ((!mediaTypes.Any() || string.IsNullOrEmpty(mediaTypes.FirstOrDefault())) && dataAsset.DataAssetType == DataAssetType.DataSet && !tags.Contains("Dataset"))
+                                                {
+                                                    tags.Add("Dataset");
+                                                }
+
+                                                if (tags.Count <= 0 && dataAsset.DataAssetType == DataAssetType.DataService)
+												{
+                                                    tags.Add("Data Service");
+												}
+                                                else if (tags.Count <= 0 && dataAsset.DataAssetType == DataAssetType.DataSet)
                                                 {
                                                     tags.Add("Dataset");
                                                 }
