@@ -1,7 +1,6 @@
-trigger:
-  branches:
-    include:
-      - master
+# CI disabled intentionally — do not re-enable without team consensus
+trigger: none
+pr: none
 
 pool:
   name: Azure Pipelines
