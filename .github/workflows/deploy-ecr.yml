@@ -1,0 +1,110 @@
+name: Deploy Docker Images (API & UI)
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Select environment"
+        required: true
+        type: choice
+        options:
+          - Dev
+          - Test
+          - Prod
+
+permissions:
+  id-token: write
+  contents: write
+
+env:
+  AWS_REGION: eu-west-2
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch all tags
+        run: git fetch --tags --force
+
+      - name: Get latest tag
+        id: latest_tag
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0 --always)
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_OUTPUT
+
+      - name: Set environment and repo variables
+        id: set-vars
+        run: |
+          ENV="${{ github.event.inputs.environment }}"
+          LATEST_TAG="${{ steps.latest_tag.outputs.LATEST_TAG }}"
+          declare -A ENV_ACCOUNT_TYPE=(
+            ["Dev"]="DEV"
+            ["Test"]="DEV"
+            ["Prod"]="PROD"
+          )
+          declare -A ACCOUNT_IDS=(
+            ["DEV"]="855859226163"
+            ["PROD"]="855859226163"
+          )
+          declare -A ROLES
+          for ACCOUNT_TYPE in "${!ACCOUNT_IDS[@]}"; do
+            ROLES[$ACCOUNT_TYPE]="arn:aws:iam::${ACCOUNT_IDS[$ACCOUNT_TYPE]}:role/ECRContainerPush"
+          done
+          declare -A REPOS=(
+            ["Dev"]="dm-fast-dev"
+            ["Test"]="dm-fast-test"
+            ["Prod"]="dm-fast-prod"
+          )
+          ACCOUNT_TYPE="${ENV_ACCOUNT_TYPE[$ENV]}"
+          AWS_ACCOUNT_ID="${ACCOUNT_IDS[$ACCOUNT_TYPE]}"
+          ROLE_TO_ASSUME="${ROLES[$ACCOUNT_TYPE]}"
+          ECR_REPO="${REPOS[$ENV]}"
+          IMAGE_TAG_API="api-${LATEST_TAG}"
+          IMAGE_TAG_UI="ui-${LATEST_TAG}"
+          FULL_IMAGE_API="${AWS_ACCOUNT_ID}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG_API}"
+          FULL_IMAGE_UI="${AWS_ACCOUNT_ID}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG_UI}"
+          echo "AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID" >> $GITHUB_ENV
+          echo "ROLE_TO_ASSUME=$ROLE_TO_ASSUME" >> $GITHUB_ENV
+          echo "ECR_REPO=$ECR_REPO" >> $GITHUB_ENV
+          echo "IMAGE_TAG_API=$IMAGE_TAG_API" >> $GITHUB_ENV
+          echo "IMAGE_TAG_UI=$IMAGE_TAG_UI" >> $GITHUB_ENV
+          echo "FULL_IMAGE_API=$FULL_IMAGE_API" >> $GITHUB_ENV
+          echo "FULL_IMAGE_UI=$FULL_IMAGE_UI" >> $GITHUB_ENV
+
+      - name: Set Git identity
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "GitHub Actions"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and Push API Image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: "${{ env.FULL_IMAGE_API }}"
+          file: Dockerfile-API
+          context: .
+          platforms: linux/amd64
+
+      - name: Build and Push UI Image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: "${{ env.FULL_IMAGE_UI }}"
+          file: Dockerfile-UI
+          context: .
+          platforms: linux/amd64
