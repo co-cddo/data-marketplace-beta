@@ -88,6 +88,11 @@ jobs:
           role-to-assume: ${{ env.ROLE_TO_ASSUME }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Download AGM NuGet package from S3
+        run: |
+          mkdir -p nuget-packages
+          aws s3 cp s3://dm-fast-assets/Agm.Catalog.DotNet.12.4.0.106.nupkg nuget-packages/Agm.Catalog.DotNet.12.4.0.106.nupkg
+
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
