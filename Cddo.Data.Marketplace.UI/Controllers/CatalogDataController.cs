@@ -1,6 +1,5 @@
 ﻿using Agm.Catalog.DotNet.Dto.Models.DataAssets;
 using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums;
-using Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V1_0;
 using Agm.Catalog.DotNet.Dto.Requests.DataAssets;
 using Agm.Catalog.DotNet.Dto.Responses.DataAssets;
 using Cddo.Data.Marketplace.Api.Dto.Requests.DataShareRequests;
