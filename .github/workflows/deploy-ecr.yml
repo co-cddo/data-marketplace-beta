@@ -58,7 +58,7 @@ jobs:
           done
           declare -A REPOS=(
             ["Dev"]="dm-fast-dev"
-            ["Test"]="dm-fast-test"
+            ["Test"]="dm-fast-tst"
             ["Prod"]="dm-fast-prod"
           )
           ACCOUNT_TYPE="${ENV_ACCOUNT_TYPE[$ENV]}"
