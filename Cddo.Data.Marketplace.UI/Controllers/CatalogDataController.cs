@@ -141,7 +141,7 @@ public class CatalogDataController : Controller
         SetViewBagPropertiesForCddoDataAssetViewing(
             getCddoDataAssetsRequest.SearchText,
             selectedThemes,
-            selectedOrganisations.Count <= 0 ? [] : organisationNames,
+            selectedOrganisations.Count <= 0 ? [] : selectedOrganisations,
             getCddoDataAssetsRequest.DataAssetTypes,
             getCddoDataAssetsRequest.DataAssetStatuses,
             getCddoDataAssetsRequest.NumberOfRecords,

@@ -141,7 +141,7 @@ public class CatalogDataService : ICatalogDataService
             //    .GetJsonAsync<GetCddoOrganisationsResponse>(cancellationToken: cancellationToken);
 
             //return response.Organisations;
-            return    new List<string> {
+            return new List<string> {
                     "Department For Business And Trade",
                     "Department For Education",
                     "Department For Energy Security And Net Zero",
@@ -385,7 +385,21 @@ public class CatalogDataService : ICatalogDataService
             // TODO: CALL ROB's API to RETRIEVE THESE VALUES !!
             var sampleCatalogueFilterOptions = new CatalogueFilterOptions
             {
-                Organisations = getCddoDataAssetsRequest.Creator,
+                Organisations = new List<string> {
+                    "Department For Business And Trade",
+                    "Department For Education",
+                    "Department For Energy Security And Net Zero",
+                    "Department For Environment Food & Rural Affairs",
+                    "Driver And Vehicle Standards Agency",
+                    "Government Property Agency",
+                    "HM Revenue & Customs",
+                    "HM Treasury",
+                    "Home Office",
+                    "Ministry Of Housing Communities Local Government",
+                    "Ministry Of Justice",
+                    "Office For National Statistics",
+                    "Ordnance Survey"
+                },
                 Topics = new List<string> {
                     "Business, economics and finance",
                     "Crime and justice",
