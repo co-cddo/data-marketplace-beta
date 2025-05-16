@@ -117,45 +117,31 @@ public class CatalogDataService : ICatalogDataService
     {
         try
         {
-            //var token = GetToken();
-            //if (token == null)
-            //{
-            //    return Enumerable.Empty<string>();
-            //}
+            var token = GetToken();
+            if (token == null)
+            {
+                return Enumerable.Empty<string>();
+            }
 
-            //var getCddoOrganisationsRequest = new GetCddoOrganisationsRequest
-            //{
-            //    DataAssetStatuses = dataAssetStatuses?.ToList()
-            //};
+            var getCddoOrganisationsRequest = new GetCddoOrganisationsRequest
+            {
+                DataAssetStatuses = dataAssetStatuses?.ToList()
+            };
+            var orgsUrl = $"{_apiBaseUrl.Value}";
+            var response = await orgsUrl
+                .WithSettings(x =>
+                    x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
+                    {
+                        Converters = { new JsonStringEnumConverter() },
+                        PropertyNameCaseInsensitive = true
+                    }))
+                .AppendPathSegments("Organisations")
+                .WithOAuthBearerToken(token)
+                .SetQueryParams(getCddoOrganisationsRequest)
+                .GetJsonAsync<GetCddoOrganisationsResponse>(cancellationToken: cancellationToken);
 
-            //var response = await _apiUrl
-            //    .WithSettings(x =>
-            //        x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
-            //        {
-            //            Converters = { new JsonStringEnumConverter() },
-            //            PropertyNameCaseInsensitive = true
-            //        }))
-            //    .AppendPathSegments("Organisations")
-            //    .WithOAuthBearerToken(token)
-            //    .SetQueryParams(getCddoOrganisationsRequest)
-            //    .GetJsonAsync<GetCddoOrganisationsResponse>(cancellationToken: cancellationToken);
+            return response.Organisations;
 
-            //return response.Organisations;
-            return new List<string> {
-                    "Department For Business And Trade",
-                    "Department For Education",
-                    "Department For Energy Security And Net Zero",
-                    "Department For Environment Food & Rural Affairs",
-                    "Driver And Vehicle Standards Agency",
-                    "Government Property Agency",
-                    "HM Revenue & Customs",
-                    "HM Treasury",
-                    "Home Office",
-                    "Ministry Of Housing Communities Local Government",
-                    "Ministry Of Justice",
-                    "Office For National Statistics",
-                    "Ordnance Survey"
-                };
         }
         catch (FlurlHttpException ex)
         {
@@ -311,33 +297,26 @@ public class CatalogDataService : ICatalogDataService
             var token = GetToken();
             // All responses from the Marketplace Api are serialized so that enums are returned as strings rather than
             // their integer value, so we have to read them back with the same conversion.
-            //var response = await _apiUrl
-            //    .WithSettings(x =>
-            //        x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
-            //        {
-            //            Converters = { new JsonStringEnumConverter() },
-            //            PropertyNameCaseInsensitive = true
-            //        }))
-            //    .AppendPathSegment("DataAsset/get-cddo-data-assets")
-            //    .WithOAuthBearerToken(token)
-            //    .SetQueryParams(getCddoDataAssetsRequest)
-            //    .GetJsonAsync<GetCddoDataAssetsResponse>(cancellationToken: cancellationToken);
-
-            // TODO: IMPLEMENT: Stubbed out the call to the catalog data service
+            
             var baseUrl = $"{ApiBaseUrl}/";
-            var response = await baseUrl
+
+            var requestUrl = baseUrl
+                .AppendPathSegment("DataAsset/get-cddo-data-assets")
+                .SetQueryParams(getCddoDataAssetsRequest); 
+
+            Console.WriteLine($"Request URL: {requestUrl}"); 
+
+            var response = await requestUrl
                 .WithSettings(x =>
                     x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
                     {
                         Converters = { new JsonStringEnumConverter() },
                         PropertyNameCaseInsensitive = true
                     }))
-                .AppendPathSegment("DataAsset/get-cddo-data-assets")
                 .WithOAuthBearerToken(token)
-                .SetQueryParams(getCddoDataAssetsRequest)
                 .GetJsonAsync<GetCddoDataAssetsResponse>(cancellationToken: cancellationToken);
 
-        
+
             //END Stub
 
 
@@ -366,61 +345,22 @@ public class CatalogDataService : ICatalogDataService
         try
         {
             var token = GetToken();
-            // All responses from the Marketplace Api are serialized so that enums are returned as strings rather than
+            //All responses from the Marketplace Api are serialized so that enums are returned as strings rather than
             // their integer value, so we have to read them back with the same conversion.
+            var baseUrl = $"{ApiBaseUrl}/"
+                .AppendPathSegment("FilteredMenuOptions")
+                .SetQueryParams(getCddoDataAssetsRequest);
+            var response = await baseUrl
+                .WithSettings(x =>
+                    x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
+                    {
+                        Converters = { new JsonStringEnumConverter() },
+                        PropertyNameCaseInsensitive = true
+                    }))
 
-            //TODO: IMPELEMENT: Stubbed out the call GetCatalogueFilterOptionsRequest
-            //var response = await _apiUrl
-            //    .WithSettings(x =>
-            //        x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
-            //        {
-            //            Converters = { new JsonStringEnumConverter() },
-            //            PropertyNameCaseInsensitive = true
-            //        }))
-            //    .AppendPathSegment("FilteredMenuOptions")
-            //    .WithOAuthBearerToken(token)
-            //    .SetQueryParams(getCddoDataAssetsRequest)
-            //    .GetJsonAsync<CatalogueFilterOptions>(cancellationToken: cancellationToken);
-
-            // TODO: CALL ROB's API to RETRIEVE THESE VALUES !!
-            var sampleCatalogueFilterOptions = new CatalogueFilterOptions
-            {
-                Organisations = new List<string> {
-                    "Department For Business And Trade",
-                    "Department For Education",
-                    "Department For Energy Security And Net Zero",
-                    "Department For Environment Food & Rural Affairs",
-                    "Driver And Vehicle Standards Agency",
-                    "Government Property Agency",
-                    "HM Revenue & Customs",
-                    "HM Treasury",
-                    "Home Office",
-                    "Ministry Of Housing Communities Local Government",
-                    "Ministry Of Justice",
-                    "Office For National Statistics",
-                    "Ordnance Survey"
-                },
-                Topics = new List<string> {
-                    "Business, economics and finance",
-                    "Crime and justice",
-                    "Culture, leisure and sport",
-                    "Education",
-                    "Energy",
-                    "Environment and nature",
-                    "Geography",
-                    "Government and public sector",
-                    "Health and care",
-                    "Population and society",
-                    "Transport and infrastructure"
-                    },
-                DataAssetTypes = new List<string> { "Dataset", "Service", "API" },
-                AccessRights = new List<string> { "OPEN", "SOMETHING_ELSE" }
-            };
- 
-            var response = sampleCatalogueFilterOptions;
-            //END Stub
-
-
+                .WithOAuthBearerToken(token)
+                
+                .GetJsonAsync<CatalogueFilterOptions>(cancellationToken: cancellationToken);
 
             return response;
         }

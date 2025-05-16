@@ -141,7 +141,7 @@ public class CatalogDataController : Controller
         SetViewBagPropertiesForCddoDataAssetViewing(
             getCddoDataAssetsRequest.SearchText,
             selectedThemes,
-            selectedOrganisations.Count <= 0 ? [] : selectedOrganisations,
+            selectedOrganisations.Count <= 0 ? [] : organisationNames,
             getCddoDataAssetsRequest.DataAssetTypes,
             getCddoDataAssetsRequest.DataAssetStatuses,
             getCddoDataAssetsRequest.NumberOfRecords,
@@ -350,7 +350,7 @@ public class CatalogDataController : Controller
                         _logger.LogWarning("No data asset  found in the API response.");
                     }
 
-                  
+
                     _logger.LogInformation("Successfully fetched data asset from external API.");
                 }
                 else
