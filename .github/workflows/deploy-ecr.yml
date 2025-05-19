@@ -59,7 +59,7 @@ jobs:
           declare -A REPOS=(
             ["Dev"]="dm-fast-dev"
             ["Test"]="dm-fast-tst"
-            ["Prod"]="dm-fast-prod"
+            ["Prod"]="dm-fast-pro"
           )
           ACCOUNT_TYPE="${ENV_ACCOUNT_TYPE[$ENV]}"
           AWS_ACCOUNT_ID="${ACCOUNT_IDS[$ACCOUNT_TYPE]}"
