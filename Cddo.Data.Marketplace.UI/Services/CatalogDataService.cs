@@ -46,7 +46,6 @@ public class CatalogDataService : ICatalogDataService
     // in this class, there is a better pattern for getting the base url (from appsettings)
     private static readonly Lazy<string> _apiBaseUrl = new(() =>
     Environment.GetEnvironmentVariable("DM_CATALOGUE_BASE_URL")
-    ?? "https://dm-server-prototype-89cdd9b9c4f8.herokuapp.com/api/v1" // Default value
 );
     // Getter for the API base URL
     private static string ApiBaseUrl => _apiBaseUrl.Value;
