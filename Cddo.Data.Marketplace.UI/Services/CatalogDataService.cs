@@ -12,6 +12,10 @@ using Cddo.Data.Marketplace.Logic.Exceptions;
 using Agm.Catalog.DotNet.Dto.Responses.Lookup;
 using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums;
 using Cddo.Data.Marketplace.UI.Model;
+using Agm.Catalog.DotNet.Dto.Models.DataAssets;
+using System.Web;
+using Cddo.Data.Marketplace.Logic.Services.Users;
+using Microsoft.Extensions.Logging;
 
 namespace Cddo.Data.Marketplace.UI.Services;
 
@@ -21,6 +25,7 @@ public class CatalogDataService : ICatalogDataService
     private readonly ILogger<CatalogDataService> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ICddoFlurlExceptionBuilder _cddoFlurlExceptionBuilder;
+    private readonly IUserProfilePresenter _userProfilePresenter;
 
     private readonly string _profileId = "dcat-ukap-v3.1";
 
@@ -28,13 +33,22 @@ public class CatalogDataService : ICatalogDataService
         ILogger<CatalogDataService> logger,
         IConfiguration configuration,
         IHttpContextAccessor httpContextAccessor,
-        ICddoFlurlExceptionBuilder cddoFlurlExceptionBuilder)
+        ICddoFlurlExceptionBuilder cddoFlurlExceptionBuilder,
+        IUserProfilePresenter userProfilePresenter
+        )
     {
         _apiUrl = configuration.GetSection("Api:Main").Value!;
         _logger = logger;
         _httpContextAccessor = httpContextAccessor;
         _cddoFlurlExceptionBuilder = cddoFlurlExceptionBuilder;
+        _userProfilePresenter = userProfilePresenter;
     }
+    // in this class, there is a better pattern for getting the base url (from appsettings)
+    private static readonly Lazy<string> _apiBaseUrl = new(() =>
+    Environment.GetEnvironmentVariable("DM_CATALOGUE_BASE_URL")
+);
+    // Getter for the API base URL
+    private static string ApiBaseUrl => _apiBaseUrl.Value;
 
     private string? GetToken()
     {
@@ -112,8 +126,8 @@ public class CatalogDataService : ICatalogDataService
             {
                 DataAssetStatuses = dataAssetStatuses?.ToList()
             };
-
-            var response = await _apiUrl
+            var orgsUrl = $"{_apiBaseUrl.Value}";
+            var response = await orgsUrl
                 .WithSettings(x =>
                     x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
                     {
@@ -126,6 +140,7 @@ public class CatalogDataService : ICatalogDataService
                 .GetJsonAsync<GetCddoOrganisationsResponse>(cancellationToken: cancellationToken);
 
             return response.Organisations;
+
         }
         catch (FlurlHttpException ex)
         {
@@ -235,9 +250,11 @@ public class CatalogDataService : ICatalogDataService
 
             if (string.IsNullOrWhiteSpace(token)) return null;
 
-
-            var url = _apiUrl
-                .AppendPathSegments("DataAsset/check-for-potential-duplicates-to-data-asset");
+            // TODO: IMPLEMENT: Stubbed out the call CheckForPotentialDuplicatesToDataAssetRequest
+            //var url = _apiUrl
+            //    .AppendPathSegments("DataAsset/check-for-potential-duplicates-to-data-asset");
+            var url = $"{ApiBaseUrl}/DataAsset/check-for-potential-duplicates-to-data-asset";
+            // END STUB
 
             var input = new CheckForPotentialDuplicatesToDataAssetRequest
             {
@@ -279,17 +296,28 @@ public class CatalogDataService : ICatalogDataService
             var token = GetToken();
             // All responses from the Marketplace Api are serialized so that enums are returned as strings rather than
             // their integer value, so we have to read them back with the same conversion.
-            var response = await _apiUrl
+            
+            var baseUrl = $"{ApiBaseUrl}/";
+
+            var requestUrl = baseUrl
+                .AppendPathSegment("DataAsset/get-cddo-data-assets")
+                .SetQueryParams(getCddoDataAssetsRequest); 
+
+            Console.WriteLine($"Request URL: {requestUrl}"); 
+
+            var response = await requestUrl
                 .WithSettings(x =>
                     x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
                     {
                         Converters = { new JsonStringEnumConverter() },
                         PropertyNameCaseInsensitive = true
                     }))
-                .AppendPathSegment("DataAsset/get-cddo-data-assets")
                 .WithOAuthBearerToken(token)
-                .SetQueryParams(getCddoDataAssetsRequest)
                 .GetJsonAsync<GetCddoDataAssetsResponse>(cancellationToken: cancellationToken);
+
+
+            //END Stub
+
 
             return response;
         }
@@ -316,18 +344,21 @@ public class CatalogDataService : ICatalogDataService
         try
         {
             var token = GetToken();
-            // All responses from the Marketplace Api are serialized so that enums are returned as strings rather than
+            //All responses from the Marketplace Api are serialized so that enums are returned as strings rather than
             // their integer value, so we have to read them back with the same conversion.
-            var response = await _apiUrl
+            var baseUrl = $"{ApiBaseUrl}/"
+                .AppendPathSegment("FilteredMenuOptions")
+                .SetQueryParams(getCddoDataAssetsRequest);
+            var response = await baseUrl
                 .WithSettings(x =>
                     x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
                     {
                         Converters = { new JsonStringEnumConverter() },
                         PropertyNameCaseInsensitive = true
                     }))
-                .AppendPathSegment("FilteredMenuOptions")
+
                 .WithOAuthBearerToken(token)
-                .SetQueryParams(getCddoDataAssetsRequest)
+                
                 .GetJsonAsync<CatalogueFilterOptions>(cancellationToken: cancellationToken);
 
             return response;
@@ -361,7 +392,27 @@ public class CatalogDataService : ICatalogDataService
 
                 // All responses from the Marketplace Api are serialized so that enums are returned as strings rather than
                 // their integer value, so we have to read them back with the same conversion.
-                var response = await _apiUrl
+                //var response = await _apiUrl
+                //    .WithSettings(x =>
+                //        x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
+                //        {
+                //            Converters = { new JsonStringEnumConverter() },
+                //            PropertyNameCaseInsensitive = true
+                //        }))
+                //    .AppendPathSegment("DataAsset/get-cddo-data-assets")
+                //    .WithOAuthBearerToken(token)
+                //    .SetQueryParams(getCddoDataAssetsRequest)
+                //    .GetJsonAsync<GetCddoDataAssetsResponse?>(cancellationToken: cancellationToken);
+
+                var baseUrl = $"{ApiBaseUrl}/";
+
+                var initiatingUserDetails = await _userProfilePresenter.GetInitiatingUserDetailsAsync();
+                if (initiatingUserDetails == null)
+                {
+                    _logger.LogError("Unable to get user details for initiating user");
+                }
+
+                var response = await baseUrl
                     .WithSettings(x =>
                         x.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
                         {
@@ -371,6 +422,7 @@ public class CatalogDataService : ICatalogDataService
                     .AppendPathSegment("DataAsset/get-cddo-data-assets")
                     .WithOAuthBearerToken(token)
                     .SetQueryParams(getCddoDataAssetsRequest)
+                    .SetQueryParam("OrganisationId", initiatingUserDetails?.OrganisationInformation.OrganisationId)
                     .GetJsonAsync<GetCddoDataAssetsResponse?>(cancellationToken: cancellationToken);
 
                 return response;

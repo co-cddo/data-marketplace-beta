@@ -1432,8 +1432,73 @@ public class CatalogDataDescriptionController(
         var dataAssetResponse = await
             _catalogDataService.GetDataAssetAsync(dataAssetId);
 
-        var validationErrorsResponse = await
-            _catalogDataService.GetDataAssetValidationErrorsAsync(dataAssetId);
+        //var validationErrorsResponse = await
+        //    _catalogDataService.GetDataAssetValidationErrorsAsync(dataAssetId);
+
+
+
+        GetCddoDataAssetValidationErrorsResponse validationErrorsResponse = new GetCddoDataAssetValidationErrorsResponse
+        {
+            PropertyValidationErrors = new List<DataAssetValidationPropertyResult>()
+        };
+        // Check if the Description is null or empty
+        if (string.IsNullOrEmpty(dataAssetResponse?.CddoDataAsset?.Description))
+        {
+            validationErrorsResponse.PropertyValidationErrors.Add(new DataAssetValidationPropertyResult
+            {
+                PropertyName = "Description",
+                Errors = new List<DataAssetValidationPropertyError> 
+                   {
+                       new DataAssetValidationPropertyError
+                       {
+                           CatalogAssetField = Agm.Catalog.DotNet.Dto.Models.CatalogData.CatalogAssetField.Description, // Assuming this is a valid value
+                           Error = "Enter required value.",
+                           ErrorSeverity = DataAssetValidationPropertyErrorSeverity.Blocking,
+                           ErrorType = DataAssetPropertyValidationErrorType.RequiredInputValueHasNotBeenProvided // Assuming this is a valid value
+                       }
+                   }
+            });
+        }
+        // Keywords
+        if (dataAssetResponse?.CddoDataAsset?.Keywords == null || !dataAssetResponse.CddoDataAsset.Keywords.Any())
+        {
+            validationErrorsResponse.PropertyValidationErrors.Add(new DataAssetValidationPropertyResult
+            {
+                PropertyName = "Keyword",
+                Errors = new List<DataAssetValidationPropertyError>
+                   {
+                       new DataAssetValidationPropertyError
+                       {
+                           CatalogAssetField = Agm.Catalog.DotNet.Dto.Models.CatalogData.CatalogAssetField.Keywords, 
+                           Error = "At least 1 values must be entered.",
+                           ErrorSeverity = DataAssetValidationPropertyErrorSeverity.Blocking,
+                           ErrorType = DataAssetPropertyValidationErrorType.RequiredInputValueHasNotBeenProvided
+                       }
+                   }
+            });
+        }
+        // point of contact 
+        if (
+                dataAssetResponse?.CddoDataAsset?.DataAssetContacts == null ||
+                 !dataAssetResponse.CddoDataAsset.DataAssetContacts.Any() ||
+                    dataAssetResponse.CddoDataAsset.DataAssetContacts.All(contact => string.IsNullOrWhiteSpace(contact.Email) && string.IsNullOrWhiteSpace(contact.Name))
+           )
+            {
+                validationErrorsResponse.PropertyValidationErrors.Add(new DataAssetValidationPropertyResult
+            {
+                PropertyName = "ContactPoint.Contact",
+                Errors = new List<DataAssetValidationPropertyError>
+                   {
+                       new DataAssetValidationPropertyError
+                       {
+                           CatalogAssetField = Agm.Catalog.DotNet.Dto.Models.CatalogData.CatalogAssetField.ContactPointEmailAddress,
+                           Error = "A Contact Point with role of 'contact' is required.",
+                           ErrorSeverity = DataAssetValidationPropertyErrorSeverity.Blocking,
+                           ErrorType = DataAssetPropertyValidationErrorType.RequiredInputValueHasNotBeenProvided
+                       }
+                   }
+            });
+        }
 
         var checkForPotentialDuplicatesToDataAssetResponse = await
             _catalogDataService.CheckForPotentialDuplicatesToDataAssetAsync(dataAssetId);

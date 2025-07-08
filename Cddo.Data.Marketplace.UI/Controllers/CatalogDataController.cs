@@ -1,6 +1,7 @@
 ﻿using Agm.Catalog.DotNet.Dto.Models.DataAssets;
 using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums;
 using Agm.Catalog.DotNet.Dto.Requests.DataAssets;
+using Agm.Catalog.DotNet.Dto.Responses.DataAssets;
 using Cddo.Data.Marketplace.Api.Dto.Requests.DataShareRequests;
 using Cddo.Data.Marketplace.Audit;
 using Cddo.Data.Marketplace.Logic.Services;
@@ -11,6 +12,8 @@ using Cddo.Data.Marketplace.UI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
+using System.Web;
 using static Cddo.Data.Marketplace.Audit.EventTypes;
 
 namespace Cddo.Data.Marketplace.UI.Controllers;
@@ -23,6 +26,16 @@ public class CatalogDataController : Controller
     private readonly ICatalogDataService _catalogDataService;
     private readonly IAppInsightsLogger _appInsightlogger;
     private readonly IUserRoleService _userRoleService;
+
+
+    // Lazy-loaded static property for the API base URL
+    // CatalogueDataService structure can get the base URL from the appsettings!
+    // You can use that pattern!
+    private static readonly Lazy<string> _apiBaseUrl = new(() =>
+        Environment.GetEnvironmentVariable("DM_CATALOGUE_BASE_URL")
+    );
+    // Getter for the API base URL
+    private static string ApiBaseUrl => _apiBaseUrl.Value;
 
     private sealed class SortOptions
     {
@@ -57,6 +70,16 @@ public class CatalogDataController : Controller
         var suggestions = await _catalogDataService.GetSearchSuggestionsForOrganisationDataAssetsAsync(searchText);
 
         return Ok(suggestions.ToList());
+    }
+
+    public static DataAssetType ConvertToDataAssetType(string dataAssetTypeString)
+    {
+        if (Enum.TryParse<DataAssetType>(dataAssetTypeString, ignoreCase: true, out var dataAssetType))
+        {
+            return dataAssetType;
+        }
+
+        throw new ArgumentException($"Invalid DataAssetType value: {dataAssetTypeString}");
     }
 
 
@@ -297,7 +320,53 @@ public class CatalogDataController : Controller
 
         if (User.Identity?.IsAuthenticated == true)
         {
-            var result = await _catalogDataService.GetDataAssetAsync(dataAssetId);
+            // TODO: IMPLEMENT: Stubbed out the call to the catalog data service
+            // var result = await _catalogDataService.GetDataAssetAsync(dataAssetId);
+
+            using var httpClient = new HttpClient();
+            var apiUrl = $"{ApiBaseUrl}/DataAsset/get-cddo-data-asset?DataAssetId={dataAssetId}";
+            GetCddoDataAssetResponse? dataAssetResponse = null;
+            try
+            {
+                var response = await httpClient.GetAsync(apiUrl);
+                var dataAssets = new List<CddoDataAsset>();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+
+                    dataAssetResponse = JsonSerializer.Deserialize<GetCddoDataAssetResponse>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    if (dataAssetResponse?.CddoDataAsset != null)
+                    {
+                        _logger.LogInformation("Successfully deserialized data asset  from API.");
+                    }
+                    else
+                    {
+                        _logger.LogWarning("No data asset  found in the API response.");
+                    }
+
+
+                    _logger.LogInformation("Successfully fetched data asset from external API.");
+                }
+                else
+                {
+                    _logger.LogError("Failed to fetch data assets. Status Code: {StatusCode}", response.StatusCode);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while calling the external API.");
+            }
+
+            var result = new GetCddoDataAssetResponse();
+            result = dataAssetResponse;
+
+            //END Stub
+
             if (result != null)
             {
                 var additionalProperties = new Dictionary<string, string>

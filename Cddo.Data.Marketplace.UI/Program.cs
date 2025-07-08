@@ -326,7 +326,18 @@ app.UseForwardedHeaders();
 var appLifetimeService = app.Services.GetRequiredService<AppLifeTimeService>();
 
 appLifetimeService.StartupTime = DateTime.UtcNow;
+
+string? apiBaseUrlFromEnv = Environment.GetEnvironmentVariable("DM_CATALOGUE_BASE_URL");
+if (string.IsNullOrEmpty(apiBaseUrlFromEnv))
+{
+
+    throw new InvalidOperationException("CRITICAL ERROR: The environment variable 'DM_CATALOGUE_BASE_URL' is not set. This is required for the application to start.");
+}
+
 var baseUrl = builder.Configuration["BaseUrl"].TrimEnd('/');
+
+
+
 app.Use(async (context, next) =>
 {
     context.Response.Cookies.Append("BaseUrl", baseUrl, new CookieOptions

@@ -12,7 +12,10 @@
     var dataAssets = Model.DataAssets;
     var totalNumberOfResults = Model.TotalNumberOfResults;
 
-    var themes = Model.Topics;
+    var themes = (Model.Topics ?? new List<string>())
+                  .Distinct()
+                  .ToList();
+
     var organisations = Model.Organisations;
     var accessRights = Model.AccessRights;    
 
@@ -45,43 +48,43 @@
 
 @section Styles
 {
-    <link rel="stylesheet" href="~/css/dataset-results.css" />
-    <style>
-        .suggestions {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            border: 1px solid #ccc;
-            border-top: none;
-            max-height: 150px;
-            overflow-y: auto;
-            position: absolute;
-            background-color: white;
-            width: calc(100% - 30px);
-            left: 0;
-            top: 100%;
-            z-index: 1000;
-            box-sizing: border-box;
-        }
+<link rel="stylesheet" href="~/css/dataset-results.css" />
+<style>
+    .suggestions {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #ccc;
+    border-top: none;
+    max-height: 150px;
+    overflow-y: auto;
+    position: absolute;
+    background-color: white;
+    width: calc(100% - 30px);
+    left: 0;
+    top: 100%;
+    z-index: 1000;
+    box-sizing: border-box;
+    }
 
-            .suggestions li {
-                padding: 10px;
-                cursor: pointer;
-            }
+    .suggestions li {
+    padding: 10px;
+    cursor: pointer;
+    }
 
-                .suggestions li:hover {
-                    background-color: #f0f0f0;
-                }
+    .suggestions li:hover {
+    background-color: #f0f0f0;
+    }
 
-        .govuk-tag--grey {
-            text-transform: inherit !important;
-            color: #282d30 !important;
-        }
+    .govuk-tag--grey {
+    text-transform: inherit !important;
+    color: #282d30 !important;
+    }
 
-        .accordion-button:not(.collapsed) {
-            background-color: #fff;
-        }
-    </style>
+    .accordion-button:not(.collapsed) {
+    background-color: #fff;
+    }
+</style>
 }
 
 @section Scripts

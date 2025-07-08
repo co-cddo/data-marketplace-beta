@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Net;
+using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using Agm.Catalog.DotNet.Dto.Models.DataAssets;
 using Agm.Catalog.DotNet.Dto.Models.DataAssets.Enums;
@@ -8,6 +10,7 @@ using Agm.Catalog.DotNet.Dto.Models.DataAssets.ManagementData.DcatUk.V3_1;
 using Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1;
 using Agm.Catalog.DotNet.Dto.Models.DataAssets.Profiles.DcatUk.V3_1.Enums;
 using Agm.Catalog.DotNet.Dto.Requests.DataAssets;
+using Agm.Catalog.DotNet.Dto.Responses.DataAssets;
 using Agm.Catalog.DotNet.Logic.Services.Ckan;
 using Agm.Catalog.DotNet.Logic.Services.Ckan.Configuration;
 using Agm.Catalog.DotNet.Logic.Services.DataAssets.DataAssetConversion;
@@ -28,6 +31,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Cddo.Data.Marketplace.Logic.Services.DataAssets;
 
+// TODO: IMPLEMENT: Stubbed out interim class 
+public class AddDataAssetResponse
+{
+    public Guid DataAssetId { get; set; }
+}
+// END Stub
+
 public class DataAssetService(
     ILogger<DataAssetService> logger,
     IProfiledDataAssetConverterPresenter profiledDataAssetConverterPresenter,
@@ -43,6 +53,14 @@ public class DataAssetService(
     IAgmUserInformationBuilder agmUserInformationBuilder)
     : IDataAssetService
 {
+    // Lazy-loaded static property for the API base URL
+    // CatalogueDataService structure can get the base URL from the appsettings!
+    // You can use that pattern!
+    private static readonly Lazy<string> _apiBaseUrl = new(() =>
+        Environment.GetEnvironmentVariable("DM_CATALOGUE_BASE_URL")
+    );
+    // Getter for the API base URL
+    private static string ApiBaseUrl => _apiBaseUrl.Value;
     async Task<IServiceOperationDataResult<IAddDataAssetResult>> IDataAssetService.AddProfiledDataAssetAsync(
         IUserDetails initiatingUserDetails,
         string profileId,
@@ -78,8 +96,89 @@ public class DataAssetService(
                 agmUserDetails,
                 null);
 
-            var createdDataAssetId = await ckanConnection.AddCatalogEntryAsync(
-                ckanCatalogEntryWrite);
+            // TODO: IMPLEMENT: Stubbed out 
+            //var createdDataAssetId = await ckanConnection.AddCatalogEntryAsync(
+            //    ckanCatalogEntryWrite);
+
+
+
+            var createdDataAssetId = new Guid();
+
+            var httpClient = new HttpClient();
+            var apiUrl = $"{ApiBaseUrl}/DataAsset/add-profiled-data-asset";
+
+            // Create the request payload
+            var requestPayload = new
+            {
+                profileId = profiledDataAsset.ProfileId,
+                dataAssetType = profiledDataAsset.DataAssetType,
+                payload = profiledDataAsset.Payload,
+                managementMetadata = new
+                {
+                    dataAssetStatus = profiledDataAsset.ManagementMetadata.DataAssetStatus,
+                    valid = profiledDataAsset.ManagementMetadata.Valid,
+                    productId = profiledDataAsset.ManagementMetadata.ProductId,
+                    organisationId = profiledDataAsset.ManagementMetadata.OrganisationId,
+                    domainId = profiledDataAsset.ManagementMetadata.DomainId,
+                    dataOwnerId = profiledDataAsset.ManagementMetadata.DataOwnerId,
+                    permissions = profiledDataAsset.ManagementMetadata.Permissions
+                },
+                actionSource = "Unknown"
+            };
+
+            // Serialize the payload to JSON
+            var jsonPayload = JsonSerializer.Serialize(requestPayload, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+
+            });
+
+            // Create the HTTP request
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, apiUrl)
+            {
+                Content = new StringContent(jsonPayload, Encoding.UTF8, "application/json")
+            };
+            httpRequest.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("text/plain"));
+
+
+
+            Console.WriteLine("HttpRequest Content:");
+            Console.WriteLine(await httpRequest.Content.ReadAsStringAsync());
+
+
+            // Send the request
+            var response = await httpClient.SendAsync(httpRequest);
+
+            // Handle the response
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                //just for this line I defined a class AddDataAssetResponse above! TODO: apply a better approach.
+                var addDataAssetResponse = JsonSerializer.Deserialize<AddDataAssetResponse>(responseContent, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (addDataAssetResponse != null)
+                {
+                    createdDataAssetId = addDataAssetResponse.DataAssetId;
+                    Console.WriteLine($"DataAssetId: {createdDataAssetId}");
+                }
+                else
+                {
+                    Console.WriteLine("Failed to deserialize the response.");
+                }
+
+            }
+            else
+            {
+                Console.WriteLine($"Request failed with status code: {response.StatusCode}");
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(errorContent);
+            }
+            //END Stub
 
             var dataAssetValidation = profileDataAssetConverter.GetDataAssetValidation();
 
@@ -125,55 +224,180 @@ public class DataAssetService(
 
         try
         {
-            var profileDataAssetConverter =
-                profiledDataAssetConverterPresenter.GetProfiledDataAssetConverterForProfileId(profileId);
+            // TODO: IMPLEMENT: Stubbed for PATCH RECORD
 
-            var ckanCatalogEntryWrite =
-                profileDataAssetConverter.ConvertProfiledPartialDataAssetPayloadToCkanCatalogEntryWrite(
-                    new ProfiledPartialDataAsset
-                    {
-                        ProfileId = profileId,
-                        DataAssetType = dataAssetType,
-                        Payload = payload,
-                        ManagementMetadata = managementMetadata
-                    });
+            // RETRIEVE  THE CATALOGUE RECORD
+            // CHECK IF THE USER HAS RIGHT TO DO
+            //    user should be in the same Org, User should have one of these roles: Publisher, Org Admin or Sys Admin
+            // HOWEVER This code does not check the roles here: It is a bug and will be fixed future, not now!
+            // UPDATE THE RECORD
+            // LIST THE ERRORS
+            //   HERE IT IS PATCH SO ONLY FOCUS ON THE PATCHED FIELD 
 
-            var existingCkanCatalogEntry = await ckanConnection.GetCatalogEntryWithProfileAsync(
-                profileId,
-                ckanCatalogEntryWrite.Id!.Value,
-                new CatalogEntriesOrganisationFilter
+
+            // GET DATA FROM CATALOGUE and CHECK IF ALLOWED
+
+            using var document = JsonDocument.Parse(payload);
+            Guid dataAssetId = Guid.Empty;
+            // Extract the DataAssetID property
+            if (document.RootElement.TryGetProperty("Identifier", out var dataAssetIdElement))
+            {
+                dataAssetId = dataAssetIdElement.GetGuid(); // Assuming DataAssetID is a GUID
+
+            }
+
+            using var httpClient2 = new HttpClient();
+            var apiUrl2 = $"{ApiBaseUrl}/DataAsset/get-cddo-data-asset?DataAssetId={dataAssetId}";
+
+            var response2 = await httpClient2.GetAsync(apiUrl2);
+            GetCddoDataAssetResponse? existingCddoDataAsset2 = null;
+            if (response2.IsSuccessStatusCode)
+            {
+                var responseContent = await response2.Content.ReadAsStringAsync();
+                existingCddoDataAsset2 = JsonSerializer.Deserialize<GetCddoDataAssetResponse>(responseContent, new JsonSerializerOptions
                 {
-                    FilterByOrganisationDiscoverability = false,
-                    FilterByOrganisationOwnership = false
+                    PropertyNameCaseInsensitive = true
                 });
+            }
 
-            var existingCddoDataAsset =
-                profileDataAssetConverter.ConvertCkanCatalogEntryReadToCddoDataAsset(existingCkanCatalogEntry);
+            // END OF GET DATA FROM CATALOGUE AND CHECK IF ALLOWED
+            // Modify the following line to extract the `CddoDataAsset` property from `GetCddoDataAssetResponse`
+            // and pass it to the `DoesInitiatingUserHaveAuthorityToAffectCkanCatalogEntry` method.
 
-            if (!DoesInitiatingUserHaveAuthorityToAffectCkanCatalogEntry(initiatingUserDetails, existingCddoDataAsset))
+            if (!DoesInitiatingUserHaveAuthorityToAffectCkanCatalogEntry(initiatingUserDetails, existingCddoDataAsset2.CddoDataAsset))
             {
                 throw new UnAuthorizedAccessToDataAssetException();
             }
 
-            var createdDataAssetId = await ckanConnection.PatchCatalogEntryAsync(
-                ckanCatalogEntryWrite,
-                existingCkanCatalogEntry);
+            // PATCH DATA 
+            var httpClient = new HttpClient();
+            var apiUrl = $"{ApiBaseUrl}/DataAsset/patch-profiled-data-asset";
 
-            var dataAssetValidation = profileDataAssetConverter.GetDataAssetValidation();
+            // Create the request payload
+            var requestPayload = new
+            {
+                profileId = profileId,
+                dataAssetType = dataAssetType,
+                payload = payload,
+                managementMetadata = managementMetadata,
+                actionSource = "Unknown"
+            };
 
-            // Validate the properties that were provided on the patched asset, and record any errors.
-            // Do not include missing properties, because this is a patch, so not all properties must
-            // be provided
 
-            var dataAssetValidationResult = dataAssetValidation.ValidateCkanCatalogEntryWrite(
-                ckanCatalogEntryWrite, existingCddoDataAsset.DataAssetType, false);
+            // Serialize the payload to JSON
+            var jsonPayload = JsonSerializer.Serialize(requestPayload, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
 
-            DoRecordDataAssetUpdateValidationErrors(actionSource, dataAssetValidationResult, initiatingUserDetails);
+            });
+
+            // Create the HTTP request
+            var httpRequest = new HttpRequestMessage(HttpMethod.Patch, apiUrl)
+            {
+                Content = new StringContent(jsonPayload, Encoding.UTF8, "application/json")
+            };
+            httpRequest.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("text/plain"));
+
+
+            // Send the request
+            var response = await httpClient.SendAsync(httpRequest);
+
+            // Handle the response
+            var updatedDataAssetId = Guid.Empty;
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                //just for this line I defined a class AddDataAssetResponse above! TODO: apply a better approach.
+                var addDataAssetResponse = JsonSerializer.Deserialize<AddDataAssetResponse>(responseContent, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (addDataAssetResponse != null)
+                {
+                    updatedDataAssetId = addDataAssetResponse.DataAssetId;
+                    Console.WriteLine($"DataAssetId: {updatedDataAssetId}");
+                }
+                else
+                {
+                    Console.WriteLine("Failed to deserialize the response.");
+                }
+
+            }
+            else
+            {
+                Console.WriteLine($"Request failed with status code: {response.StatusCode}");
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(errorContent);
+            }
+            
+
+
+
 
             return serviceOperationResultFactory.CreateSuccessfulDataResult(new PatchDataAssetResult
             {
-                DataAssetId = createdDataAssetId
+                DataAssetId = updatedDataAssetId
             });
+            // END OF PATCH DATA
+
+
+            // var profileDataAssetConverter =
+            //     profiledDataAssetConverterPresenter.GetProfiledDataAssetConverterForProfileId(profileId);
+
+            // var ckanCatalogEntryWrite =
+            //     profileDataAssetConverter.ConvertProfiledPartialDataAssetPayloadToCkanCatalogEntryWrite(
+            //         new ProfiledPartialDataAsset
+            //         {
+            //             ProfileId = profileId,
+            //             DataAssetType = dataAssetType,
+            //             Payload = payload,
+            //             ManagementMetadata = managementMetadata
+            //         });
+
+            // var existingCkanCatalogEntry = await ckanConnection.GetCatalogEntryWithProfileAsync(
+            //     profileId,
+            //     ckanCatalogEntryWrite.Id!.Value,
+            //     new CatalogEntriesOrganisationFilter
+            //     {
+            //         FilterByOrganisationDiscoverability = false,
+            //         FilterByOrganisationOwnership = false
+            //     });
+
+            // var existingCddoDataAsset =
+            //     profileDataAssetConverter.ConvertCkanCatalogEntryReadToCddoDataAsset(existingCkanCatalogEntry);
+
+            // if (!DoesInitiatingUserHaveAuthorityToAffectCkanCatalogEntry(initiatingUserDetails, existingCddoDataAsset))
+            // {
+            //     throw new UnAuthorizedAccessToDataAssetException();
+            // }
+
+            // var createdDataAssetId = await ckanConnection.PatchCatalogEntryAsync(
+            //     ckanCatalogEntryWrite,
+            //     existingCkanCatalogEntry);
+
+            // var dataAssetValidation = profileDataAssetConverter.GetDataAssetValidation();
+
+            // //Validate the properties that were provided on the patched asset, and record any errors.
+            // //Do not include missing properties, because this is a patch, so not all properties must
+            // //be provided
+
+            //var dataAssetValidationResult = dataAssetValidation.ValidateCkanCatalogEntryWrite(
+            //    ckanCatalogEntryWrite, existingCddoDataAsset.DataAssetType, false);
+
+            // DoRecordDataAssetUpdateValidationErrors(actionSource, dataAssetValidationResult, initiatingUserDetails);
+
+
+
+
+            // return serviceOperationResultFactory.CreateSuccessfulDataResult(new PatchDataAssetResult
+            // {
+            //     DataAssetId = createdDataAssetId
+            // });
+
+
         }
         catch (ProfiledDataAssetNotFoundException ex)
         {
@@ -214,21 +438,74 @@ public class DataAssetService(
             var catalogEntriesOrganisationFilter = BuildCatalogEntriesOrganisationFilter(
                 initiatingUserDetails, false, false);
 
-            var existingCkanCatalogEntry = await ckanConnection.GetCatalogEntryAsync(
-                dataAssetId,
-            catalogEntriesOrganisationFilter);
 
-            var profileDataAssetConverter = profiledDataAssetConverterPresenter.GetProfiledDataAssetConverterForProfileId(profileId);
+            // TODO: IMPLEMENT: Stubbed out the call to CkanConnection.GetCatalogEntryAsync
+            //var existingCkanCatalogEntry = await ckanConnection.GetCatalogEntryAsync(
+            //    dataAssetId,
+            //catalogEntriesOrganisationFilter);
 
-            var existingCddoDataAsset =
-                profileDataAssetConverter.ConvertCkanCatalogEntryReadToCddoDataAsset(existingCkanCatalogEntry);
+            using var httpClient = new HttpClient();
+            var apiUrl = $"{ApiBaseUrl}/DataAsset/get-cddo-data-asset?DataAssetId={dataAssetId}";
+            GetCddoDataAssetResponse? existingCddoDataAsset = null;
+            var cddoDataAsset = new CddoDataAsset();
+  
+                var response = await httpClient.GetAsync(apiUrl);
+                var dataAssets = new List<CddoDataAsset>();
 
-            if (!DoesInitiatingUserHaveAuthorityToAffectCkanCatalogEntry(initiatingUserDetails, existingCddoDataAsset))
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+
+                existingCddoDataAsset = JsonSerializer.Deserialize<GetCddoDataAssetResponse>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+ 
+                }
+
+ 
+
+            if (existingCddoDataAsset == null || initiatingUserDetails == null)
+            {
+                throw new InvalidOperationException("Required data is missing.");
+            }
+            
+            if (existingCddoDataAsset.CddoDataAsset.OrganisationId != initiatingUserDetails.UserIdSet.OrganisationId)
             {
                 throw new UnAuthorizedAccessToDataAssetException();
             }
 
-            await ckanConnection.DeleteCatalogEntryAsync(dataAssetId);
+            //var profileDataAssetConverter = profiledDataAssetConverterPresenter.GetProfiledDataAssetConverterForProfileId(profileId);
+
+            //var existingCddoDataAsset =
+            //    profileDataAssetConverter.ConvertCkanCatalogEntryReadToCddoDataAsset(existingCkanCatalogEntry);
+
+            //if (!DoesInitiatingUserHaveAuthorityToAffectCkanCatalogEntry(initiatingUserDetails, existingCddoDataAsset))
+            //{
+            //    throw new UnAuthorizedAccessToDataAssetException();
+            //}
+            
+            //await ckanConnection.DeleteCatalogEntryAsync(dataAssetId);
+
+            
+            apiUrl = $"{ApiBaseUrl}/DataAsset/delete-profiled-data-asset?DataAssetId={dataAssetId}&ProfileId={profileId}";
+            var httpRequest = new HttpRequestMessage(HttpMethod.Delete, apiUrl);
+            httpRequest.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("text/plain"));
+
+            response = await httpClient.SendAsync(httpRequest);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Delete request succeeded.");
+            }
+            else
+            {
+                Console.WriteLine($"Delete request failed with status code: {response.StatusCode}");
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error content: {errorContent}");
+            }
+            // END stub 
 
             return serviceOperationResultFactory.CreateSuccessfulDataResult(new DeleteDataAssetResult
             {
@@ -359,6 +636,7 @@ public class DataAssetService(
             var catalogEntriesOrganisationFilter = BuildCatalogEntriesOrganisationFilter(
                 initiatingUserDetails, false, false);
 
+
             var ckanCatalogEntry = await ckanConnection.GetCatalogEntryWithProfileAsync(
                 profileId,
                 dataAssetId,
@@ -392,20 +670,20 @@ public class DataAssetService(
     }
 
     async Task<IServiceOperationDataResult<IGetCddoDataAssetsResult>> IDataAssetService.GetCddoDataAssetsAsync(
-        IUserDetails initiatingUserDetails,
-        bool? onlyIncludeRecordsDiscoverableByOrganisationOfCallingUser,
-        bool? onlyIncludeRecordsOwnedByOrganisationOfCallingUser,
-        IEnumerable<DataAssetType>? dataAssetTypes,
-        IEnumerable<DataAssetStatus>? dataAssetStatuses,
-        int startIndex,
-        int numberOfAssets,
-        DataAssetsSortField sortField,
-        DataAssetsSortDirection sortDirection,
-        string? searchText,
-        IEnumerable<string>? publishers,
-        IEnumerable<string>? themes,
-        IEnumerable<string>? entryTypes,
-        IEnumerable<string>? accessRights)
+    IUserDetails initiatingUserDetails,
+    bool? onlyIncludeRecordsDiscoverableByOrganisationOfCallingUser,
+    bool? onlyIncludeRecordsOwnedByOrganisationOfCallingUser,
+    IEnumerable<DataAssetType>? dataAssetTypes,
+    IEnumerable<DataAssetStatus>? dataAssetStatuses,
+    int startIndex,
+    int numberOfAssets,
+    DataAssetsSortField sortField,
+    DataAssetsSortDirection sortDirection,
+    string? searchText,
+    IEnumerable<string>? publishers,
+    IEnumerable<string>? themes,
+    IEnumerable<string>? entryTypes,
+    IEnumerable<string>? accessRights)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(startIndex);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(numberOfAssets);
@@ -438,7 +716,7 @@ public class DataAssetService(
             var catalogEntriesOrganisationFilter = BuildCatalogEntriesOrganisationFilter(
                 initiatingUserDetails,
                 onlyIncludeRecordsDiscoverableByOrganisationOfCallingUser == true,
-                onlyIncludeRecordsOwnedByOrganisationOfCallingUser == true);    
+                onlyIncludeRecordsOwnedByOrganisationOfCallingUser == true);
 
             var ckanCatalogEntrySet = await ckanConnection.GetCatalogEntriesAsync(
                  dataAssetTypes,
@@ -478,11 +756,47 @@ public class DataAssetService(
             var catalogEntriesOrganisationFilter = BuildCatalogEntriesOrganisationFilter(
                 initiatingUserDetails, false, false);
 
-            var ckanCatalogEntry = await ckanConnection.GetCatalogEntryAsync(
-                dataAssetId,
-                catalogEntriesOrganisationFilter);
+            // TODO: IMPLEMENT: Stubbed out the call to CkanConnection.GetCatalogEntryAsync
+            //var ckanCatalogEntry = await ckanConnection.GetCatalogEntryAsync(
+            //    dataAssetId,
+            //    catalogEntriesOrganisationFilter);
 
-            var cddoDataAsset = cddoDataAssetConverter.ConvertCkanCatalogEntryReadToCddoDataAsset(ckanCatalogEntry);
+            using var httpClient = new HttpClient();
+            var apiUrl = $"{ApiBaseUrl}/DataAsset/get-cddo-data-asset?DataAssetId={dataAssetId}";
+            GetCddoDataAssetResponse? dataAssetResponse = null;
+            var cddoDataAsset = new CddoDataAsset();
+            try
+            {
+                var response = await httpClient.GetAsync(apiUrl);
+                var dataAssets = new List<CddoDataAsset>();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+
+                    dataAssetResponse = JsonSerializer.Deserialize<GetCddoDataAssetResponse>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+
+                    if (dataAssetResponse != null && dataAssetResponse.CddoDataAsset != null)
+                    {
+                        cddoDataAsset = dataAssetResponse.CddoDataAsset;
+                    }
+                    else
+                    {
+                        // Or handle it as per your application's requirements
+                        logger.LogWarning("dataAssetResponse or CddoDataAsset is null. Using a default CddoDataAsset instance.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "An error occurred while calling the external API.");
+            }
+
+            // END stub
 
             return serviceOperationResultFactory.CreateSuccessfulDataResult(new GetCddoDataAssetResult
             {
@@ -1311,7 +1625,7 @@ public class DataAssetService(
             }
         };
 
-        
+
         return managementMetadata;
     }
 
